@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				UseUnicodeResponseFiles="true"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\;.\..\..\src;.\..\..\thirdparts\log4cxx\include;&quot;.\..\..\thirdparts\CeGUI-0.7.7\include&quot;"
+				AdditionalIncludeDirectories=".\;.\..\..\DrawSpace\src;.\..\..\DrawSpace_thirdparts\log4cxx\include;&quot;.\..\..\DrawSpace_thirdparts\CeGUI-0.7.7\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -63,8 +63,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="drawspace.lib log4cxx.lib"
+				OutputFile="$(SolutionDir)\bin\$(ProjectName).exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=".\..\..\libs;.\..\..\thirdparts\log4cxx\lib\msvc\release"
+				AdditionalLibraryDirectories=".\..\..\DrawSpace\libs;.\..\..\DrawSpace_thirdparts\log4cxx\lib\msvc\release"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -188,7 +189,7 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\templates\win32\dsappentrypoint.cpp"
+			RelativePath="..\..\DrawSpace\templates\win32\dsappentrypoint.cpp"
 			>
 		</File>
 	</Files>
