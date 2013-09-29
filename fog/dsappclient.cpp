@@ -4,6 +4,7 @@
 using namespace DrawSpace;
 using namespace DrawSpace::Interface;
 using namespace DrawSpace::Core;
+using namespace DrawSpace::Gui;
 
 dsAppClient* dsAppClient::m_instance = NULL;
 
@@ -146,14 +147,9 @@ bool dsAppClient::OnIdleAppInit( void )
 {
     bool status;
 
-    Shader* vertex_shader;
-    Shader* pixel_shader;
-
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::Plugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
     renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
 
-
-    //m_texturepass = new IntermediatePass( "texture_pass" );
     m_texturepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
 
     m_texturepass->GetRenderingQueue()->EnableDepthClearing( true );
@@ -162,7 +158,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    m_fogintpass = new IntermediatePass( "fogint_pass" );
+    m_fogintpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "fogint_pass" ) );
     m_fogintpass->GetRenderingQueue()->EnableDepthClearing( true );
     m_fogintpass->GetRenderingQueue()->EnableTargetClearing( true );
     m_fogintpass->GetRenderingQueue()->SetTargetClearingColor( 255, 0, 0 );
@@ -170,16 +166,16 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    vertex_shader = new Shader( "fogblend.vsh", false );
-    pixel_shader = new Shader( "fogblend.psh", false );
-
-    vertex_shader->LoadFromFile();
-    pixel_shader->LoadFromFile();
-
-    m_fogblendpass = new IntermediatePass( "fogblend_pass" );
+    m_fogblendpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "fogblend_pass" ) );
     m_fogblendpass->CreateViewportQuad();
-    m_fogblendpass->GetViewportQuad()->GetFx()->AddShader( vertex_shader );
-    m_fogblendpass->GetViewportQuad()->GetFx()->AddShader( pixel_shader );
+
+
+    m_fogblendpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogblend.vsh", false ) ) );
+    m_fogblendpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogblend.psh", false ) ) );
+    m_fogblendpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_fogblendpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+
+
     m_fogblendpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
     m_fogblendpass->GetViewportQuad()->SetTexture( m_fogintpass->GetTargetTexture(), 1 );
 
@@ -191,16 +187,12 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    vertex_shader = new Shader( "texture.vsh", false );
-    pixel_shader = new Shader( "texture.psh", false );
-
-    vertex_shader->LoadFromFile();
-    pixel_shader->LoadFromFile();
-
-    m_finalpass = new FinalPass( "final_pass" );
+    m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
     m_finalpass->CreateViewportQuad();
-    m_finalpass->GetViewportQuad()->GetFx()->AddShader( vertex_shader );
-    m_finalpass->GetViewportQuad()->GetFx()->AddShader( pixel_shader );
+    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_finalpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_finalpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
     m_finalpass->GetViewportQuad()->SetTexture( m_fogblendpass->GetTargetTexture(), 0 );
@@ -217,64 +209,40 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ///////////////////////////////////////////////////////////////
     
+    m_chunknode = _DRAWSPACE_NEW_( ChunkNode, ChunkNode( "cube" ) );
     
+    m_chunknode->RegisterPassRenderingNode( "fogint_pass", _DRAWSPACE_NEW_( RenderingNode, RenderingNode ) );
+    m_chunknode->GetNodeFromPass( "fogint_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.vsh", false ) ) );
+    m_chunknode->GetNodeFromPass( "fogint_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.psh", false ) ) );
+    m_chunknode->GetNodeFromPass( "fogint_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_chunknode->GetNodeFromPass( "fogint_pass" )->GetFx()->GetShader( 1 )->LoadFromFile();
 
-    DrawSpace::Core::RenderingNode* fogint_rnode = new DrawSpace::Core::RenderingNode;
-    
-    vertex_shader = new Shader( "fogintensity.vsh", false );
-    pixel_shader = new Shader( "fogintensity.psh", false );
+    m_chunknode->GetNodeFromPass( "fogint_pass" )->GetFx()->AddShaderRealParameter( 0, "fog_intensity", 12 );
+    m_chunknode->GetNodeFromPass( "fogint_pass" )->GetFx()->SetShaderReal( "fog_intensity", 0.2 );
 
-    vertex_shader->LoadFromFile();
-    pixel_shader->LoadFromFile();
-
-    fogint_rnode->GetFx()->AddShader( vertex_shader );
-    fogint_rnode->GetFx()->AddShader( pixel_shader );
-
-    fogint_rnode->GetFx()->AddShaderRealParameter( 0, "fog_intensity", 12 );
-    fogint_rnode->GetFx()->SetShaderReal( "fog_intensity", 0.2 );
-
-
-    fogint_rnode->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-    fogint_rnode->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-
-
-    
-    DrawSpace::Core::RenderingNode* texture_rnode = new DrawSpace::Core::RenderingNode;
-
-    vertex_shader = new Shader( "texture.vsh", false );
-    pixel_shader = new Shader( "texture.psh", false );
-
-    vertex_shader->LoadFromFile();
-    pixel_shader->LoadFromFile();
-
-    texture_rnode->GetFx()->AddShader( vertex_shader );
-    texture_rnode->GetFx()->AddShader( pixel_shader );
-
-    texture_rnode->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-    texture_rnode->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    texture_rnode->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-    texture_rnode->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-
-    Texture* texture_metal;
-    texture_metal = new Texture( "bellerophon.jpg" );
-    texture_metal->LoadFromFile();
-    
-    texture_rnode->SetTexture( texture_metal, 0 );
+    m_chunknode->GetNodeFromPass( "fogint_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_chunknode->GetNodeFromPass( "fogint_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
 
 
 
+    m_chunknode->RegisterPassRenderingNode( "texture_pass", _DRAWSPACE_NEW_( RenderingNode, RenderingNode ) );
+    m_chunknode->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_chunknode->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_chunknode->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_chunknode->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 1 )->LoadFromFile();
 
+    m_chunknode->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_chunknode->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_chunknode->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_chunknode->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
-    m_chunknode = new DrawSpace::ChunkNode( "cube" );
+    m_chunknode->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
+    m_chunknode->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
 
     DrawSpace::Utils::AC3DMesheImport importer;
     m_chunknode->GetMeshe()->SetImporter( &importer );
     m_chunknode->GetMeshe()->LoadFromFile( "object.ac", 0 );
-
-    m_chunknode->RegisterPassRenderingNode( "fogint_pass", fogint_rnode );
-    m_chunknode->RegisterPassRenderingNode( "texture_pass", texture_rnode );
-
 
     m_scenegraph.RegisterNode( m_chunknode );
     m_chunknode->LoadAssets();
@@ -282,15 +250,17 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    m_transform = new SceneTransform();
-    m_transformtask = new DrawSpace::Core::Task<SceneTransform>( DrawSpace::Core::Task<SceneTransform>::Kill );
+    m_transform = _DRAWSPACE_NEW_( SceneTransform, SceneTransform );
+    m_transformtask = _DRAWSPACE_NEW_( DrawSpace::Core::Task<SceneTransform>, DrawSpace::Core::Task<SceneTransform>( DrawSpace::Core::Task<SceneTransform>::Kill ) );
+
+
     m_transformtask->Startup( m_transform );
 
 
     //////////////////////////////////////////////////////////////
 
     DrawSpace::Utils::CBFGFontImport fontimporter;
-    m_font = new DrawSpace::Core::Font;
+    m_font = _DRAWSPACE_NEW_( Font, Font );
 
     m_font->SetImporter( &fontimporter );
 
@@ -302,15 +272,15 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_fpstext_widget = new DrawSpace::Gui::TextWidget( "fps_text_widget", 20, 10, m_font, false );
+    m_fpstext_widget = _DRAWSPACE_NEW_( TextWidget, TextWidget( "fps_text_widget", 20, 10, m_font, false ) );
 
-    m_fpstext_widget->GetImageFx()->AddShader( new Shader( "text.vsh", false ) );
-    m_fpstext_widget->GetImageFx()->AddShader( new Shader( "text.psh", false ) );
+    m_fpstext_widget->GetImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
+    m_fpstext_widget->GetImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
     m_fpstext_widget->GetImageFx()->GetShader( 0 )->LoadFromFile();
     m_fpstext_widget->GetImageFx()->GetShader( 1 )->LoadFromFile();
 
-    m_fpstext_widget->GetTextFx()->AddShader( new Shader( "text.vsh", false ) );
-    m_fpstext_widget->GetTextFx()->AddShader( new Shader( "text.psh", false ) );
+    m_fpstext_widget->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
+    m_fpstext_widget->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
     m_fpstext_widget->GetTextFx()->GetShader( 0 )->LoadFromFile();
     m_fpstext_widget->GetTextFx()->GetShader( 1 )->LoadFromFile();
     m_fpstext_widget->GetTextFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
