@@ -9,35 +9,58 @@ class dsAppClient : public DrawSpace::App
 {
 protected:
 
-    static dsAppClient*                     m_instance;
+    typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Gui::Widget*>   WidgetEventHandler;
 
-    DrawSpace::FinalPass*                   m_finalpass;
-    DrawSpace::IntermediatePass*            m_texturepass;
+    static dsAppClient*                                                             m_instance;
+
+    DrawSpace::FinalPass*                                                           m_finalpass;
+    DrawSpace::IntermediatePass*                                                    m_texturepass;
     
 
-    DrawSpace::Scenegraph                   m_scenegraph;
-    DrawSpace::ChunkNode*                   m_chunknode;
+    DrawSpace::Scenegraph                                                           m_scenegraph;
+    DrawSpace::ChunkNode*                                                           m_chunknode;
 
 
-    DrawSpace::Core::Font*                  m_font;
+    DrawSpace::Core::Font*                                                          m_font;
 
-    dsreal                                  m_yangle;
-    dsreal                                  m_xangle;
-    dsreal                                  m_zangle;
-    DrawSpace::Utils::TimeManager           m_timer;
+    dsreal                                                                          m_yangle;
+    dsreal                                                                          m_xangle;
+    dsreal                                                                          m_zangle;
+    DrawSpace::Utils::TimeManager                                                   m_timer;
 
-    bool                                    m_mouselb;
+    bool                                                                            m_mouselb;
 
-    DrawSpace::Image*                       m_image1;
+    DrawSpace::Image*                                                               m_image1;
 
-    long                                    m_xmouse;
-    long                                    m_ymouse;
+    long                                                                            m_xmouse;
+    long                                                                            m_ymouse;
 
-    DrawSpace::Gui::TextWidget*             m_text_widget;
+    DrawSpace::Gui::TextWidget*                                                     m_text_widget;
 
-    DrawSpace::Gui::TextWidget*             m_fpstext_widget;
+    DrawSpace::Gui::TextWidget*                                                     m_fpstext_widget;
+
+    DrawSpace::Gui::TextWidget*                                                     m_text_widget_2;
+
+    DrawSpace::Gui::TextWidget*                                                     m_text_widget_3;
+
+    DrawSpace::SystemMouseInputProvider                                             m_mouse_input;
+
+    WidgetEventHandler*                                                             m_mousein_eventhandler;
+    WidgetEventHandler*                                                             m_mouseout_eventhandler;
+    WidgetEventHandler*                                                             m_mouseleftbuttondown_eventhandler;
+    WidgetEventHandler*                                                             m_mouseleftbuttonup_eventhandler;
+    WidgetEventHandler*                                                             m_mouserightbuttondown_eventhandler;
+    WidgetEventHandler*                                                             m_mouserightbuttonup_eventhandler;
+
 
     dsAppClient( void );
+
+    void on_mousein( DrawSpace::Gui::Widget* p_widget );
+    void on_mouseout( DrawSpace::Gui::Widget* p_widget );
+    void on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget );
+    void on_mouseleftbuttonup( DrawSpace::Gui::Widget* p_widget );
+    void on_mouserightbuttondown( DrawSpace::Gui::Widget* p_widget );
+    void on_mouserightbuttonup( DrawSpace::Gui::Widget* p_widget );
 
 public:
 
