@@ -314,7 +314,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////////
     
-    m_image1 = _DRAWSPACE_NEW_( Image, Image( (long)20, (long)20 ) );
+    m_image1 = _DRAWSPACE_NEW_( Image, Image( (long)8, (long)8 ) );
 
     m_image1->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texturekeyed.vsh", false ) ) );
     m_image1->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texturekeyed.psh", false ) ) );
@@ -335,6 +335,7 @@ bool dsAppClient::OnIdleAppInit( void )
         return false;
     }
 
+    m_mouse_input.RegisterImage( m_image1 );
     m_mouse_input.RegisterWidget( m_text_widget );
 
     return true;

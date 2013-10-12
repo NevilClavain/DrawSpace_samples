@@ -43,7 +43,8 @@ protected:
 
     DrawSpace::Gui::TextWidget*                                                     m_text_widget_3;
 
-    DrawSpace::SystemMouseInputProvider                                             m_mouse_input;
+    //DrawSpace::SystemMouseInputProvider                                             m_mouse_input;
+    DrawSpace::ImageMouseInputProvider                                             m_mouse_input;
 
     WidgetEventHandler*                                                             m_mousein_eventhandler;
     WidgetEventHandler*                                                             m_mouseout_eventhandler;
