@@ -60,6 +60,9 @@ protected:
 
     DrawSpace::Core::Font*                      m_font;
 
+    DrawSpace::Camera*                          m_camera;
+    DrawSpace::Core::FPSMovement                m_fpsmove;
+
 
     dsAppClient( void );
 

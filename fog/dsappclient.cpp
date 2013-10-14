@@ -100,6 +100,9 @@ dsAppClient::~dsAppClient( void )
 
 void dsAppClient::OnRenderFrame( void )
 {
+
+    m_fpsmove.Compute( m_timer, true );
+
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::Plugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
     DrawSpace::Utils::Matrix result;
@@ -219,7 +222,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunknode->GetNodeFromPass( "fogint_pass" )->GetFx()->GetShader( 1 )->LoadFromFile();
 
     m_chunknode->GetNodeFromPass( "fogint_pass" )->GetFx()->AddShaderRealParameter( 0, "fog_intensity", 12 );
-    m_chunknode->GetNodeFromPass( "fogint_pass" )->GetFx()->SetShaderReal( "fog_intensity", 0.2 );
+    m_chunknode->GetNodeFromPass( "fogint_pass" )->GetFx()->SetShaderReal( "fog_intensity", 0.02 );
 
     m_chunknode->GetNodeFromPass( "fogint_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
     m_chunknode->GetNodeFromPass( "fogint_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
@@ -293,6 +296,18 @@ bool dsAppClient::OnIdleAppInit( void )
     m_fpstext_widget->LoadAssets();
 
 
+    //////////////////////////////////////////////////////////////
+
+
+    m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
+    m_scenegraph.Add( m_camera );
+
+    m_scenegraph.SetCurrentCamera( "camera" );
+
+    m_fpsmove.SetTransformNode( m_camera );
+    m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 1.0, 6.0, 1.0 ) );
+
+    m_mouse_circularmode = true;
 
     return true;
 }
@@ -308,11 +323,38 @@ void dsAppClient::OnClose( void )
 
 void dsAppClient::OnKeyPress( long p_key ) 
 {
+    switch( p_key )
+    {
+        case 'Q':
+
+            m_fpsmove.SetSpeed( 6.0 );
+            break;
+
+        case 'W':
+
+            m_fpsmove.SetSpeed( -6.0 );
+            break;
+
+    }
 
 }
 
 void dsAppClient::OnEndKeyPress( long p_key )
 {
+    switch( p_key )
+    {
+        case 'Q':
+
+            m_fpsmove.SetSpeed( 0.0 );
+            break;
+
+
+        case 'W':
+
+            m_fpsmove.SetSpeed( 0.0 );
+            break;
+
+    }
 
 }
 
@@ -331,6 +373,12 @@ void dsAppClient::OnMouseMove( long p_xm, long p_ym, long p_dx, long p_dy )
     {
         m_transform->OnRightDrag( m_timer, p_dx, p_dy );
     }
+
+	m_fpsmove.RotateYaw( - p_dx / 4.0, m_timer );
+
+	m_fpsmove.RotatePitch( - p_dy / 4.0, m_timer );
+
+
 }
 
 void dsAppClient::OnMouseLeftButtonDown( long p_xm, long p_ym )
