@@ -342,12 +342,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    /*
-    m_fpstext_widget->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
-    m_fpstext_widget->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
-    m_fpstext_widget->GetTextFx()->GetShader( 0 )->LoadFromFile();
-    m_fpstext_widget->GetTextFx()->GetShader( 1 )->LoadFromFile();
-    */
 
     m_fpstext_widget->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
     m_fpstext_widget->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
