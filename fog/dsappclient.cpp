@@ -125,7 +125,7 @@ void dsAppClient::OnRenderFrame( void )
     }
 
 
-    m_fpstext_widget->SetVirtualTranslation( 15, 15 );
+    m_fpstext_widget->SetVirtualTranslation( 10, 5 );
     m_fpstext_widget->Transform();
 
 
@@ -274,134 +274,7 @@ bool dsAppClient::OnIdleAppInit( void )
         return false;
     }
 
-
-
-    m_fpstext_widget = _DRAWSPACE_NEW_( TextWidget, TextWidget( "fps_text_widget", 20, 10, m_font, false, NULL ) );
-
-    m_fpstext_widget->GetImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
-    m_fpstext_widget->GetImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
-
-    m_fpstext_widget->GetImageFx()->GetShader( 0 )->SetText( 
-        
-        "float4x4 matViewProjection: register(c0);"
-        "struct VS_INPUT"
-        "{"
-           "float4 Position : POSITION0;"
-           "float4 TexCoord0: TEXCOORD0;"
-        "};"
-        "struct VS_OUTPUT"
-        "{"
-           "float4 Position : POSITION0;"
-           "float4 TexCoord0: TEXCOORD0;"
-        "};"
-        "VS_OUTPUT vs_main( VS_INPUT Input )"
-        "{"
-           "VS_OUTPUT Output;"
-           "Output.Position = mul( Input.Position, matViewProjection );"
-           "Output.TexCoord0 = Input.TexCoord0;"  
-           "return( Output );"
-        "}"     
-        );
-
-    m_fpstext_widget->GetImageFx()->GetShader( 1 )->SetText( 
-
-        "float4 text_color: register(c0);"
-        "sampler2D Texture0;"
-        "struct PS_INTPUT"
-        "{"
-           "float4 Position : POSITION0;"
-           "float4 TexCoord0: TEXCOORD0;"
-        "};"
-        "float4 ps_main( PS_INTPUT input ) : COLOR0"
-        "{"
-           "float4 color = tex2D( Texture0, input.TexCoord0 );"
-
-           "float4 final_color;"
-
-           "final_color.r = text_color.r;"
-           "final_color.g = text_color.g;"
-           "final_color.b = text_color.b;"
-           "final_color.a = color.r;"
-
-           "return final_color;"
-
-        "}"        
-      );
-
-                                                                
-
-
-    m_fpstext_widget->GetImageFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
-    m_fpstext_widget->GetImageFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add"  ) );
-    m_fpstext_widget->GetImageFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always"  ) );
-    m_fpstext_widget->GetImageFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha"  ) );
-    m_fpstext_widget->GetImageFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha"  ) );
-    m_fpstext_widget->GetImageFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
-    m_fpstext_widget->GetImageFx()->AddShaderRealVectorParameter( 1, "color", 0 );
-    m_fpstext_widget->GetImageFx()->SetShaderRealVector( "color", Utils::Vector( 0.0, 0.4, 0.0, 0.0 ) );
-
-
-
-
-    m_fpstext_widget->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
-    m_fpstext_widget->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
-
-    m_fpstext_widget->GetTextFx()->GetShader( 0 )->SetText( 
-
-        "float4x4 matViewProjection: register(c0);"
-
-        "struct VS_INPUT"
-        "{"
-           "float4 Position : POSITION0;"
-           "float4 TexCoord0: TEXCOORD0;"  
-        "};"
-
-        "struct VS_OUTPUT"
-        "{"
-           "float4 Position : POSITION0;"
-           "float4 TexCoord0: TEXCOORD0;"
-        "};"
-
-        "VS_OUTPUT vs_main( VS_INPUT Input )"
-        "{"
-           "VS_OUTPUT Output;"
-
-           "Output.Position = mul( Input.Position, matViewProjection );"
-           "Output.TexCoord0 = Input.TexCoord0;"
-              
-           "return( Output );"
-        "}"
-    );
-
-
-    m_fpstext_widget->GetTextFx()->GetShader( 1 )->SetText( 
-        
-        "float4 text_color: register(c0);"
-        "sampler2D Texture0;"
-
-        "struct PS_INTPUT"
-        "{"
-           "float4 Position : POSITION0;"
-           "float4 TexCoord0: TEXCOORD0;"
-        "};"
-
-        "float4 ps_main( PS_INTPUT input ) : COLOR0"
-        "{"
-           "float4 color = tex2D( Texture0, input.TexCoord0 );"
-           "if( color.r == 0.0 && color.g == 0.0 && color.b == 0.0 )"
-           "{"
-              "clip( -1.0 );"
-           "}"
-           "return color * text_color;"
-        "}"
-    );
-
-    m_fpstext_widget->GetTextFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    m_fpstext_widget->GetTextFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    m_fpstext_widget->GetTextFx()->AddShaderRealVectorParameter( 1, "color", 0 );
-    m_fpstext_widget->GetTextFx()->SetShaderRealVector( "color", Utils::Vector( 1.0, 1.0, 1.0, 0.0 ) );
-
-    m_fpstext_widget->SetPassTargetClearingColor( 0, 0, 0 );
+    m_fpstext_widget = DrawSpace::Utils::BuildText( m_font, 15, 10, DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 0.0 ), "fps" );
 
     m_fpstext_widget->RegisterToPass( m_finalpass );
     m_fpstext_widget->LoadAssets();
