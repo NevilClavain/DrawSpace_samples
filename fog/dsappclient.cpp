@@ -32,17 +32,17 @@ void SceneTransform::Transform( void )
 
     DrawSpace::Utils::Matrix yrotate;
 
-    m_mutex_z.WaitInfinite();
+    //m_mutex_z.WaitInfinite();
     yrotate.Rotation( DrawSpace::Utils::Vector( 0.0, 1.0, 0.0, 1.0 ), 3.1415927 * m_yangle / 180.0 );
     DrawSpace::Utils::Matrix xrotate;
     xrotate.Rotation( DrawSpace::Utils::Vector( 1.0, 0.0, 0.0, 1.0 ), 3.1415927 * m_xangle / 180.0 );
-    m_mutex_z.Release();
+    //m_mutex_z.Release();
 
     DrawSpace::Utils::Transformation transform;
 
-    transform.PushMatrix( translate );
+    //transform.PushMatrix( translate );
     transform.PushMatrix( yrotate );
-    transform.PushMatrix( xrotate );
+    //transform.PushMatrix( xrotate );
     transform.BuildResult();
     transform.GetResult( &result );
 
@@ -63,18 +63,21 @@ void SceneTransform::Run( void )
 
 
 void SceneTransform::OnLeftDrag( DrawSpace::Utils::TimeManager& p_timer, long p_dx, long p_dy )
-{
+{/*
     m_mutex_angles.WaitInfinite();
     p_timer.AngleSpeedInc( &m_yangle, p_dx * 150.0 );
     p_timer.AngleSpeedInc( &m_xangle, p_dy * 150.0 );
     m_mutex_angles.Release();
+    */
 }
 
 void SceneTransform::OnRightDrag( DrawSpace::Utils::TimeManager& p_timer, long p_dx, long p_dy )
 {
+    /*
     m_mutex_z.WaitInfinite();
     p_timer.TranslationSpeedInc( &m_zpos, p_dy * 40.0 );
     m_mutex_z.Release();
+    */
 }
 
 void SceneTransform::GetResult( DrawSpace::Utils::Matrix& p_out )
@@ -116,8 +119,7 @@ void dsAppClient::OnRenderFrame( void )
 
     long current_fps = m_timer.GetFPS();
     char fps[256];
-    sprintf( fps, "%d"
-        " fps", m_timer.GetFPS() );
+    sprintf( fps, "%d fps", m_timer.GetFPS() );
     if( last_fps != current_fps )
     {
         m_fpstext_widget->SetText( 0, 0, 70, fps, DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
@@ -143,7 +145,10 @@ void dsAppClient::OnRenderFrame( void )
 
     m_timer.Update();
     if( m_timer.IsReady() )
-    {		
+    {
+        //m_transform->m_mutex_angles.WaitInfinite();
+        m_timer.AngleSpeedInc( &m_transform->m_yangle, 45.0 );
+        //m_transform->m_mutex_result.Release();
     }
 }
 

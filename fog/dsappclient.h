@@ -7,7 +7,7 @@
 
 class SceneTransform
 {
-protected:
+public:
     dsreal                                  m_xangle, m_yangle;
     dsreal                                  m_zpos;
     DrawSpace::Utils::Mutex                 m_mutex_angles;
