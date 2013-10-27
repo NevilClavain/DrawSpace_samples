@@ -1,0 +1,201 @@
+
+#include "dsappclient.h"
+
+using namespace DrawSpace;
+using namespace DrawSpace::Interface;
+using namespace DrawSpace::Core;
+using namespace DrawSpace::Gui;
+
+dsAppClient* dsAppClient::m_instance = NULL;
+
+
+
+
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false )
+{    
+    _INIT_LOGGER( "planet.conf" )  
+    m_w_title = "planet engine test";
+}
+
+dsAppClient::~dsAppClient( void )
+{
+
+}
+
+void dsAppClient::OnRenderFrame( void )
+{
+
+    m_fpsmove.Compute( m_timer, true );
+
+    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::Plugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
+
+ 
+    m_scenegraph.ComputeTransformations();
+
+    static long last_fps;
+
+    long current_fps = m_timer.GetFPS();
+    char fps[256];
+    sprintf( fps, "%d fps", m_timer.GetFPS() );
+    if( last_fps != current_fps )
+    {
+        m_fpstext_widget->SetText( 0, 0, 70, fps, DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
+        last_fps = current_fps;		
+    }
+
+
+    m_fpstext_widget->SetVirtualTranslation( 10, 5 );
+    m_fpstext_widget->Transform();
+
+
+    m_fpstext_widget->Draw();
+
+    m_finalpass->GetRenderingQueue()->Draw();
+
+    renderer->FlipScreen();
+
+    m_timer.Update();
+    if( m_timer.IsReady() )
+    {
+       
+    }
+}
+
+bool dsAppClient::OnIdleAppInit( void )
+{
+    bool status;
+
+    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::Plugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
+    renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+    //////////////////////////////////////////////////////////////
+
+    m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
+    m_finalpass->CreateViewportQuad();
+    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_finalpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_finalpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+    
+
+    
+    m_finalpass->GetViewportQuad()->LoadAssets();
+
+    //////////////////////////////////////////////////////////////
+
+    DrawSpace::Utils::CBFGFontImport fontimporter;
+    m_font = _DRAWSPACE_NEW_( Font, Font );
+
+    m_font->SetImporter( &fontimporter );
+
+    status = m_font->Build( "mangalfont.bmp", "mangalfont.csv" );
+    if( !status )
+    {
+        return false;
+    }
+
+    m_fpstext_widget = DrawSpace::Utils::BuildText( m_font, 15, 10, DrawSpace::Utils::Vector( 1.0, 1.0, 1.0, 0.0 ), "fps" );
+
+    m_fpstext_widget->RegisterToPass( m_finalpass );
+    m_fpstext_widget->LoadAssets();
+
+
+    //////////////////////////////////////////////////////////////
+
+
+    m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
+    m_scenegraph.Add( m_camera );
+
+    m_scenegraph.SetCurrentCamera( "camera" );
+
+    m_fpsmove.SetTransformNode( m_camera );
+    m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 1.0, 6.0, 1.0 ) );
+
+    m_mouse_circularmode = true;
+
+    return true;
+}
+
+void dsAppClient::OnAppInit( void )
+{
+
+}
+
+void dsAppClient::OnClose( void )
+{
+}
+
+void dsAppClient::OnKeyPress( long p_key ) 
+{
+    switch( p_key )
+    {
+        case 'Q':
+
+            m_fpsmove.SetSpeed( 6.0 );
+            break;
+
+        case 'W':
+
+            m_fpsmove.SetSpeed( -6.0 );
+            break;
+
+    }
+
+}
+
+void dsAppClient::OnEndKeyPress( long p_key )
+{
+    switch( p_key )
+    {
+        case 'Q':
+
+            m_fpsmove.SetSpeed( 0.0 );
+            break;
+
+
+        case 'W':
+
+            m_fpsmove.SetSpeed( 0.0 );
+            break;
+
+    }
+
+}
+
+void dsAppClient::OnKeyPulse( long p_key )
+{
+
+}
+
+void dsAppClient::OnMouseMove( long p_xm, long p_ym, long p_dx, long p_dy )
+{
+
+	m_fpsmove.RotateYaw( - p_dx / 4.0, m_timer );
+	m_fpsmove.RotatePitch( - p_dy / 4.0, m_timer );
+
+}
+
+void dsAppClient::OnMouseLeftButtonDown( long p_xm, long p_ym )
+{
+    m_mouselb = true;
+}
+
+void dsAppClient::OnMouseLeftButtonUp( long p_xm, long p_ym )
+{
+    m_mouselb = false;
+}
+
+void dsAppClient::OnMouseRightButtonDown( long p_xm, long p_ym )
+{
+    m_mouserb = true;
+}
+
+void dsAppClient::OnMouseRightButtonUp( long p_xm, long p_ym )
+{
+    m_mouserb = false;
+}
+
+void dsAppClient::OnAppEvent( WPARAM p_wParam, LPARAM p_lParam )
+{
+
+}
