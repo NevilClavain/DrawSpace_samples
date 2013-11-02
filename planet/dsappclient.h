@@ -18,6 +18,7 @@ protected:
     DrawSpace::Scenegraph                       m_scenegraph;
 
 
+    DrawSpace::IntermediatePass*                m_wireframepass;
     DrawSpace::FinalPass*                       m_finalpass;
 
 
@@ -32,6 +33,8 @@ protected:
 
     DrawSpace::Camera*                          m_camera;
     DrawSpace::Core::FPSMovement                m_fpsmove;
+
+    DrawSpace::Planet::Body*                    m_planet;
 
 
     dsAppClient( void );

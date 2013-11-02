@@ -5,6 +5,9 @@ using namespace DrawSpace;
 using namespace DrawSpace::Interface;
 using namespace DrawSpace::Core;
 using namespace DrawSpace::Gui;
+using namespace DrawSpace::Planet;
+using namespace DrawSpace::Utils;
+
 
 dsAppClient* dsAppClient::m_instance = NULL;
 
@@ -47,6 +50,8 @@ void dsAppClient::OnRenderFrame( void )
     m_fpstext_widget->SetVirtualTranslation( 10, 5 );
     m_fpstext_widget->Transform();
 
+    m_wireframepass->GetRenderingQueue()->Draw();
+
 
     m_fpstext_widget->Draw();
 
@@ -68,6 +73,14 @@ bool dsAppClient::OnIdleAppInit( void )
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::Plugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
     renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
 
+
+    m_wireframepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "wireframe_pass" ) );
+
+    m_wireframepass->GetRenderingQueue()->EnableDepthClearing( true );
+    m_wireframepass->GetRenderingQueue()->EnableTargetClearing( true );
+    m_wireframepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0 );
+
+
     //////////////////////////////////////////////////////////////
 
     m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
@@ -78,8 +91,79 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
+    m_finalpass->GetViewportQuad()->SetTexture( m_wireframepass->GetTargetTexture(), 0 );
     
     m_finalpass->GetViewportQuad()->LoadAssets();
+
+    //////////////////////////////////////////////////////////////
+
+    m_scenegraph.RegisterPass( m_wireframepass );
+
+
+
+    m_planet = _DRAWSPACE_NEW_( Body, Body( "planet1" ) );
+
+    m_planet->RegisterPassFaceSet( "wireframe_pass" );
+
+
+    for( long i = 0; i < Body::AllPlanetFaces; i++ )
+    {
+        m_planet->GetPassFaceFx( "wireframe_pass", i )->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
+        m_planet->GetPassFaceFx( "wireframe_pass", i )->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+
+        m_planet->GetPassFaceFx( "wireframe_pass", i )->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
+        m_planet->GetPassFaceFx( "wireframe_pass", i )->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
+
+        m_planet->GetPassFaceFx( "wireframe_pass", i )->GetShader( 0 )->SetText(
+
+                "float4x4 matWorldViewProjection: register(c0);"
+
+                "struct VS_INPUT"
+                "{"
+                   "float4 Position : POSITION0;"
+                "};"
+
+                "struct VS_OUTPUT"
+                "{"
+                   "float4 Position : POSITION0;"
+                "};"
+
+                "VS_OUTPUT vs_main( VS_INPUT Input )"
+                "{"
+                   "VS_OUTPUT Output;"
+                   "Output.Position = mul( Input.Position, matWorldViewProjection );"                      
+                   "return( Output );"
+                "}"
+
+                );
+
+        m_planet->GetPassFaceFx( "wireframe_pass", i )->GetShader( 1 )->SetText(
+
+                "float4 Color : register(c0);"
+
+                "sampler2D Texture0;"
+
+                "struct PS_INTPUT"
+                "{"
+                   "float4 Position : POSITION0;"
+                "};"
+
+                "float4 ps_main( PS_INTPUT input ) : COLOR0"
+                "{"
+                   "return Color;"
+                "}"
+                );
+
+        m_planet->GetPassFaceFx( "wireframe_pass", i )->AddShaderRealVectorParameter( 1, "color", 0 );
+        m_planet->GetPassFaceFx( "wireframe_pass", i )->SetShaderRealVector( "color", Vector( 0.0, 0.0, 1.0, 0.0 ) );
+    }
+
+    
+
+    m_scenegraph.RegisterNode( m_planet );
+
+    m_planet->LoadAssets();
+
 
     //////////////////////////////////////////////////////////////
 
@@ -102,9 +186,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
-    m_scenegraph.Add( m_camera );
+    m_scenegraph.RegisterNode( m_camera );
 
     m_scenegraph.SetCurrentCamera( "camera" );
 
