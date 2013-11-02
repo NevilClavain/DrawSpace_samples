@@ -289,7 +289,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
-    m_scenegraph.Add( m_camera );
+    m_scenegraph.RegisterNode( m_camera );
 
     m_scenegraph.SetCurrentCamera( "camera" );
 
