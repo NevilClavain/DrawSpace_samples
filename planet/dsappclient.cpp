@@ -165,6 +165,11 @@ bool dsAppClient::OnIdleAppInit( void )
     m_planet->LoadAssets();
 
 
+    m_planet->GetFace( "wireframe_pass", DrawSpace::Planet::Patch::FrontPlanetFace )->Split( ".0" );
+    m_planet->GetFace( "wireframe_pass", DrawSpace::Planet::Patch::FrontPlanetFace )->Split( ".0.0" );
+    m_planet->GetFace( "wireframe_pass", DrawSpace::Planet::Patch::FrontPlanetFace )->Split( ".0.0.2" );
+
+
     //////////////////////////////////////////////////////////////
 
     DrawSpace::Utils::CBFGFontImport fontimporter;
@@ -192,7 +197,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.SetCurrentCamera( "camera" );
 
     m_fpsmove.SetTransformNode( m_camera );
-    m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 1.0, 6.0, 1.0 ) );
+    m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 6.0, 12.0, 1.0 ) );
 
     m_mouse_circularmode = true;
 
