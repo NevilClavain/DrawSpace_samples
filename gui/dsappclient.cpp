@@ -61,7 +61,7 @@ void dsAppClient::OnRenderFrame( void )
 
 
 
-    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::Plugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
+    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
     static long last_fps;
 
@@ -117,7 +117,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     RegisterMouseInputEventsProvider( &m_mouse_input );
 
-    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::Plugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
+    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
     renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
 
     m_texturepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
@@ -393,7 +393,7 @@ void dsAppClient::OnAppInit( void )
 void dsAppClient::OnClose( void )
 {
     DrawSpace::Utils::MemAlloc::GetInstance()->DumpContent();
-    DrawSpace::Core::Plugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface->DumpMemoryAllocs();
+    DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface->DumpMemoryAllocs();
 }
 
 void dsAppClient::OnKeyPress( long p_key ) 
@@ -430,7 +430,7 @@ void dsAppClient::OnMouseMove( long p_xm, long p_ym, long p_dx, long p_dy )
     m_ymouse = (long)ymouse;
 
 
-    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::Plugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
+    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
     DrawSpace::Interface::Renderer::Characteristics characteristics;
     renderer->GetRenderCharacteristics( characteristics );
