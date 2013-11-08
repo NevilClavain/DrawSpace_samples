@@ -36,6 +36,10 @@ protected:
 
     DrawSpace::Planet::Body*                    m_planet;
 
+    DrawSpace::Interface::Drawable*             m_spacebox;
+
+    void prepare_spaceboxnode( const dsstring& p_nodeid );
+
 
     dsAppClient( void );
 

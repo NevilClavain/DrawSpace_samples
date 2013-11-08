@@ -32,6 +32,11 @@ void dsAppClient::OnRenderFrame( void )
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
+
+    DrawSpace::Utils::Matrix sbtrans;
+
+    sbtrans.Scale( 20.0, 20.0, 20.0 );
+    m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
  
     m_scenegraph.ComputeTransformations();
 
@@ -64,6 +69,59 @@ void dsAppClient::OnRenderFrame( void )
     {
        
     }
+}
+
+void dsAppClient::prepare_spaceboxnode( const dsstring& p_nodeid )
+{
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
+
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->GetShader( 0 )->SetText(
+
+            "float4x4 matWorldViewProjection: register(c0);"
+
+            "struct VS_INPUT"
+            "{"
+               "float4 Position : POSITION0;"
+            "};"
+
+            "struct VS_OUTPUT"
+            "{"
+               "float4 Position : POSITION0;"
+            "};"
+
+            "VS_OUTPUT vs_main( VS_INPUT Input )"
+            "{"
+               "VS_OUTPUT Output;"
+               "Output.Position = mul( Input.Position, matWorldViewProjection );"                      
+               "return( Output );"
+            "}"
+
+            );
+
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->GetShader( 1 )->SetText(
+
+            "float4 Color : register(c0);"
+
+            "sampler2D Texture0;"
+
+            "struct PS_INTPUT"
+            "{"
+               "float4 Position : POSITION0;"
+            "};"
+
+            "float4 ps_main( PS_INTPUT input ) : COLOR0"
+            "{"
+               "return Color;"
+            "}"
+            );
+
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddShaderRealVectorParameter( 1, "color", 0 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 0.0 ) );
+
 }
 
 bool dsAppClient::OnIdleAppInit( void )
@@ -168,6 +226,31 @@ bool dsAppClient::OnIdleAppInit( void )
     m_planet->GetFace( "wireframe_pass", DrawSpace::Planet::Patch::FrontPlanetFace )->Split( ".0" );
     m_planet->GetFace( "wireframe_pass", DrawSpace::Planet::Patch::FrontPlanetFace )->Split( ".0.0" );
     m_planet->GetFace( "wireframe_pass", DrawSpace::Planet::Patch::FrontPlanetFace )->Split( ".0.0.2" );
+
+
+    //////////////////////////////////////////////////////////////
+
+    status = DrawSpace::Utils::LoadDrawablePlugin( "spacebox.dll", "spacebox_plugin" );
+
+    m_spacebox = DrawSpace::Utils::InstanciateDrawableFromPlugin( "spacebox_plugin" );
+    m_spacebox->RegisterPassSlot( "wireframe_pass" );
+    m_spacebox->SetRenderer( renderer );
+    m_spacebox->SetName( "spacebox" );
+
+
+    prepare_spaceboxnode( "front" );
+    prepare_spaceboxnode( "rear" );
+    prepare_spaceboxnode( "top" );
+    prepare_spaceboxnode( "bottom" );
+    prepare_spaceboxnode( "left" );
+    prepare_spaceboxnode( "right" );
+
+
+    m_spacebox->LoadAssets();
+
+
+    m_scenegraph.RegisterNode( m_spacebox );
+
 
 
     //////////////////////////////////////////////////////////////
