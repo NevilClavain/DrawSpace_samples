@@ -38,7 +38,7 @@ protected:
 
     DrawSpace::Interface::Drawable*             m_spacebox;
 
-    void prepare_spaceboxnode( const dsstring& p_nodeid );
+    void prepare_spaceboxnode( const dsstring& p_nodeid, const dsstring& p_texture );
 
 
     dsAppClient( void );

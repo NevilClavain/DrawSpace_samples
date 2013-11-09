@@ -71,8 +71,30 @@ void dsAppClient::OnRenderFrame( void )
     }
 }
 
-void dsAppClient::prepare_spaceboxnode( const dsstring& p_nodeid )
+void dsAppClient::prepare_spaceboxnode( const dsstring& p_nodeid, const dsstring& p_texture )
 {
+
+
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+
+
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddShaderRealVectorParameter( 1, "color", 0 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 0.0 ) );
+
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( p_texture ) ), 0 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    
+
+
+
+    /*
     m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
     m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
 
@@ -121,7 +143,7 @@ void dsAppClient::prepare_spaceboxnode( const dsstring& p_nodeid )
 
     m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddShaderRealVectorParameter( 1, "color", 0 );
     m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 0.0 ) );
-
+    */
 }
 
 bool dsAppClient::OnIdleAppInit( void )
@@ -156,6 +178,37 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
     m_scenegraph.RegisterPass( m_wireframepass );
+
+
+
+    status = DrawSpace::Utils::LoadDrawablePlugin( "spacebox.dll", "spacebox_plugin" );
+
+    m_spacebox = DrawSpace::Utils::InstanciateDrawableFromPlugin( "spacebox_plugin" );
+    m_spacebox->RegisterPassSlot( "wireframe_pass" );
+    m_spacebox->SetRenderer( renderer );
+    m_spacebox->SetName( "spacebox" );
+
+
+    prepare_spaceboxnode( "front", "spacebox_front5.png" );
+    prepare_spaceboxnode( "rear", "spacebox_back6.png" );
+    prepare_spaceboxnode( "top", "spacebox_top3.png" );
+    prepare_spaceboxnode( "bottom", "spacebox_bottom4.png" );
+    prepare_spaceboxnode( "left", "spacebox_left2.png" );
+    prepare_spaceboxnode( "right", "spacebox_right1.png" );
+
+
+    m_spacebox->LoadAssets();
+
+
+    m_scenegraph.RegisterNode( m_spacebox );
+
+
+
+    //////////////////////////////////////////////////////////////
+
+
+
+    ///////////////////////////////////////////////////////////////
 
 
 
@@ -230,30 +283,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    status = DrawSpace::Utils::LoadDrawablePlugin( "spacebox.dll", "spacebox_plugin" );
-
-    m_spacebox = DrawSpace::Utils::InstanciateDrawableFromPlugin( "spacebox_plugin" );
-    m_spacebox->RegisterPassSlot( "wireframe_pass" );
-    m_spacebox->SetRenderer( renderer );
-    m_spacebox->SetName( "spacebox" );
-
-
-    prepare_spaceboxnode( "front" );
-    prepare_spaceboxnode( "rear" );
-    prepare_spaceboxnode( "top" );
-    prepare_spaceboxnode( "bottom" );
-    prepare_spaceboxnode( "left" );
-    prepare_spaceboxnode( "right" );
-
-
-    m_spacebox->LoadAssets();
-
-
-    m_scenegraph.RegisterNode( m_spacebox );
-
-
-
-    //////////////////////////////////////////////////////////////
 
     DrawSpace::Utils::CBFGFontImport fontimporter;
     m_font = _DRAWSPACE_NEW_( Font, Font );
