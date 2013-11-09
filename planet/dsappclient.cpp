@@ -71,81 +71,6 @@ void dsAppClient::OnRenderFrame( void )
     }
 }
 
-void dsAppClient::prepare_spaceboxnode( const dsstring& p_nodeid, const dsstring& p_texture )
-{
-
-
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-
-
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddShaderRealVectorParameter( 1, "color", 0 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 0.0 ) );
-
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->GetShader( 1 )->LoadFromFile();
-
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( p_texture ) ), 0 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetTexture( 0 )->LoadFromFile();
-
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-    
-
-
-
-    /*
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
-
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
-
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->GetShader( 0 )->SetText(
-
-            "float4x4 matWorldViewProjection: register(c0);"
-
-            "struct VS_INPUT"
-            "{"
-               "float4 Position : POSITION0;"
-            "};"
-
-            "struct VS_OUTPUT"
-            "{"
-               "float4 Position : POSITION0;"
-            "};"
-
-            "VS_OUTPUT vs_main( VS_INPUT Input )"
-            "{"
-               "VS_OUTPUT Output;"
-               "Output.Position = mul( Input.Position, matWorldViewProjection );"                      
-               "return( Output );"
-            "}"
-
-            );
-
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->GetShader( 1 )->SetText(
-
-            "float4 Color : register(c0);"
-
-            "sampler2D Texture0;"
-
-            "struct PS_INTPUT"
-            "{"
-               "float4 Position : POSITION0;"
-            "};"
-
-            "float4 ps_main( PS_INTPUT input ) : COLOR0"
-            "{"
-               "return Color;"
-            "}"
-            );
-
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->AddShaderRealVectorParameter( 1, "color", 0 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", p_nodeid )->GetFx()->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 0.0 ) );
-    */
-}
-
 bool dsAppClient::OnIdleAppInit( void )
 {
     bool status;
@@ -180,6 +105,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterPass( m_wireframepass );
 
 
+    //////////////////////////////////////////////////////////////
+
 
     status = DrawSpace::Utils::LoadDrawablePlugin( "spacebox.dll", "spacebox_plugin" );
 
@@ -189,12 +116,31 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox->SetName( "spacebox" );
 
 
-    prepare_spaceboxnode( "front", "spacebox_front5.png" );
-    prepare_spaceboxnode( "rear", "spacebox_back6.png" );
-    prepare_spaceboxnode( "top", "spacebox_top3.png" );
-    prepare_spaceboxnode( "bottom", "spacebox_bottom4.png" );
-    prepare_spaceboxnode( "left", "spacebox_left2.png" );
-    prepare_spaceboxnode( "right", "spacebox_right1.png" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "front" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "rear" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "top" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "bottom" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "left" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "right" );
+
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "front" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_front5.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "front" )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "rear" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_back6.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "rear" )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "top" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_top3.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "top" )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "bottom" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_bottom4.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "bottom" )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "left" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_left2.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "left" )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "right" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_right1.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "right" )->GetTexture( 0 )->LoadFromFile();
+
 
 
     m_spacebox->LoadAssets();
@@ -205,11 +151,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     //////////////////////////////////////////////////////////////
-
-
-
-    ///////////////////////////////////////////////////////////////
-
 
 
     m_planet = _DRAWSPACE_NEW_( Body, Body( "planet1" ) );
