@@ -63,6 +63,9 @@ protected:
     DrawSpace::Camera*                          m_camera;
     DrawSpace::Core::FPSMovement                m_fpsmove;
 
+    DrawSpace::Interface::Drawable*             m_chunk;
+
+
 
     dsAppClient( void );
 

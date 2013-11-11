@@ -111,7 +111,7 @@ void dsAppClient::OnRenderFrame( void )
     DrawSpace::Utils::Matrix result;
     m_transform->GetResult( result );
 
-    m_scenegraph.SetNodeLocalTransformation( "cube", result );
+    //m_scenegraph.SetNodeLocalTransformation( "cube", result );
 
     m_scenegraph.ComputeTransformations();
 
@@ -217,7 +217,48 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     ///////////////////////////////////////////////////////////////
+
+    status = DrawSpace::Utils::LoadDrawablePlugin( "chunk.dll", "chunk_plugin" );
+    m_chunk = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+
+    m_chunk->RegisterPassSlot( "fogint_pass" );
+    m_chunk->RegisterPassSlot( "texture_pass" );
+    m_chunk->SetRenderer( renderer );
+    m_chunk->SetName( "chunk" );
+
+    DrawSpace::Utils::AC3DMesheImport importer;
+    m_chunk->GetMeshe( "" )->SetImporter( &importer );
+    m_chunk->GetMeshe( "" )->LoadFromFile( "object.ac", 0 );
+
+    m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.vsh", false ) ) );
+    m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.psh", false ) ) );
+    m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddShaderRealParameter( 0, "fog_intensity", 12 );
+    m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->SetShaderReal( "fog_intensity", 0.08 );
+    m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     
+
+    m_chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    m_chunk->GetNodeFromPass( "texture_pass", "" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
+    m_chunk->GetNodeFromPass( "texture_pass", "" )->GetTexture( 0 )->LoadFromFile();
+
+    m_scenegraph.RegisterNode( m_chunk );
+    m_chunk->LoadAssets();
+
+
+    ///////////////////////////////////////////////////////////////
+    /*
     m_chunknode = _DRAWSPACE_NEW_( ChunkNode, ChunkNode( "cube" ) );
     
     m_chunknode->RegisterPassRenderingNode( "fogint_pass", _DRAWSPACE_NEW_( RenderingNode, RenderingNode ) );
@@ -255,6 +296,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_scenegraph.RegisterNode( m_chunknode );
     m_chunknode->LoadAssets();
+    */
 
 
     //////////////////////////////////////////////////////////////
