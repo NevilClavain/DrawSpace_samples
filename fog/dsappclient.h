@@ -39,8 +39,6 @@ protected:
 
 
     DrawSpace::Scenegraph                       m_scenegraph;
-    DrawSpace::ChunkNode*                       m_chunknode;
-
 
     DrawSpace::FinalPass*                       m_finalpass;
     DrawSpace::IntermediatePass*                m_fogblendpass;

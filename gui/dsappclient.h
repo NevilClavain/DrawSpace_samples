@@ -18,7 +18,7 @@ protected:
     
 
     DrawSpace::Scenegraph                                                           m_scenegraph;
-    DrawSpace::ChunkNode*                                                           m_chunknode;
+    //DrawSpace::ChunkNode*                                                           m_chunknode;
 
 
     DrawSpace::Core::Font*                                                          m_font;
@@ -45,6 +45,9 @@ protected:
 
     //DrawSpace::SystemMouseInputProvider                                             m_mouse_input;
     DrawSpace::ImageMouseInputProvider                                             m_mouse_input;
+
+    DrawSpace::Interface::Drawable*                                                 m_chunk;
+
 
     WidgetEventHandler*                                                             m_mousein_eventhandler;
     WidgetEventHandler*                                                             m_mouseout_eventhandler;
