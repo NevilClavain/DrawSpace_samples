@@ -5,7 +5,6 @@ using namespace DrawSpace;
 using namespace DrawSpace::Interface;
 using namespace DrawSpace::Core;
 using namespace DrawSpace::Gui;
-using namespace DrawSpace::Planet;
 using namespace DrawSpace::Utils;
 
 
@@ -152,21 +151,26 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
+    status = DrawSpace::Utils::LoadDrawablePlugin( "planetbuild.dll", "planet_plugin" );
+    m_planet = DrawSpace::Utils::InstanciateDrawableFromPlugin( "planet_plugin" );
 
-    m_planet = _DRAWSPACE_NEW_( Body, Body( "planet1" ) );
+    m_planet->SetRenderer( renderer );
+    m_planet->RegisterPassSlot( "wireframe_pass" );
+    m_planet->SetName( "planet01" );
 
-    m_planet->RegisterPassFaceSet( "wireframe_pass" );
 
+    std::vector<dsstring> idslist;
+    m_planet->GetNodesIdsList( idslist );
 
-    for( long i = 0; i < Body::AllPlanetFaces; i++ )
+    for( size_t i = 0; i < idslist.size(); i++ )
     {
-        m_planet->GetPassFaceFx( "wireframe_pass", i )->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
-        m_planet->GetPassFaceFx( "wireframe_pass", i )->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
+        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
 
-        m_planet->GetPassFaceFx( "wireframe_pass", i )->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
-        m_planet->GetPassFaceFx( "wireframe_pass", i )->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
+        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
+        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
 
-        m_planet->GetPassFaceFx( "wireframe_pass", i )->GetShader( 0 )->SetText(
+        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->GetShader( 0 )->SetText(
 
                 "float4x4 matWorldViewProjection: register(c0);"
 
@@ -189,7 +193,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
                 );
 
-        m_planet->GetPassFaceFx( "wireframe_pass", i )->GetShader( 1 )->SetText(
+        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->GetShader( 1 )->SetText(
 
                 "float4 Color : register(c0);"
 
@@ -206,21 +210,16 @@ bool dsAppClient::OnIdleAppInit( void )
                 "}"
                 );
 
-        m_planet->GetPassFaceFx( "wireframe_pass", i )->AddShaderRealVectorParameter( 1, "color", 0 );
-        m_planet->GetPassFaceFx( "wireframe_pass", i )->SetShaderRealVector( "color", Vector( 0.0, 0.0, 1.0, 0.0 ) );
+        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->AddShaderRealVectorParameter( 1, "color", 0 );
+        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->SetShaderRealVector( "color", Vector( 0.0, 0.0, 1.0, 0.0 ) );
     }
-
-    
 
     m_scenegraph.RegisterNode( m_planet );
 
     m_planet->LoadAssets();
 
-
-    m_planet->GetFace( "wireframe_pass", DrawSpace::Planet::Patch::FrontPlanetFace )->Split( ".0" );
-    m_planet->GetFace( "wireframe_pass", DrawSpace::Planet::Patch::FrontPlanetFace )->Split( ".0.0" );
-    m_planet->GetFace( "wireframe_pass", DrawSpace::Planet::Patch::FrontPlanetFace )->Split( ".0.0.2" );
-
+    DrawSpace::Core::Meshe* mesh = m_planet->GetMeshe( "front:.0" );
+   
 
     //////////////////////////////////////////////////////////////
 

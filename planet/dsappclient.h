@@ -34,9 +34,10 @@ protected:
     DrawSpace::Camera*                          m_camera;
     DrawSpace::Core::FPSMovement                m_fpsmove;
 
-    DrawSpace::Planet::Body*                    m_planet;
+    //DrawSpace::Planet::Body*                    m_planet;
 
     DrawSpace::Interface::Drawable*             m_spacebox;
+    DrawSpace::Interface::Drawable*             m_planet;
 
     dsAppClient( void );
 
