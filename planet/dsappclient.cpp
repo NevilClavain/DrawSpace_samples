@@ -298,13 +298,19 @@ void dsAppClient::OnEndKeyPress( long p_key )
             m_fpsmove.SetSpeed( 0.0 );
             break;
 
+        case VK_SPACE:
+
+            m_planet->ComputeSpecifics();
+            break;
     }
 
 }
 
 void dsAppClient::OnKeyPulse( long p_key )
 {
-
+    switch( p_key )
+    {
+    }
 }
 
 void dsAppClient::OnMouseMove( long p_xm, long p_ym, long p_dx, long p_dy )
