@@ -226,8 +226,10 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->SetRenderer( renderer );
     m_chunk->SetName( "chunk" );
 
-    DrawSpace::Utils::AC3DMesheImport importer;
-    m_chunk->GetMeshe( "" )->SetImporter( &importer );
+    status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
+    m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
+    m_chunk->GetMeshe( "" )->SetImporter( m_meshe_import );
+
     m_chunk->GetMeshe( "" )->LoadFromFile( "object.ac", 0 );
 
     m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.vsh", false ) ) );
@@ -268,10 +270,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    DrawSpace::Utils::CBFGFontImport fontimporter;
+    status = DrawSpace::Utils::LoadFontImportPlugin( "cbfgfont.dll", "cbfgfont_plugin" );
+    m_font_import = DrawSpace::Utils::InstanciateFontImportFromPlugin( "cbfgfont_plugin" );
     m_font = _DRAWSPACE_NEW_( Font, Font );
+    m_font->SetImporter( m_font_import );
 
-    m_font->SetImporter( &fontimporter );
 
     status = m_font->Build( "mangalfont.bmp", "mangalfont.csv" );
     if( !status )

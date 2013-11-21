@@ -224,10 +224,10 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
 
-    DrawSpace::Utils::CBFGFontImport fontimporter;
+    status = DrawSpace::Utils::LoadFontImportPlugin( "cbfgfont.dll", "cbfgfont_plugin" );
+    m_font_import = DrawSpace::Utils::InstanciateFontImportFromPlugin( "cbfgfont_plugin" );
     m_font = _DRAWSPACE_NEW_( Font, Font );
-
-    m_font->SetImporter( &fontimporter );
+    m_font->SetImporter( m_font_import );
 
     status = m_font->Build( "mangalfont.bmp", "mangalfont.csv" );
     if( !status )

@@ -18,9 +18,8 @@ protected:
     
 
     DrawSpace::Scenegraph                                                           m_scenegraph;
-    //DrawSpace::ChunkNode*                                                           m_chunknode;
 
-
+    DrawSpace::Interface::FontImport*                                               m_font_import;
     DrawSpace::Core::Font*                                                          m_font;
 
     dsreal                                                                          m_yangle;
@@ -44,8 +43,9 @@ protected:
     DrawSpace::Gui::TextWidget*                                                     m_text_widget_3;
 
     //DrawSpace::SystemMouseInputProvider                                             m_mouse_input;
-    DrawSpace::ImageMouseInputProvider                                             m_mouse_input;
+    DrawSpace::ImageMouseInputProvider                                              m_mouse_input;
 
+    DrawSpace::Interface::MesheImport*                                              m_meshe_import;
     DrawSpace::Interface::Drawable*                                                 m_chunk;
 
 

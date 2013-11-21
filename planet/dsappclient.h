@@ -29,12 +29,12 @@ protected:
 
     DrawSpace::Gui::TextWidget*                 m_fpstext_widget;
 
+    DrawSpace::Interface::FontImport*           m_font_import;
     DrawSpace::Core::Font*                      m_font;
 
     DrawSpace::Camera*                          m_camera;
     DrawSpace::Core::FPSMovement                m_fpsmove;
-
-    //DrawSpace::Planet::Body*                    m_planet;
+    
 
     DrawSpace::Interface::Drawable*             m_spacebox;
     DrawSpace::Interface::Drawable*             m_planet;
