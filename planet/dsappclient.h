@@ -14,7 +14,6 @@ protected:
 
     static dsAppClient*                         m_instance;
 
-
     DrawSpace::Scenegraph                       m_scenegraph;
 
 
@@ -34,6 +33,7 @@ protected:
 
     DrawSpace::Camera*                          m_camera;
     DrawSpace::Core::FPSMovement                m_fpsmove;
+    DrawSpace::Core::FreeMovement               m_freemove;
     
 
     DrawSpace::Interface::Drawable*             m_spacebox;

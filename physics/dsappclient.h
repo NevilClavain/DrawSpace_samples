@@ -4,6 +4,9 @@
 
 #include <dsapp.h>
 
+#include <btBulletCollisionCommon.h>
+#include <btBulletDynamicsCommon.h>
+
 class dsAppClient : public DrawSpace::App
 {
 protected:
@@ -30,11 +33,28 @@ protected:
 
     DrawSpace::Camera*                          m_camera;
     DrawSpace::Core::FPSMovement                m_fpsmove;
+    DrawSpace::Camera*                          m_camera2;
 
     DrawSpace::Interface::Drawable*             m_spacebox;
 
     DrawSpace::Interface::MesheImport*          m_meshe_import;
     DrawSpace::Interface::Drawable*             m_ground;
+    DrawSpace::Interface::Drawable*             m_box;
+
+
+    // bullet stuff
+
+    btDiscreteDynamicsWorld*                    m_myWorld;
+    btBroadphaseInterface*                      m_myBroadphase;
+    btCollisionDispatcher*                      m_myDispatcher;
+    btDefaultCollisionConfiguration*            m_myCollisionConfiguration;
+    btSequentialImpulseConstraintSolver*        m_mySequentialImpulseConstraintSolver;
+    btTransform                                 m_myTransform;
+    btDefaultMotionState*                       m_myMotionState;
+	btDefaultMotionState*                       m_myMotionState_Sol;
+    btScalar                                    m_matrix[16];
+    btRigidBody*                                m_body;
+	btRigidBody*                                m_body_sol; 
 
 
     dsAppClient( void );

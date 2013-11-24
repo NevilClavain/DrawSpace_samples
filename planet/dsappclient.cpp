@@ -27,7 +27,8 @@ dsAppClient::~dsAppClient( void )
 void dsAppClient::OnRenderFrame( void )
 {
 
-    m_fpsmove.Compute( m_timer, true );
+    //m_fpsmove.Compute( m_timer, true );
+    m_freemove.Compute( m_timer );
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
@@ -247,9 +248,10 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterNode( m_camera );
 
     m_scenegraph.SetCurrentCamera( "camera" );
+    
+    m_freemove.SetTransformNode( m_camera );
+    m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 6.0, 12.0, 1.0 ) );
 
-    m_fpsmove.SetTransformNode( m_camera );
-    m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 6.0, 12.0, 1.0 ) );
 
     m_mouse_circularmode = true;
 
@@ -270,17 +272,14 @@ void dsAppClient::OnKeyPress( long p_key )
     switch( p_key )
     {
         case 'Q':
-
-            m_fpsmove.SetSpeed( 6.0 );
+            m_freemove.SetSpeed( 6.0 );
             break;
 
         case 'W':
-
-            m_fpsmove.SetSpeed( -6.0 );
+            m_freemove.SetSpeed( -6.0 );
             break;
 
     }
-
 }
 
 void dsAppClient::OnEndKeyPress( long p_key )
@@ -288,14 +287,12 @@ void dsAppClient::OnEndKeyPress( long p_key )
     switch( p_key )
     {
         case 'Q':
-
-            m_fpsmove.SetSpeed( 0.0 );
+            m_freemove.SetSpeed( 0.0 );
             break;
 
 
         case 'W':
-
-            m_fpsmove.SetSpeed( 0.0 );
+            m_freemove.SetSpeed( 0.0 );
             break;
 
         case VK_SPACE:
@@ -303,7 +300,6 @@ void dsAppClient::OnEndKeyPress( long p_key )
             m_planet->ComputeSpecifics();
             break;
     }
-
 }
 
 void dsAppClient::OnKeyPulse( long p_key )
@@ -315,9 +311,15 @@ void dsAppClient::OnKeyPulse( long p_key )
 
 void dsAppClient::OnMouseMove( long p_xm, long p_ym, long p_dx, long p_dy )
 {
-
-	m_fpsmove.RotateYaw( - p_dx / 4.0, m_timer );
-	m_fpsmove.RotatePitch( - p_dy / 4.0, m_timer );
+    if( !m_mouserb )
+    {  
+	    m_freemove.RotateYaw( - p_dx / 4.0, m_timer );
+	    m_freemove.RotatePitch( - p_dy / 4.0, m_timer );
+    }
+    else
+    {
+        m_freemove.RotateRoll( -p_dx / 4.0, m_timer );
+    }
 
 }
 

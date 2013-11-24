@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				UseUnicodeResponseFiles="true"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\;.\..\..\DrawSpace\src;.\..\..\DrawSpace_thirdparts\log4cxx\include;&quot;.\..\..\DrawSpace_thirdparts\CeGUI-0.7.7\include&quot;"
+				AdditionalIncludeDirectories=".\;.\..\..\DrawSpace\src;.\..\..\DrawSpace_thirdparts\log4cxx\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
