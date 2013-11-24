@@ -39,7 +39,10 @@ protected:
 
     DrawSpace::Interface::MesheImport*          m_meshe_import;
     DrawSpace::Interface::Drawable*             m_ground;
-    DrawSpace::Interface::Drawable*             m_box;
+    //DrawSpace::Interface::Drawable*             m_box;
+
+    int                                         m_box_count;
+
 
 
     // bullet stuff
@@ -50,11 +53,24 @@ protected:
     btDefaultCollisionConfiguration*            m_myCollisionConfiguration;
     btSequentialImpulseConstraintSolver*        m_mySequentialImpulseConstraintSolver;
     btTransform                                 m_myTransform;
-    btDefaultMotionState*                       m_myMotionState;
+    //btDefaultMotionState*                       m_myMotionState;
 	btDefaultMotionState*                       m_myMotionState_Sol;
     btScalar                                    m_matrix[16];
-    btRigidBody*                                m_body;
-	btRigidBody*                                m_body_sol; 
+    //btRigidBody*                                m_body;
+	btRigidBody*                                m_body_sol;
+
+
+    typedef struct
+    {
+        DrawSpace::Interface::Drawable* drawable;
+        btRigidBody*                    body;
+        btDefaultMotionState*           motion;
+
+    } Box;
+
+    std::vector<Box>                            m_boxes;
+
+    void create_box( void );
 
 
     dsAppClient( void );

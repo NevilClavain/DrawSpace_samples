@@ -15,7 +15,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_box_count( 0 )
 {    
     _INIT_LOGGER( "physics.conf" )  
     m_w_title = "physics test";
@@ -46,7 +46,7 @@ void dsAppClient::OnRenderFrame( void )
     ground_pos.Translation( 0.0, 0.0, 0.0 );
     m_scenegraph.SetNodeLocalTransformation( "ground", ground_pos );
 
-
+/*
     m_myMotionState->m_graphicsWorldTrans.getOpenGLMatrix( m_matrix );
     DrawSpace::Utils::Matrix box_pos;
 
@@ -71,11 +71,43 @@ void dsAppClient::OnRenderFrame( void )
     box_pos( 3, 3 ) = m_matrix[15];
 
     m_scenegraph.SetNodeLocalTransformation( "box", box_pos );
+    */
 
 
+    for( long i = 0; i < m_boxes.size(); i++ )
+    {
+        m_boxes[i].motion->m_graphicsWorldTrans.getOpenGLMatrix( m_matrix );
+        DrawSpace::Utils::Matrix box_pos;
+
+        box_pos( 0, 0 ) = m_matrix[0];
+        box_pos( 0, 1 ) = m_matrix[1];
+        box_pos( 0, 2 ) = m_matrix[2];
+        box_pos( 0, 3 ) = m_matrix[3];
+
+        box_pos( 1, 0 ) = m_matrix[4];
+        box_pos( 1, 1 ) = m_matrix[5];
+        box_pos( 1, 2 ) = m_matrix[6];
+        box_pos( 1, 3 ) = m_matrix[7];
+
+        box_pos( 2, 0 ) = m_matrix[8];
+        box_pos( 2, 1 ) = m_matrix[9];
+        box_pos( 2, 2 ) = m_matrix[10];
+        box_pos( 2, 3 ) = m_matrix[11];
+
+        box_pos( 3, 0 ) = m_matrix[12];
+        box_pos( 3, 1 ) = m_matrix[13];
+        box_pos( 3, 2 ) = m_matrix[14];
+        box_pos( 3, 3 ) = m_matrix[15];
+
+        m_boxes[i].drawable->SetLocalTransform( box_pos );
+
+    }
+
+    /*
     DrawSpace::Utils::Matrix cam2_pos;
     cam2_pos.Translation( 0.0, 0.0, 2.0 );
     m_scenegraph.SetNodeLocalTransformation( "camera2", cam2_pos );
+    */
 
 
  
@@ -113,6 +145,74 @@ void dsAppClient::OnRenderFrame( void )
 	        m_myWorld->stepSimulation( 1.0 / (dsreal)m_timer.GetFPS() );
         }
     }
+}
+
+void dsAppClient::create_box( void )
+{
+    DrawSpace::Interface::Drawable* drawable;
+    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
+
+
+    drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+
+    drawable->RegisterPassSlot( "texture_pass" );
+    drawable->SetRenderer( renderer );
+
+    char name[32];
+    sprintf( name, "box_%d", m_box_count );
+
+    drawable->SetName( name );
+    
+    drawable->GetMeshe( "" )->SetImporter( m_meshe_import );
+
+    drawable->GetMeshe( "" )->LoadFromFile( "object.ac", 0 );    
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetTexture( 0 )->LoadFromFile();
+
+    m_scenegraph.RegisterNode( drawable );
+    drawable->LoadAssets();
+
+    ///////////////////////////////////////////////////////////////////
+
+
+    m_myTransform.setIdentity();
+    m_myTransform.setOrigin( btVector3( 0, 12.0, 0 ) );
+
+    btCollisionShape* shape = _DRAWSPACE_NEW_( btBoxShape, btBoxShape( btVector3( 0.5, 0.5, 0.5 ) ) );
+    btDefaultMotionState* motion = _DRAWSPACE_NEW_( btDefaultMotionState, btDefaultMotionState( m_myTransform ) );
+
+
+    btVector3 localInertia( 0, 0, 0 );
+
+    btScalar mass = 50.5;
+    shape->calculateLocalInertia( mass, localInertia );
+
+    btRigidBody::btRigidBodyConstructionInfo myBoxRigidBodyConstructionInfo( mass, motion, shape, localInertia );
+
+    btRigidBody* body = _DRAWSPACE_NEW_(  btRigidBody, btRigidBody( myBoxRigidBodyConstructionInfo ) );
+
+    m_myWorld->addRigidBody( body );
+
+    Box box;
+
+    box.drawable = drawable;
+    box.body = body;
+    box.motion = motion;
+
+    m_boxes.push_back( box );
+
+    m_box_count++;
 }
 
 bool dsAppClient::OnIdleAppInit( void )
@@ -232,6 +332,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ////////////////////////////////////////////////////////////////
 
+/*
     m_box = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
 
     m_box->RegisterPassSlot( "texture_pass" );
@@ -259,7 +360,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_scenegraph.RegisterNode( m_box );
     m_box->LoadAssets();
-
+*/
 
     ////////////////////////////////////////////////////////////////
 
@@ -299,7 +400,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterNode( m_camera2 );
 
 
-    m_box->AddChild( m_camera2 );
+    //m_box->AddChild( m_camera2 );
 
     //m_scenegraph.SetCurrentCamera( "camera2" );
     m_scenegraph.SetCurrentCamera( "camera" );
@@ -315,10 +416,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_myWorld->setGravity( btVector3( 0, -9.81, 0 ) );
 
+    /*
     btCollisionShape* shape = _DRAWSPACE_NEW_( btBoxShape, btBoxShape( btVector3( 0.5, 0.5, 0.5 ) ) );
 
     m_myTransform.setIdentity();
-    m_myTransform.setOrigin( btVector3( 10, 5, 0 ) );
+    m_myTransform.setOrigin( btVector3( 0, 5, 0 ) );
 
     btVector3 localInertia( 0, 0, 0 );
 
@@ -332,7 +434,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_body = _DRAWSPACE_NEW_(  btRigidBody, btRigidBody( myBoxRigidBodyConstructionInfo ) );
 
     m_myWorld->addRigidBody( m_body );
-
+    */
 
 
     btCollisionShape* shape_sol = new btBoxShape( btVector3( 100, 0, 100 ) );
@@ -343,16 +445,19 @@ bool dsAppClient::OnIdleAppInit( void )
     m_myTransform.setOrigin( btVector3(0,0,0) );
     btVector3 localInertiaSol(0,0,0);
 
-    mass = 0; // Le fait que le poids de cet objet soit zéro le rend statique
+    
 
     m_myMotionState_Sol = _DRAWSPACE_NEW_( btDefaultMotionState, btDefaultMotionState( m_myTransform ) );
 
-    btRigidBody::btRigidBodyConstructionInfo sol_info( mass, m_myMotionState_Sol, shape_sol, localInertiaSol );
+    btRigidBody::btRigidBodyConstructionInfo sol_info( 0.0, m_myMotionState_Sol, shape_sol, localInertiaSol );
 
     m_body_sol = _DRAWSPACE_NEW_( btRigidBody, btRigidBody( sol_info ) );
 
     // On ajoute le sol dans le monde Bullet
-    m_myWorld->addRigidBody( m_body_sol ); 
+    m_myWorld->addRigidBody( m_body_sol );
+
+
+    create_box();
 
     return true;
 }
@@ -400,6 +505,8 @@ void dsAppClient::OnEndKeyPress( long p_key )
             break;
 
         case VK_SPACE:
+
+            create_box();
 
             break;
     }
