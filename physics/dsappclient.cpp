@@ -255,49 +255,6 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
 
-    status = DrawSpace::Utils::LoadDrawablePlugin( "spacebox.dll", "spacebox_plugin" );
-
-    m_spacebox = DrawSpace::Utils::InstanciateDrawableFromPlugin( "spacebox_plugin" );
-    m_spacebox->RegisterPassSlot( "texture_pass" );
-    m_spacebox->SetRenderer( renderer );
-    m_spacebox->SetName( "spacebox" );
-
-
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "front" );
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "rear" );
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "top" );
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "bottom" );
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "left" );
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "right" );
-
-    m_spacebox->GetNodeFromPass( "texture_pass", "front" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb0.bmp" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "texture_pass", "front" )->GetTexture( 0 )->LoadFromFile();
-
-    m_spacebox->GetNodeFromPass( "texture_pass", "rear" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb2.bmp" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "texture_pass", "rear" )->GetTexture( 0 )->LoadFromFile();
-
-    m_spacebox->GetNodeFromPass( "texture_pass", "top" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb4.bmp" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "texture_pass", "top" )->GetTexture( 0 )->LoadFromFile();
-
-    m_spacebox->GetNodeFromPass( "texture_pass", "bottom" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb4.bmp" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "texture_pass", "bottom" )->GetTexture( 0 )->LoadFromFile();
-
-    m_spacebox->GetNodeFromPass( "texture_pass", "left" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb3.bmp" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "texture_pass", "left" )->GetTexture( 0 )->LoadFromFile();
-
-    m_spacebox->GetNodeFromPass( "texture_pass", "right" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb1.bmp" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "texture_pass", "right" )->GetTexture( 0 )->LoadFromFile();
-
-
-
-    m_spacebox->LoadAssets();
-
-
-    m_scenegraph.RegisterNode( m_spacebox );
-
-
-    //////////////////////////////////////////////////////////////
-
     status = DrawSpace::Utils::LoadDrawablePlugin( "chunk.dll", "chunk_plugin" );
     m_ground = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
 
@@ -332,37 +289,56 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ////////////////////////////////////////////////////////////////
 
-/*
-    m_box = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+    status = DrawSpace::Utils::LoadDrawablePlugin( "spacebox.dll", "spacebox_plugin" );
 
-    m_box->RegisterPassSlot( "texture_pass" );
-    m_box->SetRenderer( renderer );
-    m_box->SetName( "box" );
+    m_spacebox = DrawSpace::Utils::InstanciateDrawableFromPlugin( "spacebox_plugin" );
+    m_spacebox->RegisterPassSlot( "texture_pass" );
+    m_spacebox->SetRenderer( renderer );
+    m_spacebox->SetName( "spacebox" );
 
-    status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
-    m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
-    m_box->GetMeshe( "" )->SetImporter( m_meshe_import );
 
-    m_box->GetMeshe( "" )->LoadFromFile( "object.ac", 0 );    
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "front" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "rear" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "top" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "bottom" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "left" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "right" );
 
-    m_box->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_box->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-    m_box->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_box->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_spacebox->GetNodeFromPass( "texture_pass", "front" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb0.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "front" )->GetTexture( 0 )->LoadFromFile();
 
-    m_box->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-    m_box->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    m_box->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-    m_box->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_spacebox->GetNodeFromPass( "texture_pass", "rear" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb2.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "rear" )->GetTexture( 0 )->LoadFromFile();
 
-    m_box->GetNodeFromPass( "texture_pass", "" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
-    m_box->GetNodeFromPass( "texture_pass", "" )->GetTexture( 0 )->LoadFromFile();
+    m_spacebox->GetNodeFromPass( "texture_pass", "top" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb4.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "top" )->GetTexture( 0 )->LoadFromFile();
 
-    m_scenegraph.RegisterNode( m_box );
-    m_box->LoadAssets();
-*/
+    m_spacebox->GetNodeFromPass( "texture_pass", "bottom" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb4.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "bottom" )->GetTexture( 0 )->LoadFromFile();
 
-    ////////////////////////////////////////////////////////////////
+    m_spacebox->GetNodeFromPass( "texture_pass", "left" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb3.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "left" )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( "texture_pass", "right" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb1.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "right" )->GetTexture( 0 )->LoadFromFile();
+
+
+    m_spacebox->LoadAssets();
+
+
+    m_scenegraph.RegisterNode( m_spacebox );
+
+
+    m_spacebox->GetNodeFromPass( "texture_pass", "front" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "rear" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "top" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "bottom" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "left" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "right" )->SetOrderNumber( 200 );
+
+
+    //////////////////////////////////////////////////////////////
+
 
     status = DrawSpace::Utils::LoadFontImportPlugin( "cbfgfont.dll", "cbfgfont_plugin" );
     m_font_import = DrawSpace::Utils::InstanciateFontImportFromPlugin( "cbfgfont_plugin" );
