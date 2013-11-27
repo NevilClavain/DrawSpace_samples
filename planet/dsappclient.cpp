@@ -217,6 +217,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_scenegraph.RegisterNode( m_planet );
 
+    DrawSpace::Core::TypedProperty<dsreal> planet_diameter( "diameter", 20.0 );
+    m_planet->SetProperty( "diameter", &planet_diameter );
+
     m_planet->LoadAssets();
 
     DrawSpace::Core::Meshe* mesh = m_planet->GetMeshe( "front:.0" );
