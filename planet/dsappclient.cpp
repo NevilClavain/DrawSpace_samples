@@ -13,7 +13,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 )
 {    
     _INIT_LOGGER( "planet.conf" )  
     m_w_title = "planet engine test";
@@ -69,6 +69,8 @@ void dsAppClient::OnRenderFrame( void )
     {
        
     }
+
+    m_freemove.SetSpeed( m_speed );
 }
 
 bool dsAppClient::OnIdleAppInit( void )
@@ -217,7 +219,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_scenegraph.RegisterNode( m_planet );
 
-    DrawSpace::Core::TypedProperty<dsreal> planet_diameter( "diameter", 12.0 );
+    DrawSpace::Core::TypedProperty<dsreal> planet_diameter( "diameter", 12000000.0 );
     m_planet->SetProperty( "diameter", &planet_diameter );
 
     m_planet->LoadAssets();
@@ -253,7 +255,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.SetCurrentCamera( "camera" );
     
     m_freemove.SetTransformNode( m_camera );
-    m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 6.0, 12.0, 1.0 ) );
+    m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 6.0, 20000000.0, 1.0 ) );
 
 
     m_mouse_circularmode = true;
@@ -275,11 +277,26 @@ void dsAppClient::OnKeyPress( long p_key )
     switch( p_key )
     {
         case 'Q':
-            m_freemove.SetSpeed( 6.0 );
+
+            if( 0.0 == m_speed )
+            {
+                m_speed = 1.0;
+            }
+            else
+            {
+                m_speed *= 1.5;
+            }
             break;
 
         case 'W':
-            m_freemove.SetSpeed( -6.0 );
+
+            m_speed /= 1.5;
+
+            if( m_speed < 1.0 )
+            {
+                m_speed = 0.0;
+            }
+
             break;
 
     }
@@ -290,17 +307,19 @@ void dsAppClient::OnEndKeyPress( long p_key )
     switch( p_key )
     {
         case 'Q':
-            m_freemove.SetSpeed( 0.0 );
+
+
             break;
 
 
         case 'W':
-            m_freemove.SetSpeed( 0.0 );
+            
+            
             break;
 
         case VK_SPACE:
 
-            m_planet->ComputeSpecifics();
+            m_speed = 0.0;
             break;
     }
 }

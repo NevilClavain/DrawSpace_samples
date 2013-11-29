@@ -39,6 +39,8 @@ protected:
     DrawSpace::Interface::Drawable*             m_spacebox;
     DrawSpace::Interface::Drawable*             m_planet;
 
+    dsreal                                      m_speed;
+
     dsAppClient( void );
 
 public:
