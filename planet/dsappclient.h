@@ -27,6 +27,7 @@ protected:
     bool                                        m_mouserb;
 
     DrawSpace::Gui::TextWidget*                 m_fpstext_widget;
+    DrawSpace::Gui::TextWidget*                 m_planetinfos_widget;
 
     DrawSpace::Interface::FontImport*           m_font_import;
     DrawSpace::Core::Font*                      m_font;

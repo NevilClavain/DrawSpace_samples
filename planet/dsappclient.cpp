@@ -37,8 +37,29 @@ void dsAppClient::OnRenderFrame( void )
 
     sbtrans.Scale( 20.0, 20.0, 20.0 );
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
+
+
+    DrawSpace::Utils::Matrix planet_trans;
+    //planet_trans.Rotation( DrawSpace::Utils::Vector( 1.0, 1.0, 1.0, 1.0 ), 0.25 );
+    planet_trans.Identity();
+    m_scenegraph.SetNodeLocalTransformation( "planet01", planet_trans );
+
  
     m_scenegraph.ComputeTransformations();
+
+
+    DrawSpace::Utils::Matrix camera_pos;
+    m_scenegraph.GetCurrentCameraTranform( camera_pos );
+
+    TypedProperty<DrawSpace::Utils::Vector> hotpoint( "hotpoint" );
+
+    hotpoint.m_value[0] = camera_pos( 3, 0 );
+    hotpoint.m_value[1] = camera_pos( 3, 1 );
+    hotpoint.m_value[2] = camera_pos( 3, 2 );
+
+    m_planet->SetProperty( "hotpoint", &hotpoint );
+
+
 
     static long last_fps;
 
@@ -51,14 +72,30 @@ void dsAppClient::OnRenderFrame( void )
         last_fps = current_fps;		
     }
 
-
     m_fpstext_widget->SetVirtualTranslation( 10, 5 );
     m_fpstext_widget->Transform();
+
+
+    TypedProperty<dsreal>* altitud = static_cast<TypedProperty<dsreal>*>( m_planet->GetProperty( "altitud" ) );
+
+    TypedProperty<DrawSpace::Utils::Vector>* pos = static_cast<TypedProperty<DrawSpace::Utils::Vector>*>( m_planet->GetProperty( "hotpoint" ) );
+    TypedProperty<DrawSpace::Utils::Vector>* relative_pos = static_cast<TypedProperty<DrawSpace::Utils::Vector>*>( m_planet->GetProperty( "relative_hotpoint" ) );
+
+    char planetinfos[256];
+    sprintf( planetinfos, "relative pos : %.2f %.2f %.2f altitud %.2f", relative_pos->m_value[0], relative_pos->m_value[1], relative_pos->m_value[2], 
+                                                                                    altitud->m_value );
+    m_planetinfos_widget->SetText( 5, 5, 7, planetinfos );
+
+
+    m_planetinfos_widget->SetVirtualTranslation( 90, 70 );
+    m_planetinfos_widget->Transform();
+
 
     m_wireframepass->GetRenderingQueue()->Draw();
 
 
     m_fpstext_widget->Draw();
+    m_planetinfos_widget->Draw();
 
     m_finalpass->GetRenderingQueue()->Draw();
 
@@ -242,9 +279,13 @@ bool dsAppClient::OnIdleAppInit( void )
     }
 
     m_fpstext_widget = DrawSpace::Utils::BuildText( m_font, 15, 10, DrawSpace::Utils::Vector( 1.0, 1.0, 1.0, 0.0 ), "fps" );
-
     m_fpstext_widget->RegisterToPass( m_finalpass );
     m_fpstext_widget->LoadAssets();
+
+
+    m_planetinfos_widget = DrawSpace::Utils::BuildText( m_font, 180, 120, DrawSpace::Utils::Vector( 1.0, 1.0, 1.0, 0.0 ), "planetinfos" );
+    m_planetinfos_widget->RegisterToPass( m_finalpass );
+    m_planetinfos_widget->LoadAssets();
 
 
     //////////////////////////////////////////////////////////////
@@ -284,13 +325,13 @@ void dsAppClient::OnKeyPress( long p_key )
             }
             else
             {
-                m_speed *= 1.5;
+                m_speed *= 1.081;
             }
             break;
 
         case 'W':
 
-            m_speed /= 1.5;
+            m_speed /= 1.081;
 
             if( m_speed < 1.0 )
             {

@@ -9,7 +9,7 @@ using namespace DrawSpace::Gui;
 dsAppClient* dsAppClient::m_instance = NULL;
 
 
-SceneTransform::SceneTransform( void ) : m_xangle( 0.0 ), m_yangle( 0.0 ), m_zpos( -8.0 )
+SceneTransform::SceneTransform( void ) : m_xangle( 0.0 ), m_yangle( 0.0 ), m_zpos( 5000000000.0 )
 {
 
 }
@@ -40,8 +40,8 @@ void SceneTransform::Transform( void )
 
     DrawSpace::Utils::Transformation transform;
 
-    //transform.PushMatrix( translate );
-    transform.PushMatrix( yrotate );
+    transform.PushMatrix( translate );
+    //transform.PushMatrix( yrotate );
     //transform.PushMatrix( xrotate );
     transform.BuildResult();
     transform.GetResult( &result );
@@ -297,7 +297,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.SetCurrentCamera( "camera" );
 
     m_fpsmove.SetTransformNode( m_camera );
-    m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 1.0, 6.0, 1.0 ) );
+    //m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 1.0, 6.0, 1.0 ) );
+
+    m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 5000000000.0 + 10.0, 1.0 ) );
 
     m_mouse_circularmode = true;
 
