@@ -59,7 +59,7 @@ void dsAppClient::OnRenderFrame( void )
 
     m_planet->SetProperty( "hotpoint", &hotpoint );
 
-
+    m_planet->ComputeSpecifics();
 
     static long last_fps;
 
@@ -261,8 +261,10 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_planet->LoadAssets();
 
-    DrawSpace::Core::Meshe* mesh = m_planet->GetMeshe( "front:.0" );
-   
+    DrawSpace::Core::TypedProperty<bool> update_state( "update_state", true );
+    m_planet->SetProperty( "update_state", &update_state );
+
+       
 
     //////////////////////////////////////////////////////////////
 
@@ -296,7 +298,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.SetCurrentCamera( "camera" );
     
     m_freemove.SetTransformNode( m_camera );
-    m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 6.0, 20000000.0, 1.0 ) );
+    m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 20000000.0, 1.0 ) );
 
 
     m_mouse_circularmode = true;
@@ -311,6 +313,8 @@ void dsAppClient::OnAppInit( void )
 
 void dsAppClient::OnClose( void )
 {
+    DrawSpace::Core::TypedProperty<bool> update_state( "update_state", false );
+    m_planet->SetProperty( "update_state", &update_state );
 }
 
 void dsAppClient::OnKeyPress( long p_key ) 
