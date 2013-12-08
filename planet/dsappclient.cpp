@@ -13,7 +13,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 )
 {    
     _INIT_LOGGER( "planet.conf" )  
     m_w_title = "planet engine test";
@@ -323,6 +323,7 @@ void dsAppClient::OnKeyPress( long p_key )
     {
         case 'Q':
 
+            /*
             if( 0.0 == m_speed )
             {
                 m_speed = 1.0;
@@ -331,17 +332,25 @@ void dsAppClient::OnKeyPress( long p_key )
             {
                 m_speed *= 1.081;
             }
+            */
+
+            m_timer.TranslationSpeedInc( &m_speed, m_speed_speed );
+            m_speed_speed *= 1.1;
+          
             break;
 
         case 'W':
 
-            m_speed /= 1.081;
-
+            /*
             if( m_speed < 1.0 )
             {
                 m_speed = 0.0;
             }
+            */
 
+            m_timer.TranslationSpeedDec( &m_speed, m_speed_speed );
+            m_speed_speed *= 1.2;
+ 
             break;
 
     }
@@ -353,13 +362,13 @@ void dsAppClient::OnEndKeyPress( long p_key )
     {
         case 'Q':
 
-
+            m_speed_speed = 5.0;
             break;
 
 
         case 'W':
-            
-            
+
+            m_speed_speed = 5.0;                        
             break;
 
         case VK_SPACE:

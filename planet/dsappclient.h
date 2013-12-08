@@ -41,6 +41,7 @@ protected:
     DrawSpace::Interface::Drawable*             m_planet;
 
     dsreal                                      m_speed;
+    dsreal                                      m_speed_speed;
 
     dsAppClient( void );
 
