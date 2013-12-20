@@ -43,6 +43,8 @@ protected:
     dsreal                                      m_speed;
     dsreal                                      m_speed_speed;
 
+    bool                                        m_update_hp;
+
     dsAppClient( void );
 
 public:

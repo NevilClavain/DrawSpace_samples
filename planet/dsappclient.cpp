@@ -13,7 +13,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_update_hp( true )
 {    
     _INIT_LOGGER( "planet.conf" )  
     m_w_title = "planet engine test";
@@ -40,9 +40,17 @@ void dsAppClient::OnRenderFrame( void )
 
 
     DrawSpace::Utils::Matrix planet_trans;
-    //planet_trans.Rotation( DrawSpace::Utils::Vector( 1.0, 1.0, 1.0, 1.0 ), 0.25 );
-    planet_trans.Identity();
-    m_scenegraph.SetNodeLocalTransformation( "planet01", planet_trans );
+    DrawSpace::Utils::Matrix planet_rot;
+    DrawSpace::Utils::Matrix planet_res;
+
+    planet_trans.Translation( 10000000.0, 0.0, -20000000.0 );
+    planet_rot.Rotation( DrawSpace::Utils::Vector( 0.25, 1.0, 0.0, 1.0 ), Maths::DegToRad( 110.0 ) );
+
+    //planet_res = planet_rot * planet_trans;
+    planet_res.Identity();
+
+
+    m_scenegraph.SetNodeLocalTransformation( "planet01", planet_res );
 
  
     m_scenegraph.ComputeTransformations();
@@ -57,9 +65,11 @@ void dsAppClient::OnRenderFrame( void )
     hotpoint.m_value[1] = camera_pos( 3, 1 );
     hotpoint.m_value[2] = camera_pos( 3, 2 );
 
-    m_planet->SetProperty( "hotpoint", &hotpoint );
-
-    m_planet->ComputeSpecifics();
+    if( m_update_hp )
+    {
+        m_planet->SetProperty( "hotpoint", &hotpoint );
+        m_planet->ComputeSpecifics();
+    }
 
     static long last_fps;
 
@@ -75,7 +85,7 @@ void dsAppClient::OnRenderFrame( void )
     m_fpstext_widget->SetVirtualTranslation( 10, 5 );
     m_fpstext_widget->Transform();
 
-
+/*
     TypedProperty<dsreal>* altitud = static_cast<TypedProperty<dsreal>*>( m_planet->GetProperty( "altitud" ) );
 
     TypedProperty<DrawSpace::Utils::Vector>* pos = static_cast<TypedProperty<DrawSpace::Utils::Vector>*>( m_planet->GetProperty( "hotpoint" ) );
@@ -89,10 +99,9 @@ void dsAppClient::OnRenderFrame( void )
 
     m_planetinfos_widget->SetVirtualTranslation( 90, 70 );
     m_planetinfos_widget->Transform();
-
+*/
 
     m_wireframepass->GetRenderingQueue()->Draw();
-
 
     m_fpstext_widget->Draw();
     m_planetinfos_widget->Draw();
@@ -335,7 +344,7 @@ void dsAppClient::OnKeyPress( long p_key )
             */
 
             m_timer.TranslationSpeedInc( &m_speed, m_speed_speed );
-            m_speed_speed *= 1.1;
+            m_speed_speed *= 1.03;
           
             break;
 
@@ -349,7 +358,7 @@ void dsAppClient::OnKeyPress( long p_key )
             */
 
             m_timer.TranslationSpeedDec( &m_speed, m_speed_speed );
-            m_speed_speed *= 1.2;
+            m_speed_speed *= 1.06;
  
             break;
 
@@ -382,6 +391,15 @@ void dsAppClient::OnKeyPulse( long p_key )
 {
     switch( p_key )
     {
+        case VK_F1:
+
+            m_update_hp = false;
+            break;
+
+        case VK_F2:
+
+            m_update_hp = true;
+            break;
     }
 }
 
