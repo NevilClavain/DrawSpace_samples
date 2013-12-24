@@ -54,16 +54,13 @@ protected:
     bool                                        m_mouselb;
     bool                                        m_mouserb;
 
-    DrawSpace::Gui::TextWidget*                 m_fpstext_widget;
-
-    DrawSpace::Interface::FontImport*           m_font_import;
-    DrawSpace::Core::Font*                      m_font;
-
     DrawSpace::Camera*                          m_camera;
     DrawSpace::Core::FPSMovement                m_fpsmove;
 
     DrawSpace::Interface::MesheImport*          m_meshe_import;
     DrawSpace::Interface::Drawable*             m_chunk;
+
+    DrawSpace::Interface::Drawable*             m_ground;
 
 
 

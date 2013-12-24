@@ -9,7 +9,7 @@ using namespace DrawSpace::Gui;
 dsAppClient* dsAppClient::m_instance = NULL;
 
 
-SceneTransform::SceneTransform( void ) : m_xangle( 0.0 ), m_yangle( 0.0 ), m_zpos( 5000000000.0 )
+SceneTransform::SceneTransform( void ) : m_xangle( 0.0 ), m_yangle( 0.0 ), m_zpos( 0.0 )
 {
 
 }
@@ -27,7 +27,7 @@ void SceneTransform::Transform( void )
     DrawSpace::Utils::Matrix translate;
     
     m_mutex_angles.WaitInfinite();
-    translate.Translation( 0.0, 0.0, m_zpos );
+    translate.Translation( 0.0, 1.0, m_zpos );
     m_mutex_angles.Release();
 
     DrawSpace::Utils::Matrix yrotate;
@@ -115,20 +115,6 @@ void dsAppClient::OnRenderFrame( void )
 
     m_scenegraph.ComputeTransformations();
 
-    static long last_fps;
-
-    long current_fps = m_timer.GetFPS();
-    char fps[256];
-    sprintf( fps, "%d fps", m_timer.GetFPS() );
-    if( last_fps != current_fps )
-    {
-        m_fpstext_widget->SetText( 0, 0, 70, fps, DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
-        last_fps = current_fps;		
-    }
-
-
-    m_fpstext_widget->SetVirtualTranslation( 10, 5 );
-    m_fpstext_widget->Transform();
 
 
 
@@ -137,9 +123,12 @@ void dsAppClient::OnRenderFrame( void )
     
     m_fogblendpass->GetRenderingQueue()->Draw();
 
-    m_fpstext_widget->Draw();
+    
 
     m_finalpass->GetRenderingQueue()->Draw();
+
+
+    renderer->DrawText( 255, 0, 0, 10, 20, "%d fps", m_timer.GetFPS() );
 
     renderer->FlipScreen();
 
@@ -218,7 +207,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ///////////////////////////////////////////////////////////////
 
+    
+
     status = DrawSpace::Utils::LoadDrawablePlugin( "chunk.dll", "chunk_plugin" );
+
+
     m_chunk = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
 
     m_chunk->RegisterPassSlot( "fogint_pass" );
@@ -258,6 +251,52 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterNode( m_chunk );
     m_chunk->LoadAssets();
 
+    dsstring md5_string_1;
+    m_chunk->GetMeshe( "" )->GetMD5( md5_string_1 );
+
+    ///////////////////////////////////////////////////////////////
+
+    m_ground = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+
+    m_ground->RegisterPassSlot( "fogint_pass" );
+    m_ground->RegisterPassSlot( "texture_pass" );
+    m_ground->SetRenderer( renderer );
+    m_ground->SetName( "ground" );
+
+
+    m_ground->GetMeshe( "" )->SetImporter( m_meshe_import );
+
+    m_ground->GetMeshe( "" )->LoadFromFile( "grid.ac", 0 );
+
+    m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.vsh", false ) ) );
+    m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.psh", false ) ) );
+    m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddShaderRealParameter( 0, "fog_intensity", 12 );
+    m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->SetShaderReal( "fog_intensity", 0.08 );
+    m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+
+
+    m_ground->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_ground->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_ground->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_ground->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_ground->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_ground->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_ground->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_ground->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+
+    m_ground->GetNodeFromPass( "texture_pass", "" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "ground.bmp" ) ), 0 );
+    m_ground->GetNodeFromPass( "texture_pass", "" )->GetTexture( 0 )->LoadFromFile();
+
+    m_scenegraph.RegisterNode( m_ground );
+    m_ground->LoadAssets();
+
+    dsstring md5_string_2;
+    m_ground->GetMeshe( "" )->GetMD5( md5_string_2 );
 
     ///////////////////////////////////////////////////////////////
 
@@ -270,25 +309,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    status = DrawSpace::Utils::LoadFontImportPlugin( "cbfgfont.dll", "cbfgfont_plugin" );
-    m_font_import = DrawSpace::Utils::InstanciateFontImportFromPlugin( "cbfgfont_plugin" );
-    m_font = _DRAWSPACE_NEW_( Font, Font );
-    m_font->SetImporter( m_font_import );
-
-
-    status = m_font->Build( "mangalfont.bmp", "mangalfont.csv" );
-    if( !status )
-    {
-        return false;
-    }
-
-    m_fpstext_widget = DrawSpace::Utils::BuildText( m_font, 15, 10, DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 0.0 ), "fps" );
-
-    m_fpstext_widget->RegisterToPass( m_finalpass );
-    m_fpstext_widget->LoadAssets();
-
-
-    //////////////////////////////////////////////////////////////
 
 
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
@@ -299,7 +319,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_fpsmove.SetTransformNode( m_camera );
     //m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 1.0, 6.0, 1.0 ) );
 
-    m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 5000000000.0 + 10.0, 1.0 ) );
+    m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 1.0, 10.0, 1.0 ) );
 
     m_mouse_circularmode = true;
 
