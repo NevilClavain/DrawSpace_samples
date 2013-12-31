@@ -63,6 +63,13 @@ protected:
     DrawSpace::Interface::Drawable*             m_ground;
 
 
+    DrawSpace::Interface::FontImport*           m_font_import;
+    DrawSpace::Core::Font*                      m_font;
+
+    DrawSpace::Text*                            m_mytext;
+
+
+
 
     dsAppClient( void );
 

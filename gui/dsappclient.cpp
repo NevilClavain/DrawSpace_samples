@@ -71,20 +71,25 @@ void dsAppClient::OnRenderFrame( void )
     char fps[256];
     sprintf( fps, "%d fps", m_timer.GetFPS() );
 
+    
     if( last_fps != current_fps )
     {
-        m_text_widget->SetText( 5, 120, 15, fps, DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
+        m_text_widget->SetText( 5, 120, 40, fps, DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
 
         m_fpstext_widget->SetText( 0, 0, 70, fps, DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
         last_fps = current_fps;		
     }
+    
 
     m_image1->SetVirtualTranslation( m_xmouse, m_ymouse );
 
+    
     m_fpstext_widget->SetVirtualTranslation( 15, 5 );
     m_fpstext_widget->Transform();
 
+    
     m_text_widget->SetVirtualTranslation( 160, 110 );
+    
     m_text_widget_2->SetVirtualTranslation( 10, 120 );
 
     m_text_widget_3->SetVirtualTranslation( 100, 100 );
@@ -97,9 +102,13 @@ void dsAppClient::OnRenderFrame( void )
     m_texturepass->GetRenderingQueue()->Draw();
 
 
+    
     m_text_widget->Draw();
+    
     m_fpstext_widget->Draw();
+   
     m_text_widget_3->Draw();
+    
 
     m_finalpass->GetRenderingQueue()->Draw();
 
@@ -138,7 +147,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_finalpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
     
-    m_finalpass->GetViewportQuad()->LoadAssets();
+    
 
     ///////////////////////////////////////////////////////////////
 
@@ -146,37 +155,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ///////////////////////////////////////////////////////////////
 
-    /*
-    DrawSpace::Core::RenderingNode* texture_rnode = _DRAWSPACE_NEW_( RenderingNode, RenderingNode );
-
-    texture_rnode->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    texture_rnode->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-    texture_rnode->GetFx()->GetShader( 0 )->LoadFromFile();
-    texture_rnode->GetFx()->GetShader( 1 )->LoadFromFile();
-
-
-    texture_rnode->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-    texture_rnode->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    texture_rnode->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-    texture_rnode->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-
-
-    texture_rnode->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
-    texture_rnode->GetTexture( 0 )->LoadFromFile();
-
-
-    m_chunknode = _DRAWSPACE_NEW_( ChunkNode, ChunkNode( "cube" ) );
-
-    DrawSpace::Utils::AC3DMesheImport importer;
-    m_chunknode->GetMeshe()->SetImporter( &importer );
-    m_chunknode->GetMeshe()->LoadFromFile( "object.ac", 0 );
-
-    m_chunknode->RegisterPassRenderingNode( "texture_pass", texture_rnode );
-
-
-    m_scenegraph.RegisterNode( m_chunknode );
-    m_chunknode->LoadAssets();
-    */
 
     status = DrawSpace::Utils::LoadDrawablePlugin( "chunk.dll", "chunk_plugin" );
     m_chunk = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
@@ -204,7 +182,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->GetNodeFromPass( "texture_pass", "" )->GetTexture( 0 )->LoadFromFile();
 
     m_scenegraph.RegisterNode( m_chunk );
-    m_chunk->LoadAssets();
+
 
     /////////////////////////////////////////////////////////////////
 
@@ -225,30 +203,37 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_text_widget = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget", 25, 15, m_font, true, NULL ) );
 
-    m_text_widget->GetBackGroundImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_text_widget->GetBackGroundImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-    m_text_widget->GetBackGroundImageFx()->GetShader( 0 )->LoadFromFile();
-    m_text_widget->GetBackGroundImageFx()->GetShader( 1 )->LoadFromFile();
+    m_text_widget->GetBackgroundImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_text_widget->GetBackgroundImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_text_widget->GetBackgroundImage()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget->GetBackgroundImage()->GetFx()->GetShader( 1 )->LoadFromFile();
 
-    m_text_widget->SetBackgroundTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
-    m_text_widget->GetBackGroundImageTexture( 0 )->LoadFromFile();
-    
-    m_text_widget->GetImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_text_widget->GetImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-    m_text_widget->GetImageFx()->GetShader( 0 )->LoadFromFile();
-    m_text_widget->GetImageFx()->GetShader( 1 )->LoadFromFile();
+    m_text_widget->GetBackgroundImage()->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
+    m_text_widget->GetBackgroundImage()->GetTexture( 0 )->LoadFromFile();
 
-    m_text_widget->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
-    m_text_widget->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
-    m_text_widget->GetTextFx()->GetShader( 0 )->LoadFromFile();
-    m_text_widget->GetTextFx()->GetShader( 1 )->LoadFromFile();
-    m_text_widget->GetTextFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    m_text_widget->GetTextFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    m_text_widget->GetTextFx()->AddShaderRealVectorParameter( 1, "color", 0 );
-    m_text_widget->GetTextFx()->SetShaderRealVector( "color", Utils::Vector( 1.0, 1.0, 0.0, 1.0 ) );
+
+  
+    m_text_widget->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_text_widget->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_text_widget->GetImage()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget->GetImage()->GetFx()->GetShader( 1 )->LoadFromFile();
+
+
+    m_text_widget->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
+    m_text_widget->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
+    m_text_widget->GetText()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget->GetText()->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_text_widget->GetText()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_text_widget->GetText()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+
+    m_text_widget->GetText()->AddShaderParameter( 1, "color", 0 );
+    m_text_widget->GetText()->SetShaderRealVector( "color", Utils::Vector( 1.0, 1.0, 0.0, 1.0 ) );
+
+    m_text_widget->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
 
     m_text_widget->RegisterToPass( m_finalpass );
-    m_text_widget->LoadAssets();
+    
 
     m_text_widget->RegisterMouseInEventHandler( m_mousein_eventhandler );
     m_text_widget->RegisterMouseOutEventHandler( m_mouseout_eventhandler );
@@ -261,32 +246,32 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_text_widget_2 = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget_2", 50, 50, m_font, true, m_text_widget ) );
 
-    m_text_widget_2->GetBackGroundImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_text_widget_2->GetBackGroundImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-    m_text_widget_2->GetBackGroundImageFx()->GetShader( 0 )->LoadFromFile();
-    m_text_widget_2->GetBackGroundImageFx()->GetShader( 1 )->LoadFromFile();
+    m_text_widget_2->GetBackgroundImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_text_widget_2->GetBackgroundImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_text_widget_2->GetBackgroundImage()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget_2->GetBackgroundImage()->GetFx()->GetShader( 1 )->LoadFromFile();
 
-    m_text_widget_2->SetBackgroundTexture( _DRAWSPACE_NEW_( Texture, Texture( "shelby.jpg" ) ), 0 );
-    m_text_widget_2->GetBackGroundImageTexture( 0 )->LoadFromFile();
+    m_text_widget_2->GetBackgroundImage()->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "shelby.jpg" ) ), 0 );
+    m_text_widget_2->GetBackgroundImage()->GetTexture( 0 )->LoadFromFile();
 
-    m_text_widget_2->GetImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_text_widget_2->GetImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-    m_text_widget_2->GetImageFx()->GetShader( 0 )->LoadFromFile();
-    m_text_widget_2->GetImageFx()->GetShader( 1 )->LoadFromFile();
+    m_text_widget_2->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_text_widget_2->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_text_widget_2->GetImage()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget_2->GetImage()->GetFx()->GetShader( 1 )->LoadFromFile();
 
-    m_text_widget_2->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
-    m_text_widget_2->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
-    m_text_widget_2->GetTextFx()->GetShader( 0 )->LoadFromFile();
-    m_text_widget_2->GetTextFx()->GetShader( 1 )->LoadFromFile();
-    m_text_widget_2->GetTextFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    m_text_widget_2->GetTextFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    m_text_widget_2->GetTextFx()->AddShaderRealVectorParameter( 1, "color", 0 );
-    m_text_widget_2->GetTextFx()->SetShaderRealVector( "color", Utils::Vector( 1.0, 1.0, 0.0, 1.0 ) );
+    m_text_widget_2->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
+    m_text_widget_2->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
+    m_text_widget_2->GetText()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget_2->GetText()->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_text_widget_2->GetText()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_text_widget_2->GetText()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_text_widget_2->GetText()->AddShaderParameter( 1, "color", 0 );
+    m_text_widget_2->GetText()->SetShaderRealVector( "color", Utils::Vector( 1.0, 1.0, 0.0, 1.0 ) );
 
-
+    m_text_widget_2->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
 
     m_text_widget_2->RegisterToPass( m_finalpass );
-    m_text_widget_2->LoadAssets();
+    
 
     m_text_widget_2->RegisterMouseInEventHandler( m_mousein_eventhandler );
     m_text_widget_2->RegisterMouseOutEventHandler( m_mouseout_eventhandler );
@@ -301,44 +286,48 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_text_widget_3 = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget_3", 70, 50, m_font, false, NULL ) );
 
-    m_text_widget_3->GetImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
-    m_text_widget_3->GetImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
-    m_text_widget_3->GetImageFx()->GetShader( 0 )->LoadFromFile();
-    m_text_widget_3->GetImageFx()->GetShader( 1 )->LoadFromFile();
+    m_text_widget_3->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
+    m_text_widget_3->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
+    m_text_widget_3->GetImage()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget_3->GetImage()->GetFx()->GetShader( 1 )->LoadFromFile();
 
-    m_text_widget_3->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
-    m_text_widget_3->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
-    m_text_widget_3->GetTextFx()->GetShader( 0 )->LoadFromFile();
-    m_text_widget_3->GetTextFx()->GetShader( 1 )->LoadFromFile();
-    m_text_widget_3->GetTextFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    m_text_widget_3->GetTextFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    m_text_widget_3->GetTextFx()->AddShaderRealVectorParameter( 1, "color", 0 );
-    m_text_widget_3->GetTextFx()->SetShaderRealVector( "color", Utils::Vector( 1.0, 1.0, 1.0, 1.0 ) );
+    m_text_widget_3->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
+    m_text_widget_3->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
+    m_text_widget_3->GetText()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget_3->GetText()->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_text_widget_3->GetText()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_text_widget_3->GetText()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_text_widget_3->GetText()->AddShaderParameter( 1, "color", 0 );
+    m_text_widget_3->GetText()->SetShaderRealVector( "color", Utils::Vector( 1.0, 1.0, 1.0, 1.0 ) );
 
+    m_text_widget_3->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
     m_text_widget_3->RegisterToPass( m_finalpass );
-    m_text_widget_3->LoadAssets();
 
 
+    
     //////////////////////////////////////////////////////////////////////
 
     m_fpstext_widget = _DRAWSPACE_NEW_( TextWidget, TextWidget( "fps_text_widget", 20, 10, m_font, false, NULL ) );
 
-    m_fpstext_widget->GetImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
-    m_fpstext_widget->GetImageFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
-    m_fpstext_widget->GetImageFx()->GetShader( 0 )->LoadFromFile();
-    m_fpstext_widget->GetImageFx()->GetShader( 1 )->LoadFromFile();
+    m_fpstext_widget->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
+    m_fpstext_widget->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
+    m_fpstext_widget->GetText()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_fpstext_widget->GetText()->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_fpstext_widget->GetText()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_fpstext_widget->GetText()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
-    m_fpstext_widget->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
-    m_fpstext_widget->GetTextFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
-    m_fpstext_widget->GetTextFx()->GetShader( 0 )->LoadFromFile();
-    m_fpstext_widget->GetTextFx()->GetShader( 1 )->LoadFromFile();
-    m_fpstext_widget->GetTextFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    m_fpstext_widget->GetTextFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    m_fpstext_widget->GetTextFx()->AddShaderRealVectorParameter( 1, "color", 0 );
-    m_fpstext_widget->GetTextFx()->SetShaderRealVector( "color", Utils::Vector( 0.0, 1.0, 0.0, 1.0 ) );
+    m_fpstext_widget->GetText()->AddShaderParameter( 1, "color", 0 );
+    m_fpstext_widget->GetText()->SetShaderRealVector( "color", Utils::Vector( 0.0, 1.0, 0.0, 1.0 ) );
+
+    m_fpstext_widget->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
+    m_fpstext_widget->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
+    m_fpstext_widget->GetImage()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_fpstext_widget->GetImage()->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_fpstext_widget->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
+
 
     m_fpstext_widget->RegisterToPass( m_finalpass );
-    m_fpstext_widget->LoadAssets();
 
 
     //////////////////////////////////////////////////////////////////
@@ -358,11 +347,12 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_finalpass->GetRenderingQueue()->Add( m_image1 );
 
-    status = m_image1->LoadAssets();
-    if( !status )
-    {
-        return false;
-    }
+
+
+    m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
+    m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
+
+
 
     m_mouse_input.RegisterImage( m_image1 );
     m_mouse_input.RegisterWidget( m_text_widget );

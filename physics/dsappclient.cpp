@@ -46,32 +46,6 @@ void dsAppClient::OnRenderFrame( void )
     ground_pos.Translation( 0.0, 0.0, 0.0 );
     m_scenegraph.SetNodeLocalTransformation( "ground", ground_pos );
 
-/*
-    m_myMotionState->m_graphicsWorldTrans.getOpenGLMatrix( m_matrix );
-    DrawSpace::Utils::Matrix box_pos;
-
-    box_pos( 0, 0 ) = m_matrix[0];
-    box_pos( 0, 1 ) = m_matrix[1];
-    box_pos( 0, 2 ) = m_matrix[2];
-    box_pos( 0, 3 ) = m_matrix[3];
-
-    box_pos( 1, 0 ) = m_matrix[4];
-    box_pos( 1, 1 ) = m_matrix[5];
-    box_pos( 1, 2 ) = m_matrix[6];
-    box_pos( 1, 3 ) = m_matrix[7];
-
-    box_pos( 2, 0 ) = m_matrix[8];
-    box_pos( 2, 1 ) = m_matrix[9];
-    box_pos( 2, 2 ) = m_matrix[10];
-    box_pos( 2, 3 ) = m_matrix[11];
-
-    box_pos( 3, 0 ) = m_matrix[12];
-    box_pos( 3, 1 ) = m_matrix[13];
-    box_pos( 3, 2 ) = m_matrix[14];
-    box_pos( 3, 3 ) = m_matrix[15];
-
-    m_scenegraph.SetNodeLocalTransformation( "box", box_pos );
-    */
 
 
     for( long i = 0; i < m_boxes.size(); i++ )
@@ -118,20 +92,22 @@ void dsAppClient::OnRenderFrame( void )
     long current_fps = m_timer.GetFPS();
     char fps[256];
     sprintf( fps, "%d fps", m_timer.GetFPS() );
+    /*
     if( last_fps != current_fps )
     {
         m_fpstext_widget->SetText( 0, 0, 70, fps, DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
         last_fps = current_fps;		
     }
+    */
 
-
+/*
     m_fpstext_widget->SetVirtualTranslation( 10, 5 );
     m_fpstext_widget->Transform();
-
+*/
     m_texturepass->GetRenderingQueue()->Draw();
 
 
-    m_fpstext_widget->Draw();
+    //m_fpstext_widget->Draw();
 
     m_finalpass->GetRenderingQueue()->Draw();
 
@@ -181,7 +157,7 @@ void dsAppClient::create_box( void )
     drawable->GetNodeFromPass( "texture_pass", "" )->GetTexture( 0 )->LoadFromFile();
 
     m_scenegraph.RegisterNode( drawable );
-    drawable->LoadAssets();
+
 
     ///////////////////////////////////////////////////////////////////
 
@@ -213,6 +189,8 @@ void dsAppClient::create_box( void )
     m_boxes.push_back( box );
 
     m_box_count++;
+
+    m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
 }
 
 bool dsAppClient::OnIdleAppInit( void )
@@ -245,7 +223,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_finalpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
     
-    m_finalpass->GetViewportQuad()->LoadAssets();
+
 
     //////////////////////////////////////////////////////////////
 
@@ -284,7 +262,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->GetNodeFromPass( "texture_pass", "" )->GetTexture( 0 )->LoadFromFile();
 
     m_scenegraph.RegisterNode( m_ground );
-    m_ground->LoadAssets();
+
 
 
     ////////////////////////////////////////////////////////////////
@@ -323,7 +301,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox->GetNodeFromPass( "texture_pass", "right" )->GetTexture( 0 )->LoadFromFile();
 
 
-    m_spacebox->LoadAssets();
+
 
 
     m_scenegraph.RegisterNode( m_spacebox );
@@ -353,10 +331,10 @@ bool dsAppClient::OnIdleAppInit( void )
         return false;
     }
 
-    m_fpstext_widget = DrawSpace::Utils::BuildText( m_font, 15, 10, DrawSpace::Utils::Vector( 1.0, 1.0, 1.0, 0.0 ), "fps" );
+//    m_fpstext_widget = DrawSpace::Utils::BuildText( m_font, 15, 10, DrawSpace::Utils::Vector( 1.0, 1.0, 1.0, 0.0 ), "fps" );
 
-    m_fpstext_widget->RegisterToPass( m_finalpass );
-    m_fpstext_widget->LoadAssets();
+//    m_fpstext_widget->RegisterToPass( m_finalpass );
+
 
 
     //////////////////////////////////////////////////////////////
@@ -380,6 +358,10 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //m_scenegraph.SetCurrentCamera( "camera2" );
     m_scenegraph.SetCurrentCamera( "camera" );
+
+
+    
+    m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
 
 
     //////////////////////////////////////////////////////////////

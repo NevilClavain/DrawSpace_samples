@@ -115,15 +115,10 @@ void dsAppClient::OnRenderFrame( void )
 
     m_scenegraph.ComputeTransformations();
 
-
-
-
     m_texturepass->GetRenderingQueue()->Draw();
     m_fogintpass->GetRenderingQueue()->Draw();
     
     m_fogblendpass->GetRenderingQueue()->Draw();
-
-    
 
     m_finalpass->GetRenderingQueue()->Draw();
 
@@ -177,11 +172,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_fogblendpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
     m_fogblendpass->GetViewportQuad()->SetTexture( m_fogintpass->GetTargetTexture(), 1 );
 
-    m_fogblendpass->GetViewportQuad()->LoadAssets();
-
-    m_fogblendpass->GetViewportQuad()->GetFx()->AddShaderRealVectorParameter( 1, "fog_color", 0 );
-    m_fogblendpass->GetViewportQuad()->GetFx()->SetShaderRealVector( "fog_color", DrawSpace::Utils::Vector( 145.0 / 255.0, 230.0 / 255.0, 230.0 / 255.0, 1.0 ) );
-
+    m_fogblendpass->GetViewportQuad()->AddShaderParameter( 1, "fog_color", 0 );
+    m_fogblendpass->GetViewportQuad()->SetShaderRealVector( "fog_color", DrawSpace::Utils::Vector( 145.0 / 255.0, 230.0 / 255.0, 230.0 / 255.0, 1.0 ) );
 
     //////////////////////////////////////////////////////////////
 
@@ -195,10 +187,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_finalpass->GetViewportQuad()->SetTexture( m_fogblendpass->GetTargetTexture(), 0 );
     
-    m_finalpass->GetViewportQuad()->LoadAssets();
-
-
-
     ///////////////////////////////////////////////////////////////
 
     m_scenegraph.RegisterPass( m_texturepass );
@@ -229,8 +217,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.psh", false ) ) );
     m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
     m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
-    m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddShaderRealParameter( 0, "fog_intensity", 12 );
-    m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->SetShaderReal( "fog_intensity", 0.08 );
+    m_chunk->GetNodeFromPass( "fogint_pass", "" )->AddShaderParameter( 0, "fog_intensity", 12 );
+    m_chunk->GetNodeFromPass( "fogint_pass", "" )->SetShaderReal( "fog_intensity", 0.08 );
+
     m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
     m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     
@@ -249,7 +238,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->GetNodeFromPass( "texture_pass", "" )->GetTexture( 0 )->LoadFromFile();
 
     m_scenegraph.RegisterNode( m_chunk );
-    m_chunk->LoadAssets();
 
     dsstring md5_string_1;
     m_chunk->GetMeshe( "" )->GetMD5( md5_string_1 );
@@ -272,8 +260,10 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.psh", false ) ) );
     m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
     m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
-    m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddShaderRealParameter( 0, "fog_intensity", 12 );
-    m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->SetShaderReal( "fog_intensity", 0.08 );
+
+    m_ground->GetNodeFromPass( "fogint_pass", "" )->AddShaderParameter( 0, "fog_intensity", 12 );
+    m_ground->GetNodeFromPass( "fogint_pass", "" )->SetShaderReal( "fog_intensity", 0.08 );
+
     m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
     m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
 
@@ -293,10 +283,41 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->GetNodeFromPass( "texture_pass", "" )->GetTexture( 0 )->LoadFromFile();
 
     m_scenegraph.RegisterNode( m_ground );
-    m_ground->LoadAssets();
 
-    dsstring md5_string_2;
-    m_ground->GetMeshe( "" )->GetMD5( md5_string_2 );
+
+
+    /////////////////////////////////////////////////////////////////
+
+    status = DrawSpace::Utils::LoadFontImportPlugin( "cbfgfont.dll", "cbfgfont_plugin" );
+    m_font_import = DrawSpace::Utils::InstanciateFontImportFromPlugin( "cbfgfont_plugin" );
+    m_font = _DRAWSPACE_NEW_( Font, Font );
+    m_font->SetImporter( m_font_import );
+
+    status = m_font->Build( "mangalfont.bmp", "mangalfont.csv" );
+    if( !status )
+    {
+        return false;
+    }
+
+    /////////////////////////////////////////////////////////////////
+
+    m_mytext = _DRAWSPACE_NEW_( DrawSpace::Text, DrawSpace::Text( m_font ) );
+    status = m_mytext->Initialize();
+
+    m_mytext->SetText( 100, 100, 8, "Emmanuel" );
+    m_mytext->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_mytext->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_mytext->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_mytext->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_mytext->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_mytext->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_mytext->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_mytext->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+
+    m_finalpass->GetRenderingQueue()->Add( m_mytext );
+
 
     ///////////////////////////////////////////////////////////////
 
@@ -317,9 +338,17 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.SetCurrentCamera( "camera" );
 
     m_fpsmove.SetTransformNode( m_camera );
-    //m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 1.0, 6.0, 1.0 ) );
 
     m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 1.0, 10.0, 1.0 ) );
+
+
+
+    m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
+    m_fogintpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_fogblendpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
+
+
 
     m_mouse_circularmode = true;
 
