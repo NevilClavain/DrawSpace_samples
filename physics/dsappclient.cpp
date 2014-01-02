@@ -92,22 +92,22 @@ void dsAppClient::OnRenderFrame( void )
     long current_fps = m_timer.GetFPS();
     char fps[256];
     sprintf( fps, "%d fps", m_timer.GetFPS() );
-    /*
+    
     if( last_fps != current_fps )
     {
         m_fpstext_widget->SetText( 0, 0, 70, fps, DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
         last_fps = current_fps;		
     }
-    */
+    
 
-/*
+
     m_fpstext_widget->SetVirtualTranslation( 10, 5 );
     m_fpstext_widget->Transform();
-*/
+
     m_texturepass->GetRenderingQueue()->Draw();
 
 
-    //m_fpstext_widget->Draw();
+    m_fpstext_widget->Draw();
 
     m_finalpass->GetRenderingQueue()->Draw();
 
@@ -331,9 +331,9 @@ bool dsAppClient::OnIdleAppInit( void )
         return false;
     }
 
-//    m_fpstext_widget = DrawSpace::Utils::BuildText( m_font, 15, 10, DrawSpace::Utils::Vector( 1.0, 1.0, 1.0, 0.0 ), "fps" );
+    m_fpstext_widget = DrawSpace::Utils::BuildText( m_font, 15, 10, DrawSpace::Utils::Vector( 1.0, 1.0, 1.0, 0.0 ), "fps" );
 
-//    m_fpstext_widget->RegisterToPass( m_finalpass );
+    m_fpstext_widget->RegisterToPass( m_finalpass );
 
 
 
