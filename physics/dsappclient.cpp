@@ -111,6 +111,9 @@ void dsAppClient::OnRenderFrame( void )
 
     m_finalpass->GetRenderingQueue()->Draw();
 
+
+    renderer->DrawText( 255, 0, 0, 30, 50, "%d %d", m_texturepass->GetRenderingQueue()->GetSwitchesCost(), m_texturepass->GetRenderingQueue()->GetTheoricalSwitchesCost() );
+
     renderer->FlipScreen();
 
     m_timer.Update();
