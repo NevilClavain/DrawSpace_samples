@@ -230,6 +230,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_text_widget->GetText()->AddShaderParameter( 1, "color", 0 );
     m_text_widget->GetText()->SetShaderRealVector( "color", Utils::Vector( 1.0, 1.0, 0.0, 1.0 ) );
 
+    m_text_widget->GetImage()->SetOrderNumber( 20000 );
     m_text_widget->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
 
     m_text_widget->RegisterToPass( m_finalpass );
@@ -268,6 +269,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_text_widget_2->GetText()->AddShaderParameter( 1, "color", 0 );
     m_text_widget_2->GetText()->SetShaderRealVector( "color", Utils::Vector( 1.0, 1.0, 0.0, 1.0 ) );
 
+
+    m_text_widget_2->GetImage()->SetOrderNumber( 20000 );
     m_text_widget_2->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
 
     m_text_widget_2->RegisterToPass( m_finalpass );
@@ -300,6 +303,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_text_widget_3->GetText()->AddShaderParameter( 1, "color", 0 );
     m_text_widget_3->GetText()->SetShaderRealVector( "color", Utils::Vector( 1.0, 1.0, 1.0, 1.0 ) );
 
+    m_text_widget_3->GetImage()->SetOrderNumber( 20000 );
     m_text_widget_3->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
     m_text_widget_3->RegisterToPass( m_finalpass );
 
@@ -324,10 +328,13 @@ bool dsAppClient::OnIdleAppInit( void )
     m_fpstext_widget->GetImage()->GetFx()->GetShader( 0 )->LoadFromFile();
     m_fpstext_widget->GetImage()->GetFx()->GetShader( 1 )->LoadFromFile();
 
+    m_fpstext_widget->GetImage()->SetOrderNumber( 20000 );
+
     m_fpstext_widget->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
 
 
     m_fpstext_widget->RegisterToPass( m_finalpass );
+    
 
 
     //////////////////////////////////////////////////////////////////
@@ -342,6 +349,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_image1->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "money.bmp" ) ), 0 );
     m_image1->GetTexture( 0 )->LoadFromFile();
+
+    m_image1->SetOrderNumber( 20000 );
 
 
 

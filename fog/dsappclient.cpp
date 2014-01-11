@@ -315,6 +315,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_mytext->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     m_mytext->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
+    m_mytext->SetOrderNumber( 20000 );
+
 
     m_finalpass->GetRenderingQueue()->Add( m_mytext );
 

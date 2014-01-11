@@ -304,18 +304,18 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox->GetNodeFromPass( "texture_pass", "right" )->GetTexture( 0 )->LoadFromFile();
 
 
-
-
-
-    m_scenegraph.RegisterNode( m_spacebox );
-
-
     m_spacebox->GetNodeFromPass( "texture_pass", "front" )->SetOrderNumber( 200 );
     m_spacebox->GetNodeFromPass( "texture_pass", "rear" )->SetOrderNumber( 200 );
     m_spacebox->GetNodeFromPass( "texture_pass", "top" )->SetOrderNumber( 200 );
     m_spacebox->GetNodeFromPass( "texture_pass", "bottom" )->SetOrderNumber( 200 );
     m_spacebox->GetNodeFromPass( "texture_pass", "left" )->SetOrderNumber( 200 );
     m_spacebox->GetNodeFromPass( "texture_pass", "right" )->SetOrderNumber( 200 );
+
+
+
+    m_scenegraph.RegisterNode( m_spacebox );
+
+
 
 
     //////////////////////////////////////////////////////////////
@@ -335,6 +335,8 @@ bool dsAppClient::OnIdleAppInit( void )
     }
 
     m_fpstext_widget = DrawSpace::Utils::BuildText( m_font, 15, 10, DrawSpace::Utils::Vector( 1.0, 1.0, 1.0, 0.0 ), "fps" );
+
+    m_fpstext_widget->GetImage()->SetOrderNumber( 20000 );
 
     m_fpstext_widget->RegisterToPass( m_finalpass );
 
