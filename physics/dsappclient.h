@@ -42,6 +42,7 @@ protected:
     //DrawSpace::Interface::Drawable*             m_box;
 
     int                                         m_box_count;
+    int                                         m_box_texture;
 
 
 
