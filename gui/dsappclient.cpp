@@ -59,6 +59,7 @@ void dsAppClient::OnRenderFrame( void )
     
     m_scenegraph.SetNodeLocalTransformation( "cube", result );
     m_scenegraph.ComputeTransformations();
+    m_scenegraph.ComputeVSpheres();
     
 
 
