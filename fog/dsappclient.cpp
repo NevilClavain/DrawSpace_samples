@@ -115,6 +115,7 @@ void dsAppClient::OnRenderFrame( void )
 
     m_scenegraph.ComputeTransformations();
     m_scenegraph.ComputeVSpheres();
+    m_scenegraph.ComputeLods();
 
     m_texturepass->GetRenderingQueue()->Draw();
     m_fogintpass->GetRenderingQueue()->Draw();

@@ -87,6 +87,7 @@ void dsAppClient::OnRenderFrame( void )
  
     m_scenegraph.ComputeTransformations();
     m_scenegraph.ComputeVSpheres();
+    m_scenegraph.ComputeLods();
 
     static long last_fps;
 
