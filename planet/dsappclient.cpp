@@ -39,6 +39,7 @@ void dsAppClient::OnRenderFrame( void )
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
 
 
+    /*
     DrawSpace::Utils::Matrix planet_trans;
     DrawSpace::Utils::Matrix planet_rot;
     DrawSpace::Utils::Matrix planet_res;
@@ -48,9 +49,8 @@ void dsAppClient::OnRenderFrame( void )
 
     //planet_res = planet_rot * planet_trans;
     planet_res.Identity();
-
-
     m_scenegraph.SetNodeLocalTransformation( "planet01", planet_res );
+    */
 
  
     m_scenegraph.ComputeTransformations();
@@ -67,8 +67,8 @@ void dsAppClient::OnRenderFrame( void )
 
     if( m_update_hp )
     {
-        m_planet->SetProperty( "hotpoint", &hotpoint );
-        m_planet->ComputeSpecifics();
+        //m_planet->SetProperty( "hotpoint", &hotpoint );
+        //m_planet->ComputeSpecifics();
     }
 
     static long last_fps;
@@ -146,7 +146,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_finalpass->GetViewportQuad()->SetTexture( m_wireframepass->GetTargetTexture(), 0 );
     
-    m_finalpass->GetViewportQuad()->LoadAssets();
 
     //////////////////////////////////////////////////////////////
 
@@ -190,8 +189,12 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox->GetNodeFromPass( "wireframe_pass", "right" )->GetTexture( 0 )->LoadFromFile();
 
 
-
-    m_spacebox->LoadAssets();
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "front" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "rear" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "top" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "bottom" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "left" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", "right" )->SetOrderNumber( 200 );
 
 
     m_scenegraph.RegisterNode( m_spacebox );
@@ -259,19 +262,14 @@ bool dsAppClient::OnIdleAppInit( void )
                 "}"
                 );
 
-        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->AddShaderRealVectorParameter( 1, "color", 0 );
-        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->SetShaderRealVector( "color", Vector( 0.0, 0.0, 1.0, 0.0 ) );
+        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->AddShaderParameter( 1, "color", 0 );
+        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->SetShaderRealVector( "color", Vector( 0.0, 0.0, 1.0, 0.0 ) );
     }
 
     m_scenegraph.RegisterNode( m_planet );
 
     DrawSpace::Core::TypedProperty<dsreal> planet_diameter( "diameter", 12000000.0 );
     m_planet->SetProperty( "diameter", &planet_diameter );
-
-    m_planet->LoadAssets();
-
-    DrawSpace::Core::TypedProperty<bool> update_state( "update_state", true );
-    m_planet->SetProperty( "update_state", &update_state );
 
        
 
@@ -290,13 +288,13 @@ bool dsAppClient::OnIdleAppInit( void )
     }
 
     m_fpstext_widget = DrawSpace::Utils::BuildText( m_font, 15, 10, DrawSpace::Utils::Vector( 1.0, 1.0, 1.0, 0.0 ), "fps" );
+
+    m_fpstext_widget->GetImage()->SetOrderNumber( 20000 );
     m_fpstext_widget->RegisterToPass( m_finalpass );
-    m_fpstext_widget->LoadAssets();
 
 
     m_planetinfos_widget = DrawSpace::Utils::BuildText( m_font, 180, 120, DrawSpace::Utils::Vector( 1.0, 1.0, 1.0, 0.0 ), "planetinfos" );
     m_planetinfos_widget->RegisterToPass( m_finalpass );
-    m_planetinfos_widget->LoadAssets();
 
 
     //////////////////////////////////////////////////////////////
@@ -305,6 +303,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterNode( m_camera );
 
     m_scenegraph.SetCurrentCamera( "camera" );
+
+    m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_wireframepass->GetRenderingQueue()->UpdateOutputQueue();
     
     m_freemove.SetTransformNode( m_camera );
     m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 20000000.0, 1.0 ) );
@@ -323,7 +324,6 @@ void dsAppClient::OnAppInit( void )
 void dsAppClient::OnClose( void )
 {
     DrawSpace::Core::TypedProperty<bool> update_state( "update_state", false );
-    m_planet->SetProperty( "update_state", &update_state );
 }
 
 void dsAppClient::OnKeyPress( long p_key ) 
