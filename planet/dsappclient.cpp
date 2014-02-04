@@ -39,7 +39,7 @@ void dsAppClient::OnRenderFrame( void )
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
 
 
-    /*
+    
     DrawSpace::Utils::Matrix planet_trans;
     DrawSpace::Utils::Matrix planet_rot;
     DrawSpace::Utils::Matrix planet_res;
@@ -50,7 +50,7 @@ void dsAppClient::OnRenderFrame( void )
     //planet_res = planet_rot * planet_trans;
     planet_res.Identity();
     m_scenegraph.SetNodeLocalTransformation( "planet01", planet_res );
-    */
+    
 
  
     m_scenegraph.ComputeTransformations();
@@ -67,8 +67,8 @@ void dsAppClient::OnRenderFrame( void )
 
     if( m_update_hp )
     {
-        //m_planet->SetProperty( "hotpoint", &hotpoint );
-        //m_planet->ComputeSpecifics();
+        m_planet->SetProperty( "hotpoint", &hotpoint );
+        m_planet->ComputeSpecifics();
     }
 
     static long last_fps;
@@ -210,68 +210,21 @@ bool dsAppClient::OnIdleAppInit( void )
     m_planet->RegisterPassSlot( "wireframe_pass" );
     m_planet->SetName( "planet01" );
 
-
+    
     std::vector<dsstring> idslist;
     m_planet->GetNodesIdsList( idslist );
-
     for( size_t i = 0; i < idslist.size(); i++ )
     {
-        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
-        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
-
-        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
-        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
-
-        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->GetShader( 0 )->SetText(
-
-                "float4x4 matWorldViewProjection: register(c0);"
-
-                "struct VS_INPUT"
-                "{"
-                   "float4 Position : POSITION0;"
-                "};"
-
-                "struct VS_OUTPUT"
-                "{"
-                   "float4 Position : POSITION0;"
-                "};"
-
-                "VS_OUTPUT vs_main( VS_INPUT Input )"
-                "{"
-                   "VS_OUTPUT Output;"
-                   "Output.Position = mul( Input.Position, matWorldViewProjection );"                      
-                   "return( Output );"
-                "}"
-
-                );
-
-        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->GetFx()->GetShader( 1 )->SetText(
-
-                "float4 Color : register(c0);"
-
-                "sampler2D Texture0;"
-
-                "struct PS_INTPUT"
-                "{"
-                   "float4 Position : POSITION0;"
-                "};"
-
-                "float4 ps_main( PS_INTPUT input ) : COLOR0"
-                "{"
-                   "return Color;"
-                "}"
-                );
-
-        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->AddShaderParameter( 1, "color", 0 );
-        m_planet->GetNodeFromPass( "wireframe_pass", idslist[i] )->SetShaderRealVector( "color", Vector( 0.0, 0.0, 1.0, 0.0 ) );
+        m_planet->SetNodeFromPassSpecificFx( "wireframe_pass", idslist[i], "main_fx" );
     }
+    
 
     m_scenegraph.RegisterNode( m_planet );
 
     DrawSpace::Core::TypedProperty<dsreal> planet_diameter( "diameter", 12000000.0 );
     m_planet->SetProperty( "diameter", &planet_diameter );
 
-       
+    m_planet->Initialize();
 
     //////////////////////////////////////////////////////////////
 
@@ -323,7 +276,6 @@ void dsAppClient::OnAppInit( void )
 
 void dsAppClient::OnClose( void )
 {
-    DrawSpace::Core::TypedProperty<bool> update_state( "update_state", false );
 }
 
 void dsAppClient::OnKeyPress( long p_key ) 
@@ -399,6 +351,15 @@ void dsAppClient::OnKeyPulse( long p_key )
         case VK_F2:
 
             m_update_hp = true;
+            break;
+
+        case VK_F3:
+            {
+                TypedProperty<dsstring> patchname( "split" );
+                patchname.m_value = ".0";
+
+                m_planet->SetProperty( "split", &patchname );
+            }
             break;
     }
 }
