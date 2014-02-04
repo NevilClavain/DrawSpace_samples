@@ -113,8 +113,7 @@ void dsAppClient::OnRenderFrame( void )
 
     m_scenegraph.SetNodeLocalTransformation( "chunk", result );
 
-    m_scenegraph.ComputeTransformations();
-    m_scenegraph.ComputeVSpheres();
+    m_scenegraph.ComputeTransformations();    
     m_scenegraph.ComputeLods();
 
     m_texturepass->GetRenderingQueue()->Draw();
