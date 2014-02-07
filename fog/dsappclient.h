@@ -69,7 +69,9 @@ protected:
     DrawSpace::Text*                            m_mytext;
 
     DrawSpace::Dynamics::World                  m_world;
-    DrawSpace::Dynamics::InertBody*             m_cube;
+    DrawSpace::Dynamics::InertBody*             m_cube_body;
+
+    DrawSpace::Dynamics::InertBody*             m_ground_body;
 
 
 

@@ -111,7 +111,10 @@ void dsAppClient::OnRenderFrame( void )
     DrawSpace::Utils::Matrix result;
     m_transform->GetResult( result );
 
-    m_scenegraph.SetNodeLocalTransformation( "chunk", result );
+    //m_scenegraph.SetNodeLocalTransformation( "chunk", result );
+
+    m_cube_body->Update();
+    m_ground_body->Update();
 
     m_scenegraph.ComputeTransformations();    
 
@@ -357,8 +360,24 @@ bool dsAppClient::OnIdleAppInit( void )
     m_world.Initialize();
     m_world.SetGravity( DrawSpace::Utils::Vector( 0.0, -9.81, 0.0, 0.0 ) );
 
+    DrawSpace::Dynamics::InertBody::Parameters cube_params;
+    cube_params.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
+    cube_params.mass = 50.0;
+    cube_params.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 100.5, 0.0, 1.0 );
+    cube_params.inital_rot.Identity();
+
+    m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, m_chunk, cube_params ) );
 
 
+    DrawSpace::Dynamics::InertBody::Parameters ground_params;
+    ground_params.box_dims = DrawSpace::Utils::Vector( 100.0, 0.0, 100., 1.0 );
+    ground_params.mass = 0.0;
+    ground_params.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    ground_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
+    ground_params.inital_rot.Identity();
+
+    m_ground_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, m_ground, ground_params ) );
 
 
     m_mouse_circularmode = true;
