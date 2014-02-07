@@ -133,6 +133,8 @@ void dsAppClient::OnRenderFrame( void )
         //m_transform->m_mutex_angles.WaitInfinite();
         m_timer.AngleSpeedInc( &m_transform->m_yangle, 45.0 );
         //m_transform->m_mutex_result.Release();
+
+        m_world.StepSimulation( m_timer.GetFPS() );
     }
 }
 
@@ -186,6 +188,7 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
     m_finalpass->GetViewportQuad()->SetTexture( m_fogblendpass->GetTargetTexture(), 0 );
+
     
     ///////////////////////////////////////////////////////////////
 
@@ -349,6 +352,12 @@ bool dsAppClient::OnIdleAppInit( void )
     m_fogintpass->GetRenderingQueue()->UpdateOutputQueue();
     m_fogblendpass->GetRenderingQueue()->UpdateOutputQueue();
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
+
+
+    m_world.Initialize();
+    m_world.SetGravity( DrawSpace::Utils::Vector( 0.0, -9.81, 0.0, 0.0 ) );
+
+
 
 
 
