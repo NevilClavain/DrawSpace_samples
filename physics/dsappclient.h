@@ -44,10 +44,13 @@ protected:
     int                                         m_box_count;
     int                                         m_box_texture;
 
+    DrawSpace::Dynamics::World                  m_world;
+    DrawSpace::Dynamics::InertBody*             m_ground_body;
+
 
 
     // bullet stuff
-
+/*
     btDiscreteDynamicsWorld*                    m_myWorld;
     btBroadphaseInterface*                      m_myBroadphase;
     btCollisionDispatcher*                      m_myDispatcher;
@@ -60,7 +63,6 @@ protected:
     //btRigidBody*                                m_body;
 	btRigidBody*                                m_body_sol;
 
-
     typedef struct
     {
         DrawSpace::Interface::Drawable* drawable;
@@ -71,8 +73,18 @@ protected:
 
     std::vector<Box>                            m_boxes;
 
-    void create_box( void );
+*/
 
+    typedef struct
+    {
+        DrawSpace::Interface::Drawable* drawable;
+        DrawSpace::Dynamics::InertBody* inert_body;
+
+    } Box;
+
+    std::vector<Box>                            m_boxes;
+
+    void create_box( void );
 
     dsAppClient( void );
 

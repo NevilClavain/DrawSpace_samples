@@ -5,32 +5,6 @@
 #include <dsapp.h>
 
 
-class SceneTransform
-{
-public:
-    dsreal                                  m_xangle, m_yangle;
-    dsreal                                  m_zpos;
-    DrawSpace::Utils::Mutex                 m_mutex_angles;
-    DrawSpace::Utils::Mutex                 m_mutex_z;
-
-    DrawSpace::Utils::Mutex                 m_mutex_result;
-    DrawSpace::Utils::Matrix                m_result;
-
-public:
-    SceneTransform( void );
-    ~SceneTransform( void );
-
-    void Run( void );
-    void Transform( void );
-    void GetResult( DrawSpace::Utils::Matrix& p_out );
-
-    void OnLeftDrag( DrawSpace::Utils::TimeManager& p_timer, long p_dx, long p_dy );
-    void OnRightDrag( DrawSpace::Utils::TimeManager& p_timer, long p_dx, long p_dy );
-};
-
-
-
-
 class dsAppClient : public DrawSpace::App
 {
 protected:
@@ -47,8 +21,6 @@ protected:
     DrawSpace::IntermediatePass*                m_texturepass;
 
 
-    SceneTransform*                             m_transform;
-    DrawSpace::Core::Task<SceneTransform>*      m_transformtask;
     DrawSpace::Utils::TimeManager               m_timer;
 
     bool                                        m_mouselb;

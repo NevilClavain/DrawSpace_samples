@@ -9,6 +9,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "planet", "planet\planet.vcp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics", "physics\physics.vcproj", "{5112D7BF-FF8A-4F57-BD6E-A84772FC8805}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics2", "physics2\physics2.vcproj", "{7AC2407E-9677-4C8B-A69C-205A79E47C94}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "orbiters", "orbiters\orbiters.vcproj", "{9914B350-8E3A-4A2C-AA4B-6F677424C00F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -31,6 +35,14 @@ Global
 		{5112D7BF-FF8A-4F57-BD6E-A84772FC8805}.Debug|Win32.Build.0 = Debug|Win32
 		{5112D7BF-FF8A-4F57-BD6E-A84772FC8805}.Release|Win32.ActiveCfg = Release|Win32
 		{5112D7BF-FF8A-4F57-BD6E-A84772FC8805}.Release|Win32.Build.0 = Release|Win32
+		{7AC2407E-9677-4C8B-A69C-205A79E47C94}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7AC2407E-9677-4C8B-A69C-205A79E47C94}.Debug|Win32.Build.0 = Debug|Win32
+		{7AC2407E-9677-4C8B-A69C-205A79E47C94}.Release|Win32.ActiveCfg = Release|Win32
+		{7AC2407E-9677-4C8B-A69C-205A79E47C94}.Release|Win32.Build.0 = Release|Win32
+		{9914B350-8E3A-4A2C-AA4B-6F677424C00F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9914B350-8E3A-4A2C-AA4B-6F677424C00F}.Debug|Win32.Build.0 = Debug|Win32
+		{9914B350-8E3A-4A2C-AA4B-6F677424C00F}.Release|Win32.ActiveCfg = Release|Win32
+		{9914B350-8E3A-4A2C-AA4B-6F677424C00F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

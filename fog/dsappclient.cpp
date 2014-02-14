@@ -9,85 +9,6 @@ using namespace DrawSpace::Gui;
 dsAppClient* dsAppClient::m_instance = NULL;
 
 
-SceneTransform::SceneTransform( void ) : m_xangle( 0.0 ), m_yangle( 0.0 ), m_zpos( 0.0 )
-{
-
-}
-
-SceneTransform::~SceneTransform( void )
-{
-
-
-}
-
-void SceneTransform::Transform( void )
-{
-    DrawSpace::Utils::Matrix result;
-
-    DrawSpace::Utils::Matrix translate;
-    
-    m_mutex_angles.WaitInfinite();
-    translate.Translation( 0.0, 1.0, m_zpos );
-    m_mutex_angles.Release();
-
-    DrawSpace::Utils::Matrix yrotate;
-
-    //m_mutex_z.WaitInfinite();
-    yrotate.Rotation( DrawSpace::Utils::Vector( 0.0, 1.0, 0.0, 1.0 ), 3.1415927 * m_yangle / 180.0 );
-    DrawSpace::Utils::Matrix xrotate;
-    xrotate.Rotation( DrawSpace::Utils::Vector( 1.0, 0.0, 0.0, 1.0 ), 3.1415927 * m_xangle / 180.0 );
-    //m_mutex_z.Release();
-
-    DrawSpace::Utils::Transformation transform;
-
-    transform.PushMatrix( translate );
-    //transform.PushMatrix( yrotate );
-    //transform.PushMatrix( xrotate );
-    transform.BuildResult();
-    transform.GetResult( &result );
-
-
-    m_mutex_result.WaitInfinite();
-    m_result = result;
-    m_mutex_result.Release();
-}
-
-void SceneTransform::Run( void )
-{
-    while( 1 )
-    {
-        Transform();
-        //Sleep( 1 );
-    }
-}
-
-
-void SceneTransform::OnLeftDrag( DrawSpace::Utils::TimeManager& p_timer, long p_dx, long p_dy )
-{/*
-    m_mutex_angles.WaitInfinite();
-    p_timer.AngleSpeedInc( &m_yangle, p_dx * 150.0 );
-    p_timer.AngleSpeedInc( &m_xangle, p_dy * 150.0 );
-    m_mutex_angles.Release();
-    */
-}
-
-void SceneTransform::OnRightDrag( DrawSpace::Utils::TimeManager& p_timer, long p_dx, long p_dy )
-{
-    /*
-    m_mutex_z.WaitInfinite();
-    p_timer.TranslationSpeedInc( &m_zpos, p_dy * 40.0 );
-    m_mutex_z.Release();
-    */
-}
-
-void SceneTransform::GetResult( DrawSpace::Utils::Matrix& p_out )
-{
-    m_mutex_result.WaitInfinite();
-    p_out = m_result;
-    m_mutex_result.Release();
-}
-
-
 
 
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false )
@@ -107,11 +28,6 @@ void dsAppClient::OnRenderFrame( void )
     m_fpsmove.Compute( m_timer, true );
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
-
-    DrawSpace::Utils::Matrix result;
-    m_transform->GetResult( result );
-
-    //m_scenegraph.SetNodeLocalTransformation( "chunk", result );
 
     m_cube_body->Update();
     m_ground_body->Update();
@@ -133,10 +49,6 @@ void dsAppClient::OnRenderFrame( void )
     m_timer.Update();
     if( m_timer.IsReady() )
     {
-        //m_transform->m_mutex_angles.WaitInfinite();
-        m_timer.AngleSpeedInc( &m_transform->m_yangle, 45.0 );
-        //m_transform->m_mutex_result.Release();
-
         m_world.StepSimulation( m_timer.GetFPS() );
     }
 }
@@ -310,7 +222,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_mytext = _DRAWSPACE_NEW_( DrawSpace::Text, DrawSpace::Text( m_font ) );
     status = m_mytext->Initialize();
 
-    m_mytext->SetText( 100, 100, 8, "Emmanuel" );
+    m_mytext->SetText( 3, 16, 8, "Fog test" );
     m_mytext->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_mytext->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_mytext->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -328,16 +240,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     ///////////////////////////////////////////////////////////////
-
-    m_transform = _DRAWSPACE_NEW_( SceneTransform, SceneTransform );
-    m_transformtask = _DRAWSPACE_NEW_( DrawSpace::Core::Task<SceneTransform>, DrawSpace::Core::Task<SceneTransform>( DrawSpace::Core::Task<SceneTransform>::Kill ) );
-
-
-    m_transformtask->Startup( m_transform );
-
-
-    //////////////////////////////////////////////////////////////
-
 
 
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
@@ -364,7 +266,7 @@ bool dsAppClient::OnIdleAppInit( void )
     cube_params.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
     cube_params.mass = 50.0;
     cube_params.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
-    cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 100.5, 0.0, 1.0 );
+    cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 10.5, 0.0, 1.0 );
     cube_params.inital_rot.Identity();
 
     m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, m_chunk, cube_params ) );
@@ -433,25 +335,13 @@ void dsAppClient::OnEndKeyPress( long p_key )
 
 void dsAppClient::OnKeyPulse( long p_key )
 {
-
 }
 
 void dsAppClient::OnMouseMove( long p_xm, long p_ym, long p_dx, long p_dy )
 {
-    if( m_mouselb )
-    {
-        m_transform->OnLeftDrag( m_timer, p_dx, p_dy );
-    }
-    else if( m_mouserb )
-    {
-        m_transform->OnRightDrag( m_timer, p_dx, p_dy );
-    }
-
 	m_fpsmove.RotateYaw( - p_dx / 4.0, m_timer );
 
 	m_fpsmove.RotatePitch( - p_dy / 4.0, m_timer );
-
-
 }
 
 void dsAppClient::OnMouseLeftButtonDown( long p_xm, long p_ym )

@@ -18,9 +18,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_box_count( 0 ), m_box_texture( 0 )
 {    
     _INIT_LOGGER( "physics.conf" )  
-    m_w_title = "physics test";
-
-    m_myWorld = NULL;
+    m_w_title = "physics test";    
 }
 
 dsAppClient::~dsAppClient( void )
@@ -41,48 +39,13 @@ void dsAppClient::OnRenderFrame( void )
     sbtrans.Scale( 20.0, 20.0, 20.0 );
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
 
-
-    DrawSpace::Utils::Matrix ground_pos;
-    ground_pos.Translation( 0.0, 0.0, 0.0 );
-    m_scenegraph.SetNodeLocalTransformation( "ground", ground_pos );
+    m_ground_body->Update();
 
 
-
-    for( long i = 0; i < m_boxes.size(); i++ )
+    for( size_t i = 0; i < m_boxes.size(); i++ )
     {
-        m_boxes[i].motion->m_graphicsWorldTrans.getOpenGLMatrix( m_matrix );
-        DrawSpace::Utils::Matrix box_pos;
-
-        box_pos( 0, 0 ) = m_matrix[0];
-        box_pos( 0, 1 ) = m_matrix[1];
-        box_pos( 0, 2 ) = m_matrix[2];
-        box_pos( 0, 3 ) = m_matrix[3];
-
-        box_pos( 1, 0 ) = m_matrix[4];
-        box_pos( 1, 1 ) = m_matrix[5];
-        box_pos( 1, 2 ) = m_matrix[6];
-        box_pos( 1, 3 ) = m_matrix[7];
-
-        box_pos( 2, 0 ) = m_matrix[8];
-        box_pos( 2, 1 ) = m_matrix[9];
-        box_pos( 2, 2 ) = m_matrix[10];
-        box_pos( 2, 3 ) = m_matrix[11];
-
-        box_pos( 3, 0 ) = m_matrix[12];
-        box_pos( 3, 1 ) = m_matrix[13];
-        box_pos( 3, 2 ) = m_matrix[14];
-        box_pos( 3, 3 ) = m_matrix[15];
-
-        m_boxes[i].drawable->SetLocalTransform( box_pos );
-
+        m_boxes[i].inert_body->Update();
     }
-
-    /*
-    DrawSpace::Utils::Matrix cam2_pos;
-    cam2_pos.Translation( 0.0, 0.0, 2.0 );
-    m_scenegraph.SetNodeLocalTransformation( "camera2", cam2_pos );
-    */
-
 
  
     m_scenegraph.ComputeTransformations();    
@@ -114,20 +77,19 @@ void dsAppClient::OnRenderFrame( void )
 
     renderer->DrawText( 255, 0, 0, 30, 50, "%d %d", m_texturepass->GetRenderingQueue()->GetSwitchesCost(), m_texturepass->GetRenderingQueue()->GetTheoricalSwitchesCost() );
 
+
     renderer->FlipScreen();
 
     m_timer.Update();
     if( m_timer.IsReady() )
     {
-        if( m_myWorld )
-        {
-	        m_myWorld->stepSimulation( 1.0 / (dsreal)m_timer.GetFPS() );
-        }
+        m_world.StepSimulation( m_timer.GetFPS() );
     }
 }
 
 void dsAppClient::create_box( void )
 {
+    
     DrawSpace::Interface::Drawable* drawable;
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
@@ -173,38 +135,29 @@ void dsAppClient::create_box( void )
     m_scenegraph.RegisterNode( drawable );
 
 
-    ///////////////////////////////////////////////////////////////////
+    DrawSpace::Dynamics::InertBody::Parameters cube_params;
+    cube_params.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
+    cube_params.mass = 50.0;
+    cube_params.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 10.5, 0.0, 1.0 );
+    cube_params.inital_rot.Identity();
 
+    DrawSpace::Dynamics::InertBody* cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, drawable, cube_params ) );
 
-    m_myTransform.setIdentity();
-    m_myTransform.setOrigin( btVector3( 0, 12.0, 0 ) );
-
-    btCollisionShape* shape = _DRAWSPACE_NEW_( btBoxShape, btBoxShape( btVector3( 0.5, 0.5, 0.5 ) ) );
-    btDefaultMotionState* motion = _DRAWSPACE_NEW_( btDefaultMotionState, btDefaultMotionState( m_myTransform ) );
-
-
-    btVector3 localInertia( 0, 0, 0 );
-
-    btScalar mass = 50.5;
-    shape->calculateLocalInertia( mass, localInertia );
-
-    btRigidBody::btRigidBodyConstructionInfo myBoxRigidBodyConstructionInfo( mass, motion, shape, localInertia );
-
-    btRigidBody* body = _DRAWSPACE_NEW_(  btRigidBody, btRigidBody( myBoxRigidBodyConstructionInfo ) );
-
-    m_myWorld->addRigidBody( body );
 
     Box box;
 
     box.drawable = drawable;
-    box.body = body;
-    box.motion = motion;
+    box.inert_body = cube_body;
 
     m_boxes.push_back( box );
 
     m_box_count++;
 
+
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
+
+    
 }
 
 bool dsAppClient::OnIdleAppInit( void )
@@ -382,56 +335,21 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    m_myCollisionConfiguration = _DRAWSPACE_NEW_( btDefaultCollisionConfiguration, btDefaultCollisionConfiguration );
-    m_myDispatcher = _DRAWSPACE_NEW_( btCollisionDispatcher, btCollisionDispatcher( m_myCollisionConfiguration ) );
-    m_myBroadphase = _DRAWSPACE_NEW_( btDbvtBroadphase, btDbvtBroadphase );
-    m_mySequentialImpulseConstraintSolver = _DRAWSPACE_NEW_( btSequentialImpulseConstraintSolver, btSequentialImpulseConstraintSolver );
-    m_myWorld = _DRAWSPACE_NEW_( btDiscreteDynamicsWorld, btDiscreteDynamicsWorld( m_myDispatcher, m_myBroadphase, m_mySequentialImpulseConstraintSolver, m_myCollisionConfiguration ) ); 
+    m_world.Initialize();
+    m_world.SetGravity( DrawSpace::Utils::Vector( 0.0, -9.81, 0.0, 0.0 ) );
 
-    m_myWorld->setGravity( btVector3( 0, -9.81, 0 ) );
+    DrawSpace::Dynamics::InertBody::Parameters ground_params;
+    ground_params.box_dims = DrawSpace::Utils::Vector( 100.0, 0.0, 100., 1.0 );
+    ground_params.mass = 0.0;
+    ground_params.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    ground_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
+    ground_params.inital_rot.Identity();
 
-    /*
-    btCollisionShape* shape = _DRAWSPACE_NEW_( btBoxShape, btBoxShape( btVector3( 0.5, 0.5, 0.5 ) ) );
-
-    m_myTransform.setIdentity();
-    m_myTransform.setOrigin( btVector3( 0, 5, 0 ) );
-
-    btVector3 localInertia( 0, 0, 0 );
-
-    btScalar mass = 0.5;
-    shape->calculateLocalInertia( mass, localInertia );
-
-    m_myMotionState = _DRAWSPACE_NEW_( btDefaultMotionState, btDefaultMotionState( m_myTransform ) );
-
-    btRigidBody::btRigidBodyConstructionInfo myBoxRigidBodyConstructionInfo( mass, m_myMotionState, shape, localInertia );
-
-    m_body = _DRAWSPACE_NEW_(  btRigidBody, btRigidBody( myBoxRigidBodyConstructionInfo ) );
-
-    m_myWorld->addRigidBody( m_body );
-    */
-
-
-    btCollisionShape* shape_sol = new btBoxShape( btVector3( 100, 0, 100 ) );
-
-    m_myTransform.setIdentity();
-
-    // Position du sol
-    m_myTransform.setOrigin( btVector3(0,0,0) );
-    btVector3 localInertiaSol(0,0,0);
-
-    
-
-    m_myMotionState_Sol = _DRAWSPACE_NEW_( btDefaultMotionState, btDefaultMotionState( m_myTransform ) );
-
-    btRigidBody::btRigidBodyConstructionInfo sol_info( 0.0, m_myMotionState_Sol, shape_sol, localInertiaSol );
-
-    m_body_sol = _DRAWSPACE_NEW_( btRigidBody, btRigidBody( sol_info ) );
-
-    // On ajoute le sol dans le monde Bullet
-    m_myWorld->addRigidBody( m_body_sol );
+    m_ground_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, m_ground, ground_params ) );
 
 
     create_box();
+   
 
     return true;
 }
@@ -458,7 +376,6 @@ void dsAppClient::OnKeyPress( long p_key )
 
             m_fpsmove.SetSpeed( -6.0 );
             break;
-
     }
 
 }
@@ -481,10 +398,8 @@ void dsAppClient::OnEndKeyPress( long p_key )
         case VK_SPACE:
 
             create_box();
-
             break;
     }
-
 }
 
 void dsAppClient::OnKeyPulse( long p_key )
