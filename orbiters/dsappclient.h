@@ -35,6 +35,7 @@ protected:
     DrawSpace::Core::FPSMovement                m_fpsmove;
     DrawSpace::Core::FreeMovement               m_freemove;
     
+    DrawSpace::Interface::MesheImport*          m_meshe_import;
 
     DrawSpace::Interface::Drawable*             m_spacebox;
     
@@ -42,6 +43,10 @@ protected:
     dsreal                                      m_speed;
     dsreal                                      m_speed_speed;
 
+
+    DrawSpace::Dynamics::Orbiter*               m_orbiters[12];
+
+    DrawSpace::Dynamics::World                  m_world;
 
 
     dsAppClient( void );

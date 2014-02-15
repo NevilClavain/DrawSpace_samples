@@ -38,14 +38,7 @@ void dsAppClient::OnRenderFrame( void )
     sbtrans.Scale( 20.0, 20.0, 20.0 );
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
 
-
-    
-    DrawSpace::Utils::Matrix planet_trans;
-    DrawSpace::Utils::Matrix planet_rot;
-    DrawSpace::Utils::Matrix planet_res;
-
-    planet_trans.Translation( 10000000.0, 0.0, -20000000.0 );
-    planet_rot.Rotation( DrawSpace::Utils::Vector( 0.25, 1.0, 0.0, 1.0 ), Maths::DegToRad( 110.0 ) );
+    m_orbiters[0]->Update( 0.0, Vector( 0.0, 0.0, 10.0, 1.0 ) );
 
      
     m_scenegraph.ComputeTransformations();
@@ -81,7 +74,7 @@ void dsAppClient::OnRenderFrame( void )
     m_timer.Update();
     if( m_timer.IsReady() )
     {
-       
+        m_world.StepSimulation( m_timer.GetFPS() );  
     }
 
     m_freemove.SetSpeed( m_speed );
@@ -167,7 +160,56 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_scenegraph.RegisterNode( m_spacebox );
 
+    //////////////////////////////////////////////////////////////
 
+
+    m_world.Initialize();
+ 
+
+
+
+    //////////////////////////////////////////////////////////////
+
+    status = DrawSpace::Utils::LoadDrawablePlugin( "chunk.dll", "chunk_plugin" );
+
+    Drawable* drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+
+    drawable->RegisterPassSlot( "wireframe_pass" );
+    drawable->SetRenderer( renderer );
+    drawable->SetName( "orbiter_0" );
+
+    status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
+    m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
+    drawable->GetMeshe( "" )->SetImporter( m_meshe_import );
+
+    drawable->GetMeshe( "" )->LoadFromFile( "planet.ac", 0 );
+
+
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mars.jpg" ) ), 0 );
+
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetTexture( 0 )->LoadFromFile();
+
+    m_scenegraph.RegisterNode( drawable );
+
+    DrawSpace::Dynamics::Orbiter::Parameters cube_params;
+    cube_params.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
+    cube_params.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 10.5, 0.0, 1.0 );
+    cube_params.inital_rot.Identity();
+
+    m_orbiters[0] = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Orbiter, DrawSpace::Dynamics::Orbiter( &m_world, drawable ) );
+
+    m_orbiters[0]->SetKinematic( cube_params );
 
     //////////////////////////////////////////////////////////////
 
@@ -200,7 +242,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_wireframepass->GetRenderingQueue()->UpdateOutputQueue();
     
     m_freemove.SetTransformNode( m_camera );
-    m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 20000000.0, 1.0 ) );
+    m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 20.0, 1.0 ) );
 
 
     m_mouse_circularmode = true;
