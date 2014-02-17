@@ -6,6 +6,7 @@ using namespace DrawSpace::Interface;
 using namespace DrawSpace::Core;
 using namespace DrawSpace::Gui;
 using namespace DrawSpace::Utils;
+using namespace DrawSpace::Dynamics;
 
 
 dsAppClient* dsAppClient::m_instance = NULL;
@@ -17,6 +18,11 @@ dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_spe
 {    
     _INIT_LOGGER( "orbiters.conf" )  
     m_w_title = "orbiters test";
+
+    for( long i = 0; i < 12; i++ )
+    {
+        m_orbiters_revol_angle[i] = 0.0;
+    }
 }
 
 dsAppClient::~dsAppClient( void )
@@ -38,7 +44,9 @@ void dsAppClient::OnRenderFrame( void )
     sbtrans.Scale( 20.0, 20.0, 20.0 );
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
 
-    m_orbiters[0]->Update( 0.0, Vector( 0.0, 0.0, 10.0, 1.0 ) );
+
+
+    m_orbiters[0]->Update( m_orbiters_revol_angle[0], Vector( 0.0, 0.0, 0.0, 1.0 ) );
 
      
     m_scenegraph.ComputeTransformations();
@@ -74,7 +82,10 @@ void dsAppClient::OnRenderFrame( void )
     m_timer.Update();
     if( m_timer.IsReady() )
     {
-        m_world.StepSimulation( m_timer.GetFPS() );  
+        m_world.StepSimulation( m_timer.GetFPS() ); 
+
+
+        m_timer.AngleSpeedInc( &m_orbiters_revol_angle[0], 70.0 );
     }
 
     m_freemove.SetSpeed( m_speed );
@@ -202,14 +213,20 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterNode( drawable );
 
     DrawSpace::Dynamics::Orbiter::Parameters cube_params;
-    cube_params.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
-    cube_params.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
-    cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 10.5, 0.0, 1.0 );
+    cube_params.shape_descr.sphere_radius = 0.5;
+    cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::SPHERE_SHAPE;
+    cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
     cube_params.inital_rot.Identity();
 
     m_orbiters[0] = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Orbiter, DrawSpace::Dynamics::Orbiter( &m_world, drawable ) );
 
     m_orbiters[0]->SetKinematic( cube_params );
+
+    Orbiter::Orbit orbit0;
+    orbit0.m_excentricity = 0.2;
+    orbit0.m_ray = 25.0;
+
+    m_orbiters[0]->SetOrbit1( orbit0 );
 
     //////////////////////////////////////////////////////////////
 

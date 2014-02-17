@@ -136,9 +136,11 @@ void dsAppClient::create_box( void )
 
 
     DrawSpace::Dynamics::InertBody::Parameters cube_params;
-    cube_params.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
+    //cube_params.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
     cube_params.mass = 50.0;
-    cube_params.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    //cube_params.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
     cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 10.5, 0.0, 1.0 );
     cube_params.inital_rot.Identity();
 
@@ -339,9 +341,11 @@ bool dsAppClient::OnIdleAppInit( void )
     m_world.SetGravity( DrawSpace::Utils::Vector( 0.0, -9.81, 0.0, 0.0 ) );
 
     DrawSpace::Dynamics::InertBody::Parameters ground_params;
-    ground_params.box_dims = DrawSpace::Utils::Vector( 100.0, 0.0, 100., 1.0 );
+    //ground_params.box_dims = DrawSpace::Utils::Vector( 100.0, 0.0, 100., 1.0 );
     ground_params.mass = 0.0;
-    ground_params.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    //ground_params.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    ground_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    ground_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 100.0, 0.0, 100., 1.0 );
     ground_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
     ground_params.inital_rot.Identity();
 

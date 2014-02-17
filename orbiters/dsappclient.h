@@ -45,8 +45,11 @@ protected:
 
 
     DrawSpace::Dynamics::Orbiter*               m_orbiters[12];
+    dsreal                                      m_orbiters_revol_angle[12];
 
     DrawSpace::Dynamics::World                  m_world;
+
+    
 
 
     dsAppClient( void );
