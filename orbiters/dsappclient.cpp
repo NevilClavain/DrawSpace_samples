@@ -286,6 +286,9 @@ bool dsAppClient::OnIdleAppInit( void )
     drawable->GetNodeFromPass( "wireframe_pass", "" )->AddShaderParameter( 1, "color", 0 );
     drawable->GetNodeFromPass( "wireframe_pass", "" )->SetShaderRealVector( "color", Vector( 1.0, 0.0, 0.0, 1.0 ) );
 
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->AddShaderParameter( 1, "thickness", 1 );
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->SetShaderReal( "thickness", 0.005 );
+
     m_scenegraph.RegisterNode( drawable );
 
 
