@@ -85,7 +85,7 @@ void dsAppClient::OnRenderFrame( void )
         m_world.StepSimulation( m_timer.GetFPS() ); 
 
 
-        m_timer.AngleSpeedInc( &m_orbiters_revol_angle[0], 70.0 );
+        m_timer.AngleSpeedInc( &m_orbiters_revol_angle[0], 2.0 );
     }
 
     m_freemove.SetSpeed( m_speed );
@@ -223,11 +223,73 @@ bool dsAppClient::OnIdleAppInit( void )
     m_orbiters[0]->SetKinematic( cube_params );
 
     Orbiter::Orbit orbit0;
-    orbit0.m_excentricity = 0.2;
+    orbit0.m_excentricity = 0.8;
     orbit0.m_ray = 25.0;
 
     m_orbiters[0]->SetOrbit1( orbit0 );
 
+    //////////////////////////////////////////////////////////////
+
+    drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+
+    drawable->RegisterPassSlot( "wireframe_pass" );
+    drawable->SetRenderer( renderer );
+    drawable->SetName( "orbit_0" );
+
+    /*
+    status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
+    m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
+    drawable->GetMeshe( "" )->SetImporter( m_meshe_import );
+
+    drawable->GetMeshe( "" )->LoadFromFile( "planet.ac", 0 );
+    */
+
+    Meshe* orb0_meshe = drawable->GetMeshe( "" );
+
+    /*
+    Vertex o1v1, o1v2, o1v3;
+
+    o1v1.x = 0.0;
+    o1v1.y = 0.0;
+    o1v1.z = 0.0;
+    o1v1.tu[0] = 1.0;
+
+    o1v2.x = 300.0;
+    o1v2.y = 0.0;
+    o1v2.z = 0.0;
+    o1v2.tu[0] = 1.0;
+
+    o1v3.x = 300.0;
+    o1v3.y = -300.0;
+    o1v3.z = 0.0;
+    o1v3.tu[0] = 0.0;
+
+
+    orb0_meshe->AddVertex( o1v1 );
+    orb0_meshe->AddVertex( o1v2 );
+    orb0_meshe->AddVertex( o1v3 );
+    orb0_meshe->AddTriangle( Triangle( 0, 1, 2 ) );
+    */
+
+    m_orbiters[0]->BuildOrbit1Meshe( 10.0, orb0_meshe );
+
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "line.vsh", false ) ) );
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "line.psh", false ) ) );
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "none" ) );
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->AddShaderParameter( 1, "color", 0 );
+    drawable->GetNodeFromPass( "wireframe_pass", "" )->SetShaderRealVector( "color", Vector( 1.0, 0.0, 0.0, 1.0 ) );
+
+    m_scenegraph.RegisterNode( drawable );
+
+
+    
     //////////////////////////////////////////////////////////////
 
 
