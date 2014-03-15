@@ -17,7 +17,7 @@ protected:
     DrawSpace::Scenegraph                       m_scenegraph;
 
 
-    DrawSpace::IntermediatePass*                m_wireframepass;
+    DrawSpace::IntermediatePass*                m_texturepass;
     DrawSpace::FinalPass*                       m_finalpass;
 
 
@@ -43,16 +43,40 @@ protected:
     dsreal                                      m_speed;
     dsreal                                      m_speed_speed;
 
-
-    DrawSpace::Dynamics::Orbiter*               m_orbiters[12];
-    dsreal                                      m_orbiters_revol_angle[12];
-
     DrawSpace::Dynamics::World                  m_world;
 
     
+    DrawSpace::Dynamics::InertBody*             m_cube_body;
+    DrawSpace::Dynamics::InertBody*             m_cube_body_2;
 
+
+    DrawSpace::Dynamics::Orbiter*               m_sun;
+
+    DrawSpace::Dynamics::Orbiter*               m_mars;
+    DrawSpace::Dynamics::Orbit*                 m_mars_orbit;
+    DrawSpace::Dynamics::Centroid*              m_mars_centroid;
+
+    DrawSpace::Dynamics::Orbiter*               m_moon;
+    DrawSpace::Dynamics::Orbit*                 m_moon_orbit;
+    DrawSpace::Dynamics::Centroid*              m_moon_centroid;
+
+
+    DrawSpace::Dynamics::Orbiter*               m_saturn;
+    DrawSpace::Dynamics::Orbit*                 m_saturn_orbit;
+    DrawSpace::Dynamics::Centroid*              m_saturn_centroid;
+
+
+    DrawSpace::Dynamics::Calendar*              m_calendar;
+
+
+    DrawSpace::Dynamics::Orbiter*               build_planet( char* p_name, char* p_texture );
+    DrawSpace::Interface::Drawable*             build_orbit_drawable( char* p_name, DrawSpace::Dynamics::Orbit* p_orbit );
+
+
+    
 
     dsAppClient( void );
+
 
 public:
 

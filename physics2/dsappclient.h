@@ -38,7 +38,7 @@ protected:
     DrawSpace::Interface::Drawable*             m_spacebox;
 
     DrawSpace::Interface::MesheImport*          m_meshe_import;
-    DrawSpace::Interface::Drawable*             m_ground;
+
     //DrawSpace::Interface::Drawable*             m_box;
 
     int                                         m_box_count;
@@ -54,31 +54,64 @@ protected:
     btDefaultCollisionConfiguration*            m_myCollisionConfiguration;
     btSequentialImpulseConstraintSolver*        m_mySequentialImpulseConstraintSolver;
     btTransform                                 m_myTransform;
+
+    
     //btDefaultMotionState*                       m_myMotionState;
-	btDefaultMotionState*                       m_myMotionState_Sol;
+	
     btScalar                                    m_matrix[16];
     //btRigidBody*                                m_body;
-	btRigidBody*                                m_body_sol;
 
 
-    bool                                        m_force;
+    DrawSpace::Utils::Vector                    m_fwd;
+    DrawSpace::Utils::Vector                    m_right;
+    DrawSpace::Utils::Vector                    m_left;
+    DrawSpace::Utils::Vector                    m_up;
+    DrawSpace::Utils::Vector                    m_down;
 
-    bool                                        m_compose;
+    DrawSpace::Utils::Vector                    m_transformed_fwd;
+    DrawSpace::Utils::Vector                    m_transformed_left;
+    DrawSpace::Utils::Vector                    m_transformed_right;
+    DrawSpace::Utils::Vector                    m_transformed_up;
+    DrawSpace::Utils::Vector                    m_transformed_down;
 
-    DrawSpace::Utils::Vector                    m_kpos;
 
 
-    typedef struct
+    btTransform                                 m_myTransform_mem;
+    btVector3                                   m_linearspeed_mem;
+    btVector3                                   m_angularspeed_mem;
+
+
+
+
+    btDiscreteDynamicsWorld*                    m_myWorld_2;
+    btBroadphaseInterface*                      m_myBroadphase_2;
+    btCollisionDispatcher*                      m_myDispatcher_2;
+    btDefaultCollisionConfiguration*            m_myCollisionConfiguration_2;
+    btSequentialImpulseConstraintSolver*        m_mySequentialImpulseConstraintSolver_2;
+
+
+    bool                                        m_attached;
+
+
+
+    typedef struct box
     {
         DrawSpace::Interface::Drawable* drawable;
         btRigidBody*                    body;
         btDefaultMotionState*           motion;
 
+        bool                            kinematic;
+
+        dsreal                          k_angle;
+        DrawSpace::Utils::Vector        k_pos;
+        
+        DrawSpace::Utils::Matrix        mat_b;
+
     } Box;
 
     std::vector<Box>                            m_boxes;
 
-    void create_box( void );
+    void create_box( const dsstring& p_meshe, dsreal p_dims, const DrawSpace::Utils::Vector& p_pos, bool p_kinematic, bool p_world2 );
 
 
     dsAppClient( void );

@@ -1,6 +1,8 @@
 
 #include "dsappclient.h"
 
+
+
 using namespace DrawSpace;
 using namespace DrawSpace::Interface;
 using namespace DrawSpace::Core;
@@ -18,11 +20,6 @@ dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_spe
 {    
     _INIT_LOGGER( "orbiters.conf" )  
     m_w_title = "orbiters test";
-
-    for( long i = 0; i < 12; i++ )
-    {
-        m_orbiters_revol_angle[i] = 0.0;
-    }
 }
 
 dsAppClient::~dsAppClient( void )
@@ -30,23 +27,118 @@ dsAppClient::~dsAppClient( void )
 
 }
 
+Orbiter* dsAppClient::build_planet( char* p_name, char* p_texture )
+{
+    Drawable* drawable;
+    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
+
+    drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+
+    drawable->RegisterPassSlot( "texture_pass" );
+    drawable->SetRenderer( renderer );
+    drawable->SetName( p_name );
+
+    drawable->GetMeshe( "" )->SetImporter( m_meshe_import );
+
+    drawable->GetMeshe( "" )->LoadFromFile( "planet.ac", 0 );
+
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( p_texture ) ), 0 );
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetTexture( 0 )->LoadFromFile();
+
+    m_scenegraph.RegisterNode( drawable );
+
+    DrawSpace::Dynamics::Orbiter::Parameters sphere_params;
+    sphere_params.shape_descr.sphere_radius = 0.5;
+    sphere_params.shape_descr.shape = DrawSpace::Dynamics::Body::SPHERE_SHAPE;
+    sphere_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
+    sphere_params.initial_rot.Identity();
+
+    Orbiter* orbiter = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Orbiter, DrawSpace::Dynamics::Orbiter( &m_world, drawable ) );
+
+    orbiter->SetKinematic( sphere_params );
+
+    return orbiter;
+}
+
+Drawable* dsAppClient::build_orbit_drawable( char* p_name, Orbit* p_orbit )
+{
+    Drawable* drawable;
+    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
+
+    drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+
+    drawable->RegisterPassSlot( "texture_pass" );
+    drawable->SetRenderer( renderer );
+    drawable->SetName( p_name );
+
+    Meshe* orb0_meshe = drawable->GetMeshe( "" );
+
+    p_orbit->BuildMeshe( 10.0, orb0_meshe );
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "line.vsh", false ) ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "line.psh", false ) ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "none" ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->AddShaderParameter( 1, "color", 0 );
+    drawable->GetNodeFromPass( "texture_pass", "" )->SetShaderRealVector( "color", Vector( 1.0, 0.0, 0.0, 1.0 ) );
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->AddShaderParameter( 1, "thickness", 1 );
+    drawable->GetNodeFromPass( "texture_pass", "" )->SetShaderReal( "thickness", 0.005 );
+
+    m_scenegraph.RegisterNode( drawable );
+
+    return drawable;
+}
+
 void dsAppClient::OnRenderFrame( void )
 {
-
-    //m_fpsmove.Compute( m_timer, true );
     m_freemove.Compute( m_timer );
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
 
+    
     DrawSpace::Utils::Matrix sbtrans;
-
     sbtrans.Scale( 20.0, 20.0, 20.0 );
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
+    
+
+
+    m_cube_body->Update();
+    m_cube_body_2->Update();
+
+
+    
+    
+    Matrix origin;
+    origin.Identity();
 
 
 
-    m_orbiters[0]->Update( m_orbiters_revol_angle[0], Vector( 0.0, 0.0, 0.0, 1.0 ) );
+    m_mars_orbit->OrbitStep( origin );
+    m_saturn_orbit->OrbitStep( origin );
+    
+    
+
+    
 
      
     m_scenegraph.ComputeTransformations();
@@ -67,43 +159,58 @@ void dsAppClient::OnRenderFrame( void )
         last_fps = current_fps;		
     }
 
+    dsstring date;
+    m_calendar->GetFormatedDate( date );
+
+
     m_fpstext_widget->SetVirtualTranslation( 10, 5 );
     m_fpstext_widget->Transform();
 
 
-    m_wireframepass->GetRenderingQueue()->Draw();
+    m_texturepass->GetRenderingQueue()->Draw();
 
     m_fpstext_widget->Draw();
 
     m_finalpass->GetRenderingQueue()->Draw();
 
+
+    renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
+
+
     renderer->FlipScreen();
 
+    /*
     m_timer.Update();
     if( m_timer.IsReady() )
     {
         m_world.StepSimulation( m_timer.GetFPS() ); 
 
 
-        m_timer.AngleSpeedInc( &m_orbiters_revol_angle[0], 2.0 );
     }
+    */
+
+    m_calendar->Run();
 
     m_freemove.SetSpeed( m_speed );
 }
 
 bool dsAppClient::OnIdleAppInit( void )
 {
+
+    /////////////////////////////////////
+
     bool status;
+    Drawable* drawable;
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
     renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
 
 
-    m_wireframepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "wireframe_pass" ) );
+    m_texturepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
 
-    m_wireframepass->GetRenderingQueue()->EnableDepthClearing( true );
-    m_wireframepass->GetRenderingQueue()->EnableTargetClearing( true );
-    m_wireframepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0 );
+    m_texturepass->GetRenderingQueue()->EnableDepthClearing( true );
+    m_texturepass->GetRenderingQueue()->EnableTargetClearing( true );
+    m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0 );
 
 
     //////////////////////////////////////////////////////////////
@@ -116,12 +223,12 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    m_finalpass->GetViewportQuad()->SetTexture( m_wireframepass->GetTargetTexture(), 0 );
+    m_finalpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
     
 
     //////////////////////////////////////////////////////////////
 
-    m_scenegraph.RegisterPass( m_wireframepass );
+    m_scenegraph.RegisterPass( m_texturepass );
 
 
     //////////////////////////////////////////////////////////////
@@ -130,169 +237,203 @@ bool dsAppClient::OnIdleAppInit( void )
     status = DrawSpace::Utils::LoadDrawablePlugin( "spacebox.dll", "spacebox_plugin" );
 
     m_spacebox = DrawSpace::Utils::InstanciateDrawableFromPlugin( "spacebox_plugin" );
-    m_spacebox->RegisterPassSlot( "wireframe_pass" );
+    m_spacebox->RegisterPassSlot( "texture_pass" );
     m_spacebox->SetRenderer( renderer );
     m_spacebox->SetName( "spacebox" );
 
 
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "front" );
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "rear" );
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "top" );
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "bottom" );
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "left" );
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "right" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "front" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "rear" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "top" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "bottom" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "left" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass", "right" );
 
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "front" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_front5.png" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "front" )->GetTexture( 0 )->LoadFromFile();
+    m_spacebox->GetNodeFromPass( "texture_pass", "front" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_front5.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "front" )->GetTexture( 0 )->LoadFromFile();
 
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "rear" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_back6.png" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "rear" )->GetTexture( 0 )->LoadFromFile();
+    m_spacebox->GetNodeFromPass( "texture_pass", "rear" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_back6.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "rear" )->GetTexture( 0 )->LoadFromFile();
 
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "top" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_top3.png" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "top" )->GetTexture( 0 )->LoadFromFile();
+    m_spacebox->GetNodeFromPass( "texture_pass", "top" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_top3.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "top" )->GetTexture( 0 )->LoadFromFile();
 
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "bottom" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_bottom4.png" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "bottom" )->GetTexture( 0 )->LoadFromFile();
+    m_spacebox->GetNodeFromPass( "texture_pass", "bottom" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_bottom4.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "bottom" )->GetTexture( 0 )->LoadFromFile();
 
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "left" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_left2.png" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "left" )->GetTexture( 0 )->LoadFromFile();
+    m_spacebox->GetNodeFromPass( "texture_pass", "left" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_left2.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "left" )->GetTexture( 0 )->LoadFromFile();
 
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "right" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_right1.png" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "right" )->GetTexture( 0 )->LoadFromFile();
+    m_spacebox->GetNodeFromPass( "texture_pass", "right" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_right1.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "right" )->GetTexture( 0 )->LoadFromFile();
 
 
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "front" )->SetOrderNumber( 200 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "rear" )->SetOrderNumber( 200 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "top" )->SetOrderNumber( 200 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "bottom" )->SetOrderNumber( 200 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "left" )->SetOrderNumber( 200 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "right" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "front" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "rear" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "top" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "bottom" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "left" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "texture_pass", "right" )->SetOrderNumber( 200 );
 
 
     m_scenegraph.RegisterNode( m_spacebox );
+    
 
     //////////////////////////////////////////////////////////////
 
 
     m_world.Initialize();
+    
  
-
-
-
-    //////////////////////////////////////////////////////////////
-
     status = DrawSpace::Utils::LoadDrawablePlugin( "chunk.dll", "chunk_plugin" );
 
-    Drawable* drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
-
-    drawable->RegisterPassSlot( "wireframe_pass" );
-    drawable->SetRenderer( renderer );
-    drawable->SetName( "orbiter_0" );
-
     status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
     m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
-    drawable->GetMeshe( "" )->SetImporter( m_meshe_import );
-
-    drawable->GetMeshe( "" )->LoadFromFile( "planet.ac", 0 );
 
 
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
 
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mars.jpg" ) ), 0 );
-
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetTexture( 0 )->LoadFromFile();
-
-    m_scenegraph.RegisterNode( drawable );
-
-    DrawSpace::Dynamics::Orbiter::Parameters cube_params;
-    cube_params.shape_descr.sphere_radius = 0.5;
-    cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::SPHERE_SHAPE;
-    cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
-    cube_params.inital_rot.Identity();
-
-    m_orbiters[0] = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Orbiter, DrawSpace::Dynamics::Orbiter( &m_world, drawable ) );
-
-    m_orbiters[0]->SetKinematic( cube_params );
-
-    Orbiter::Orbit orbit0;
-    orbit0.m_excentricity = 0.8;
-    orbit0.m_ray = 25.0;
-
-    m_orbiters[0]->SetOrbit1( orbit0 );
-
-    //////////////////////////////////////////////////////////////
-
-    drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
-
-    drawable->RegisterPassSlot( "wireframe_pass" );
-    drawable->SetRenderer( renderer );
-    drawable->SetName( "orbit_0" );
-
-    /*
-    status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
-    m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
-    drawable->GetMeshe( "" )->SetImporter( m_meshe_import );
-
-    drawable->GetMeshe( "" )->LoadFromFile( "planet.ac", 0 );
-    */
-
-    Meshe* orb0_meshe = drawable->GetMeshe( "" );
-
-    /*
-    Vertex o1v1, o1v2, o1v3;
-
-    o1v1.x = 0.0;
-    o1v1.y = 0.0;
-    o1v1.z = 0.0;
-    o1v1.tu[0] = 1.0;
-
-    o1v2.x = 300.0;
-    o1v2.y = 0.0;
-    o1v2.z = 0.0;
-    o1v2.tu[0] = 1.0;
-
-    o1v3.x = 300.0;
-    o1v3.y = -300.0;
-    o1v3.z = 0.0;
-    o1v3.tu[0] = 0.0;
-
-
-    orb0_meshe->AddVertex( o1v1 );
-    orb0_meshe->AddVertex( o1v2 );
-    orb0_meshe->AddVertex( o1v3 );
-    orb0_meshe->AddTriangle( Triangle( 0, 1, 2 ) );
-    */
-
-    m_orbiters[0]->BuildOrbit1Meshe( 10.0, orb0_meshe );
-
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "line.vsh", false ) ) );
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "line.psh", false ) ) );
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
-
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "none" ) );
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
-
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->AddShaderParameter( 1, "color", 0 );
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->SetShaderRealVector( "color", Vector( 1.0, 0.0, 0.0, 1.0 ) );
-
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->AddShaderParameter( 1, "thickness", 1 );
-    drawable->GetNodeFromPass( "wireframe_pass", "" )->SetShaderReal( "thickness", 0.005 );
-
-    m_scenegraph.RegisterNode( drawable );
+   
+    
+    m_sun = build_planet( "sun", "texture_sun.jpg" );
 
 
     
+    m_mars = build_planet( "mars", "mars.jpg" );
+
+    m_mars_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
+    m_mars_centroid->SetOrbiter( m_mars );
+
+    m_mars_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 25.0, 0.37, 90.0, 9.0, 0.0, 0.0, 1.0, m_mars_centroid ) );
+
+    m_mars_orbit->RegisterDrawable( build_orbit_drawable( "mars_orbit", m_mars_orbit ) );
+
+
+    
+
+
+    m_moon = build_planet( "moon", "mars.jpg" );
+
+    m_moon_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
+    m_moon_centroid->SetOrbiter( m_moon );
+
+    m_moon_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 5.0, 0.45, 0.0, 10.0, 3.0, 0.0, 0.0001, m_moon_centroid ) );
+
+    m_moon_orbit->RegisterDrawable( build_orbit_drawable( "moon_orbit", m_moon_orbit ) );
+
+
+    m_mars_centroid->RegisterSubOrbit( m_moon_orbit );
+
+
+
+
+
+    m_saturn = build_planet( "saturn", "saturnmap.jpg" );
+
+    m_saturn_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
+    m_saturn_centroid->SetOrbiter( m_saturn );
+
+    m_saturn_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 60.0, 0.9999, 8.0, 1.0, 0.0, 0.0, 20.0, m_saturn_centroid ) );
+
+    m_saturn_orbit->RegisterDrawable( build_orbit_drawable( "saturn_orbit", m_saturn_orbit ) );
+
+
+    
+
+
+    m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer, &m_world ) );
+
+    
+
+    //////////////////////////////////////////////////////////////
+
+
+    drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+
+    drawable->RegisterPassSlot( "texture_pass" );
+    drawable->SetRenderer( renderer );
+
+    drawable->SetName( "box" );
+    
+    drawable->GetMeshe( "" )->SetImporter( m_meshe_import );
+
+    drawable->GetMeshe( "" )->LoadFromFile( "object.ac", 0 );    
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "tex07.jpg" ) ), 0 );
+
+
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetTexture( 0 )->LoadFromFile();
+
+    m_scenegraph.RegisterNode( drawable );
+
+
+    DrawSpace::Dynamics::InertBody::Parameters cube_params;
+    cube_params.mass = 50.0;
+    cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
+    cube_params.initial_pos = DrawSpace::Utils::Vector( -5.0, 0.0, -100.0, 1.0 );
+    cube_params.initial_rot.Identity();
+
+    m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, drawable, cube_params ) );
+
+
+
+
+
+    drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+
+    drawable->RegisterPassSlot( "texture_pass" );
+    drawable->SetRenderer( renderer );
+
+    drawable->SetName( "box2" );
+    
+    drawable->GetMeshe( "" )->SetImporter( m_meshe_import );
+
+    drawable->GetMeshe( "" )->LoadFromFile( "object.ac", 0 );    
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "tex07.jpg" ) ), 0 );
+
+
+
+    drawable->GetNodeFromPass( "texture_pass", "" )->GetTexture( 0 )->LoadFromFile();
+
+    m_scenegraph.RegisterNode( drawable );
+
+
+    cube_params.mass = 50.0;
+    cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
+    cube_params.initial_pos = DrawSpace::Utils::Vector( 5.0, 0.0, -100.0, 1.0 );
+    cube_params.initial_rot.Identity();
+
+    m_cube_body_2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, drawable, cube_params ) );
+
+
+
+
+
+
+
     //////////////////////////////////////////////////////////////
 
 
@@ -318,10 +459,14 @@ bool dsAppClient::OnIdleAppInit( void )
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
     m_scenegraph.RegisterNode( m_camera );
 
+    //m_moon->GetDrawable()->AddChild( m_camera );
+
+
+
     m_scenegraph.SetCurrentCamera( "camera" );
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
-    m_wireframepass->GetRenderingQueue()->UpdateOutputQueue();
+    m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     
     m_freemove.SetTransformNode( m_camera );
     m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 20.0, 1.0 ) );
@@ -329,6 +474,14 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_mouse_circularmode = true;
 
+    m_calendar->RegisterOrbit( m_mars_orbit );
+    m_calendar->RegisterOrbit( m_moon_orbit );
+
+
+
+    m_calendar->Startup( 0, 35, 13, 28, 3, 1988 - 1900 );
+
+        
     return true;
 }
 
@@ -406,6 +559,30 @@ void dsAppClient::OnKeyPulse( long p_key )
 {
     switch( p_key )
     {
+        case VK_F1:
+
+            m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+            break;
+
+        case VK_F2:
+
+            m_calendar->SetTimeFactor( Calendar::MUL2_TIME );
+            break;
+
+        case VK_F3:
+
+            m_calendar->SetTimeFactor( Calendar::SEC_1DAY_TIME );
+            break;
+
+        case VK_F4:
+
+            m_calendar->SetTimeFactor( Calendar::SEC_30DAYS_TIME );
+            break;
+
+        case VK_F5:
+
+            m_calendar->SetTimeFactor( Calendar::PAUSE_TIME );
+            break;
     }
 }
 

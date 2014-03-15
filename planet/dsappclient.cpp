@@ -221,7 +221,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_scenegraph.RegisterNode( m_planet );
 
-    DrawSpace::Core::TypedProperty<dsreal> planet_diameter( "diameter", 12000000.0 );
+    DrawSpace::Core::TypedProperty<dsreal> planet_diameter( "diameter", /*12000000.0*/ 12000.0 );
     m_planet->SetProperty( "diameter", &planet_diameter );
 
     m_planet->Initialize();
@@ -261,7 +261,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_wireframepass->GetRenderingQueue()->UpdateOutputQueue();
     
     m_freemove.SetTransformNode( m_camera );
-    m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 20000000.0, 1.0 ) );
+    m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, /*20000000.0*/ 40000.0, 1.0 ) );
 
 
     m_mouse_circularmode = true;
