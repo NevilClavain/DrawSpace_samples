@@ -577,7 +577,7 @@ bool dsAppClient::OnIdleAppInit( void )
     create_box( "object.ac", 1.0, Vector( 0.0, 0.0, 0.0, 1.0 ), false, false );
 
 
-    m_boxes[1].drawable->AddChild( m_camera );
+    //m_boxes[1].drawable->AddChild( m_camera );
     m_scenegraph.SetCurrentCamera( "camera" );
 
 
@@ -781,38 +781,7 @@ void dsAppClient::OnEndKeyPress( long p_key )
 
 
 
-                /*
-                m_boxes[0].motion->getWorldTransform( tf );
-                tf.getOpenGLMatrix( imat );
 
-
-
-                DrawSpace::Utils::Matrix mat_b;
-
-                mat_b( 0, 0 ) = imat[0];
-                mat_b( 0, 1 ) = imat[1];
-                mat_b( 0, 2 ) = imat[2];
-                mat_b( 0, 3 ) = imat[3];
-
-                mat_b( 1, 0 ) = imat[4];
-                mat_b( 1, 1 ) = imat[5];
-                mat_b( 1, 2 ) = imat[6];
-                mat_b( 1, 3 ) = imat[7];
-
-                mat_b( 2, 0 ) = imat[8];
-                mat_b( 2, 1 ) = imat[9];
-                mat_b( 2, 2 ) = imat[10];
-                mat_b( 2, 3 ) = imat[11];
-
-                mat_b( 3, 0 ) = imat[12];
-                mat_b( 3, 1 ) = imat[13];
-                mat_b( 3, 2 ) = imat[14];
-                mat_b( 3, 3 ) = imat[15];
-
-
-
-                mat_b.Inverse();
-                */
 
                 DrawSpace::Utils::Matrix mat_b = m_boxes[0].mat_b;
                 mat_b.Inverse();
@@ -902,13 +871,6 @@ void dsAppClient::OnEndKeyPress( long p_key )
                 m_boxes[1].body = body;
 
 
-                /*
-
-                body->setAngularVelocity( m_angularspeed_mem );
-                body->setLinearVelocity( m_linearspeed_mem );
-
-                */
-
                 // m_angularspeed_mem & m_linearspeed_mem a passer dans le repere planete
 
                 Vector angularspeed_mem, linearspeed_mem;
@@ -947,6 +909,155 @@ void dsAppClient::OnEndKeyPress( long p_key )
                 // detach
 
                 m_attached = false;
+
+
+
+                btTransform tf;
+                btScalar imat[16];
+
+
+                m_boxes[1].motion->getWorldTransform( tf );
+                tf.getOpenGLMatrix( imat );
+
+
+
+                DrawSpace::Utils::Matrix mat_a;
+
+                mat_a( 0, 0 ) = imat[0];
+                mat_a( 0, 1 ) = imat[1];
+                mat_a( 0, 2 ) = imat[2];
+                mat_a( 0, 3 ) = imat[3];
+
+                mat_a( 1, 0 ) = imat[4];
+                mat_a( 1, 1 ) = imat[5];
+                mat_a( 1, 2 ) = imat[6];
+                mat_a( 1, 3 ) = imat[7];
+
+                mat_a( 2, 0 ) = imat[8];
+                mat_a( 2, 1 ) = imat[9];
+                mat_a( 2, 2 ) = imat[10];
+                mat_a( 2, 3 ) = imat[11];
+
+                mat_a( 3, 0 ) = imat[12];
+                mat_a( 3, 1 ) = imat[13];
+                mat_a( 3, 2 ) = imat[14];
+                mat_a( 3, 3 ) = imat[15];
+
+
+
+                DrawSpace::Utils::Matrix mat_b = m_boxes[0].mat_b;
+                
+
+
+                DrawSpace::Utils::Matrix mat_a2 = mat_a * mat_b;
+
+
+
+
+                
+
+                btScalar kmat[16];    
+                btTransform ktf;
+
+                kmat[0] = mat_a2( 0, 0 );
+                kmat[1] = mat_a2( 0, 1 );
+                kmat[2] = mat_a2( 0, 2 );
+                kmat[3] = mat_a2( 0, 3 );
+
+                kmat[4] = mat_a2( 1, 0 );
+                kmat[5] = mat_a2( 1, 1 );
+                kmat[6] = mat_a2( 1, 2 );
+                kmat[7] = mat_a2( 1, 3 );
+
+                kmat[8] = mat_a2( 2, 0 );
+                kmat[9] = mat_a2( 2, 1 );
+                kmat[10] = mat_a2( 2, 2 );
+                kmat[11] = mat_a2( 2, 3 );
+
+                kmat[12] = mat_a2( 3, 0 );
+                kmat[13] = mat_a2( 3, 1 );
+                kmat[14] = mat_a2( 3, 2 );
+                kmat[15] = mat_a2( 3, 3 );
+
+                ktf.setFromOpenGLMatrix( kmat );
+         
+
+
+
+                m_linearspeed_mem = m_boxes[1].body->getLinearVelocity();
+                m_angularspeed_mem = m_boxes[1].body->getAngularVelocity();
+
+
+
+
+
+
+
+
+
+
+                m_myWorld_2->removeRigidBody( m_boxes[1].body );
+                _DRAWSPACE_DELETE_( m_boxes[1].motion );
+                _DRAWSPACE_DELETE_( m_boxes[1].body );
+
+
+
+
+
+                btCollisionShape* shape = _DRAWSPACE_NEW_( btBoxShape, btBoxShape( btVector3( 0.5, 0.5, 0.5 ) ) );
+                btDefaultMotionState* motion = _DRAWSPACE_NEW_( btDefaultMotionState, btDefaultMotionState( ktf ) );
+
+
+                btVector3 localInertia( 0, 0, 0 );
+
+                btScalar mass = 8.5;
+                shape->calculateLocalInertia( mass, localInertia );
+
+                btRigidBody::btRigidBodyConstructionInfo myBoxRigidBodyConstructionInfo( mass, motion, shape, localInertia );
+
+                btRigidBody* body = _DRAWSPACE_NEW_(  btRigidBody, btRigidBody( myBoxRigidBodyConstructionInfo ) );
+
+
+
+                m_myWorld->addRigidBody( body );
+
+                body->setActivationState( DISABLE_DEACTIVATION );
+
+                m_boxes[1].motion = motion;
+                m_boxes[1].body = body;
+
+
+
+                // m_angularspeed_mem & m_linearspeed_mem a passer dans le repere global
+
+                Vector angularspeed_mem, linearspeed_mem;
+                Vector angularspeed_mem_2, linearspeed_mem_2;
+                btVector3 angularspeed_mem_3, linearspeed_mem_3;
+
+
+                angularspeed_mem[0] = m_angularspeed_mem.x();
+                angularspeed_mem[1] = m_angularspeed_mem.y();
+                angularspeed_mem[2] = m_angularspeed_mem.z();
+                angularspeed_mem[3] = 1.0;
+
+
+                linearspeed_mem[0] = m_linearspeed_mem.x();
+                linearspeed_mem[1] = m_linearspeed_mem.y();
+                linearspeed_mem[2] = m_linearspeed_mem.z();
+                linearspeed_mem[3] = 1.0;
+
+
+                
+
+                mat_b.ClearTranslation();
+               
+
+                mat_b.Transform( &angularspeed_mem, &angularspeed_mem_2 );
+                mat_b.Transform( &linearspeed_mem, &linearspeed_mem_2 );
+               
+                body->setAngularVelocity( btVector3( angularspeed_mem_2[0], angularspeed_mem_2[1], angularspeed_mem_2[2] ) );
+                body->setLinearVelocity( btVector3( linearspeed_mem_2[0], linearspeed_mem_2[1], linearspeed_mem_2[2] ) );
+
             }
             break;
 

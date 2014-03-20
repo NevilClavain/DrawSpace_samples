@@ -176,6 +176,10 @@ void dsAppClient::OnRenderFrame( void )
 
     renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
 
+    renderer->DrawText( 0, 255, 0, 10, 75, "%d", m_calendar->GetCurrentInstant() );
+
+    renderer->DrawText( 0, 255, 0, 10, 95, "%d", m_calendar->GetSubSecCount() );
+
 
     renderer->FlipScreen();
 
@@ -303,7 +307,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_mars_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
     m_mars_centroid->SetOrbiter( m_mars );
 
-    m_mars_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 25.0, 0.37, 90.0, 9.0, 0.0, 0.0, 1.0, m_mars_centroid ) );
+    m_mars_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 25.0, 0.37, 0.0, 9.0, 0.0, 0.0, 1.0, m_mars_centroid ) );
 
     m_mars_orbit->RegisterDrawable( build_orbit_drawable( "mars_orbit", m_mars_orbit ) );
 
@@ -479,7 +483,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_calendar->Startup( 0, 35, 13, 28, 3, 1988 - 1900 );
+    m_calendar->Startup( 162682566 );
 
         
     return true;
@@ -576,7 +580,7 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F4:
 
-            m_calendar->SetTimeFactor( Calendar::SEC_30DAYS_TIME );
+            m_calendar->SetTimeFactor( Calendar::DIV2_TIME );
             break;
 
         case VK_F5:
