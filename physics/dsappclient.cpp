@@ -8,6 +8,7 @@ using namespace DrawSpace::Interface;
 using namespace DrawSpace::Core;
 using namespace DrawSpace::Gui;
 using namespace DrawSpace::Utils;
+using namespace DrawSpace::Dynamics;
 
 
 dsAppClient* dsAppClient::m_instance = NULL;
@@ -75,16 +76,25 @@ void dsAppClient::OnRenderFrame( void )
     m_finalpass->GetRenderingQueue()->Draw();
 
 
+    dsstring date;
+    m_calendar->GetFormatedDate( date );
+
     renderer->DrawText( 255, 0, 0, 30, 50, "%d %d", m_texturepass->GetRenderingQueue()->GetSwitchesCost(), m_texturepass->GetRenderingQueue()->GetTheoricalSwitchesCost() );
+
+    renderer->DrawText( 0, 255, 0, 10, 85, "%s", date.c_str() );
 
 
     renderer->FlipScreen();
 
+    /*
     m_timer.Update();
     if( m_timer.IsReady() )
     {
         m_world.StepSimulation( m_timer.GetFPS() );
     }
+    */
+
+    m_calendar->Run();
 }
 
 void dsAppClient::create_box( void )
@@ -137,9 +147,8 @@ void dsAppClient::create_box( void )
 
 
     DrawSpace::Dynamics::InertBody::Parameters cube_params;
-    //cube_params.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
+
     cube_params.mass = 50.0;
-    //cube_params.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
     cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 10.5, 0.0, 1.0 );
@@ -354,6 +363,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     create_box();
+
+    m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer, &m_world ) );
+
+
+    m_calendar->Startup( 162682566 );
    
 
     return true;
@@ -411,6 +425,34 @@ void dsAppClient::OnKeyPulse( long p_key )
 {
     switch( p_key )
     {
+        case VK_F1:
+
+            m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+            break;
+
+        case VK_F2:
+
+            m_calendar->SetTimeFactor( Calendar::SEC_1HOUR_TIME );
+            break;
+
+        case VK_F3:
+
+            m_calendar->SetTimeFactor( Calendar::DIV2_TIME );
+            break;
+
+        case VK_F4:
+
+            m_calendar->SetTimeFactor( Calendar::DIV10_TIME );
+            break;
+
+        case VK_F5:
+            m_calendar->Suspend( true );
+            break;
+
+        case VK_F6:
+            m_calendar->Suspend( false );
+            break;
+
     }
 }
 

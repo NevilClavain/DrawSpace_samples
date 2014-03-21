@@ -47,33 +47,7 @@ protected:
     DrawSpace::Dynamics::World                  m_world;
     DrawSpace::Dynamics::InertBody*             m_ground_body;
 
-
-
-    // bullet stuff
-/*
-    btDiscreteDynamicsWorld*                    m_myWorld;
-    btBroadphaseInterface*                      m_myBroadphase;
-    btCollisionDispatcher*                      m_myDispatcher;
-    btDefaultCollisionConfiguration*            m_myCollisionConfiguration;
-    btSequentialImpulseConstraintSolver*        m_mySequentialImpulseConstraintSolver;
-    btTransform                                 m_myTransform;
-    //btDefaultMotionState*                       m_myMotionState;
-	btDefaultMotionState*                       m_myMotionState_Sol;
-    btScalar                                    m_matrix[16];
-    //btRigidBody*                                m_body;
-	btRigidBody*                                m_body_sol;
-
-    typedef struct
-    {
-        DrawSpace::Interface::Drawable* drawable;
-        btRigidBody*                    body;
-        btDefaultMotionState*           motion;
-
-    } Box;
-
-    std::vector<Box>                            m_boxes;
-
-*/
+    DrawSpace::Dynamics::Calendar*              m_calendar;
 
     typedef struct
     {
