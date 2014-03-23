@@ -13,7 +13,7 @@ using namespace DrawSpace::Dynamics;
 
 dsAppClient* dsAppClient::m_instance = NULL;
 
-
+_DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_box_count( 0 ), m_box_texture( 0 )
@@ -451,6 +451,11 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F6:
             m_calendar->Suspend( false );
+            break;
+
+        case VK_F7:
+            {
+            }
             break;
 
     }

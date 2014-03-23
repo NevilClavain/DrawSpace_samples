@@ -10,7 +10,7 @@ using namespace DrawSpace::Utils;
 
 dsAppClient* dsAppClient::m_instance = NULL;
 
-
+_DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_update_hp( true )
