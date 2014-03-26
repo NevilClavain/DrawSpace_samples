@@ -585,7 +585,6 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F5:
 
-            m_calendar->SetTimeFactor( Calendar::PAUSE_TIME );
             break;
     }
 }

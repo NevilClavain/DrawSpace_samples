@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "physics2", "physics2\physic
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "orbiters", "orbiters\orbiters.vcproj", "{9914B350-8E3A-4A2C-AA4B-6F677424C00F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "orbiters2", "orbiters2\orbiters2.vcproj", "{FF6C5F7F-4108-4DE5-97DE-44564FD7A737}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -43,6 +45,10 @@ Global
 		{9914B350-8E3A-4A2C-AA4B-6F677424C00F}.Debug|Win32.Build.0 = Debug|Win32
 		{9914B350-8E3A-4A2C-AA4B-6F677424C00F}.Release|Win32.ActiveCfg = Release|Win32
 		{9914B350-8E3A-4A2C-AA4B-6F677424C00F}.Release|Win32.Build.0 = Release|Win32
+		{FF6C5F7F-4108-4DE5-97DE-44564FD7A737}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FF6C5F7F-4108-4DE5-97DE-44564FD7A737}.Debug|Win32.Build.0 = Debug|Win32
+		{FF6C5F7F-4108-4DE5-97DE-44564FD7A737}.Release|Win32.ActiveCfg = Release|Win32
+		{FF6C5F7F-4108-4DE5-97DE-44564FD7A737}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
