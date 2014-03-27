@@ -66,6 +66,10 @@ protected:
 
 
     Planet*                                     m_planet;
+
+    DrawSpace::Dynamics::Orbit*                 m_orbit;
+    DrawSpace::Dynamics::Centroid*              m_centroid;
+
     
 
     dsAppClient( void );

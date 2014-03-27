@@ -72,12 +72,40 @@ void dsAppClient::OnRenderFrame( void )
     DrawSpace::Utils::Matrix sbtrans;
     sbtrans.Scale( 20.0, 20.0, 20.0 );
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
+
+
+    
+    Matrix origin;
+    origin.Identity();
+
+    m_orbit->OrbitStep( origin );
+    
+  
+/*
+    DrawSpace::Utils::Matrix planet_res;
+    planet_res.Identity();
+    m_scenegraph.SetNodeLocalTransformation( "planet01", planet_res );
+*/
     
         
     m_scenegraph.ComputeTransformations();
 
 
     DrawSpace::Utils::Matrix camera_pos;
+    m_scenegraph.GetCurrentCameraTranform( camera_pos );
+
+    TypedProperty<DrawSpace::Utils::Vector> hotpoint( "hotpoint" );
+
+    hotpoint.m_value[0] = camera_pos( 3, 0 );
+    hotpoint.m_value[1] = camera_pos( 3, 1 );
+    hotpoint.m_value[2] = camera_pos( 3, 2 );
+
+    m_planet->GetDrawable()->SetProperty( "hotpoint", &hotpoint );
+    m_planet->GetDrawable()->ComputeSpecifics();
+
+
+
+
     m_scenegraph.GetCurrentCameraTranform( camera_pos );
 
 
@@ -212,24 +240,34 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_world.Initialize();
     
- 
     
-
-    m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
-
-
-
-   
-
-
-    
-
-
-    m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer, &m_world ) );
-
-    
-
     //////////////////////////////////////////////////////////////
+
+
+    m_planet = _DRAWSPACE_NEW_( Planet, Planet( "planet01", &m_world ) );
+
+
+    m_planet->GetDrawable()->RegisterPassSlot( "texture_pass" );
+
+    
+    std::vector<dsstring> idslist;
+    m_planet->GetDrawable()->GetNodesIdsList( idslist );
+    for( size_t i = 0; i < idslist.size(); i++ )
+    {
+        m_planet->GetDrawable()->SetNodeFromPassSpecificFx( "texture_pass", idslist[i], "main_fx" );
+    }
+    m_scenegraph.RegisterNode( m_planet->GetDrawable() );
+
+    m_planet->GetDrawable()->Initialize();
+
+    
+
+    m_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
+    m_centroid->SetOrbiter( m_planet->GetOrbiter() );
+
+    m_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 50000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.333, m_centroid ) );
+
+      
 
 
 
@@ -246,13 +284,15 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     
     m_freemove.SetTransformNode( m_camera );
-    m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 20.0, 1.0 ) );
+    m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 40000.0, 1.0 ) );
 
 
     m_mouse_circularmode = true;
 
 
+    m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer, &m_world ) );
 
+    m_calendar->RegisterOrbit( m_orbit );
     m_calendar->Startup( 162682566 );
 
         
