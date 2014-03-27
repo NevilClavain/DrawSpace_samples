@@ -16,6 +16,38 @@ dsAppClient* dsAppClient::m_instance = NULL;
 _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
+
+Planet::Planet( const dsstring& p_name, DrawSpace::Dynamics::World* p_world ) : m_name( p_name )
+{
+    m_drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "planet_plugin" );
+    m_drawable->SetName( p_name );
+    m_drawable->SetRenderer( DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface );
+
+
+    DrawSpace::Core::TypedProperty<dsreal> planet_diameter( "diameter", /*12000000.0*/ 12000.0 );
+    m_drawable->SetProperty( "diameter", &planet_diameter );
+
+    m_orbiter = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Orbiter, DrawSpace::Dynamics::Orbiter( p_world, m_drawable ) );
+}
+
+Planet::~Planet( void )
+{
+    _DRAWSPACE_DELETE_( m_orbiter );
+    _DRAWSPACE_DELETE_( m_drawable );
+}
+
+DrawSpace::Interface::Drawable* Planet::GetDrawable( void )
+{
+    return m_drawable;
+}
+
+DrawSpace::Dynamics::Orbiter* Planet::GetOrbiter( void )
+{
+    return m_orbiter;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 )
 {    
     _INIT_LOGGER( "orbiters2.conf" )  
@@ -49,21 +81,15 @@ void dsAppClient::OnRenderFrame( void )
     m_scenegraph.GetCurrentCameraTranform( camera_pos );
 
 
-    static long last_fps;
-
-    long current_fps = m_timer.GetFPS();
-
-
-
     m_texturepass->GetRenderingQueue()->Draw();
-
-
     m_finalpass->GetRenderingQueue()->Draw();
 
 
-    dsstring date;
-    m_calendar->GetFormatedDate( date );
+    long current_fps = m_timer.GetFPS();
+    renderer->DrawText( 0, 255, 0, 10, 35, "%d", current_fps );
 
+    dsstring date;
+    m_calendar->GetFormatedDate( date );    
     renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
 
 
@@ -76,11 +102,39 @@ void dsAppClient::OnRenderFrame( void )
 
 bool dsAppClient::OnIdleAppInit( void )
 {
-
-    /////////////////////////////////////
-
     bool status;
-    Drawable* drawable;
+
+    status = DrawSpace::Utils::LoadDrawablePlugin( "planetbuild.dll", "planet_plugin" );
+    if( !status )
+    {
+        _DSEXCEPTION( "Cannot load planetbuild plugin !" )
+    }
+    _DSDEBUG( logger, "planetbuild plugin successfully loaded..." );
+
+    status = DrawSpace::Utils::LoadDrawablePlugin( "spacebox.dll", "spacebox_plugin" );
+    if( !status )
+    {
+        _DSEXCEPTION( "Cannot load spacebox plugin !" )
+    }
+    _DSDEBUG( logger, "spacebox plugin successfully loaded..." );
+
+    status = DrawSpace::Utils::LoadDrawablePlugin( "chunk.dll", "chunk_plugin" );
+    if( !status )
+    {
+        _DSEXCEPTION( "Cannot load chunk plugin !" )
+    }
+    _DSDEBUG( logger, "chunk plugin successfully loaded..." );
+
+    status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
+    if( !status )
+    {
+        _DSEXCEPTION( "Cannot load ac3dmeshe plugin !" )
+    }
+    _DSDEBUG( logger, "ac3dmeshe plugin successfully loaded..." );
+
+
+
+    /////////////////////////////////////    
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
     renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
@@ -89,8 +143,10 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
 
     m_texturepass->GetRenderingQueue()->EnableDepthClearing( true );
-    m_texturepass->GetRenderingQueue()->EnableTargetClearing( true );
+    m_texturepass->GetRenderingQueue()->EnableTargetClearing( false );
     m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0 );
+
+    m_scenegraph.RegisterPass( m_texturepass );
 
 
     //////////////////////////////////////////////////////////////
@@ -107,14 +163,6 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
     //////////////////////////////////////////////////////////////
-
-    m_scenegraph.RegisterPass( m_texturepass );
-
-
-    //////////////////////////////////////////////////////////////
-
-
-    status = DrawSpace::Utils::LoadDrawablePlugin( "spacebox.dll", "spacebox_plugin" );
 
     m_spacebox = DrawSpace::Utils::InstanciateDrawableFromPlugin( "spacebox_plugin" );
     m_spacebox->RegisterPassSlot( "texture_pass" );
@@ -165,9 +213,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_world.Initialize();
     
  
-    status = DrawSpace::Utils::LoadDrawablePlugin( "chunk.dll", "chunk_plugin" );
+    
 
-    status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
     m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
 
 

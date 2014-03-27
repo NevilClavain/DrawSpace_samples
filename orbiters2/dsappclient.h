@@ -5,7 +5,23 @@
 #include <dsapp.h>
 
 
+class Planet
+{
+protected:
 
+    dsstring                            m_name;
+    DrawSpace::Dynamics::Orbiter*       m_orbiter;
+    DrawSpace::Interface::Drawable*     m_drawable;
+
+public:
+
+    Planet( const dsstring& p_name, DrawSpace::Dynamics::World* p_world );
+    ~Planet( void );
+
+    DrawSpace::Interface::Drawable* GetDrawable( void );
+    DrawSpace::Dynamics::Orbiter*   GetOrbiter( void );
+
+};
 
 
 class dsAppClient : public DrawSpace::App
@@ -45,10 +61,11 @@ protected:
     DrawSpace::Dynamics::World                  m_world;
 
     
-    DrawSpace::Dynamics::InertBody*             m_cube_body;
-
 
     DrawSpace::Dynamics::Calendar*              m_calendar;
+
+
+    Planet*                                     m_planet;
     
 
     dsAppClient( void );
