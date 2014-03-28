@@ -74,6 +74,7 @@ void dsAppClient::OnRenderFrame( void )
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
 
 
+    m_ship->Update();
     
     Matrix origin;
     origin.Identity();
@@ -160,7 +161,7 @@ bool dsAppClient::OnIdleAppInit( void )
     }
     _DSDEBUG( logger, "ac3dmeshe plugin successfully loaded..." );
 
-
+    m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
 
     /////////////////////////////////////    
 
@@ -267,7 +268,49 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 50000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.333, m_centroid ) );
 
-      
+
+    //////////////////////////////////////////////////////////////
+
+
+    m_ship_drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+
+    m_ship_drawable->RegisterPassSlot( "texture_pass" );
+    m_ship_drawable->SetRenderer( renderer );
+
+    m_ship_drawable->SetName( "rocket" );
+    
+    m_ship_drawable->GetMeshe( "" )->SetImporter( m_meshe_import );
+
+    m_ship_drawable->GetMeshe( "" )->LoadFromFile( "object.ac", 0 );    
+
+    m_ship_drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_ship_drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_ship_drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_ship_drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_ship_drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_ship_drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_ship_drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_ship_drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    m_ship_drawable->GetNodeFromPass( "texture_pass", "" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "tex07.jpg" ) ), 0 );
+
+
+
+    m_ship_drawable->GetNodeFromPass( "texture_pass", "" )->GetTexture( 0 )->LoadFromFile();
+
+    m_scenegraph.RegisterNode( m_ship_drawable );
+
+
+    DrawSpace::Dynamics::Body::Parameters cube_params;
+    cube_params.mass = 50.0;
+    cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
+    cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, -10.0, 1.0 );
+    cube_params.initial_rot.Identity();
+
+    m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, m_ship_drawable, cube_params ) );
+
 
 
 
@@ -277,14 +320,20 @@ bool dsAppClient::OnIdleAppInit( void )
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
     m_scenegraph.RegisterNode( m_camera );
 
+    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera2" ) );
+    m_scenegraph.RegisterNode( m_camera2 );
 
-    m_scenegraph.SetCurrentCamera( "camera" );
+    m_ship_drawable->AddChild( m_camera2 );
+
+
+    //m_scenegraph.SetCurrentCamera( "camera" );
+    m_scenegraph.SetCurrentCamera( "camera2" );
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     
     m_freemove.SetTransformNode( m_camera );
-    m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 40000.0, 1.0 ) );
+    m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 ) );
 
 
     m_mouse_circularmode = true;
@@ -334,6 +383,49 @@ void dsAppClient::OnKeyPress( long p_key )
  
             break;
 
+
+        case 'E':
+
+            m_ship->ApplyUpPitch( 15.0 );
+            break;
+
+        case 'C':
+
+            m_ship->ApplyDownPitch( 15.0 );
+            break;
+
+        case 'S':
+
+            m_ship->ApplyLeftYaw( 10.0 );
+            break;
+
+        case 'F':
+
+            m_ship->ApplyRightYaw( 10.0 );
+            break;
+
+
+        case 'Z':
+
+            m_ship->ApplyLeftRoll( 10.0 );
+            break;
+
+        case 'R':
+
+            m_ship->ApplyRightRoll( 10.0 );
+            break;
+
+
+        case VK_SPACE:
+
+            m_ship->ZeroSpeed();
+            break;
+
+        case VK_RETURN:
+
+            m_ship->ApplyFwdForce( 20.0 );
+            break;
+
     }
 }
 
@@ -375,12 +467,12 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F3:
 
-            m_calendar->SetTimeFactor( Calendar::SEC_1DAY_TIME );
+            m_calendar->SetTimeFactor( Calendar::MUL10_TIME );
             break;
 
         case VK_F4:
 
-            m_calendar->SetTimeFactor( Calendar::DIV2_TIME );
+            m_calendar->SetTimeFactor( Calendar::MUL100_TIME );
             break;
 
         case VK_F5:

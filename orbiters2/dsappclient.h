@@ -47,6 +47,7 @@ protected:
     DrawSpace::Core::Font*                      m_font;
 
     DrawSpace::Camera*                          m_camera;
+    DrawSpace::Camera*                          m_camera2;
     DrawSpace::Core::FPSMovement                m_fpsmove;
     DrawSpace::Core::FreeMovement               m_freemove;
     
@@ -69,6 +70,9 @@ protected:
 
     DrawSpace::Dynamics::Orbit*                 m_orbit;
     DrawSpace::Dynamics::Centroid*              m_centroid;
+
+    DrawSpace::Dynamics::Rocket*                m_ship;
+    DrawSpace::Interface::Drawable*             m_ship_drawable;
 
     
 

@@ -432,7 +432,7 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F2:
 
-            m_calendar->SetTimeFactor( Calendar::SEC_1HOUR_TIME );
+            m_calendar->SetTimeFactor( Calendar::MUL4_TIME );
             break;
 
         case VK_F3:
