@@ -74,7 +74,7 @@ protected:
     DrawSpace::Dynamics::Rocket*                m_ship;
     DrawSpace::Interface::Drawable*             m_ship_drawable;
 
-    
+    bool                                        m_update_planet;
 
     dsAppClient( void );
 

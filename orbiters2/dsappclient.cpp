@@ -52,6 +52,8 @@ dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_spe
 {    
     _INIT_LOGGER( "orbiters2.conf" )  
     m_w_title = "orbiters 2 test";
+
+    m_update_planet = false;
 }
 
 dsAppClient::~dsAppClient( void )
@@ -73,41 +75,42 @@ void dsAppClient::OnRenderFrame( void )
     sbtrans.Scale( 20.0, 20.0, 20.0 );
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
 
-
-    m_ship->Update();
+    
     
     Matrix origin;
     origin.Identity();
 
     m_orbit->OrbitStep( origin );
-    
-  
-/*
-    DrawSpace::Utils::Matrix planet_res;
-    planet_res.Identity();
-    m_scenegraph.SetNodeLocalTransformation( "planet01", planet_res );
-*/
-    
-        
+
+
+    m_ship->Update();
+
+
+           
     m_scenegraph.ComputeTransformations();
 
 
-    DrawSpace::Utils::Matrix camera_pos;
-    m_scenegraph.GetCurrentCameraTranform( camera_pos );
 
-    TypedProperty<DrawSpace::Utils::Vector> hotpoint( "hotpoint" );
+    if( m_update_planet )
+    {
+        
+        DrawSpace::Utils::Matrix camera_pos;
 
-    hotpoint.m_value[0] = camera_pos( 3, 0 );
-    hotpoint.m_value[1] = camera_pos( 3, 1 );
-    hotpoint.m_value[2] = camera_pos( 3, 2 );
+        m_ship->GetLastLocalWorldTrans( camera_pos );        
+        //m_scenegraph.GetCurrentCameraTranform( camera_pos );
 
-    m_planet->GetDrawable()->SetProperty( "hotpoint", &hotpoint );
-    m_planet->GetDrawable()->ComputeSpecifics();
+        TypedProperty<DrawSpace::Utils::Vector> hotpoint( "hotpoint" );
+
+        hotpoint.m_value[0] = camera_pos( 3, 0 );
+        hotpoint.m_value[1] = camera_pos( 3, 1 );
+        hotpoint.m_value[2] = camera_pos( 3, 2 );
+
+        m_planet->GetDrawable()->SetProperty( "hotpoint", &hotpoint );
+        m_planet->GetDrawable()->ComputeSpecifics();
+    }
 
 
 
-
-    m_scenegraph.GetCurrentCameraTranform( camera_pos );
 
 
     m_texturepass->GetRenderingQueue()->Draw();
@@ -477,7 +480,25 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F5:
 
+            m_calendar->SetTimeFactor( Calendar::SEC_1HOUR_TIME );
             break;
+
+
+        case VK_F6:
+
+            m_calendar->SetTimeFactor( Calendar::SEC_1DAY_TIME );
+            break;
+
+        case VK_F9:
+
+            m_update_planet = true;
+            m_ship->Attach( m_planet->GetOrbiter() );
+            break;
+
+        case VK_F10:
+
+            break;
+
     }
 }
 
