@@ -13,7 +13,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_update_hp( true )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_update_hp( true ), m_nb_split( 0 ), m_nb_merge( 0 )
 {    
     _INIT_LOGGER( "planet.conf" )  
     m_w_title = "planet engine test";
@@ -85,21 +85,6 @@ void dsAppClient::OnRenderFrame( void )
     m_fpstext_widget->SetVirtualTranslation( 10, 5 );
     m_fpstext_widget->Transform();
 
-/*
-    TypedProperty<dsreal>* altitud = static_cast<TypedProperty<dsreal>*>( m_planet->GetProperty( "altitud" ) );
-
-    TypedProperty<DrawSpace::Utils::Vector>* pos = static_cast<TypedProperty<DrawSpace::Utils::Vector>*>( m_planet->GetProperty( "hotpoint" ) );
-    TypedProperty<DrawSpace::Utils::Vector>* relative_pos = static_cast<TypedProperty<DrawSpace::Utils::Vector>*>( m_planet->GetProperty( "relative_hotpoint" ) );
-
-    char planetinfos[256];
-    sprintf( planetinfos, "relative pos : %.2f %.2f %.2f altitud %.2f", relative_pos->m_value[0], relative_pos->m_value[1], relative_pos->m_value[2], 
-                                                                                    altitud->m_value );
-    m_planetinfos_widget->SetText( 5, 5, 7, planetinfos );
-
-
-    m_planetinfos_widget->SetVirtualTranslation( 90, 70 );
-    m_planetinfos_widget->Transform();
-*/
 
     m_wireframepass->GetRenderingQueue()->Draw();
 
@@ -107,6 +92,9 @@ void dsAppClient::OnRenderFrame( void )
     m_planetinfos_widget->Draw();
 
     m_finalpass->GetRenderingQueue()->Draw();
+
+
+    renderer->DrawText( 0, 255, 0, 10, 85, "nb split : %d     nb merge : %d", m_nb_split, m_nb_merge );
 
     renderer->FlipScreen();
 
@@ -122,6 +110,8 @@ void dsAppClient::OnRenderFrame( void )
 bool dsAppClient::OnIdleAppInit( void )
 {
     bool status;
+
+    
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
     renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
@@ -225,6 +215,10 @@ bool dsAppClient::OnIdleAppInit( void )
     m_planet->SetProperty( "diameter", &planet_diameter );
 
     m_planet->Initialize();
+
+    m_planet_evt_cb = _DRAWSPACE_NEW_( PlanetEvtCb, PlanetEvtCb( this, &dsAppClient::on_planet_event ) );
+
+    m_planet->RegisterEventHandler( m_planet_evt_cb );
 
     //////////////////////////////////////////////////////////////
 
@@ -401,4 +395,16 @@ void dsAppClient::OnMouseRightButtonUp( long p_xm, long p_ym )
 void dsAppClient::OnAppEvent( WPARAM p_wParam, LPARAM p_lParam )
 {
 
+}
+
+void dsAppClient::on_planet_event( const dsstring& p_evt )
+{
+    if( "split_event" == p_evt )
+    {
+        m_nb_split++;
+    }
+    else if( "merge_event" == p_evt )
+    {
+        m_nb_merge++;
+    }
 }

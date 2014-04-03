@@ -10,6 +10,10 @@
 
 class dsAppClient : public DrawSpace::App
 {
+public:
+
+    typedef DrawSpace::Core::CallBack<dsAppClient, void, const dsstring&> PlanetEvtCb;
+
 protected:
 
     static dsAppClient*                         m_instance;
@@ -44,6 +48,13 @@ protected:
     dsreal                                      m_speed_speed;
 
     bool                                        m_update_hp;
+
+    int                                         m_nb_split;
+    int                                         m_nb_merge;
+
+    PlanetEvtCb*                                m_planet_evt_cb;
+
+    void on_planet_event( const dsstring& p_evt );
 
     dsAppClient( void );
 

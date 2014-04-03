@@ -348,18 +348,64 @@ void dsAppClient::create_box( const dsstring& p_meshe, dsreal p_dims, const Draw
         m_myTransform.setOrigin( btVector3( p_pos[0], p_pos[1], p_pos[2] ) );
     }
 
-    btCollisionShape* shape = _DRAWSPACE_NEW_( btBoxShape, btBoxShape( btVector3( p_dims / 2.0, p_dims / 2.0, p_dims / 2.0 ) ) );
+    btCollisionShape* shape;
+
+    if( !p_kinematic )
+    {
+        shape = _DRAWSPACE_NEW_( btBoxShape, btBoxShape( btVector3( p_dims / 2.0, p_dims / 2.0, p_dims / 2.0 ) ) );
+    }
+    else
+    {
+
+        btTriangleMesh* data = _DRAWSPACE_NEW_( btTriangleMesh, btTriangleMesh );
+        Meshe* meshe = drawable->GetMeshe( "" );
+
+        for( long i = 0; i < meshe->GetTrianglesListSize(); i++ )
+        {
+            Triangle curr_triangle;
+            meshe->GetTriangles( i, curr_triangle );
+
+            Vertex v1, v2, v3;
+
+            meshe->GetVertex( curr_triangle.vertex1, v1 );
+            meshe->GetVertex( curr_triangle.vertex2, v2 );
+            meshe->GetVertex( curr_triangle.vertex3, v3 );
+
+            btVector3 a( v1.x, v1.y, v1.z );
+            btVector3 b( v2.x, v2.y, v2.z );
+            btVector3 c( v3.x, v3.y, v3.z );
+
+            data->addTriangle( a, b, c, false );
+        }
+
+        shape = _DRAWSPACE_NEW_( btBvhTriangleMeshShape, btBvhTriangleMeshShape( data, true, true ) );
+
+    }
+
     motion = _DRAWSPACE_NEW_( btDefaultMotionState, btDefaultMotionState( m_myTransform ) );
 
 
     btVector3 localInertia( 0, 0, 0 );
 
-    btScalar mass = 8.5;
-    shape->calculateLocalInertia( mass, localInertia );
+    if( !p_kinematic )
+    {
+        btScalar mass = 8.5;
+        shape->calculateLocalInertia( mass, localInertia );
 
-    btRigidBody::btRigidBodyConstructionInfo myBoxRigidBodyConstructionInfo( mass, motion, shape, localInertia );
+        btRigidBody::btRigidBodyConstructionInfo myBoxRigidBodyConstructionInfo( mass, motion, shape, localInertia );
 
-    body = _DRAWSPACE_NEW_(  btRigidBody, btRigidBody( myBoxRigidBodyConstructionInfo ) );
+        body = _DRAWSPACE_NEW_(  btRigidBody, btRigidBody( myBoxRigidBodyConstructionInfo ) );
+    }
+    else
+    {
+        btRigidBody::btRigidBodyConstructionInfo myBoxRigidBodyConstructionInfo( 0.0, motion, shape, localInertia );
+
+        body = _DRAWSPACE_NEW_(  btRigidBody, btRigidBody( myBoxRigidBodyConstructionInfo ) );
+    }
+
+    
+
+    
 
     
     if( p_kinematic )
