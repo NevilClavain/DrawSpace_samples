@@ -5,20 +5,20 @@
 #include <dsapp.h>
 
 
-class Planet
+class MyPlanet
 {
 protected:
 
     dsstring                            m_name;
     DrawSpace::Dynamics::Orbiter*       m_orbiter;
-    DrawSpace::Interface::Drawable*     m_drawable;
+    DrawSpace::Planet::Body*            m_drawable;
 
 public:
 
-    Planet( const dsstring& p_name, DrawSpace::Dynamics::World* p_world );
-    ~Planet( void );
+    MyPlanet( const dsstring& p_name, DrawSpace::Dynamics::World* p_world );
+    ~MyPlanet( void );
 
-    DrawSpace::Interface::Drawable* GetDrawable( void );
+    DrawSpace::Drawable* GetDrawable( void );
     DrawSpace::Dynamics::Orbiter*   GetOrbiter( void );
 
 };
@@ -53,7 +53,8 @@ protected:
     
     DrawSpace::Interface::MesheImport*          m_meshe_import;
 
-    DrawSpace::Interface::Drawable*             m_spacebox;
+    //DrawSpace::Interface::Drawable*             m_spacebox;
+    DrawSpace::Spacebox*                        m_spacebox;
     
 
     dsreal                                      m_speed;
@@ -66,13 +67,15 @@ protected:
     DrawSpace::Dynamics::Calendar*              m_calendar;
 
 
-    Planet*                                     m_planet;
+    MyPlanet*                                   m_planet;
 
     DrawSpace::Dynamics::Orbit*                 m_orbit;
     DrawSpace::Dynamics::Centroid*              m_centroid;
 
     DrawSpace::Dynamics::Rocket*                m_ship;
-    DrawSpace::Interface::Drawable*             m_ship_drawable;
+    
+
+    DrawSpace::Chunk*                           m_ship_drawable;
 
     bool                                        m_update_planet;
 

@@ -46,7 +46,7 @@ protected:
     DrawSpace::ImageMouseInputProvider                                              m_mouse_input;
 
     DrawSpace::Interface::MesheImport*                                              m_meshe_import;
-    DrawSpace::Interface::Drawable*                                                 m_chunk;
+    DrawSpace::Chunk*                                                               m_chunk;
 
 
     WidgetEventHandler*                                                             m_mousein_eventhandler;

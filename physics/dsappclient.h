@@ -35,11 +35,14 @@ protected:
     DrawSpace::Core::FPSMovement                m_fpsmove;
     DrawSpace::Camera*                          m_camera2;
 
-    DrawSpace::Interface::Drawable*             m_spacebox;
+    //DrawSpace::Interface::Drawable*             m_spacebox;
+    DrawSpace::Spacebox*                        m_spacebox;
 
     DrawSpace::Interface::MesheImport*          m_meshe_import;
-    DrawSpace::Interface::Drawable*             m_ground;
+    //DrawSpace::Interface::Drawable*             m_ground;
     //DrawSpace::Interface::Drawable*             m_box;
+
+    DrawSpace::Chunk*                           m_ground;
 
     int                                         m_box_count;
     int                                         m_box_texture;
@@ -51,7 +54,7 @@ protected:
 
     typedef struct
     {
-        DrawSpace::Interface::Drawable* drawable;
+        DrawSpace::Drawable* drawable;
         DrawSpace::Dynamics::InertBody* inert_body;
 
     } Box;

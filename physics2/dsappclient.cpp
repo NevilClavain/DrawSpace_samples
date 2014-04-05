@@ -287,11 +287,11 @@ void dsAppClient::OnRenderFrame( void )
 
 void dsAppClient::create_box( const dsstring& p_meshe, dsreal p_dims, const DrawSpace::Utils::Vector& p_pos, bool p_kinematic, bool p_world2 )
 {
-    DrawSpace::Interface::Drawable* drawable;
+    DrawSpace::Drawable* drawable;
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
 
-    drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+    drawable = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
     drawable->RegisterPassSlot( "texture_pass" );
     drawable->SetRenderer( renderer );
@@ -484,7 +484,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_scenegraph.RegisterPass( m_texturepass );
 
-    status = DrawSpace::Utils::LoadDrawablePlugin( "chunk.dll", "chunk_plugin" );
+    
 
     status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
     m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
@@ -493,9 +493,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ////////////////////////////////////////////////////////////////
 
-    status = DrawSpace::Utils::LoadDrawablePlugin( "spacebox.dll", "spacebox_plugin" );
 
-    m_spacebox = DrawSpace::Utils::InstanciateDrawableFromPlugin( "spacebox_plugin" );
+    m_spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
     m_spacebox->RegisterPassSlot( "texture_pass" );
     m_spacebox->SetRenderer( renderer );
     m_spacebox->SetName( "spacebox" );

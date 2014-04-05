@@ -100,11 +100,13 @@ void dsAppClient::OnRenderFrame( void )
 void dsAppClient::create_box( void )
 {
     
-    DrawSpace::Interface::Drawable* drawable;
+    DrawSpace::Drawable* drawable;
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
 
-    drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+    //drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+
+    drawable = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
     drawable->RegisterPassSlot( "texture_pass" );
     drawable->SetRenderer( renderer );
@@ -211,9 +213,12 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-
+    /*
     status = DrawSpace::Utils::LoadDrawablePlugin( "chunk.dll", "chunk_plugin" );
     m_ground = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+    */
+
+    m_ground = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
     m_ground->RegisterPassSlot( "texture_pass" );
     m_ground->SetRenderer( renderer );
@@ -246,9 +251,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ////////////////////////////////////////////////////////////////
 
-    status = DrawSpace::Utils::LoadDrawablePlugin( "spacebox.dll", "spacebox_plugin" );
-
-    m_spacebox = DrawSpace::Utils::InstanciateDrawableFromPlugin( "spacebox_plugin" );
+    m_spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
     m_spacebox->RegisterPassSlot( "texture_pass" );
     m_spacebox->SetRenderer( renderer );
     m_spacebox->SetName( "spacebox" );

@@ -41,16 +41,15 @@ protected:
     DrawSpace::Core::FreeMovement               m_freemove;
     
 
-    DrawSpace::Interface::Drawable*             m_spacebox;
-    DrawSpace::Interface::Drawable*             m_planet;
+    DrawSpace::Planet::Body*                    m_planet;
+    DrawSpace::Spacebox*                        m_spacebox;
 
     dsreal                                      m_speed;
     dsreal                                      m_speed_speed;
 
     bool                                        m_update_hp;
 
-    int                                         m_nb_split;
-    int                                         m_nb_merge;
+    int                                         m_nb_lodchanges;
 
     PlanetEvtCb*                                m_planet_evt_cb;
 

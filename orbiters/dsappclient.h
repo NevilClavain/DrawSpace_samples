@@ -37,7 +37,8 @@ protected:
     
     DrawSpace::Interface::MesheImport*          m_meshe_import;
 
-    DrawSpace::Interface::Drawable*             m_spacebox;
+    //DrawSpace::Interface::Drawable*             m_spacebox;
+    DrawSpace::Spacebox*                        m_spacebox;
     
 
     dsreal                                      m_speed;
@@ -70,7 +71,7 @@ protected:
 
 
     DrawSpace::Dynamics::Orbiter*               build_planet( char* p_name, char* p_texture );
-    DrawSpace::Interface::Drawable*             build_orbit_drawable( char* p_name, DrawSpace::Dynamics::Orbit* p_orbit );
+    DrawSpace::Drawable*                        build_orbit_drawable( char* p_name, DrawSpace::Dynamics::Orbit* p_orbit );
 
 
     

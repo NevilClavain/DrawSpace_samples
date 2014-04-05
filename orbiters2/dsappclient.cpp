@@ -17,9 +17,9 @@ _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
 
-Planet::Planet( const dsstring& p_name, DrawSpace::Dynamics::World* p_world ) : m_name( p_name )
+MyPlanet::MyPlanet( const dsstring& p_name, DrawSpace::Dynamics::World* p_world ) : m_name( p_name )
 {
-    m_drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "planet_plugin" );
+    m_drawable = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body );
     m_drawable->SetName( p_name );
     m_drawable->SetRenderer( DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface );
 
@@ -30,18 +30,18 @@ Planet::Planet( const dsstring& p_name, DrawSpace::Dynamics::World* p_world ) : 
     m_orbiter = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Orbiter, DrawSpace::Dynamics::Orbiter( p_world, m_drawable ) );
 }
 
-Planet::~Planet( void )
+MyPlanet::~MyPlanet( void )
 {
     _DRAWSPACE_DELETE_( m_orbiter );
     _DRAWSPACE_DELETE_( m_drawable );
 }
 
-DrawSpace::Interface::Drawable* Planet::GetDrawable( void )
+DrawSpace::Drawable* MyPlanet::GetDrawable( void )
 {
     return m_drawable;
 }
 
-DrawSpace::Dynamics::Orbiter* Planet::GetOrbiter( void )
+DrawSpace::Dynamics::Orbiter* MyPlanet::GetOrbiter( void )
 {
     return m_orbiter;
 }
@@ -106,7 +106,8 @@ void dsAppClient::OnRenderFrame( void )
         hotpoint.m_value[2] = camera_pos( 3, 2 );
 
         m_planet->GetDrawable()->SetProperty( "hotpoint", &hotpoint );
-        m_planet->GetDrawable()->ComputeSpecifics();
+        DrawSpace::Planet::Body* planet_body = static_cast<DrawSpace::Planet::Body*>( m_planet->GetDrawable() );
+        planet_body->Compute();
     }
 
 
@@ -135,27 +136,6 @@ void dsAppClient::OnRenderFrame( void )
 bool dsAppClient::OnIdleAppInit( void )
 {
     bool status;
-
-    status = DrawSpace::Utils::LoadDrawablePlugin( "planetbuild.dll", "planet_plugin" );
-    if( !status )
-    {
-        _DSEXCEPTION( "Cannot load planetbuild plugin !" )
-    }
-    _DSDEBUG( logger, "planetbuild plugin successfully loaded..." );
-
-    status = DrawSpace::Utils::LoadDrawablePlugin( "spacebox.dll", "spacebox_plugin" );
-    if( !status )
-    {
-        _DSEXCEPTION( "Cannot load spacebox plugin !" )
-    }
-    _DSDEBUG( logger, "spacebox plugin successfully loaded..." );
-
-    status = DrawSpace::Utils::LoadDrawablePlugin( "chunk.dll", "chunk_plugin" );
-    if( !status )
-    {
-        _DSEXCEPTION( "Cannot load chunk plugin !" )
-    }
-    _DSDEBUG( logger, "chunk plugin successfully loaded..." );
 
     status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
     if( !status )
@@ -196,7 +176,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    m_spacebox = DrawSpace::Utils::InstanciateDrawableFromPlugin( "spacebox_plugin" );
+    m_spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
     m_spacebox->RegisterPassSlot( "texture_pass" );
     m_spacebox->SetRenderer( renderer );
     m_spacebox->SetName( "spacebox" );
@@ -248,7 +228,7 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
 
-    m_planet = _DRAWSPACE_NEW_( Planet, Planet( "planet01", &m_world ) );
+    m_planet = _DRAWSPACE_NEW_( MyPlanet, MyPlanet( "planet01", &m_world ) );
 
 
     m_planet->GetDrawable()->RegisterPassSlot( "texture_pass" );
@@ -275,7 +255,7 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
 
-    m_ship_drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
+    m_ship_drawable = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
     m_ship_drawable->RegisterPassSlot( "texture_pass" );
     m_ship_drawable->SetRenderer( renderer );

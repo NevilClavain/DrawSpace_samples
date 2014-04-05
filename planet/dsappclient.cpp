@@ -13,7 +13,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_update_hp( true ), m_nb_split( 0 ), m_nb_merge( 0 )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_update_hp( true ), m_nb_lodchanges( 0 )
 {    
     _INIT_LOGGER( "planet.conf" )  
     m_w_title = "planet engine test";
@@ -68,7 +68,7 @@ void dsAppClient::OnRenderFrame( void )
     if( m_update_hp )
     {
         m_planet->SetProperty( "hotpoint", &hotpoint );
-        m_planet->ComputeSpecifics();
+        m_planet->Compute();
     }
 
     static long last_fps;
@@ -94,7 +94,7 @@ void dsAppClient::OnRenderFrame( void )
     m_finalpass->GetRenderingQueue()->Draw();
 
 
-    renderer->DrawText( 0, 255, 0, 10, 85, "nb split : %d     nb merge : %d", m_nb_split, m_nb_merge );
+    renderer->DrawText( 0, 255, 0, 10, 85, "nb lod changes : %d", m_nb_lodchanges );
 
     renderer->FlipScreen();
 
@@ -144,10 +144,14 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-
+/*
     status = DrawSpace::Utils::LoadDrawablePlugin( "spacebox.dll", "spacebox_plugin" );
 
     m_spacebox = DrawSpace::Utils::InstanciateDrawableFromPlugin( "spacebox_plugin" );
+    */
+
+
+    m_spacebox = _DRAWSPACE_NEW_( Spacebox, Spacebox );
     m_spacebox->RegisterPassSlot( "wireframe_pass" );
     m_spacebox->SetRenderer( renderer );
     m_spacebox->SetName( "spacebox" );
@@ -193,8 +197,12 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
+    /*
     status = DrawSpace::Utils::LoadDrawablePlugin( "planetbuild.dll", "planet_plugin" );
     m_planet = DrawSpace::Utils::InstanciateDrawableFromPlugin( "planet_plugin" );
+    */
+
+    m_planet = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body );
 
     m_planet->SetRenderer( renderer );
     m_planet->RegisterPassSlot( "wireframe_pass" );
@@ -399,12 +407,5 @@ void dsAppClient::OnAppEvent( WPARAM p_wParam, LPARAM p_lParam )
 
 void dsAppClient::on_planet_event( const dsstring& p_evt )
 {
-    if( "split_event" == p_evt )
-    {
-        m_nb_split++;
-    }
-    else if( "merge_event" == p_evt )
-    {
-        m_nb_merge++;
-    }
+    m_nb_lodchanges++;
 }

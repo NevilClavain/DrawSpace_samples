@@ -30,9 +30,9 @@ protected:
     DrawSpace::Core::FPSMovement                m_fpsmove;
 
     DrawSpace::Interface::MesheImport*          m_meshe_import;
-    DrawSpace::Interface::Drawable*             m_chunk;
+    DrawSpace::Chunk*                           m_chunk;
 
-    DrawSpace::Interface::Drawable*             m_ground;
+    DrawSpace::Chunk*                           m_ground;
 
 
     DrawSpace::Interface::FontImport*           m_font_import;
