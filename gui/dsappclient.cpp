@@ -165,8 +165,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
     m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
-    m_chunk->GetMeshe( "" )->SetImporter( m_meshe_import );
-    m_chunk->GetMeshe( "" )->LoadFromFile( "object.ac", 0 );
+    m_chunk->GetMeshe()->SetImporter( m_meshe_import );
+    m_chunk->GetMeshe()->LoadFromFile( "object.ac", 0 );
 
     m_chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );

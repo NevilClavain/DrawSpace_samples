@@ -36,7 +36,7 @@ MyPlanet::~MyPlanet( void )
     _DRAWSPACE_DELETE_( m_drawable );
 }
 
-DrawSpace::Drawable* MyPlanet::GetDrawable( void )
+DrawSpace::Planet::Body* MyPlanet::GetDrawable( void )
 {
     return m_drawable;
 }
@@ -105,8 +105,8 @@ void dsAppClient::OnRenderFrame( void )
         hotpoint.m_value[1] = camera_pos( 3, 1 );
         hotpoint.m_value[2] = camera_pos( 3, 2 );
 
-        m_planet->GetDrawable()->SetProperty( "hotpoint", &hotpoint );
-        DrawSpace::Planet::Body* planet_body = static_cast<DrawSpace::Planet::Body*>( m_planet->GetDrawable() );
+        DrawSpace::Planet::Body* planet_body = m_planet->GetDrawable();
+        planet_body->SetProperty( "hotpoint", &hotpoint );
         planet_body->Compute();
     }
 
@@ -262,9 +262,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_ship_drawable->SetName( "rocket" );
     
-    m_ship_drawable->GetMeshe( "" )->SetImporter( m_meshe_import );
+    m_ship_drawable->GetMeshe()->SetImporter( m_meshe_import );
 
-    m_ship_drawable->GetMeshe( "" )->LoadFromFile( "object.ac", 0 );    
+    m_ship_drawable->GetMeshe()->LoadFromFile( "object.ac", 0 );    
 
     m_ship_drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_ship_drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );

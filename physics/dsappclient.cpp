@@ -100,52 +100,52 @@ void dsAppClient::OnRenderFrame( void )
 void dsAppClient::create_box( void )
 {
     
-    DrawSpace::Drawable* drawable;
+    Chunk* chunk;
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
 
     //drawable = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
 
-    drawable = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+    chunk = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
-    drawable->RegisterPassSlot( "texture_pass" );
-    drawable->SetRenderer( renderer );
+    chunk->RegisterPassSlot( "texture_pass" );
+    chunk->SetRenderer( renderer );
 
     char name[32];
     sprintf( name, "box_%d", m_box_count );
 
-    drawable->SetName( name );
+    chunk->SetName( name );
     
-    drawable->GetMeshe( "" )->SetImporter( m_meshe_import );
+    chunk->GetMeshe()->SetImporter( m_meshe_import );
 
-    drawable->GetMeshe( "" )->LoadFromFile( "object.ac", 0 );    
+    chunk->GetMeshe()->LoadFromFile( "object.ac", 0 );    
 
-    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
-    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
+    chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->GetShader( 1 )->LoadFromFile();
 
-    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-    drawable->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    chunk->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
     
     if( 0 == m_box_texture )
     {
-        drawable->GetNodeFromPass( "texture_pass", "" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "shelby.jpg" ) ), 0 );
+        chunk->GetNodeFromPass( "texture_pass", "" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "shelby.jpg" ) ), 0 );
         m_box_texture = 1;
     }
     else
     {
-        drawable->GetNodeFromPass( "texture_pass", "" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "tex07.jpg" ) ), 0 );
+        chunk->GetNodeFromPass( "texture_pass", "" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "tex07.jpg" ) ), 0 );
         m_box_texture = 0;
     }
     
 
-    drawable->GetNodeFromPass( "texture_pass", "" )->GetTexture( 0 )->LoadFromFile();
+    chunk->GetNodeFromPass( "texture_pass", "" )->GetTexture( 0 )->LoadFromFile();
 
-    m_scenegraph.RegisterNode( drawable );
+    m_scenegraph.RegisterNode( chunk );
 
 
     DrawSpace::Dynamics::InertBody::Parameters cube_params;
@@ -156,12 +156,12 @@ void dsAppClient::create_box( void )
     cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 10.5, 0.0, 1.0 );
     cube_params.initial_rot.Identity();
 
-    DrawSpace::Dynamics::InertBody* cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, drawable, cube_params ) );
+    DrawSpace::Dynamics::InertBody* cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, chunk, cube_params ) );
 
 
     Box box;
 
-    box.drawable = drawable;
+    box.drawable = chunk;
     box.inert_body = cube_body;
 
     m_boxes.push_back( box );
@@ -226,9 +226,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
     status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
     m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
-    m_ground->GetMeshe( "" )->SetImporter( m_meshe_import );
+    m_ground->GetMeshe()->SetImporter( m_meshe_import );
 
-    m_ground->GetMeshe( "" )->LoadFromFile( "grid.ac", 0 );
+    m_ground->GetMeshe()->LoadFromFile( "grid.ac", 0 );
     
 
     m_ground->GetNodeFromPass( "texture_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );

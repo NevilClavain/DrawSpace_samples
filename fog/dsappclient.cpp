@@ -124,9 +124,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
     m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
-    m_chunk->GetMeshe( "" )->SetImporter( m_meshe_import );
-
-    m_chunk->GetMeshe( "" )->LoadFromFile( "object.ac", 0 );
+    m_chunk->GetMeshe()->SetImporter( m_meshe_import );
+    m_chunk->GetMeshe()->LoadFromFile( "object.ac", 0 );
 
     m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.vsh", false ) ) );
     m_chunk->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.psh", false ) ) );
@@ -155,7 +154,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterNode( m_chunk );
 
     dsstring md5_string_1;
-    m_chunk->GetMeshe( "" )->GetMD5( md5_string_1 );
+    m_chunk->GetMeshe()->GetMD5( md5_string_1 );
 
     ///////////////////////////////////////////////////////////////
 
@@ -167,9 +166,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->SetName( "ground" );
 
 
-    m_ground->GetMeshe( "" )->SetImporter( m_meshe_import );
+    m_ground->GetMeshe()->SetImporter( m_meshe_import );
 
-    m_ground->GetMeshe( "" )->LoadFromFile( "grid.ac", 0 );
+    m_ground->GetMeshe()->LoadFromFile( "grid.ac", 0 );
 
     m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.vsh", false ) ) );
     m_ground->GetNodeFromPass( "fogint_pass", "" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.psh", false ) ) );

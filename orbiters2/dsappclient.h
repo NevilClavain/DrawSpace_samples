@@ -18,7 +18,7 @@ public:
     MyPlanet( const dsstring& p_name, DrawSpace::Dynamics::World* p_world );
     ~MyPlanet( void );
 
-    DrawSpace::Drawable* GetDrawable( void );
+    DrawSpace::Planet::Body* GetDrawable( void );
     DrawSpace::Dynamics::Orbiter*   GetOrbiter( void );
 
 };
