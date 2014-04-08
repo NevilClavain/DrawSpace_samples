@@ -71,7 +71,7 @@ protected:
 
 
     DrawSpace::Dynamics::Orbiter*               build_planet( char* p_name, char* p_texture );
-    DrawSpace::Drawable*                        build_orbit_drawable( char* p_name, DrawSpace::Dynamics::Orbit* p_orbit );
+    DrawSpace::Chunk*                           build_orbit_drawable( char* p_name, DrawSpace::Dynamics::Orbit* p_orbit );
 
 
     

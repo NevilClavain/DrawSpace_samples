@@ -59,15 +59,24 @@ void dsAppClient::OnRenderFrame( void )
     DrawSpace::Utils::Matrix camera_pos;
     m_scenegraph.GetCurrentCameraTranform( camera_pos );
 
-    TypedProperty<DrawSpace::Utils::Vector> hotpoint( "hotpoint" );
 
+    //TypedProperty<DrawSpace::Utils::Vector> hotpoint( "hotpoint" );
+    Utils::Vector hotpoint;
+
+    /*
     hotpoint.m_value[0] = camera_pos( 3, 0 );
     hotpoint.m_value[1] = camera_pos( 3, 1 );
     hotpoint.m_value[2] = camera_pos( 3, 2 );
+    */
+
+    hotpoint[0] = camera_pos( 3, 0 );
+    hotpoint[1] = camera_pos( 3, 1 );
+    hotpoint[2] = camera_pos( 3, 2 );
+
 
     if( m_update_hp )
     {
-        m_planet->SetProperty( "hotpoint", &hotpoint );
+        m_planet->UpdateHotPoint( hotpoint );
         m_planet->Compute();
     }
 
@@ -157,38 +166,33 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox->SetName( "spacebox" );
 
 
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "front" );
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "rear" );
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "top" );
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "bottom" );
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "left" );
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass", "right" );
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "wireframe_pass" );
 
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "front" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_front5.png" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "front" )->GetTexture( 0 )->LoadFromFile();
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::FrontQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_front5.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::FrontQuad )->GetTexture( 0 )->LoadFromFile();
 
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "rear" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_back6.png" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "rear" )->GetTexture( 0 )->LoadFromFile();
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::RearQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_back6.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::RearQuad )->GetTexture( 0 )->LoadFromFile();
 
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "top" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_top3.png" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "top" )->GetTexture( 0 )->LoadFromFile();
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::TopQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_top3.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::TopQuad )->GetTexture( 0 )->LoadFromFile();
 
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "bottom" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_bottom4.png" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "bottom" )->GetTexture( 0 )->LoadFromFile();
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::BottomQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_bottom4.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::BottomQuad )->GetTexture( 0 )->LoadFromFile();
 
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "left" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_left2.png" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "left" )->GetTexture( 0 )->LoadFromFile();
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::LeftQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_left2.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::LeftQuad )->GetTexture( 0 )->LoadFromFile();
 
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "right" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_right1.png" ) ), 0 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "right" )->GetTexture( 0 )->LoadFromFile();
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::RightQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_right1.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::RightQuad )->GetTexture( 0 )->LoadFromFile();
 
 
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "front" )->SetOrderNumber( 200 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "rear" )->SetOrderNumber( 200 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "top" )->SetOrderNumber( 200 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "bottom" )->SetOrderNumber( 200 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "left" )->SetOrderNumber( 200 );
-    m_spacebox->GetNodeFromPass( "wireframe_pass", "right" )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::FrontQuad )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::RearQuad )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::TopQuad )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::BottomQuad )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::LeftQuad )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( "wireframe_pass", Spacebox::RightQuad )->SetOrderNumber( 200 );
 
 
     m_scenegraph.RegisterNode( m_spacebox );
@@ -202,25 +206,20 @@ bool dsAppClient::OnIdleAppInit( void )
     m_planet = DrawSpace::Utils::InstanciateDrawableFromPlugin( "planet_plugin" );
     */
 
-    m_planet = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body );
+    m_planet = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( /*12000000.0*/ 12000.0 ) );
 
     m_planet->SetRenderer( renderer );
     m_planet->RegisterPassSlot( "wireframe_pass" );
     m_planet->SetName( "planet01" );
 
     
-    std::vector<dsstring> idslist;
-    m_planet->GetNodesIdsList( idslist );
-    for( size_t i = 0; i < idslist.size(); i++ )
+    for( int i = 0; i < 6; i++ )
     {
-        m_planet->SetNodeFromPassSpecificFx( "wireframe_pass", idslist[i], "main_fx" );
+        m_planet->SetNodeFromPassSpecificFx( "wireframe_pass", i, "main_fx" );
     }
     
 
     m_scenegraph.RegisterNode( m_planet );
-
-    DrawSpace::Core::TypedProperty<dsreal> planet_diameter( "diameter", /*12000000.0*/ 12000.0 );
-    m_planet->SetProperty( "diameter", &planet_diameter );
 
     m_planet->Initialize();
 
@@ -353,15 +352,6 @@ void dsAppClient::OnKeyPulse( long p_key )
         case VK_F2:
 
             m_update_hp = true;
-            break;
-
-        case VK_F3:
-            {
-                TypedProperty<dsstring> patchname( "split" );
-                patchname.m_value = ".0";
-
-                m_planet->SetProperty( "split", &patchname );
-            }
             break;
     }
 }

@@ -53,7 +53,7 @@ protected:
     
     DrawSpace::Interface::MesheImport*          m_meshe_import;
 
-    //DrawSpace::Interface::Drawable*             m_spacebox;
+    
     DrawSpace::Spacebox*                        m_spacebox;
     
 

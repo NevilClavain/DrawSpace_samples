@@ -95,7 +95,7 @@ protected:
 
     typedef struct box
     {
-        DrawSpace::Drawable*            drawable;
+        DrawSpace::Chunk*               drawable;
         btRigidBody*                    body;
         btDefaultMotionState*           motion;
 

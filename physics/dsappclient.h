@@ -54,7 +54,8 @@ protected:
 
     typedef struct
     {
-        DrawSpace::Drawable* drawable;
+        //DrawSpace::Drawable* drawable;
+        DrawSpace::Chunk* drawable;
         DrawSpace::Dynamics::InertBody* inert_body;
 
     } Box;
