@@ -9,9 +9,14 @@ class MyPlanet
 {
 protected:
 
+    typedef DrawSpace::Core::CallBack<MyPlanet, void, const dsstring&> PlanetEvtCb;
+
     dsstring                            m_name;
     DrawSpace::Dynamics::Orbiter*       m_orbiter;
     DrawSpace::Planet::Body*            m_drawable;
+    PlanetEvtCb*                        m_planet_evt_cb;
+
+    void on_planet_event( const dsstring& p_evt );
 
 public:
 

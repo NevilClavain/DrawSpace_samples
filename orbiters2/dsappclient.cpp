@@ -19,11 +19,14 @@ _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 MyPlanet::MyPlanet( const dsstring& p_name, DrawSpace::Dynamics::World* p_world ) : m_name( p_name )
 {
-    m_drawable = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( /*12000000.0*/ 12000.0 ) );
+    m_drawable = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( /*12000000.0*/ 1000.0 ) );
     m_drawable->SetName( p_name );
     m_drawable->SetRenderer( DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface );
 
     m_orbiter = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Orbiter, DrawSpace::Dynamics::Orbiter( p_world, m_drawable ) );
+
+    m_planet_evt_cb = _DRAWSPACE_NEW_( PlanetEvtCb, PlanetEvtCb( this, &MyPlanet::on_planet_event ) );
+    m_drawable->RegisterEventHandler( m_planet_evt_cb );
 }
 
 MyPlanet::~MyPlanet( void )
@@ -40,6 +43,30 @@ DrawSpace::Planet::Body* MyPlanet::GetDrawable( void )
 DrawSpace::Dynamics::Orbiter* MyPlanet::GetOrbiter( void )
 {
     return m_orbiter;
+}
+
+void MyPlanet::on_planet_event( const dsstring& p_evt )
+{
+    dsreal alt = m_drawable->GetAltitud();
+
+    if( alt < 20.0 )
+    {
+        Meshe* patch_meshe = m_drawable->GetPatcheMeshe();
+
+        Meshe final_meshe;
+
+        for( long i = 0; i < 6; i++ )
+        {
+            Planet::Patch* curr_patch = m_drawable->GetFaceCurrentLeaf( i );
+
+            // to be continued...
+        }
+    }
+    else
+    {
+
+
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,8 +119,7 @@ void dsAppClient::OnRenderFrame( void )
         
         DrawSpace::Utils::Matrix camera_pos;
 
-        m_ship->GetLastLocalWorldTrans( camera_pos );        
-        //m_scenegraph.GetCurrentCameraTranform( camera_pos );
+        m_ship->GetLastLocalWorldTrans( camera_pos );
 
         DrawSpace::Utils::Vector hotpoint;
 
