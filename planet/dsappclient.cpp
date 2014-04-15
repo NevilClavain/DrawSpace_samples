@@ -223,9 +223,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_planet->Initialize();
 
-    m_planet_evt_cb = _DRAWSPACE_NEW_( PlanetEvtCb, PlanetEvtCb( this, &dsAppClient::on_planet_event ) );
 
-    m_planet->RegisterEventHandler( m_planet_evt_cb );
 
     //////////////////////////////////////////////////////////////
 
@@ -393,9 +391,4 @@ void dsAppClient::OnMouseRightButtonUp( long p_xm, long p_ym )
 void dsAppClient::OnAppEvent( WPARAM p_wParam, LPARAM p_lParam )
 {
 
-}
-
-void dsAppClient::on_planet_event( const dsstring& p_evt )
-{
-    m_nb_lodchanges++;
 }

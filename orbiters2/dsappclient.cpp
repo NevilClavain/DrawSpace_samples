@@ -17,9 +17,12 @@ _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
 
-MyPlanet::MyPlanet( const dsstring& p_name, DrawSpace::Dynamics::World* p_world ) : m_name( p_name )
+MyPlanet::MyPlanet( const dsstring& p_name, DrawSpace::Dynamics::World* p_world ) : 
+m_name( p_name ),
+m_ray( /*12000000.0*/ 200000.0 ),
+m_collision_state( false )
 {
-    m_drawable = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( /*12000000.0*/ 1000.0 ) );
+    m_drawable = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
     m_drawable->SetName( p_name );
     m_drawable->SetRenderer( DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface );
 
@@ -45,28 +48,154 @@ DrawSpace::Dynamics::Orbiter* MyPlanet::GetOrbiter( void )
     return m_orbiter;
 }
 
-void MyPlanet::on_planet_event( const dsstring& p_evt )
+bool MyPlanet::GetCollisionState( void )
 {
+    return m_collision_state;
+}
+
+void MyPlanet::on_planet_event( int p_currentface )
+{
+    long tri_index = 0;
+
     dsreal alt = m_drawable->GetAltitud();
+
+    
 
     if( alt < 20.0 )
     {
+        if( m_collision_state )
+        {
+            m_orbiter->UnsetKinematic();
+        }
+
         Meshe* patch_meshe = m_drawable->GetPatcheMeshe();
 
         Meshe final_meshe;
 
-        for( long i = 0; i < 6; i++ )
-        {
-            Planet::Patch* curr_patch = m_drawable->GetFaceCurrentLeaf( i );
+        Planet::Patch* curr_patch = m_drawable->GetFaceCurrentLeaf( p_currentface );
 
-            // to be continued...
+        dsreal sidelength = curr_patch->GetSideLength() / m_ray;
+        dsreal xpos, ypos;    
+        curr_patch->GetPos( xpos, ypos );
+
+        xpos = xpos / m_ray;
+        ypos = ypos / m_ray;
+
+
+        for( long i = 0; i < patch_meshe->GetVertexListSize(); i++ )
+        {
+            int orientation = curr_patch->GetOrientation();
+
+            Vertex v, v2, v3;
+            patch_meshe->GetVertex( i, v );
+
+            v.x = v.x * sidelength / 2.0;
+            v.y = v.y * sidelength / 2.0;
+            v.z = v.z * sidelength / 2.0;
+
+            v.x += xpos;
+            v.y += ypos;
+
+            switch( orientation )
+            {
+                case Planet::Patch::FrontPlanetFace:
+
+                    v2.x = v.x;
+                    v2.y = v.y;
+                    v2.z = 1.0;
+                    break;
+
+                case Planet::Patch::RearPlanetFace:
+
+                    v2.x = -v.x;
+                    v2.y = v.y;
+                    v2.z = -1.0;
+                    break;
+
+                case Planet::Patch::LeftPlanetFace:
+
+                    v2.x = -1.0;
+                    v2.y = v.y;
+                    v2.z = v.x;
+                    break;
+
+                case Planet::Patch::RightPlanetFace:
+
+                    v2.x = 1.0;
+                    v2.y = v.y;
+                    v2.z = -v.x;
+                    break;
+
+                case Planet::Patch::TopPlanetFace:
+
+                    v2.x = v.x;
+                    v2.y = 1.0;
+                    v2.z = -v.y;
+                    break;
+
+                case Planet::Patch::BottomPlanetFace:
+
+                    v2.x = v.x;
+                    v2.y = -1.0;
+                    v2.z = v.y;
+                    break;
+            }
+
+            dsreal xtemp = v2.x;
+            dsreal ytemp = v2.y;
+            dsreal ztemp = v2.z;
+
+            v2.x = xtemp * sqrt( 1.0 - ytemp * ytemp * 0.5 - ztemp * ztemp * 0.5 + ytemp * ytemp * ztemp * ztemp / 3.0 );
+            v2.y = ytemp * sqrt( 1.0 - ztemp * ztemp * 0.5 - xtemp * xtemp * 0.5 + xtemp * xtemp * ztemp * ztemp / 3.0 );
+            v2.z = ztemp * sqrt( 1.0 - xtemp * xtemp * 0.5 - ytemp * ytemp * 0.5 + xtemp * xtemp * ytemp * ytemp / 3.0 );
+
+            v3.x = v2.x * m_ray;
+            v3.y = v2.y * m_ray;
+            v3.z = v2.z * m_ray;
+
+            final_meshe.AddVertex( v3 );
         }
+
+        for( long i = 0; i < patch_meshe->GetTrianglesListSize(); i++ )
+        {
+            Triangle t;
+            patch_meshe->GetTriangles( i, t );
+            final_meshe.AddTriangle( t );
+        }
+
+        Body::Parameters params;
+
+        params.mass = 0.0;
+        params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
+        params.initial_rot.Identity();
+
+        
+        params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
+        params.shape_descr.meshe = final_meshe;
+        
+
+        /*
+        params.shape_descr.shape = DrawSpace::Dynamics::Body::SPHERE_SHAPE;
+        params.shape_descr.sphere_radius = m_ray;
+        */
+
+        m_orbiter->SetKinematic( params );
+
+        m_collision_state = true;
     }
     else
     {
-
-
+        if( m_collision_state )
+        {
+            m_orbiter->UnsetKinematic();
+            m_collision_state = false;
+        }
     }
+}
+
+dsreal MyPlanet::GetAltitud( void )
+{
+    return m_drawable->GetAltitud();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,7 +227,9 @@ void dsAppClient::OnRenderFrame( void )
     sbtrans.Scale( 20.0, 20.0, 20.0 );
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
 
-    
+    Matrix cam_pos;
+    cam_pos.Translation( 0.0, 1.5, 11.4 );
+    m_camera2->SetLocalTransform( cam_pos );
     
     Matrix origin;
     origin.Identity();
@@ -147,6 +278,9 @@ void dsAppClient::OnRenderFrame( void )
     dsstring date;
     m_calendar->GetFormatedDate( date );    
     renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
+
+    dsreal alt = m_planet->GetAltitud();
+    renderer->DrawText( 0, 255, 0, 10, 75, "collision state %d altitud = %f", m_planet->GetCollisionState(), alt );
 
 
     renderer->FlipScreen();
@@ -264,7 +398,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
     m_centroid->SetOrbiter( m_planet->GetOrbiter() );
 
-    m_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 50000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.333, m_centroid ) );
+    m_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 700000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.333, m_centroid ) );
 
 
     //////////////////////////////////////////////////////////////
@@ -340,7 +474,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer, &m_world ) );
 
     m_calendar->RegisterOrbit( m_orbit );
-    m_calendar->Startup( 162682566 );
+    //m_calendar->Startup( 162682566 );
+
+    m_calendar->Startup( 0 );
 
         
     return true;
@@ -421,7 +557,12 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case VK_RETURN:
 
-            m_ship->ApplyFwdForce( 20.0 );
+            m_ship->ApplyFwdForce( 1200.0 );
+            break;
+
+        case VK_SHIFT:
+
+            m_ship->ApplyFwdForce( -1200.0 );
             break;
 
     }

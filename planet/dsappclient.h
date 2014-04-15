@@ -51,9 +51,8 @@ protected:
 
     int                                         m_nb_lodchanges;
 
-    PlanetEvtCb*                                m_planet_evt_cb;
 
-    void on_planet_event( const dsstring& p_evt );
+ 
 
     dsAppClient( void );
 

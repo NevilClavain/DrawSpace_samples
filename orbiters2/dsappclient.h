@@ -9,14 +9,18 @@ class MyPlanet
 {
 protected:
 
-    typedef DrawSpace::Core::CallBack<MyPlanet, void, const dsstring&> PlanetEvtCb;
+    typedef DrawSpace::Core::CallBack<MyPlanet, void, int> PlanetEvtCb;
 
     dsstring                            m_name;
     DrawSpace::Dynamics::Orbiter*       m_orbiter;
     DrawSpace::Planet::Body*            m_drawable;
     PlanetEvtCb*                        m_planet_evt_cb;
 
-    void on_planet_event( const dsstring& p_evt );
+    dsreal                              m_ray;
+
+    bool                                m_collision_state;
+
+    void on_planet_event( int p_currentface );
 
 public:
 
@@ -25,6 +29,10 @@ public:
 
     DrawSpace::Planet::Body* GetDrawable( void );
     DrawSpace::Dynamics::Orbiter*   GetOrbiter( void );
+
+    bool GetCollisionState( void );
+
+    dsreal GetAltitud( void );
 
 };
 

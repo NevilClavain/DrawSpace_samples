@@ -302,7 +302,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_mars_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
     m_mars_centroid->SetOrbiter( m_mars );
 
-    m_mars_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 25.0, 0.37, 0.0, 9.0, 0.0, 0.0, 1.0, m_mars_centroid ) );
+    m_mars_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 25.0, 0.999, 0.0, 9.0, 0.0, 0.0, 1.0, m_mars_centroid ) );
 
     m_mars_orbit->RegisterChunk( build_orbit_drawable( "mars_orbit", m_mars_orbit ) );
 
@@ -478,7 +478,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_calendar->Startup( 162682566 );
+    //m_calendar->Startup( 162682566 );
+    m_calendar->Startup( 0 );
 
         
     return true;
