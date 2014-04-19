@@ -11,6 +11,7 @@ protected:
 
     typedef DrawSpace::Core::CallBack<MyPlanet, void, int> PlanetEvtCb;
 
+    DrawSpace::Dynamics::World          m_world;
     dsstring                            m_name;
     DrawSpace::Dynamics::Orbiter*       m_orbiter;
     DrawSpace::Planet::Body*            m_drawable;
@@ -24,15 +25,18 @@ protected:
 
 public:
 
-    MyPlanet( const dsstring& p_name, DrawSpace::Dynamics::World* p_world );
+    MyPlanet( const dsstring& p_name );
     ~MyPlanet( void );
 
     DrawSpace::Planet::Body* GetDrawable( void );
     DrawSpace::Dynamics::Orbiter*   GetOrbiter( void );
+    DrawSpace::Dynamics::World*     GetWorld( void );
 
     bool GetCollisionState( void );
 
     dsreal GetAltitud( void );
+
+    void UpdateLocalWorld( void );
 
 };
 

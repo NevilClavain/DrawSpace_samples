@@ -17,16 +17,18 @@ _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
 
-MyPlanet::MyPlanet( const dsstring& p_name, DrawSpace::Dynamics::World* p_world ) : 
+MyPlanet::MyPlanet( const dsstring& p_name ) : 
 m_name( p_name ),
-m_ray( /*12000000.0*/ 200000.0 ),
+m_ray( /*12000000.0*/ 600000.0 ),
 m_collision_state( false )
 {
+    m_world.Initialize();
+
     m_drawable = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
     m_drawable->SetName( p_name );
     m_drawable->SetRenderer( DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface );
 
-    m_orbiter = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Orbiter, DrawSpace::Dynamics::Orbiter( p_world, m_drawable ) );
+    m_orbiter = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Orbiter, DrawSpace::Dynamics::Orbiter( &m_world, m_drawable ) );
 
     m_planet_evt_cb = _DRAWSPACE_NEW_( PlanetEvtCb, PlanetEvtCb( this, &MyPlanet::on_planet_event ) );
     m_drawable->RegisterEventHandler( m_planet_evt_cb );
@@ -53,6 +55,11 @@ bool MyPlanet::GetCollisionState( void )
     return m_collision_state;
 }
 
+void MyPlanet::UpdateLocalWorld( void )
+{
+
+}
+
 void MyPlanet::on_planet_event( int p_currentface )
 {
     long tri_index = 0;
@@ -61,7 +68,7 @@ void MyPlanet::on_planet_event( int p_currentface )
 
     
 
-    if( alt < 20.0 )
+    if( alt < 200.0 )
     {
         if( m_collision_state )
         {
@@ -198,6 +205,11 @@ dsreal MyPlanet::GetAltitud( void )
     return m_drawable->GetAltitud();
 }
 
+DrawSpace::Dynamics::World* MyPlanet::GetWorld( void )
+{
+    return &m_world;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 )
@@ -292,6 +304,9 @@ void dsAppClient::OnRenderFrame( void )
 
 bool dsAppClient::OnIdleAppInit( void )
 {
+    World::m_scale = 0.5;
+
+
     bool status;
 
     status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
@@ -380,7 +395,7 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
 
-    m_planet = _DRAWSPACE_NEW_( MyPlanet, MyPlanet( "planet01", &m_world ) );
+    m_planet = _DRAWSPACE_NEW_( MyPlanet, MyPlanet( "planet01" ) );
 
 
     m_planet->GetDrawable()->RegisterPassSlot( "texture_pass" );
@@ -398,7 +413,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
     m_centroid->SetOrbiter( m_planet->GetOrbiter() );
 
-    m_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 700000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.333, m_centroid ) );
+    m_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 270000000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.333, m_centroid ) );
 
 
     //////////////////////////////////////////////////////////////
@@ -438,7 +453,7 @@ bool dsAppClient::OnIdleAppInit( void )
     cube_params.mass = 50.0;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
-    cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, -10.0, 1.0 );
+    cube_params.initial_pos = DrawSpace::Utils::Vector( 265000000.0, 0.0, -10.0, 1.0 );
     cube_params.initial_rot.Identity();
 
     m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, m_ship_drawable, cube_params ) );
@@ -471,7 +486,10 @@ bool dsAppClient::OnIdleAppInit( void )
     m_mouse_circularmode = true;
 
 
-    m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer, &m_world ) );
+    m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer ) );
+
+    m_calendar->RegisterWorld( &m_world );
+    m_calendar->RegisterWorld( m_planet->GetWorld() );
 
     m_calendar->RegisterOrbit( m_orbit );
     //m_calendar->Startup( 162682566 );
@@ -557,12 +575,12 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case VK_RETURN:
 
-            m_ship->ApplyFwdForce( 1200.0 );
+            m_ship->ApplyFwdForce( 12.0 );
             break;
 
         case VK_SHIFT:
 
-            m_ship->ApplyFwdForce( -1200.0 );
+            m_ship->ApplyFwdForce( -12.0 );
             break;
 
     }

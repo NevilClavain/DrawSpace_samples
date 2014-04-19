@@ -362,7 +362,10 @@ bool dsAppClient::OnIdleAppInit( void )
 
     create_box();
 
-    m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer, &m_world ) );
+    
+
+    m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer ) );
+    m_calendar->RegisterWorld( &m_world );
 
 
     m_calendar->Startup( 162682566 );
