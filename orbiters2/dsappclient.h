@@ -11,15 +11,17 @@ protected:
 
     typedef DrawSpace::Core::CallBack<MyPlanet, void, int> PlanetEvtCb;
 
-    DrawSpace::Dynamics::World          m_world;
-    dsstring                            m_name;
-    DrawSpace::Dynamics::Orbiter*       m_orbiter;
-    DrawSpace::Planet::Body*            m_drawable;
-    PlanetEvtCb*                        m_planet_evt_cb;
+    DrawSpace::Dynamics::World                              m_world;
+    dsstring                                                m_name;
+    DrawSpace::Dynamics::Orbiter*                           m_orbiter;
+    DrawSpace::Planet::Body*                                m_drawable;
+    PlanetEvtCb*                                            m_planet_evt_cb;
 
-    dsreal                              m_ray;
+    dsreal                                                  m_ray;
 
-    bool                                m_collision_state;
+    bool                                                    m_collision_state;
+
+    std::vector<DrawSpace::Dynamics::InertBody*>            m_attached_bodies;
 
     void on_planet_event( int p_currentface );
 
@@ -36,7 +38,10 @@ public:
 
     dsreal GetAltitud( void );
 
-    void UpdateLocalWorld( void );
+    void AttachBody( DrawSpace::Dynamics::InertBody* p_body );
+
+
+    void ApplyGravity( void );
 
 };
 

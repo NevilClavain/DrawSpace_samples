@@ -55,11 +55,6 @@ bool MyPlanet::GetCollisionState( void )
     return m_collision_state;
 }
 
-void MyPlanet::UpdateLocalWorld( void )
-{
-
-}
-
 void MyPlanet::on_planet_event( int p_currentface )
 {
     long tri_index = 0;
@@ -210,6 +205,32 @@ DrawSpace::Dynamics::World* MyPlanet::GetWorld( void )
     return &m_world;
 }
 
+void MyPlanet::AttachBody( DrawSpace::Dynamics::InertBody* p_body )
+{
+    p_body->Attach( m_orbiter );
+
+    m_attached_bodies.push_back( p_body );
+}
+
+void MyPlanet::ApplyGravity( void )
+{
+    for( size_t i = 0; i < m_attached_bodies.size(); i++ )
+    {
+        DrawSpace::Utils::Matrix local_pos;
+        m_attached_bodies[i]->GetLastLocalWorldTrans( local_pos );
+
+        Vector gravity;
+        gravity[0] = -local_pos( 3, 0 );
+        gravity[1] = -local_pos( 3, 1 );
+        gravity[2] = -local_pos( 3, 2 );
+        gravity[3] = 1.0;
+        gravity.Normalize();
+        gravity.Scale( 50.0 * 9.81 );
+
+        m_attached_bodies[i]->ApplyForce( gravity );
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 )
@@ -249,7 +270,10 @@ void dsAppClient::OnRenderFrame( void )
     m_orbit->OrbitStep( origin );
 
 
+    m_planet->ApplyGravity();
+
     m_ship->Update();
+
 
 
            
@@ -538,33 +562,33 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case 'E':
 
-            m_ship->ApplyUpPitch( 15.0 );
+            m_ship->ApplyUpPitch( 1.0 );
             break;
 
         case 'C':
 
-            m_ship->ApplyDownPitch( 15.0 );
+            m_ship->ApplyDownPitch( 1.0 );
             break;
 
         case 'S':
 
-            m_ship->ApplyLeftYaw( 10.0 );
+            m_ship->ApplyLeftYaw( 1.0 );
             break;
 
         case 'F':
 
-            m_ship->ApplyRightYaw( 10.0 );
+            m_ship->ApplyRightYaw( 1.0 );
             break;
 
 
         case 'Z':
 
-            m_ship->ApplyLeftRoll( 10.0 );
+            m_ship->ApplyLeftRoll( 1.0 );
             break;
 
         case 'R':
 
-            m_ship->ApplyRightRoll( 10.0 );
+            m_ship->ApplyRightRoll( 1.0 );
             break;
 
 
@@ -575,12 +599,17 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case VK_RETURN:
 
-            m_ship->ApplyFwdForce( 12.0 );
+            m_ship->ApplyFwdForce( 9000.0 );
             break;
 
-        case VK_SHIFT:
+        case VK_UP:
 
-            m_ship->ApplyFwdForce( -12.0 );
+            m_ship->ApplyFwdForce( -9000.0 );
+            break;
+
+        case VK_DOWN:
+
+            m_ship->ApplyDownForce( -7000.0 );
             break;
 
     }
@@ -646,7 +675,7 @@ void dsAppClient::OnKeyPulse( long p_key )
         case VK_F9:
 
             m_update_planet = true;
-            m_ship->Attach( m_planet->GetOrbiter() );
+            m_planet->AttachBody( m_ship );
             break;
 
         case VK_F10:
