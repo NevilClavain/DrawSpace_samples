@@ -20,7 +20,11 @@ _DECLARE_DS_LOGGER( logger, "AppClient" )
 MyPlanet::MyPlanet( const dsstring& p_name ) : 
 m_name( p_name ),
 m_ray( /*12000000.0*/ 600000.0 ),
-m_collision_state( false )
+m_collision_state( false ),
+m_buildmeshe_collision_state( false ),
+m_player_relative( false ),
+m_player_body( NULL ),
+m_suspend_update( false )
 {
     m_world.Initialize();
 
@@ -32,12 +36,31 @@ m_collision_state( false )
 
     m_planet_evt_cb = _DRAWSPACE_NEW_( PlanetEvtCb, PlanetEvtCb( this, &MyPlanet::on_planet_event ) );
     m_drawable->RegisterEventHandler( m_planet_evt_cb );
+
+    m_task = _DRAWSPACE_NEW_( Task<MyPlanet>, Task<MyPlanet> );
+
+    m_buildmeshe_request_event = CreateEvent( 
+        NULL,               // default security attributes
+        TRUE,               // manual-reset event
+        FALSE,              // initial state is nonsignaled
+        "ReqBuildMesheEvent"  // object name
+        );
+
+    m_buildmeshe_done_event = CreateEvent( 
+        NULL,               // default security attributes
+        TRUE,               // manual-reset event
+        FALSE,              // initial state is nonsignaled
+        "DoneBuildMesheEvent"  // object name
+        );
+
+    m_task->Startup( this );
 }
 
 MyPlanet::~MyPlanet( void )
 {
     _DRAWSPACE_DELETE_( m_orbiter );
     _DRAWSPACE_DELETE_( m_drawable );
+    _DRAWSPACE_DELETE_( m_task );
 }
 
 DrawSpace::Planet::Body* MyPlanet::GetDrawable( void )
@@ -61,136 +84,55 @@ void MyPlanet::on_planet_event( int p_currentface )
 
     dsreal alt = m_drawable->GetAltitud();
 
-    
-
-    if( alt < 200.0 )
+    if( alt < 1000.0 )
     {
-        if( m_collision_state )
+        if( !m_suspend_update )
         {
-            m_orbiter->UnsetKinematic();
-        }
+            Planet::Patch* curr_patch = m_drawable->GetFaceCurrentLeaf( p_currentface );
 
-        Meshe* patch_meshe = m_drawable->GetPatcheMeshe();
+            m_buildmeshe_inputs_mutex.WaitInfinite();
 
-        Meshe final_meshe;
+            m_buildmeshe_patchmeshe = *( m_drawable->GetPatcheMeshe() );
 
-        Planet::Patch* curr_patch = m_drawable->GetFaceCurrentLeaf( p_currentface );
+            m_buildmeshe_sidelength = curr_patch->GetSideLength() / m_ray;
 
-        dsreal sidelength = curr_patch->GetSideLength() / m_ray;
-        dsreal xpos, ypos;    
-        curr_patch->GetPos( xpos, ypos );
+            curr_patch->GetPos( m_buildmeshe_xpos, m_buildmeshe_ypos );
 
-        xpos = xpos / m_ray;
-        ypos = ypos / m_ray;
+            m_buildmeshe_xpos = m_buildmeshe_xpos / m_ray;
+            m_buildmeshe_ypos = m_buildmeshe_ypos / m_ray;
+
+            m_buildmeshe_planetray = m_ray;
+
+            m_buildmeshe_patch_orientation = curr_patch->GetOrientation();
 
 
-        for( long i = 0; i < patch_meshe->GetVertexListSize(); i++ )
-        {
-            int orientation = curr_patch->GetOrientation();
+            m_buildmeshe_inputs_mutex.Release();
 
-            Vertex v, v2, v3;
-            patch_meshe->GetVertex( i, v );
+            // suspend planet update until meshe build is terminated
 
-            v.x = v.x * sidelength / 2.0;
-            v.y = v.y * sidelength / 2.0;
-            v.z = v.z * sidelength / 2.0;
+            m_suspend_update = true;
 
-            v.x += xpos;
-            v.y += ypos;
-
-            switch( orientation )
+            
+            if( m_collision_state )
             {
-                case Planet::Patch::FrontPlanetFace:
-
-                    v2.x = v.x;
-                    v2.y = v.y;
-                    v2.z = 1.0;
-                    break;
-
-                case Planet::Patch::RearPlanetFace:
-
-                    v2.x = -v.x;
-                    v2.y = v.y;
-                    v2.z = -1.0;
-                    break;
-
-                case Planet::Patch::LeftPlanetFace:
-
-                    v2.x = -1.0;
-                    v2.y = v.y;
-                    v2.z = v.x;
-                    break;
-
-                case Planet::Patch::RightPlanetFace:
-
-                    v2.x = 1.0;
-                    v2.y = v.y;
-                    v2.z = -v.x;
-                    break;
-
-                case Planet::Patch::TopPlanetFace:
-
-                    v2.x = v.x;
-                    v2.y = 1.0;
-                    v2.z = -v.y;
-                    break;
-
-                case Planet::Patch::BottomPlanetFace:
-
-                    v2.x = v.x;
-                    v2.y = -1.0;
-                    v2.z = v.y;
-                    break;
+                m_orbiter->RemoveFromWorld();
+                m_orbiter->UnsetKinematic();
             }
+            
 
-            dsreal xtemp = v2.x;
-            dsreal ytemp = v2.y;
-            dsreal ztemp = v2.z;
+            SetEvent( m_buildmeshe_request_event );
 
-            v2.x = xtemp * sqrt( 1.0 - ytemp * ytemp * 0.5 - ztemp * ztemp * 0.5 + ytemp * ytemp * ztemp * ztemp / 3.0 );
-            v2.y = ytemp * sqrt( 1.0 - ztemp * ztemp * 0.5 - xtemp * xtemp * 0.5 + xtemp * xtemp * ztemp * ztemp / 3.0 );
-            v2.z = ztemp * sqrt( 1.0 - xtemp * xtemp * 0.5 - ytemp * ytemp * 0.5 + xtemp * xtemp * ytemp * ytemp / 3.0 );
-
-            v3.x = v2.x * m_ray;
-            v3.y = v2.y * m_ray;
-            v3.z = v2.z * m_ray;
-
-            final_meshe.AddVertex( v3 );
+            ////////////////////////////////////////////////
         }
-
-        for( long i = 0; i < patch_meshe->GetTrianglesListSize(); i++ )
-        {
-            Triangle t;
-            patch_meshe->GetTriangles( i, t );
-            final_meshe.AddTriangle( t );
-        }
-
-        Body::Parameters params;
-
-        params.mass = 0.0;
-        params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
-        params.initial_rot.Identity();
-
-        
-        params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
-        params.shape_descr.meshe = final_meshe;
-        
-
-        /*
-        params.shape_descr.shape = DrawSpace::Dynamics::Body::SPHERE_SHAPE;
-        params.shape_descr.sphere_radius = m_ray;
-        */
-
-        m_orbiter->SetKinematic( params );
-
-        m_collision_state = true;
     }
     else
     {
         if( m_collision_state )
         {
+            m_orbiter->RemoveFromWorld();
             m_orbiter->UnsetKinematic();
             m_collision_state = false;
+            m_buildmeshe_collision_state = false;
         }
     }
 }
@@ -231,14 +173,234 @@ void MyPlanet::ApplyGravity( void )
     }
 }
 
+void MyPlanet::Update( DrawSpace::Dynamics::InertBody* p_player_body )
+{
+    if( m_player_relative )
+    {
+        if( m_suspend_update && WAIT_OBJECT_0 == WaitForSingleObject( m_buildmeshe_done_event, 0 ) )
+        {
+            // bullet meshe build done
+
+            /*
+            if( m_collision_state )
+            {
+                m_orbiter->RemoveFromWorld();
+            }
+            */
+
+            m_orbiter->AddToWorld();
+
+            ResetEvent( m_buildmeshe_done_event );
+            m_collision_state = true;
+
+            m_suspend_update = false;
+        }
+        else
+        {        
+            DrawSpace::Utils::Matrix camera_pos;
+
+            m_player_body->GetLastLocalWorldTrans( camera_pos );
+
+            DrawSpace::Utils::Vector hotpoint;
+
+            hotpoint[0] = camera_pos( 3, 0 );
+            hotpoint[1] = camera_pos( 3, 1 );
+            hotpoint[2] = camera_pos( 3, 2 );
+
+            m_drawable->UpdateHotPoint( hotpoint );
+            m_drawable->Compute();
+        }
+    }
+    else
+    {
+        DrawSpace::Utils::Matrix playerbodypos;
+        p_player_body->GetLastLocalWorldTrans( playerbodypos );
+
+        DrawSpace::Utils::Vector playerbodypos2;
+        playerbodypos2[0] = playerbodypos( 3, 0 );
+        playerbodypos2[1] = playerbodypos( 3, 1 );
+        playerbodypos2[2] = playerbodypos( 3, 2 );
+
+        DrawSpace::Utils::Matrix planetbodypos;
+        m_orbiter->GetLastWorldTransformation( planetbodypos );
+
+        DrawSpace::Utils::Vector planetbodypos2;
+        planetbodypos2[0] = planetbodypos( 3, 0 );
+        planetbodypos2[1] = planetbodypos( 3, 1 );
+        planetbodypos2[2] = planetbodypos( 3, 2 );
+
+        Vector delta;
+
+        delta[0] = planetbodypos2[0] - playerbodypos2[0];
+        delta[1] = planetbodypos2[1] - playerbodypos2[1];
+        delta[2] = planetbodypos2[2] - playerbodypos2[2];
+        delta[3] = 1.0;
+
+        if( ( delta.Length() / m_ray ) < 2.0 )
+        {
+            AttachBody( p_player_body );
+            m_player_relative = true;
+            m_suspend_update = false;
+            m_player_body = p_player_body;
+        }
+    }
+}
+
+void MyPlanet::Run( void )
+{
+    while( 1 )
+    {
+        DWORD wait = WaitForSingleObject( m_buildmeshe_request_event, INFINITE );
+
+        if( WAIT_OBJECT_0 == wait )
+        {
+            dsreal sidelength;
+            dsreal xpos, ypos;
+            dsreal planetray;
+
+
+            m_buildmeshe_inputs_mutex.WaitInfinite();
+
+            //localy copy inputs
+
+            DrawSpace::Core::Meshe patchmeshe;
+
+            patchmeshe = m_buildmeshe_patchmeshe;
+            sidelength = m_buildmeshe_sidelength;
+            xpos = m_buildmeshe_xpos;
+            ypos = m_buildmeshe_ypos;
+            planetray = m_buildmeshe_planetray;
+
+            m_buildmeshe_inputs_mutex.Release();
+
+
+            ////////////////////////////// do the work
+
+            /*
+            if( m_buildmeshe_collision_state )
+            {
+                m_orbiter->UnsetKinematic();
+            }
+            */
+
+
+            Meshe final_meshe;
+
+            for( long i = 0; i < m_buildmeshe_patchmeshe.GetVertexListSize(); i++ )
+            {                
+
+                Vertex v, v2, v3;
+                m_buildmeshe_patchmeshe.GetVertex( i, v );
+
+                v.x = v.x * m_buildmeshe_sidelength / 2.0;
+                v.y = v.y * m_buildmeshe_sidelength / 2.0;
+                v.z = v.z * m_buildmeshe_sidelength / 2.0;
+
+                v.x += xpos;
+                v.y += ypos;
+
+                switch( m_buildmeshe_patch_orientation )
+                {
+                    case Planet::Patch::FrontPlanetFace:
+
+                        v2.x = v.x;
+                        v2.y = v.y;
+                        v2.z = 1.0;
+                        break;
+
+                    case Planet::Patch::RearPlanetFace:
+
+                        v2.x = -v.x;
+                        v2.y = v.y;
+                        v2.z = -1.0;
+                        break;
+
+                    case Planet::Patch::LeftPlanetFace:
+
+                        v2.x = -1.0;
+                        v2.y = v.y;
+                        v2.z = v.x;
+                        break;
+
+                    case Planet::Patch::RightPlanetFace:
+
+                        v2.x = 1.0;
+                        v2.y = v.y;
+                        v2.z = -v.x;
+                        break;
+
+                    case Planet::Patch::TopPlanetFace:
+
+                        v2.x = v.x;
+                        v2.y = 1.0;
+                        v2.z = -v.y;
+                        break;
+
+                    case Planet::Patch::BottomPlanetFace:
+
+                        v2.x = v.x;
+                        v2.y = -1.0;
+                        v2.z = v.y;
+                        break;
+                }
+
+                dsreal xtemp = v2.x;
+                dsreal ytemp = v2.y;
+                dsreal ztemp = v2.z;
+
+                v2.x = xtemp * sqrt( 1.0 - ytemp * ytemp * 0.5 - ztemp * ztemp * 0.5 + ytemp * ytemp * ztemp * ztemp / 3.0 );
+                v2.y = ytemp * sqrt( 1.0 - ztemp * ztemp * 0.5 - xtemp * xtemp * 0.5 + xtemp * xtemp * ztemp * ztemp / 3.0 );
+                v2.z = ztemp * sqrt( 1.0 - xtemp * xtemp * 0.5 - ytemp * ytemp * 0.5 + xtemp * xtemp * ytemp * ytemp / 3.0 );
+
+                v3.x = v2.x * m_ray;
+                v3.y = v2.y * m_ray;
+                v3.z = v2.z * m_ray;
+
+                final_meshe.AddVertex( v3 );
+            }
+
+            for( long i = 0; i < m_buildmeshe_patchmeshe.GetTrianglesListSize(); i++ )
+            {
+                Triangle t;
+                m_buildmeshe_patchmeshe.GetTriangles( i, t );
+                final_meshe.AddTriangle( t );
+            }
+
+
+            Body::Parameters params;
+
+
+            params.mass = 0.0;
+            params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
+            params.initial_rot.Identity();
+            
+            params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
+            params.shape_descr.meshe = final_meshe;
+
+        
+
+            m_orbiter->SetKinematic( params );
+
+            ////////////////////////////////////////////
+
+
+            ResetEvent( m_buildmeshe_request_event );
+            SetEvent( m_buildmeshe_done_event );
+
+            m_buildmeshe_collision_state = true;
+
+        }
+
+        Sleep( 25 );
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 )
 {    
     _INIT_LOGGER( "orbiters2.conf" )  
     m_w_title = "orbiters 2 test";
-
-    m_update_planet = false;
 }
 
 dsAppClient::~dsAppClient( void )
@@ -280,8 +442,11 @@ void dsAppClient::OnRenderFrame( void )
     m_scenegraph.ComputeTransformations();
 
 
+    m_planet->Update( m_ship );
 
-    if( m_update_planet )
+
+    /*
+    if( m_player_relative )
     {
         
         DrawSpace::Utils::Matrix camera_pos;
@@ -299,8 +464,7 @@ void dsAppClient::OnRenderFrame( void )
         planet_body->UpdateHotPoint( hotpoint );
         planet_body->Compute();
     }
-
-
+    */
 
 
 
@@ -599,17 +763,17 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case VK_RETURN:
 
-            m_ship->ApplyFwdForce( 9000.0 );
+            m_ship->ApplyFwdForce( 3000.0 );
             break;
 
         case VK_UP:
 
-            m_ship->ApplyFwdForce( -9000.0 );
+            m_ship->ApplyFwdForce( -3000.0 );
             break;
 
         case VK_DOWN:
 
-            m_ship->ApplyDownForce( -7000.0 );
+            m_ship->ApplyDownForce( -2000.0 );
             break;
 
     }
@@ -674,8 +838,8 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F9:
 
-            m_update_planet = true;
-            m_planet->AttachBody( m_ship );
+            //m_player_relative = true;
+            //m_planet->AttachBody( m_ship );
             break;
 
         case VK_F10:

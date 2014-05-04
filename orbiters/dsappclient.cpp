@@ -68,6 +68,7 @@ Orbiter* dsAppClient::build_planet( char* p_name, char* p_texture )
     Orbiter* orbiter = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Orbiter, DrawSpace::Dynamics::Orbiter( &m_world, chunk ) );
 
     orbiter->SetKinematic( sphere_params );
+    orbiter->AddToWorld();
 
     return orbiter;
 }
@@ -339,7 +340,10 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
 
-    m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer, &m_world ) );
+    m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer ) );
+    m_calendar->RegisterWorld( &m_world );
+
+
 
     
 

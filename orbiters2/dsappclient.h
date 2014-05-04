@@ -22,6 +22,29 @@ protected:
     bool                                                    m_collision_state;
 
     std::vector<DrawSpace::Dynamics::InertBody*>            m_attached_bodies;
+    DrawSpace::Dynamics::InertBody*                         m_player_body;
+
+    bool                                                    m_player_relative;
+    bool                                                    m_suspend_update;
+
+    DrawSpace::Core::Task<MyPlanet>*                        m_task;
+
+    //////// bullet patch build thread
+    HANDLE                                                  m_buildmeshe_request_event;
+
+    DrawSpace::Utils::Mutex                                 m_buildmeshe_inputs_mutex;
+    DrawSpace::Core::Meshe                                  m_buildmeshe_patchmeshe;
+
+    dsreal                                                  m_buildmeshe_sidelength;
+    dsreal                                                  m_buildmeshe_xpos, m_buildmeshe_ypos;
+    dsreal                                                  m_buildmeshe_planetray;
+    int                                                     m_buildmeshe_patch_orientation;
+
+    bool                                                    m_buildmeshe_collision_state;
+
+
+    HANDLE                                                  m_buildmeshe_done_event; 
+
 
     void on_planet_event( int p_currentface );
 
@@ -39,9 +62,16 @@ public:
     dsreal GetAltitud( void );
 
     void AttachBody( DrawSpace::Dynamics::InertBody* p_body );
+    
 
 
     void ApplyGravity( void );
+
+    //void Update( const DrawSpace::Utils::Vector& p_hotpoint );
+
+    void Update( DrawSpace::Dynamics::InertBody* p_player_body );
+
+    void Run( void );
 
 };
 
@@ -99,7 +129,7 @@ protected:
 
     DrawSpace::Chunk*                           m_ship_drawable;
 
-    bool                                        m_update_planet;
+    
 
     dsAppClient( void );
 
