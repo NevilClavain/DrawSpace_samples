@@ -129,8 +129,11 @@ void MyPlanet::on_planet_event( int p_currentface )
     {
         if( m_collision_state )
         {
-            m_orbiter->RemoveFromWorld();
-            m_orbiter->UnsetKinematic();
+            if( !m_suspend_update )
+            {
+                m_orbiter->RemoveFromWorld();
+                m_orbiter->UnsetKinematic();
+            }
             m_collision_state = false;
             m_buildmeshe_collision_state = false;
         }
@@ -167,7 +170,7 @@ void MyPlanet::ApplyGravity( void )
         gravity[2] = -local_pos( 3, 2 );
         gravity[3] = 1.0;
         gravity.Normalize();
-        gravity.Scale( 50.0 * 9.81 );
+        gravity.Scale( 5.0 * 9.81 );
 
         m_attached_bodies[i]->ApplyForce( gravity );
     }
@@ -196,7 +199,8 @@ void MyPlanet::Update( DrawSpace::Dynamics::InertBody* p_player_body )
             m_suspend_update = false;
         }
         else
-        {        
+        {   
+
             DrawSpace::Utils::Matrix camera_pos;
 
             m_player_body->GetLastLocalWorldTrans( camera_pos );
@@ -483,6 +487,13 @@ void dsAppClient::OnRenderFrame( void )
     renderer->DrawText( 0, 255, 0, 10, 75, "collision state %d altitud = %f", m_planet->GetCollisionState(), alt );
 
 
+    dsreal speed = m_ship->GetLinearSpeedMagnitude();
+
+    renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h ( %.1f m/s) - aspeed = %.1f", speed * 3.6, speed, m_ship->GetAngularSpeedMagnitude() );
+
+    renderer->DrawText( 0, 255, 0, 10, 115, "contact = %d", m_ship->GetContactState() );
+
+
     renderer->FlipScreen();
 
     m_calendar->Run();
@@ -616,7 +627,7 @@ bool dsAppClient::OnIdleAppInit( void )
     
     m_ship_drawable->GetMeshe()->SetImporter( m_meshe_import );
 
-    m_ship_drawable->GetMeshe()->LoadFromFile( "object.ac", 0 );    
+    m_ship_drawable->GetMeshe()->LoadFromFile( "object3.ac", 0 );    
 
     m_ship_drawable->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_ship_drawable->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
@@ -638,9 +649,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     DrawSpace::Dynamics::Body::Parameters cube_params;
-    cube_params.mass = 50.0;
+    cube_params.mass = 5.0;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
-    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
+    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 2.0, 0.5, 4.0, 1.0 );
     cube_params.initial_pos = DrawSpace::Utils::Vector( 265000000.0, 0.0, -10.0, 1.0 );
     cube_params.initial_rot.Identity();
 
@@ -773,7 +784,7 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case VK_DOWN:
 
-            m_ship->ApplyDownForce( -2000.0 );
+            m_ship->ApplyDownForce( -100.0 );
             break;
 
     }
