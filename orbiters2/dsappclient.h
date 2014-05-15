@@ -73,6 +73,8 @@ public:
 
     void Run( void );
 
+    bool IsPlayerRelative( void );
+
 };
 
 
@@ -129,9 +131,39 @@ protected:
 
     DrawSpace::Chunk*                           m_ship_drawable;
 
+
+
+    ///////////////////////////////////////////////////////////
+
+    DrawSpace::Utils::Vector                    m_player_ship_gravity;
+
+    DrawSpace::Utils::Matrix                    m_player_view_transform;
+
+    DrawSpace::Utils::Vector                    m_player_view_pos;
+    dsreal                                      m_player_view_linear_acc[3];
+    dsreal                                      m_player_view_linear_speed[3];
+
+    dsreal                                      m_player_view_linear_speed_clamp_up[3];
+    dsreal                                      m_player_view_linear_speed_clamp_down[3];
+
+
+    dsreal                                      m_player_view_theta;
+    dsreal                                      m_player_view_phi;
+    dsreal                                      m_player_view_rho;
+
+    dsreal                                      m_player_view_angular_acc[3];
+    dsreal                                      m_player_view_angular_acc_2[3];
+
+    dsreal                                      m_player_view_angular_speed_clamp_up[3];
+    dsreal                                      m_player_view_angular_speed_clamp_down[3];
+
+    dsreal                                      m_player_view_angular_speed[3];
+
     
 
     dsAppClient( void );
+
+    void compute_player_view_transform( void );
 
 
 public:
@@ -162,6 +194,9 @@ public:
     virtual void OnMouseRightButtonDown( long p_xm, long p_ym );
     virtual void OnMouseRightButtonUp( long p_xm, long p_ym );
     virtual void OnAppEvent( WPARAM p_wParam, LPARAM p_lParam );
+
+    virtual DrawSpace::Dynamics::Rocket* GetPlayerShip( void );
+    virtual void SetLastPlayerShipGravity( const DrawSpace::Utils::Vector& p_gravity );
 };
 
 #endif

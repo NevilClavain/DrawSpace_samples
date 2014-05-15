@@ -16,6 +16,8 @@ dsAppClient* dsAppClient::m_instance = NULL;
 _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
+#define SHIP_MASS 5.0
+
 
 MyPlanet::MyPlanet( const dsstring& p_name ) : 
 m_name( p_name ),
@@ -170,9 +172,14 @@ void MyPlanet::ApplyGravity( void )
         gravity[2] = -local_pos( 3, 2 );
         gravity[3] = 1.0;
         gravity.Normalize();
-        gravity.Scale( 5.0 * 9.81 );
+        gravity.Scale( SHIP_MASS * 9.81 );
 
         m_attached_bodies[i]->ApplyForce( gravity );
+
+        if( m_attached_bodies[i] == dsAppClient::GetInstance()->GetPlayerShip() )
+        {
+            dsAppClient::GetInstance()->SetLastPlayerShipGravity( gravity );
+        }
     }
 }
 
@@ -399,12 +406,48 @@ void MyPlanet::Run( void )
     }
 }
 
+bool MyPlanet::IsPlayerRelative( void )
+{
+    return m_player_relative;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 )
 {    
     _INIT_LOGGER( "orbiters2.conf" )  
     m_w_title = "orbiters 2 test";
+
+    m_player_view_linear_acc[0] = m_player_view_linear_acc[1] = m_player_view_linear_acc[2] = 0;
+    m_player_view_linear_speed[0] = m_player_view_linear_speed[1] = m_player_view_linear_speed[2] = 0;
+
+    m_player_view_angular_acc[0] = m_player_view_angular_acc[1] = m_player_view_angular_acc[2] = 0;
+    m_player_view_angular_acc_2[0] = m_player_view_angular_acc_2[1] = m_player_view_angular_acc_2[2] = 0;
+    m_player_view_angular_speed[0] = m_player_view_angular_speed[1] = m_player_view_angular_speed[2] = 0;
+
+
+    m_player_view_angular_speed_clamp_up[0] = 0.0;
+    m_player_view_angular_speed_clamp_down[0] = 0.0;
+
+    m_player_view_angular_speed_clamp_up[1] = 0.0;
+    m_player_view_angular_speed_clamp_down[1] = 0.0;
+
+    m_player_view_angular_speed_clamp_up[2] = 0.0;
+    m_player_view_angular_speed_clamp_down[2] = 0.0;
+
+
+    m_player_view_linear_speed_clamp_up[0] = 0.0;
+    m_player_view_linear_speed_clamp_down[0] = 0.0;
+
+    m_player_view_linear_speed_clamp_up[1] = 0.0;
+    m_player_view_linear_speed_clamp_down[1] = 0.0;
+
+    m_player_view_linear_speed_clamp_up[2] = 0.0;
+    m_player_view_linear_speed_clamp_down[2] = 0.0;
+
+
+
+    m_player_view_theta = m_player_view_phi = m_player_view_rho = 0.0;
 }
 
 dsAppClient::~dsAppClient( void )
@@ -413,6 +456,349 @@ dsAppClient::~dsAppClient( void )
 }
 
 
+#define SPEED     1.5
+
+void dsAppClient::compute_player_view_transform( void )
+{
+    Matrix cam_base_pos;
+    cam_base_pos.Translation( 0.0, 2.8, 11.4 );
+
+    /////////////////////////////////////////////////////
+
+
+    if( m_player_view_linear_acc[2] > 0.0 )
+    {
+        dsreal limit = ( m_player_view_linear_acc[2] / ( 8000.0 / SHIP_MASS ) );
+        if( m_player_view_pos[2] < limit )
+        {
+            m_player_view_linear_speed[2] = SPEED;
+        }
+        else
+        {
+            m_player_view_linear_speed[2] = 0.0;
+        }
+    }
+    else if( m_player_view_linear_acc[2] < 0.0 )
+    {
+        dsreal limit = ( m_player_view_linear_acc[2] / ( 8000.0 / SHIP_MASS ) );
+        if( m_player_view_pos[2] > limit )
+        {
+            m_player_view_linear_speed[2] = -SPEED;
+        }
+        else
+        {
+            m_player_view_linear_speed[2] = 0.0;
+        }
+    }
+    else
+    {
+        if( m_player_view_pos[2] > 0.1 )
+        {
+            m_player_view_linear_speed[2] = -SPEED;
+        }
+
+        else if( m_player_view_pos[2] < -0.1 )
+        {
+            m_player_view_linear_speed[2] = SPEED;
+        }
+
+        else
+        {
+            m_player_view_linear_speed[2] = 0.0;
+        }
+    }
+
+    /////////////////////////////////////////////////////
+
+
+    dsreal zpos = m_player_view_pos[2];
+    m_timer.TranslationSpeedInc( &zpos, m_player_view_linear_speed[2] );
+    m_player_view_pos[2] = zpos;
+
+
+    Matrix cam_delta_pos;
+    cam_delta_pos.Translation( m_player_view_pos );
+
+    /////////////////////////////////////////////////////
+
+    if( m_player_view_angular_acc[0] > 0.0 )
+    {
+        m_player_view_angular_speed_clamp_up[0] = 10.0;
+        m_player_view_angular_speed_clamp_down[0] = 0.0;
+
+        if( m_player_view_phi < 4 * m_player_view_angular_acc[0] )
+        {
+            m_player_view_angular_acc_2[0] = 5.0;
+        }
+        else
+        {
+            m_player_view_angular_acc_2[0] = -5.0;
+        }
+    }
+    else if( m_player_view_angular_acc[0] < 0.0 )
+    {
+        m_player_view_angular_speed_clamp_up[0] = 0.0;
+        m_player_view_angular_speed_clamp_down[0] = -10.0;
+
+        if( m_player_view_phi > 4 * m_player_view_angular_acc[0] )
+        {
+            m_player_view_angular_acc_2[0] = -5.0;
+        }
+        else
+        {
+            m_player_view_angular_acc_2[0] = 5.0;
+        }
+    }
+    else
+    {
+        if( m_player_view_phi > 0.3 )
+        {
+            m_player_view_angular_speed_clamp_up[0] = 0.0;
+            m_player_view_angular_speed_clamp_down[0] = -10.0;
+
+            m_player_view_angular_acc_2[0] = -5.0;
+        }
+
+        else if( m_player_view_phi < -0.3 )
+        {
+            m_player_view_angular_speed_clamp_up[0] = 10.0;
+            m_player_view_angular_speed_clamp_down[0] = 0.0;
+
+            m_player_view_angular_acc_2[1] = 5.0;
+        }
+
+        else
+        {
+            if( m_player_view_phi > 0.0 )
+            {
+                m_player_view_angular_acc_2[0] = 5.0;
+
+                m_player_view_angular_speed_clamp_up[0] = 0.0;
+                m_player_view_angular_speed_clamp_down[0] = -10.0;
+            }
+            else if( m_player_view_phi < 0.0 )
+            {
+                m_player_view_angular_acc_2[0] = -5.0;
+
+                m_player_view_angular_speed_clamp_up[0] = 10.0;
+                m_player_view_angular_speed_clamp_down[0] = 0.0;
+            }
+        }
+    }
+
+
+
+
+
+
+    if( m_player_view_angular_acc[1] > 0.0 )
+    {
+        m_player_view_angular_speed_clamp_up[1] = 10.0;
+        m_player_view_angular_speed_clamp_down[1] = 0.0;
+
+        if( m_player_view_theta < 4 * m_player_view_angular_acc[1] )
+        {
+            m_player_view_angular_acc_2[1] = 5.0;
+        }
+        else
+        {
+            m_player_view_angular_acc_2[1] = -5.0;
+        }
+    }
+    else if( m_player_view_angular_acc[1] < 0.0 )
+    {
+        m_player_view_angular_speed_clamp_up[1] = 0.0;
+        m_player_view_angular_speed_clamp_down[1] = -10.0;
+
+        if( m_player_view_theta > 4 * m_player_view_angular_acc[1] )
+        {
+            m_player_view_angular_acc_2[1] = -5.0;
+        }
+        else
+        {
+            m_player_view_angular_acc_2[1] = 5.0;
+        }
+    }
+    else
+    {
+        if( m_player_view_theta > 0.3 )
+        {
+            m_player_view_angular_speed_clamp_up[1] = 0.0;
+            m_player_view_angular_speed_clamp_down[1] = -10.0;
+
+            m_player_view_angular_acc_2[1] = -5.0;
+        }
+
+        else if( m_player_view_theta < -0.3 )
+        {
+            m_player_view_angular_speed_clamp_up[1] = 10.0;
+            m_player_view_angular_speed_clamp_down[1] = 0.0;
+
+            m_player_view_angular_acc_2[1] = 5.0;
+        }
+
+        else
+        {
+            if( m_player_view_theta > 0.0 )
+            {
+                m_player_view_angular_acc_2[1] = 5.0;
+
+                m_player_view_angular_speed_clamp_up[1] = 0.0;
+                m_player_view_angular_speed_clamp_down[1] = -10.0;
+            }
+            else if( m_player_view_theta < 0.0 )
+            {
+                m_player_view_angular_acc_2[1] = -5.0;
+
+                m_player_view_angular_speed_clamp_up[1] = 10.0;
+                m_player_view_angular_speed_clamp_down[1] = 0.0;
+            }            
+        }
+    }
+
+
+
+
+
+    if( m_player_view_angular_acc[2] > 0.0 )
+    {
+        m_player_view_angular_speed_clamp_up[2] = 10.0;
+        m_player_view_angular_speed_clamp_down[2] = 0.0;
+
+        if( m_player_view_rho < 3 * m_player_view_angular_acc[2] )
+        {
+            m_player_view_angular_acc_2[2] = 5.0;
+        }
+        else
+        {
+            m_player_view_angular_acc_2[2] = -5.0;
+        }
+    }
+    else if( m_player_view_angular_acc[2] < 0.0 )
+    {
+        m_player_view_angular_speed_clamp_up[2] = 0.0;
+        m_player_view_angular_speed_clamp_down[2] = -10.0;
+
+        if( m_player_view_rho > 3 * m_player_view_angular_acc[2] )
+        {          
+            m_player_view_angular_acc_2[2] = -5.0;
+        }
+        else
+        {
+            m_player_view_angular_acc_2[2] = 5.0;
+        }
+    }
+    else
+    {
+        if( m_player_view_rho > 0.3 )
+        {
+            m_player_view_angular_speed_clamp_up[2] = 0.0;
+            m_player_view_angular_speed_clamp_down[2] = -10.0;
+
+            m_player_view_angular_acc_2[2] = -5.0;
+        }
+
+        else if( m_player_view_rho < -0.3 )
+        {
+            m_player_view_angular_speed_clamp_up[2] = 10.0;
+            m_player_view_angular_speed_clamp_down[2] = 0.0;
+
+            m_player_view_angular_acc_2[2] = 5.0;
+        }
+
+        else
+        {
+            if( m_player_view_rho > 0.0 )
+            {
+                m_player_view_angular_acc_2[2] = 5.0;
+
+                m_player_view_angular_speed_clamp_up[2] = 0.0;
+                m_player_view_angular_speed_clamp_down[2] = -10.0;
+            }
+            else if( m_player_view_rho < 0.0 )
+            {
+                m_player_view_angular_acc_2[2] = -5.0;
+
+                m_player_view_angular_speed_clamp_up[2] = 10.0;
+                m_player_view_angular_speed_clamp_down[2] = 0.0;
+            }
+        }
+    }
+
+
+
+
+
+    dsreal phi = m_player_view_phi;
+    m_timer.TranslationSpeedInc( &phi, m_player_view_angular_speed[0] );
+    m_player_view_phi = phi;
+
+
+    dsreal rho = m_player_view_rho;
+    m_timer.TranslationSpeedInc( &rho, m_player_view_angular_speed[2] );
+    m_player_view_rho = rho;
+
+
+    dsreal theta = m_player_view_theta;
+    m_timer.TranslationSpeedInc( &theta, m_player_view_angular_speed[1] );
+    m_player_view_theta = theta;
+
+
+
+
+    dsreal curr_speed = m_player_view_angular_speed[0];
+    m_timer.TranslationSpeedInc( &curr_speed, m_player_view_angular_acc_2[0] );
+    m_player_view_angular_speed[0] = curr_speed;
+
+    
+    m_player_view_angular_speed[0] = DrawSpace::Utils::Maths::Clamp( m_player_view_angular_speed_clamp_down[0], m_player_view_angular_speed_clamp_up[0], m_player_view_angular_speed[0] );
+
+
+
+
+    curr_speed = m_player_view_angular_speed[1];
+    m_timer.TranslationSpeedInc( &curr_speed, m_player_view_angular_acc_2[1] );
+    m_player_view_angular_speed[1] = curr_speed;
+
+    
+    m_player_view_angular_speed[1] = DrawSpace::Utils::Maths::Clamp( m_player_view_angular_speed_clamp_down[1], m_player_view_angular_speed_clamp_up[1], m_player_view_angular_speed[1] );
+
+
+
+    
+    curr_speed = m_player_view_angular_speed[2];
+    m_timer.TranslationSpeedInc( &curr_speed, m_player_view_angular_acc_2[2] );
+    m_player_view_angular_speed[2] = curr_speed;
+
+    
+    m_player_view_angular_speed[2] = DrawSpace::Utils::Maths::Clamp( m_player_view_angular_speed_clamp_down[2], m_player_view_angular_speed_clamp_up[2], m_player_view_angular_speed[2] );
+
+
+
+
+    /////////////////////////////////////////////////////
+
+    Matrix rotx;
+    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0 ), DrawSpace::Utils::Maths::DegToRad( m_player_view_phi ) );
+
+    Matrix roty;
+    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0 ), DrawSpace::Utils::Maths::DegToRad( m_player_view_theta ) );
+
+    Matrix rotz;
+    rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), DrawSpace::Utils::Maths::DegToRad( m_player_view_rho ) );
+
+
+    Transformation tf;
+
+    tf.ClearAll();
+    tf.PushMatrix( cam_delta_pos );
+    tf.PushMatrix( cam_base_pos );
+    tf.PushMatrix( rotx );
+    tf.PushMatrix( roty );
+    tf.PushMatrix( rotz );
+    tf.BuildResult();
+    tf.GetResult( &m_player_view_transform );
+}
 
 void dsAppClient::OnRenderFrame( void )
 {
@@ -426,9 +812,9 @@ void dsAppClient::OnRenderFrame( void )
     sbtrans.Scale( 20.0, 20.0, 20.0 );
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
 
-    Matrix cam_pos;
-    cam_pos.Translation( 0.0, 1.5, 11.4 );
-    m_camera2->SetLocalTransform( cam_pos );
+
+    compute_player_view_transform();
+    m_camera2->SetLocalTransform( m_player_view_transform );
     
     Matrix origin;
     origin.Identity();
@@ -448,27 +834,6 @@ void dsAppClient::OnRenderFrame( void )
 
     m_planet->Update( m_ship );
 
-
-    /*
-    if( m_player_relative )
-    {
-        
-        DrawSpace::Utils::Matrix camera_pos;
-
-        m_ship->GetLastLocalWorldTrans( camera_pos );
-
-        DrawSpace::Utils::Vector hotpoint;
-
-        hotpoint[0] = camera_pos( 3, 0 );
-        hotpoint[1] = camera_pos( 3, 1 );
-        hotpoint[2] = camera_pos( 3, 2 );
-
-        DrawSpace::Planet::Body* planet_body = m_planet->GetDrawable();
-
-        planet_body->UpdateHotPoint( hotpoint );
-        planet_body->Compute();
-    }
-    */
 
 
 
@@ -492,6 +857,90 @@ void dsAppClient::OnRenderFrame( void )
     renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h ( %.1f m/s) - aspeed = %.1f", speed * 3.6, speed, m_ship->GetAngularSpeedMagnitude() );
 
     renderer->DrawText( 0, 255, 0, 10, 115, "contact = %d", m_ship->GetContactState() );
+
+    Vector tf, tt;
+    Vector tf2, tt2;
+
+    Matrix ship_trans;
+
+    m_ship->GetLastLocalWorldTrans( ship_trans );
+    ship_trans.ClearTranslation();
+    ship_trans.Inverse();
+
+    m_ship->GetTotalForce( tf );
+    m_ship->GetTotalTorque( tt );
+
+
+    if( m_planet->IsPlayerRelative() )
+    {
+        // remove gravity effect
+
+        // had to scale my ship gravity vector by 0.5, but dont understand why...
+
+        tf[0] = tf[0] - 0.5 * m_player_ship_gravity[0];
+        tf[1] = tf[1] - 0.5 * m_player_ship_gravity[1];
+        tf[2] = tf[2] - 0.5 * m_player_ship_gravity[2];
+    }
+
+    
+    ship_trans.Transform( &tf, &tf2 );
+    ship_trans.Transform( &tt, &tt2 );
+        
+    m_player_view_linear_acc[2] = -tf2[2] / SHIP_MASS;
+
+    m_player_view_angular_acc[2] = -tt2[2];
+    m_player_view_angular_acc[1] = -tt2[1];
+    m_player_view_angular_acc[0] = -tt2[0];
+
+
+/*
+    if( tt2[2] > 0.0 )
+    {
+        m_player_view_angular_acc[2] = -1.0;
+    }
+    else if( tt2[2] < 0.0 )
+    {
+        m_player_view_angular_acc[2] = 1.0;
+    }
+    else
+    {
+        m_player_view_angular_acc[2] = 0.0;
+    }
+
+
+    if( tt2[1] > 0.0 )
+    {
+        m_player_view_angular_acc[1] = -1.0;
+    }
+    else if( tt2[1] < 0.0 )
+    {
+        m_player_view_angular_acc[1] = 1.0;
+    }
+    else
+    {
+        m_player_view_angular_acc[1] = 0.0;
+    }
+
+
+    if( tt2[0] > 0.0 )
+    {
+        m_player_view_angular_acc[0] = -1.0;
+    }
+    else if( tt2[0] < 0.0 )
+    {
+        m_player_view_angular_acc[0] = 1.0;
+    }
+    else
+    {
+        m_player_view_angular_acc[0] = 0.0;
+    }
+*/
+
+    renderer->DrawText( 0, 255, 0, 10, 135, "force/torque = %f %f %f / %f %f %f", tf2[0], tf2[1], tf2[2], tt2[0], tt2[1], tt2[2] );
+
+    
+
+
 
 
     renderer->FlipScreen();
@@ -649,7 +1098,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     DrawSpace::Dynamics::Body::Parameters cube_params;
-    cube_params.mass = 5.0;
+    cube_params.mass = SHIP_MASS;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 2.0, 0.5, 4.0, 1.0 );
     cube_params.initial_pos = DrawSpace::Utils::Vector( 265000000.0, 0.0, -10.0, 1.0 );
@@ -787,6 +1236,56 @@ void dsAppClient::OnKeyPress( long p_key )
             m_ship->ApplyDownForce( -100.0 );
             break;
 
+
+        case 'I':
+            m_player_view_linear_acc[2] = 500.0;
+            break;
+
+        case 'K':
+            m_player_view_linear_acc[2] = -500.0;
+            break;
+
+        case 'U':
+            m_player_view_linear_acc[1] = 500.0;
+            break;
+
+        case 'J':
+            m_player_view_linear_acc[1] = -500.0;
+            break;
+
+        case 'Y':
+
+            m_player_view_angular_acc[0] = 1.0;
+            break;
+
+        case 'H':
+
+            m_player_view_angular_acc[0] = -1.0;
+            break;
+
+
+        case 'T':
+
+            m_player_view_angular_acc[2] = 1.0;
+            break;
+
+        case 'G':
+
+            m_player_view_angular_acc[2] = -1.0;
+            break;
+
+
+        case 'N':
+
+            m_player_view_angular_acc[1] = 1.0;
+            break;
+
+        case 'V':
+
+            m_player_view_angular_acc[1] = -1.0;
+            break;
+
+
     }
 }
 
@@ -809,6 +1308,40 @@ void dsAppClient::OnEndKeyPress( long p_key )
 
             m_speed = 0.0;
             break;
+
+
+        case 'I':
+        case 'K':
+
+            m_player_view_linear_acc[2] = 0.0;
+            break;
+
+
+        case 'U':
+        case 'J':
+
+            m_player_view_linear_acc[1] = 0.0;
+            break;
+
+        case 'Y':
+        case 'H':
+
+            m_player_view_angular_acc[0] = 0.0;
+            break;
+
+
+        case 'T':
+        case 'G':
+
+            m_player_view_angular_acc[2] = 0.0;
+            break;
+
+        case 'V':
+        case 'N':
+
+            m_player_view_angular_acc[1] = 0.0;
+            break;
+
     }
 }
 
@@ -897,4 +1430,14 @@ void dsAppClient::OnMouseRightButtonUp( long p_xm, long p_ym )
 void dsAppClient::OnAppEvent( WPARAM p_wParam, LPARAM p_lParam )
 {
 
+}
+
+DrawSpace::Dynamics::Rocket* dsAppClient::GetPlayerShip( void )
+{
+    return m_ship;
+}
+
+void dsAppClient::SetLastPlayerShipGravity( const DrawSpace::Utils::Vector& p_gravity )
+{
+    m_player_ship_gravity = p_gravity;
 }

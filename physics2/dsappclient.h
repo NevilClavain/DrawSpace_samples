@@ -110,7 +110,7 @@ protected:
 
     std::vector<Box>                            m_boxes;
 
-    void create_box( const dsstring& p_meshe, dsreal p_dims, const DrawSpace::Utils::Vector& p_pos, bool p_kinematic, bool p_world2 );
+    void create_box( const dsstring& p_meshe, dsreal p_dims, const DrawSpace::Utils::Vector& p_pos, bool p_kinematic, bool p_world2, dsreal p_mass );
 
 
     dsAppClient( void );

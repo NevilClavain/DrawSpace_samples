@@ -131,6 +131,11 @@ void dsAppClient::OnRenderFrame( void )
                 box_rot.Transform( &m_down, &m_transformed_down );
 
             }
+
+            if( 2 <= i )
+            {
+                m_boxes[i].drawable->SetLocalTransform( box_pos );
+            }
         }
 
         else
@@ -285,7 +290,7 @@ void dsAppClient::OnRenderFrame( void )
     }
 }
 
-void dsAppClient::create_box( const dsstring& p_meshe, dsreal p_dims, const DrawSpace::Utils::Vector& p_pos, bool p_kinematic, bool p_world2 )
+void dsAppClient::create_box( const dsstring& p_meshe, dsreal p_dims, const DrawSpace::Utils::Vector& p_pos, bool p_kinematic, bool p_world2, dsreal p_mass )
 {
     Chunk* chunk;
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -389,7 +394,7 @@ void dsAppClient::create_box( const dsstring& p_meshe, dsreal p_dims, const Draw
 
     if( !p_kinematic )
     {
-        btScalar mass = 8.5;
+        btScalar mass = p_mass;
         shape->calculateLocalInertia( mass, localInertia );
 
         btRigidBody::btRigidBodyConstructionInfo myBoxRigidBodyConstructionInfo( mass, motion, shape, localInertia );
@@ -612,9 +617,13 @@ bool dsAppClient::OnIdleAppInit( void )
     m_myWorld_2->setGravity( btVector3( 0, 0.0, 0 ) );
 
 
-    create_box( "object2.ac", 10.0, Vector( 20.0, 0.0, -10.0, 1.0 ), true, true );
+    create_box( "object2.ac", 10.0, Vector( 20.0, 0.0, -10.0, 1.0 ), true, true, 0.0 );
 
-    create_box( "object.ac", 1.0, Vector( 0.0, 0.0, 0.0, 1.0 ), false, false );
+    create_box( "object.ac", 1.0, Vector( 0.0, 0.0, 0.0, 1.0 ), false, false, 8.5 );
+
+    create_box( "object.ac", 1.0, Vector( 0.0, 2.0, 0.0, 1.0 ), false, false, 0.001 );
+
+    create_box( "object.ac", 1.0, Vector( 0.0, 2.0, -5.0, 1.0 ), false, false, 10.0 );
 
 
     //m_boxes[1].drawable->AddChild( m_camera );
@@ -622,9 +631,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
+    //btTypedConstraint* p2p = new btPoint2PointConstraint( *( m_boxes[1].body ), *( m_boxes[2].body ), btVector3( 0.0, 1.0, 0.0 ), btVector3( 0.0, -1.0, 0.0 ) );
 
-
-
+    //m_myWorld->addConstraint( p2p );
 
 
     return true;
@@ -666,9 +675,13 @@ void dsAppClient::OnKeyPress( long p_key )
         case 'Z':
 
             m_boxes[1].body->applyForce( btVector3( m_transformed_fwd[0] * 5.0, m_transformed_fwd[1] * 5.0, m_transformed_fwd[2] * 5.0 ), btVector3( 0.0, 0.0, 0.0 ) );
+            //m_boxes[2].body->applyForce( btVector3( m_transformed_fwd[0] * 5.0, m_transformed_fwd[1] * 5.0, m_transformed_fwd[2] * 5.0 ), btVector3( 0.0, 0.0, 0.0 ) );
+
             break;
 
         case 'S':
+
+            m_boxes[1].body->applyForce( btVector3( - m_transformed_fwd[0] * 5.0, - m_transformed_fwd[1] * 5.0, - m_transformed_fwd[2] * 5.0 ), btVector3( 0.0, 0.0, 0.0 ) );
 
             
             break;
@@ -719,63 +732,7 @@ void dsAppClient::OnEndKeyPress( long p_key )
             break;
 
 
-       case VK_F1:
-
-            {
-
-                // remove & recreate object 
-
-                m_myWorld->removeRigidBody( m_boxes[1].body );
-
-                
-
-                _DRAWSPACE_DELETE_( m_boxes[1].motion );
-                _DRAWSPACE_DELETE_( m_boxes[1].body );
-
-                /*
-                m_myTransform.setIdentity();
-                m_myTransform.setOrigin( btVector3( 0, 3.0, 0 ) );
-                */
-
-                btCollisionShape* shape = _DRAWSPACE_NEW_( btBoxShape, btBoxShape( btVector3( 0.5, 0.5, 0.5 ) ) );
-                btDefaultMotionState* motion = _DRAWSPACE_NEW_( btDefaultMotionState, btDefaultMotionState( /*m_myTransform*/ m_myTransform_mem ) );
-
-
-                btVector3 localInertia( 0, 0, 0 );
-
-                btScalar mass = 8.5;
-                shape->calculateLocalInertia( mass, localInertia );
-
-                btRigidBody::btRigidBodyConstructionInfo myBoxRigidBodyConstructionInfo( mass, motion, shape, localInertia );
-
-                btRigidBody* body = _DRAWSPACE_NEW_(  btRigidBody, btRigidBody( myBoxRigidBodyConstructionInfo ) );
-
-
-
-                m_myWorld->addRigidBody( body );
-
-                body->setActivationState( DISABLE_DEACTIVATION );
-
-                m_boxes[1].motion = motion;
-                m_boxes[1].body = body;
-
-                body->setAngularVelocity( m_angularspeed_mem );
-                body->setLinearVelocity( m_linearspeed_mem );
-
-
-            }
-            break;
-
-
-        case VK_F2:
-
-            m_boxes[1].motion->getWorldTransform( m_myTransform_mem );
-
-            m_linearspeed_mem = m_boxes[1].body->getLinearVelocity();
-            m_angularspeed_mem = m_boxes[1].body->getAngularVelocity();
-
-            break;
-
+ 
 
         case VK_F3:
             {
@@ -1101,14 +1058,7 @@ void dsAppClient::OnEndKeyPress( long p_key )
             }
             break;
 
-        case VK_F5:
-            {
-
-                m_boxes[1].body->setLinearVelocity( btVector3( 0.0, 0.0, 0.0 ) );
-                m_boxes[1].body->setAngularVelocity( btVector3( 0.0, 0.0, 0.0 ) );
-            }
-            break;
-
+    
     }
 
 }
