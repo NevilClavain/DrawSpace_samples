@@ -141,6 +141,7 @@ protected:
 
     DrawSpace::Utils::Vector                    m_player_view_pos;
     dsreal                                      m_player_view_linear_acc[3];
+    dsreal                                      m_player_view_linear_acc_2[3];
     dsreal                                      m_player_view_linear_speed[3];
 
     dsreal                                      m_player_view_linear_speed_clamp_up[3];

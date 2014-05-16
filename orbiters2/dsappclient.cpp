@@ -419,6 +419,7 @@ dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_spe
     m_w_title = "orbiters 2 test";
 
     m_player_view_linear_acc[0] = m_player_view_linear_acc[1] = m_player_view_linear_acc[2] = 0;
+    m_player_view_linear_acc_2[0] = m_player_view_linear_acc_2[1] = m_player_view_linear_acc_2[2] = 0;
     m_player_view_linear_speed[0] = m_player_view_linear_speed[1] = m_player_view_linear_speed[2] = 0;
 
     m_player_view_angular_acc[0] = m_player_view_angular_acc[1] = m_player_view_angular_acc[2] = 0;
@@ -466,6 +467,7 @@ void dsAppClient::compute_player_view_transform( void )
     /////////////////////////////////////////////////////
 
 
+    /*
     if( m_player_view_linear_acc[2] > 0.0 )
     {
         dsreal limit = ( m_player_view_linear_acc[2] / ( 8000.0 / SHIP_MASS ) );
@@ -507,6 +509,76 @@ void dsAppClient::compute_player_view_transform( void )
             m_player_view_linear_speed[2] = 0.0;
         }
     }
+    */
+
+    if( m_player_view_linear_acc[2] > 0.0 )
+    {
+        m_player_view_linear_speed_clamp_up[2] = 10.0;
+        m_player_view_linear_speed_clamp_down[2] = 0.0;
+
+        dsreal limit = ( m_player_view_linear_acc[2] / ( 8000.0 / SHIP_MASS ) );
+
+        if( m_player_view_pos[2] < limit )
+        {
+            m_player_view_linear_acc_2[2] = 5.0;
+        }
+        else
+        {
+            m_player_view_linear_acc_2[2] = -5.0;
+        }
+    }
+    else if( m_player_view_linear_acc[2] < 0.0 )
+    {
+        m_player_view_linear_speed_clamp_up[2] = 0.0;
+        m_player_view_linear_speed_clamp_down[2] = -10.0;
+
+        dsreal limit = ( m_player_view_linear_acc[2] / ( 8000.0 / SHIP_MASS ) );
+
+        if( m_player_view_pos[2] > limit )
+        {
+            m_player_view_linear_acc_2[2] = -5.0;
+        }
+        else
+        {
+            m_player_view_linear_acc_2[2] = 5.0;
+        }
+    }
+    else
+    {
+        if( m_player_view_pos[2] > 0.01 )
+        {
+            m_player_view_linear_speed_clamp_up[2] = 0.0;
+            m_player_view_linear_speed_clamp_down[2] = -10.0;
+
+            m_player_view_linear_acc_2[2] = -5.0;
+        }
+
+        else if( m_player_view_pos[2] < -0.01 )
+        {
+            m_player_view_linear_speed_clamp_up[2] = 10.0;
+            m_player_view_linear_speed_clamp_down[2] = 0.0;
+
+            m_player_view_linear_acc_2[2] = 5.0;
+        }
+        else
+        {
+            if( m_player_view_pos[2] > 0.0 )
+            {
+                m_player_view_linear_acc_2[2] = 5.0;
+
+                m_player_view_linear_speed_clamp_up[2] = 0.0;
+                m_player_view_linear_speed_clamp_down[2] = -10.0;
+            }
+            else if( m_player_view_pos[2] < 0.0 )
+            {
+                m_player_view_angular_acc_2[2] = -5.0;
+
+                m_player_view_linear_speed_clamp_up[2] = 10.0;
+                m_player_view_linear_speed_clamp_down[2] = 0.0;
+            }
+        }
+    }
+
 
     /////////////////////////////////////////////////////
 
@@ -514,6 +586,13 @@ void dsAppClient::compute_player_view_transform( void )
     dsreal zpos = m_player_view_pos[2];
     m_timer.TranslationSpeedInc( &zpos, m_player_view_linear_speed[2] );
     m_player_view_pos[2] = zpos;
+
+
+    dsreal curr_speed = m_player_view_linear_speed[2];
+    m_timer.TranslationSpeedInc( &curr_speed, m_player_view_linear_acc_2[2] );
+    m_player_view_linear_speed[2] = curr_speed;   
+    m_player_view_linear_speed[2] = DrawSpace::Utils::Maths::Clamp( m_player_view_linear_speed_clamp_down[2], m_player_view_linear_speed_clamp_up[2], m_player_view_linear_speed[2] );
+
 
 
     Matrix cam_delta_pos;
@@ -746,7 +825,7 @@ void dsAppClient::compute_player_view_transform( void )
 
 
 
-    dsreal curr_speed = m_player_view_angular_speed[0];
+    curr_speed = m_player_view_angular_speed[0];
     m_timer.TranslationSpeedInc( &curr_speed, m_player_view_angular_acc_2[0] );
     m_player_view_angular_speed[0] = curr_speed;
 
