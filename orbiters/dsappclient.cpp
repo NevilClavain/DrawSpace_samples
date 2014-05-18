@@ -303,7 +303,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_mars_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
     m_mars_centroid->SetOrbiter( m_mars );
 
-    m_mars_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 25.0, 0.999, 0.0, 9.0, 0.0, 0.0, 1.0, m_mars_centroid ) );
+    m_mars_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 8.0, 0.999, 0.0, /*9.0*/ 0.0, 0.0, 0.0, 1.0, 33.0, 0.0, m_mars_centroid ) );
 
     m_mars_orbit->RegisterChunk( build_orbit_drawable( "mars_orbit", m_mars_orbit ) );
 
@@ -316,7 +316,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_moon_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
     m_moon_centroid->SetOrbiter( m_moon );
 
-    m_moon_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 5.0, 0.45, 0.0, 10.0, 3.0, 0.0, 0.0001, m_moon_centroid ) );
+    m_moon_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 5.0, 0.45, 0.0, 10.0, 3.0, 0.0, 0.0001, 0.0, 0.0, m_moon_centroid ) );
 
     m_moon_orbit->RegisterChunk( build_orbit_drawable( "moon_orbit", m_moon_orbit ) );
 
@@ -332,7 +332,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_saturn_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
     m_saturn_centroid->SetOrbiter( m_saturn );
 
-    m_saturn_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 60.0, 0.9999, 8.0, 1.0, 0.0, 0.0, 20.0, m_saturn_centroid ) );
+    m_saturn_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 60.0, 0.9999, 8.0, 1.0, 0.0, 0.0, 20.0, 0.0, 1.0, m_saturn_centroid ) );
 
     m_saturn_orbit->RegisterChunk( build_orbit_drawable( "saturn_orbit", m_saturn_orbit ) );
 
@@ -479,6 +479,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_calendar->RegisterOrbit( m_mars_orbit );
     m_calendar->RegisterOrbit( m_moon_orbit );
+    m_calendar->RegisterOrbit( m_saturn_orbit );
 
 
 
@@ -570,12 +571,12 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F2:
 
-            m_calendar->SetTimeFactor( Calendar::MUL2_TIME );
+            m_calendar->SetTimeFactor( Calendar::SEC_1HOUR_TIME );
             break;
 
         case VK_F3:
 
-            m_calendar->SetTimeFactor( Calendar::SEC_1DAY_TIME );
+            m_calendar->SetTimeFactor( Calendar::SEC_30DAYS_TIME );
             break;
 
         case VK_F4:
