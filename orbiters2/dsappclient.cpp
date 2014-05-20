@@ -94,18 +94,18 @@ void MyPlanet::on_planet_event( int p_currentface )
 
             m_buildmeshe_inputs_mutex.WaitInfinite();
 
-            m_buildmeshe_patchmeshe = *( m_drawable->GetPatcheMeshe() );
+            m_buildmeshe_patchmeshe[0] = *( m_drawable->GetPatcheMeshe() );
 
-            m_buildmeshe_sidelength = curr_patch->GetSideLength() / m_ray;
+            m_buildmeshe_sidelength[0] = curr_patch->GetSideLength() / m_ray;
 
-            curr_patch->GetPos( m_buildmeshe_xpos, m_buildmeshe_ypos );
+            dsreal xpos, ypos;
+            curr_patch->GetPos( xpos, ypos );
 
-            m_buildmeshe_xpos = m_buildmeshe_xpos / m_ray;
-            m_buildmeshe_ypos = m_buildmeshe_ypos / m_ray;
+            m_buildmeshe_xpos[0] = xpos / m_ray;
+            m_buildmeshe_ypos[0] = ypos / m_ray;
 
-            m_buildmeshe_planetray = m_ray;
+            m_buildmeshe_patch_orientation[0] = curr_patch->GetOrientation();
 
-            m_buildmeshe_patch_orientation = curr_patch->GetOrientation();
 
 
             m_buildmeshe_inputs_mutex.Release();
@@ -257,6 +257,89 @@ void MyPlanet::Update( DrawSpace::Dynamics::InertBody* p_player_body )
     }
 }
 
+void MyPlanet::build_meshe( DrawSpace::Core::Meshe& p_patchmeshe, int p_patch_orientation, dsreal p_sidelength, dsreal p_xpos, dsreal p_ypos, DrawSpace::Core::Meshe& p_outmeshe )
+{
+    for( long i = 0; i < p_patchmeshe.GetVertexListSize(); i++ )
+    {                
+
+        Vertex v, v2, v3;
+        p_patchmeshe.GetVertex( i, v );
+
+        v.x = v.x * p_sidelength / 2.0;
+        v.y = v.y * p_sidelength / 2.0;
+        v.z = v.z * p_sidelength / 2.0;
+
+        v.x += p_xpos;
+        v.y += p_ypos;
+
+        switch( p_patch_orientation )
+        {
+            case Planet::Patch::FrontPlanetFace:
+
+                v2.x = v.x;
+                v2.y = v.y;
+                v2.z = 1.0;
+                break;
+
+            case Planet::Patch::RearPlanetFace:
+
+                v2.x = -v.x;
+                v2.y = v.y;
+                v2.z = -1.0;
+                break;
+
+            case Planet::Patch::LeftPlanetFace:
+
+                v2.x = -1.0;
+                v2.y = v.y;
+                v2.z = v.x;
+                break;
+
+            case Planet::Patch::RightPlanetFace:
+
+                v2.x = 1.0;
+                v2.y = v.y;
+                v2.z = -v.x;
+                break;
+
+            case Planet::Patch::TopPlanetFace:
+
+                v2.x = v.x;
+                v2.y = 1.0;
+                v2.z = -v.y;
+                break;
+
+            case Planet::Patch::BottomPlanetFace:
+
+                v2.x = v.x;
+                v2.y = -1.0;
+                v2.z = v.y;
+                break;
+        }
+
+        dsreal xtemp = v2.x;
+        dsreal ytemp = v2.y;
+        dsreal ztemp = v2.z;
+
+        v2.x = xtemp * sqrt( 1.0 - ytemp * ytemp * 0.5 - ztemp * ztemp * 0.5 + ytemp * ytemp * ztemp * ztemp / 3.0 );
+        v2.y = ytemp * sqrt( 1.0 - ztemp * ztemp * 0.5 - xtemp * xtemp * 0.5 + xtemp * xtemp * ztemp * ztemp / 3.0 );
+        v2.z = ztemp * sqrt( 1.0 - xtemp * xtemp * 0.5 - ytemp * ytemp * 0.5 + xtemp * xtemp * ytemp * ytemp / 3.0 );
+
+        v3.x = v2.x * m_ray;
+        v3.y = v2.y * m_ray;
+        v3.z = v2.z * m_ray;
+
+        p_outmeshe.AddVertex( v3 );
+    }
+
+    for( long i = 0; i < p_patchmeshe.GetTrianglesListSize(); i++ )
+    {
+        Triangle t;
+        p_patchmeshe.GetTriangles( i, t );
+        p_outmeshe.AddTriangle( t );
+    }
+}
+
 void MyPlanet::Run( void )
 {
     while( 1 )
@@ -265,117 +348,32 @@ void MyPlanet::Run( void )
 
         if( WAIT_OBJECT_0 == wait )
         {
-            dsreal sidelength;
-            dsreal xpos, ypos;
-            dsreal planetray;
-
 
             m_buildmeshe_inputs_mutex.WaitInfinite();
 
             //localy copy inputs
 
-            DrawSpace::Core::Meshe patchmeshe;
+            DrawSpace::Core::Meshe patchmeshe[9];
+            int patch_orientation[9];
+            dsreal sidelength[9];
+            dsreal xpos[9], ypos[9];
 
-            patchmeshe = m_buildmeshe_patchmeshe;
-            sidelength = m_buildmeshe_sidelength;
-            xpos = m_buildmeshe_xpos;
-            ypos = m_buildmeshe_ypos;
-            planetray = m_buildmeshe_planetray;
-
+            for( long i = 0; i < 9; i++ )
+            {
+                patchmeshe[i] = m_buildmeshe_patchmeshe[i];
+                sidelength[i] = m_buildmeshe_sidelength[i];
+                xpos[i] = m_buildmeshe_xpos[i];
+                ypos[i] = m_buildmeshe_ypos[i];
+                patch_orientation[i] = m_buildmeshe_patch_orientation[i];
+            }
             m_buildmeshe_inputs_mutex.Release();
 
 
             ////////////////////////////// do the work
 
-            /*
-            if( m_buildmeshe_collision_state )
-            {
-                m_orbiter->UnsetKinematic();
-            }
-            */
-
-
             Meshe final_meshe;
 
-            for( long i = 0; i < m_buildmeshe_patchmeshe.GetVertexListSize(); i++ )
-            {                
-
-                Vertex v, v2, v3;
-                m_buildmeshe_patchmeshe.GetVertex( i, v );
-
-                v.x = v.x * m_buildmeshe_sidelength / 2.0;
-                v.y = v.y * m_buildmeshe_sidelength / 2.0;
-                v.z = v.z * m_buildmeshe_sidelength / 2.0;
-
-                v.x += xpos;
-                v.y += ypos;
-
-                switch( m_buildmeshe_patch_orientation )
-                {
-                    case Planet::Patch::FrontPlanetFace:
-
-                        v2.x = v.x;
-                        v2.y = v.y;
-                        v2.z = 1.0;
-                        break;
-
-                    case Planet::Patch::RearPlanetFace:
-
-                        v2.x = -v.x;
-                        v2.y = v.y;
-                        v2.z = -1.0;
-                        break;
-
-                    case Planet::Patch::LeftPlanetFace:
-
-                        v2.x = -1.0;
-                        v2.y = v.y;
-                        v2.z = v.x;
-                        break;
-
-                    case Planet::Patch::RightPlanetFace:
-
-                        v2.x = 1.0;
-                        v2.y = v.y;
-                        v2.z = -v.x;
-                        break;
-
-                    case Planet::Patch::TopPlanetFace:
-
-                        v2.x = v.x;
-                        v2.y = 1.0;
-                        v2.z = -v.y;
-                        break;
-
-                    case Planet::Patch::BottomPlanetFace:
-
-                        v2.x = v.x;
-                        v2.y = -1.0;
-                        v2.z = v.y;
-                        break;
-                }
-
-                dsreal xtemp = v2.x;
-                dsreal ytemp = v2.y;
-                dsreal ztemp = v2.z;
-
-                v2.x = xtemp * sqrt( 1.0 - ytemp * ytemp * 0.5 - ztemp * ztemp * 0.5 + ytemp * ytemp * ztemp * ztemp / 3.0 );
-                v2.y = ytemp * sqrt( 1.0 - ztemp * ztemp * 0.5 - xtemp * xtemp * 0.5 + xtemp * xtemp * ztemp * ztemp / 3.0 );
-                v2.z = ztemp * sqrt( 1.0 - xtemp * xtemp * 0.5 - ytemp * ytemp * 0.5 + xtemp * xtemp * ytemp * ytemp / 3.0 );
-
-                v3.x = v2.x * m_ray;
-                v3.y = v2.y * m_ray;
-                v3.z = v2.z * m_ray;
-
-                final_meshe.AddVertex( v3 );
-            }
-
-            for( long i = 0; i < m_buildmeshe_patchmeshe.GetTrianglesListSize(); i++ )
-            {
-                Triangle t;
-                m_buildmeshe_patchmeshe.GetTriangles( i, t );
-                final_meshe.AddTriangle( t );
-            }
+            build_meshe( patchmeshe[0], patch_orientation[0], sidelength[0], xpos[0], ypos[0], final_meshe );
 
 
             Body::Parameters params;
@@ -1140,7 +1138,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
     m_centroid->SetOrbiter( m_planet->GetOrbiter() );
 
-    m_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 270000000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.333, m_centroid ) );
+    m_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 270000000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.333, 25.0, 1.0, m_centroid ) );
 
 
     //////////////////////////////////////////////////////////////

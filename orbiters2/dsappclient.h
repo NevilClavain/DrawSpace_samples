@@ -33,12 +33,11 @@ protected:
     HANDLE                                                  m_buildmeshe_request_event;
 
     DrawSpace::Utils::Mutex                                 m_buildmeshe_inputs_mutex;
-    DrawSpace::Core::Meshe                                  m_buildmeshe_patchmeshe;
 
-    dsreal                                                  m_buildmeshe_sidelength;
-    dsreal                                                  m_buildmeshe_xpos, m_buildmeshe_ypos;
-    dsreal                                                  m_buildmeshe_planetray;
-    int                                                     m_buildmeshe_patch_orientation;
+    DrawSpace::Core::Meshe                                  m_buildmeshe_patchmeshe[9];
+    dsreal                                                  m_buildmeshe_sidelength[9];
+    dsreal                                                  m_buildmeshe_xpos[9], m_buildmeshe_ypos[9];
+    int                                                     m_buildmeshe_patch_orientation[9];
 
     bool                                                    m_buildmeshe_collision_state;
 
@@ -47,6 +46,8 @@ protected:
 
 
     void on_planet_event( int p_currentface );
+
+    void build_meshe( DrawSpace::Core::Meshe& p_patchmeshe, int p_patch_orientation, dsreal p_sidelength, dsreal p_xpos, dsreal p_ypos, DrawSpace::Core::Meshe& p_outmeshe );
 
 public:
 
