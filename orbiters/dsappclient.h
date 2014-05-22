@@ -69,6 +69,8 @@ protected:
 
     DrawSpace::Dynamics::Calendar*              m_calendar;
 
+    DrawSpace::Chunk*                           m_chunk;
+
 
     DrawSpace::Dynamics::Orbiter*               build_planet( char* p_name, char* p_texture );
     DrawSpace::Chunk*                           build_orbit_drawable( char* p_name, DrawSpace::Dynamics::Orbit* p_orbit );

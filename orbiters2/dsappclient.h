@@ -63,6 +63,7 @@ public:
     dsreal GetAltitud( void );
 
     void AttachBody( DrawSpace::Dynamics::InertBody* p_body );
+    void DetachBody( DrawSpace::Dynamics::InertBody* p_body );
     
 
 

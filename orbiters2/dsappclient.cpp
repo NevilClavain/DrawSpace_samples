@@ -159,6 +159,20 @@ void MyPlanet::AttachBody( DrawSpace::Dynamics::InertBody* p_body )
     m_attached_bodies.push_back( p_body );
 }
 
+void MyPlanet::DetachBody( DrawSpace::Dynamics::InertBody* p_body )
+{
+    p_body->Detach();
+
+    for( std::vector<DrawSpace::Dynamics::InertBody*>::iterator it = m_attached_bodies.begin(); it != m_attached_bodies.end(); ++it )
+    {
+        if( (*it) == p_body )
+        {
+            m_attached_bodies.erase( it );
+            break;
+        }
+    }
+}
+
 void MyPlanet::ApplyGravity( void )
 {
     for( size_t i = 0; i < m_attached_bodies.size(); i++ )
@@ -187,39 +201,51 @@ void MyPlanet::Update( DrawSpace::Dynamics::InertBody* p_player_body )
 {
     if( m_player_relative )
     {
-        if( m_suspend_update && WAIT_OBJECT_0 == WaitForSingleObject( m_buildmeshe_done_event, 0 ) )
+        DrawSpace::Utils::Matrix playerbodypos;
+        p_player_body->GetLastLocalWorldTrans( playerbodypos );
+
+        DrawSpace::Utils::Vector playerbodypos2;
+        playerbodypos2[0] = playerbodypos( 3, 0 );
+        playerbodypos2[1] = playerbodypos( 3, 1 );
+        playerbodypos2[2] = playerbodypos( 3, 2 );
+
+        dsreal rel_alt = ( playerbodypos2.Length() / m_ray );
+
+        if( rel_alt >= 2.5 )
         {
-            // bullet meshe build done
-
-            /*
-            if( m_collision_state )
-            {
-                m_orbiter->RemoveFromWorld();
-            }
-            */
-
-            m_orbiter->AddToWorld();
-
-            ResetEvent( m_buildmeshe_done_event );
-            m_collision_state = true;
-
-            m_suspend_update = false;
+            DetachBody( p_player_body );
+            m_player_relative = false;
+            m_player_body = NULL;
         }
         else
-        {   
+        {
+            if( m_suspend_update && WAIT_OBJECT_0 == WaitForSingleObject( m_buildmeshe_done_event, 0 ) )
+            {
+                // bullet meshe build done
 
-            DrawSpace::Utils::Matrix camera_pos;
+                m_orbiter->AddToWorld();
 
-            m_player_body->GetLastLocalWorldTrans( camera_pos );
+                ResetEvent( m_buildmeshe_done_event );
+                m_collision_state = true;
 
-            DrawSpace::Utils::Vector hotpoint;
+                m_suspend_update = false;
+            }
+            else
+            {   
 
-            hotpoint[0] = camera_pos( 3, 0 );
-            hotpoint[1] = camera_pos( 3, 1 );
-            hotpoint[2] = camera_pos( 3, 2 );
+                DrawSpace::Utils::Matrix camera_pos;
 
-            m_drawable->UpdateHotPoint( hotpoint );
-            m_drawable->Compute();
+                m_player_body->GetLastLocalWorldTrans( camera_pos );
+
+                DrawSpace::Utils::Vector hotpoint;
+
+                hotpoint[0] = camera_pos( 3, 0 );
+                hotpoint[1] = camera_pos( 3, 1 );
+                hotpoint[2] = camera_pos( 3, 2 );
+
+                m_drawable->UpdateHotPoint( hotpoint );
+                m_drawable->Compute();
+            }
         }
     }
     else

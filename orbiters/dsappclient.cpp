@@ -384,10 +384,12 @@ bool dsAppClient::OnIdleAppInit( void )
     cube_params.mass = 50.0;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
-    cube_params.initial_pos = DrawSpace::Utils::Vector( -5.0, 0.0, -100.0, 1.0 );
+    cube_params.initial_pos = DrawSpace::Utils::Vector( 5.0, 0.0, -10.0, 1.0 );
     cube_params.initial_rot.Identity();
 
     m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, chunk, cube_params ) );
+
+    m_chunk = chunk;
 
 
 
@@ -461,6 +463,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
     m_scenegraph.RegisterNode( m_camera );
+
+    m_chunk->AddChild( m_camera );
 
     //m_moon->GetDrawable()->AddChild( m_camera );
 
@@ -586,6 +590,12 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F5:
 
+            m_cube_body->Attach( m_mars );
+            break;
+
+        case VK_F6:
+
+            m_cube_body->Detach();
             break;
     }
 }
