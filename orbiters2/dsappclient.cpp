@@ -41,18 +41,21 @@ m_suspend_update( false )
 
     m_task = _DRAWSPACE_NEW_( Task<MyPlanet>, Task<MyPlanet> );
 
+    dsstring reqevtname = p_name + dsstring( "_ReqBuildMesheEvent" );
+    dsstring doneevtname = p_name + dsstring( "_DoneBuildMesheEvent" );
+
     m_buildmeshe_request_event = CreateEvent( 
         NULL,               // default security attributes
         TRUE,               // manual-reset event
         FALSE,              // initial state is nonsignaled
-        "ReqBuildMesheEvent"  // object name
+        reqevtname.c_str() // object name
         );
 
     m_buildmeshe_done_event = CreateEvent( 
         NULL,               // default security attributes
         TRUE,               // manual-reset event
         FALSE,              // initial state is nonsignaled
-        "DoneBuildMesheEvent"  // object name
+        doneevtname.c_str()  // object name
         );
 
     m_task->Startup( this );
@@ -152,6 +155,11 @@ DrawSpace::Dynamics::World* MyPlanet::GetWorld( void )
     return &m_world;
 }
 
+void MyPlanet::GetName( dsstring& p_name )
+{
+    p_name = m_name;
+}
+
 void MyPlanet::AttachBody( DrawSpace::Dynamics::InertBody* p_body )
 {
     p_body->Attach( m_orbiter );
@@ -216,6 +224,8 @@ void MyPlanet::Update( DrawSpace::Dynamics::InertBody* p_player_body )
             DetachBody( p_player_body );
             m_player_relative = false;
             m_player_body = NULL;
+
+            dsAppClient::GetInstance()->SetRelativePlanet( NULL );
         }
         else
         {
@@ -279,6 +289,8 @@ void MyPlanet::Update( DrawSpace::Dynamics::InertBody* p_player_body )
             m_player_relative = true;
             m_suspend_update = false;
             m_player_body = p_player_body;
+
+            dsAppClient::GetInstance()->SetRelativePlanet( this );
         }
     }
 }
@@ -383,7 +395,8 @@ void MyPlanet::Run( void )
             int patch_orientation[9];
             dsreal sidelength[9];
             dsreal xpos[9], ypos[9];
-
+            
+            /*
             for( long i = 0; i < 9; i++ )
             {
                 patchmeshe[i] = m_buildmeshe_patchmeshe[i];
@@ -392,6 +405,15 @@ void MyPlanet::Run( void )
                 ypos[i] = m_buildmeshe_ypos[i];
                 patch_orientation[i] = m_buildmeshe_patch_orientation[i];
             }
+            */
+
+            patchmeshe[0] = m_buildmeshe_patchmeshe[0];
+            sidelength[0] = m_buildmeshe_sidelength[0];
+            xpos[0] = m_buildmeshe_xpos[0];
+            ypos[0] = m_buildmeshe_ypos[0];
+            patch_orientation[0] = m_buildmeshe_patch_orientation[0];
+
+
             m_buildmeshe_inputs_mutex.Release();
 
 
@@ -437,7 +459,12 @@ bool MyPlanet::IsPlayerRelative( void )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 )
+dsAppClient::dsAppClient( void ) : 
+m_mouselb( false ), 
+m_mouserb( false ), 
+m_speed( 0.0 ), 
+m_speed_speed( 5.0 ),
+m_relative_planet( NULL )
 {    
     _INIT_LOGGER( "orbiters2.conf" )  
     m_w_title = "orbiters 2 test";
@@ -926,6 +953,7 @@ void dsAppClient::OnRenderFrame( void )
 
 
     m_planet->ApplyGravity();
+    m_moon->ApplyGravity();
 
     m_ship->Update();
 
@@ -936,6 +964,7 @@ void dsAppClient::OnRenderFrame( void )
 
 
     m_planet->Update( m_ship );
+    m_moon->Update( m_ship );
 
 
 
@@ -951,8 +980,7 @@ void dsAppClient::OnRenderFrame( void )
     m_calendar->GetFormatedDate( date );    
     renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
 
-    dsreal alt = m_planet->GetAltitud();
-    renderer->DrawText( 0, 255, 0, 10, 75, "collision state %d altitud = %f", m_planet->GetCollisionState(), alt );
+    
 
 
     dsreal speed = m_ship->GetLinearSpeedMagnitude();
@@ -960,6 +988,16 @@ void dsAppClient::OnRenderFrame( void )
     renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h ( %.1f m/s) - aspeed = %.1f", speed * 3.6, speed, m_ship->GetAngularSpeedMagnitude() );
 
     renderer->DrawText( 0, 255, 0, 10, 115, "contact = %d", m_ship->GetContactState() );
+
+    if( m_relative_planet )
+    {
+        
+
+        dsstring planet_name;
+        m_relative_planet->GetName( planet_name );
+        renderer->DrawText( 0, 255, 0, 10, 135, "relative to : %s altitud = %f", planet_name.c_str(), m_relative_planet->GetAltitud() );
+        renderer->DrawText( 0, 255, 0, 10, 155, "collision state %d", m_relative_planet->GetCollisionState() );
+    }
 
     Vector tf, tt;
     Vector tf2, tt2;
@@ -973,8 +1011,8 @@ void dsAppClient::OnRenderFrame( void )
     m_ship->GetTotalForce( tf );
     m_ship->GetTotalTorque( tt );
 
-
-    if( m_planet->IsPlayerRelative() )
+    
+    if( m_relative_planet )
     {
         // remove gravity effect
 
@@ -996,52 +1034,7 @@ void dsAppClient::OnRenderFrame( void )
     m_player_view_angular_acc[0] = -tt2[0];
 
 
-/*
-    if( tt2[2] > 0.0 )
-    {
-        m_player_view_angular_acc[2] = -1.0;
-    }
-    else if( tt2[2] < 0.0 )
-    {
-        m_player_view_angular_acc[2] = 1.0;
-    }
-    else
-    {
-        m_player_view_angular_acc[2] = 0.0;
-    }
 
-
-    if( tt2[1] > 0.0 )
-    {
-        m_player_view_angular_acc[1] = -1.0;
-    }
-    else if( tt2[1] < 0.0 )
-    {
-        m_player_view_angular_acc[1] = 1.0;
-    }
-    else
-    {
-        m_player_view_angular_acc[1] = 0.0;
-    }
-
-
-    if( tt2[0] > 0.0 )
-    {
-        m_player_view_angular_acc[0] = -1.0;
-    }
-    else if( tt2[0] < 0.0 )
-    {
-        m_player_view_angular_acc[0] = 1.0;
-    }
-    else
-    {
-        m_player_view_angular_acc[0] = 0.0;
-    }
-*/
-
-    renderer->DrawText( 0, 255, 0, 10, 135, "force/torque = %f %f %f / %f %f %f", tf2[0], tf2[1], tf2[2], tt2[0], tt2[1], tt2[2] );
-
-    
 
 
 
@@ -1169,6 +1162,30 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
+    m_moon = _DRAWSPACE_NEW_( MyPlanet, MyPlanet( "moon" ) );
+
+
+    m_moon->GetDrawable()->RegisterPassSlot( "texture_pass" );
+
+    for( long i = 0; i < 6; i++ )
+    {
+        m_moon->GetDrawable()->SetNodeFromPassSpecificFx( "texture_pass", i, "main_fx" );
+    }
+    m_scenegraph.RegisterNode( m_moon->GetDrawable() );
+
+    m_moon->GetDrawable()->Initialize();
+
+    m_centroid2 = _DRAWSPACE_NEW_( Centroid, Centroid );
+    m_centroid2->SetOrbiter( m_moon->GetOrbiter() );
+
+    m_orbit2 = _DRAWSPACE_NEW_( Orbit, Orbit( 20000000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.002, 0.0, 1.0, m_centroid2 ) );
+
+    m_centroid->RegisterSubOrbit( m_orbit2 );
+
+
+
+    //////////////////////////////////////////////////////////////
+
 
     m_ship_drawable = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
@@ -1241,8 +1258,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_calendar->RegisterWorld( &m_world );
     m_calendar->RegisterWorld( m_planet->GetWorld() );
+    m_calendar->RegisterWorld( m_moon->GetWorld() );
 
     m_calendar->RegisterOrbit( m_orbit );
+    m_calendar->RegisterOrbit( m_orbit2 );
+
     //m_calendar->Startup( 162682566 );
 
     m_calendar->Startup( 0 );
@@ -1484,9 +1504,6 @@ void dsAppClient::OnKeyPulse( long p_key )
             break;
 
         case VK_F9:
-
-            //m_player_relative = true;
-            //m_planet->AttachBody( m_ship );
             break;
 
         case VK_F10:
@@ -1543,4 +1560,9 @@ DrawSpace::Dynamics::Rocket* dsAppClient::GetPlayerShip( void )
 void dsAppClient::SetLastPlayerShipGravity( const DrawSpace::Utils::Vector& p_gravity )
 {
     m_player_ship_gravity = p_gravity;
+}
+
+void dsAppClient::SetRelativePlanet( MyPlanet* p_planet )
+{
+    m_relative_planet = p_planet;
 }

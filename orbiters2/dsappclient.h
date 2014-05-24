@@ -77,6 +77,8 @@ public:
 
     bool IsPlayerRelative( void );
 
+    void GetName( dsstring& p_name );
+
 };
 
 
@@ -128,6 +130,15 @@ protected:
     DrawSpace::Dynamics::Orbit*                 m_orbit;
     DrawSpace::Dynamics::Centroid*              m_centroid;
 
+
+    MyPlanet*                                   m_moon;
+
+
+
+    DrawSpace::Dynamics::Orbit*                 m_orbit2;
+    DrawSpace::Dynamics::Centroid*              m_centroid2;
+
+
     DrawSpace::Dynamics::Rocket*                m_ship;
     
 
@@ -162,7 +173,10 @@ protected:
 
     dsreal                                      m_player_view_angular_speed[3];
 
-    
+    ////////////////////////////////////////////////////////////
+
+    MyPlanet*                                   m_relative_planet;
+
 
     dsAppClient( void );
 
@@ -200,6 +214,8 @@ public:
 
     virtual DrawSpace::Dynamics::Rocket* GetPlayerShip( void );
     virtual void SetLastPlayerShipGravity( const DrawSpace::Utils::Vector& p_gravity );
+
+    virtual void SetRelativePlanet( MyPlanet* p_planet );
 };
 
 #endif
