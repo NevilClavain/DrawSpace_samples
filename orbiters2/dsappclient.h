@@ -51,7 +51,7 @@ protected:
 
 public:
 
-    MyPlanet( const dsstring& p_name );
+    MyPlanet( const dsstring& p_name, dsreal p_ray );
     ~MyPlanet( void );
 
     DrawSpace::Planet::Body* GetDrawable( void );

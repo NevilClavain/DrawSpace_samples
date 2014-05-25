@@ -19,9 +19,9 @@ _DECLARE_DS_LOGGER( logger, "AppClient" )
 #define SHIP_MASS 5.0
 
 
-MyPlanet::MyPlanet( const dsstring& p_name ) : 
+MyPlanet::MyPlanet( const dsstring& p_name, dsreal p_ray ) : 
 m_name( p_name ),
-m_ray( /*12000000.0*/ 600000.0 ),
+m_ray( /*12000000.0*/ /*600000.0*/ p_ray * 1000.0 ),
 m_collision_state( false ),
 m_buildmeshe_collision_state( false ),
 m_player_relative( false ),
@@ -219,7 +219,7 @@ void MyPlanet::Update( DrawSpace::Dynamics::InertBody* p_player_body )
 
         dsreal rel_alt = ( playerbodypos2.Length() / m_ray );
 
-        if( rel_alt >= 2.5 )
+        if( rel_alt >= 1.2 )
         {
             DetachBody( p_player_body );
             m_player_relative = false;
@@ -283,7 +283,7 @@ void MyPlanet::Update( DrawSpace::Dynamics::InertBody* p_player_body )
         delta[2] = planetbodypos2[2] - playerbodypos2[2];
         delta[3] = 1.0;
 
-        if( ( delta.Length() / m_ray ) < 2.0 )
+        if( ( delta.Length() / m_ray ) < 1.1 )
         {
             AttachBody( p_player_body );
             m_player_relative = true;
@@ -1139,7 +1139,7 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
 
-    m_planet = _DRAWSPACE_NEW_( MyPlanet, MyPlanet( "planet01" ) );
+    m_planet = _DRAWSPACE_NEW_( MyPlanet, MyPlanet( "planet01", 400.0 ) );
 
 
     m_planet->GetDrawable()->RegisterPassSlot( "texture_pass" );
@@ -1162,7 +1162,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    m_moon = _DRAWSPACE_NEW_( MyPlanet, MyPlanet( "moon" ) );
+    m_moon = _DRAWSPACE_NEW_( MyPlanet, MyPlanet( "moon", 300.0 ) );
 
 
     m_moon->GetDrawable()->RegisterPassSlot( "texture_pass" );
