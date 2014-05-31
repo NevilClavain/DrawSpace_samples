@@ -31,16 +31,14 @@ protected:
     DrawSpace::Interface::FontImport*           m_font_import;
     DrawSpace::Core::Font*                      m_font;
 
-    DrawSpace::Camera*                          m_camera;
+    DrawSpace::Dynamics::CameraPoint*           m_camera;
     DrawSpace::Core::FPSMovement                m_fpsmove;
-    DrawSpace::Camera*                          m_camera2;
+    //DrawSpace::Camera*                          m_camera2;
 
-    //DrawSpace::Interface::Drawable*             m_spacebox;
+
     DrawSpace::Spacebox*                        m_spacebox;
 
     DrawSpace::Interface::MesheImport*          m_meshe_import;
-    //DrawSpace::Interface::Drawable*             m_ground;
-    //DrawSpace::Interface::Drawable*             m_box;
 
     DrawSpace::Chunk*                           m_ground;
 

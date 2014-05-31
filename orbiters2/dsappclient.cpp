@@ -932,7 +932,7 @@ void dsAppClient::compute_player_view_transform( void )
 
 void dsAppClient::OnRenderFrame( void )
 {
-    m_freemove.Compute( m_timer );
+    
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
@@ -960,7 +960,7 @@ void dsAppClient::OnRenderFrame( void )
 
 
            
-    m_scenegraph.ComputeTransformations();
+    m_scenegraph.ComputeTransformations( m_timer );
 
 
     m_planet->Update( m_ship );
@@ -1227,28 +1227,24 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, m_ship_drawable, cube_params ) );
 
 
-
-
-
     //////////////////////////////////////////////////////////////
 
-    m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
+
+    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera" ) );
     m_scenegraph.RegisterNode( m_camera );
 
-    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera2" ) );
+    
+    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", m_ship ) );
     m_scenegraph.RegisterNode( m_camera2 );
 
-    m_ship_drawable->AddChild( m_camera2 );
-
-
-    //m_scenegraph.SetCurrentCamera( "camera" );
-    m_scenegraph.SetCurrentCamera( "camera2" );
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     
-    m_freemove.SetTransformNode( m_camera );
     m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 ) );
+
+
+    m_camera->RegisterMovement( &m_freemove );
 
 
     m_mouse_circularmode = true;
@@ -1262,6 +1258,14 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_calendar->RegisterOrbit( m_orbit );
     m_calendar->RegisterOrbit( m_orbit2 );
+
+
+
+    //m_scenegraph.SetCurrentCamera( "camera" );
+    m_scenegraph.SetCurrentCamera( "camera2" );
+
+
+
 
     //m_calendar->Startup( 162682566 );
 

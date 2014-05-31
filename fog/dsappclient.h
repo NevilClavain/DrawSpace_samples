@@ -26,7 +26,10 @@ protected:
     bool                                        m_mouselb;
     bool                                        m_mouserb;
 
-    DrawSpace::Camera*                          m_camera;
+    //DrawSpace::Camera*                          m_camera;
+
+    DrawSpace::Dynamics::CameraPoint*           m_camera;
+
     DrawSpace::Core::FPSMovement                m_fpsmove;
 
     DrawSpace::Interface::MesheImport*          m_meshe_import;

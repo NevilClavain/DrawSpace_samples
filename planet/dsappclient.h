@@ -36,7 +36,8 @@ protected:
     DrawSpace::Interface::FontImport*           m_font_import;
     DrawSpace::Core::Font*                      m_font;
 
-    DrawSpace::Camera*                          m_camera;
+    //DrawSpace::Camera*                          m_camera;
+    DrawSpace::Dynamics::CameraPoint*           m_camera;
     DrawSpace::Core::FPSMovement                m_fpsmove;
     DrawSpace::Core::FreeMovement               m_freemove;
     

@@ -25,14 +25,14 @@ dsAppClient::~dsAppClient( void )
 void dsAppClient::OnRenderFrame( void )
 {
 
-    m_fpsmove.Compute( m_timer, true );
+    //m_fpsmove.Compute( m_timer, true );
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
     m_cube_body->Update();
     m_ground_body->Update();
 
-    m_scenegraph.ComputeTransformations();    
+    m_scenegraph.ComputeTransformations( m_timer );    
 
     m_texturepass->GetRenderingQueue()->Draw();
     m_fogintpass->GetRenderingQueue()->Draw();
@@ -238,14 +238,21 @@ bool dsAppClient::OnIdleAppInit( void )
     ///////////////////////////////////////////////////////////////
 
 
-    m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
+    //m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
+    //m_scenegraph.RegisterNode( m_camera );
+
+    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera" ) );
     m_scenegraph.RegisterNode( m_camera );
 
     m_scenegraph.SetCurrentCamera( "camera" );
 
-    m_fpsmove.SetTransformNode( m_camera );
+    //m_fpsmove.SetTransformNode( m_camera );
 
     m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 1.0, 10.0, 1.0 ) );
+
+    m_camera->RegisterMovement( &m_fpsmove );
+
+    
 
 
 

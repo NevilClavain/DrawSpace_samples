@@ -59,8 +59,6 @@ dsAppClient::~dsAppClient( void )
 void dsAppClient::OnRenderFrame( void )
 {
 
-    m_fpsmove.Compute( m_timer, true );
-
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
 
@@ -236,7 +234,7 @@ void dsAppClient::OnRenderFrame( void )
 
 
  
-    m_scenegraph.ComputeTransformations();    
+    m_scenegraph.ComputeTransformations( m_timer );    
 
     static long last_fps;
 
@@ -566,20 +564,24 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
+    //m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
+
+    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera" ) );
     m_scenegraph.RegisterNode( m_camera );
 
     
 
-    m_fpsmove.SetTransformNode( m_camera );
+    
     m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 0.75, 12.0, 1.0 ) );
+
+    m_camera->RegisterMovement( &m_fpsmove );
 
     m_mouse_circularmode = true;
 
-
+/*
     m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera2" ) );
     m_scenegraph.RegisterNode( m_camera2 );
-
+*/
 
     //m_box->AddChild( m_camera2 );
 

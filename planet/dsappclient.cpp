@@ -53,7 +53,7 @@ void dsAppClient::OnRenderFrame( void )
     
 
  
-    m_scenegraph.ComputeTransformations();
+    m_scenegraph.ComputeTransformations( m_timer );
 
 
     DrawSpace::Utils::Matrix camera_pos;
@@ -251,7 +251,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
+    //m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
+
+    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera" ) );
     m_scenegraph.RegisterNode( m_camera );
 
     m_scenegraph.SetCurrentCamera( "camera" );
@@ -259,8 +261,10 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_wireframepass->GetRenderingQueue()->UpdateOutputQueue();
     
-    m_freemove.SetTransformNode( m_camera );
+    //m_freemove.SetTransformNode( m_camera );
     m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, /*20000000.0*/ 40000.0, 1.0 ) );
+
+    m_camera->RegisterMovement( &m_freemove );
 
 
     m_mouse_circularmode = true;
