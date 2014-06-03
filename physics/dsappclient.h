@@ -33,7 +33,9 @@ protected:
 
     DrawSpace::Dynamics::CameraPoint*           m_camera;
     DrawSpace::Core::FPSMovement                m_fpsmove;
-    //DrawSpace::Camera*                          m_camera2;
+
+    DrawSpace::Dynamics::CameraPoint*           m_camera_2;
+    
 
 
     DrawSpace::Spacebox*                        m_spacebox;

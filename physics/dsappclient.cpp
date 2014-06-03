@@ -30,7 +30,12 @@ dsAppClient::~dsAppClient( void )
 void dsAppClient::OnRenderFrame( void )
 {
 
-    
+    Matrix cam2_pos;
+    cam2_pos.Translation( 1.0, 2.7, 6.0 );
+
+    m_camera_2->SetLocalTransform( cam2_pos );
+
+
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
@@ -82,6 +87,14 @@ void dsAppClient::OnRenderFrame( void )
     renderer->DrawText( 255, 0, 0, 30, 50, "%d %d", m_texturepass->GetRenderingQueue()->GetSwitchesCost(), m_texturepass->GetRenderingQueue()->GetTheoricalSwitchesCost() );
 
     renderer->DrawText( 0, 255, 0, 10, 85, "%s", date.c_str() );
+
+
+    Vector v1;
+    m_camera_2->GetLockedBodyCenter( v1 );
+
+    renderer->DrawText( 0, 255, 0, 10, 105, "%f %f %f", v1[0], v1[1], v1[2] );
+
+
 
 
     renderer->FlipScreen();
@@ -323,7 +336,10 @@ bool dsAppClient::OnIdleAppInit( void )
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera" ) );
     m_scenegraph.RegisterNode( m_camera );
 
-    
+
+    m_camera_2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2" ) );
+    m_scenegraph.RegisterNode( m_camera_2 );
+
 
     
     m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 0.75, 12.0, 1.0 ) );
@@ -331,13 +347,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_mouse_circularmode = true;
 
 
-    /*
-    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera2" ) );
-    m_scenegraph.RegisterNode( m_camera2 );
-    */
 
-
-    m_scenegraph.SetCurrentCamera( "camera" );
+    //m_scenegraph.SetCurrentCamera( "camera" );
+    m_scenegraph.SetCurrentCamera( "camera2" );
 
     m_camera->RegisterMovement( &m_fpsmove );
 
@@ -372,6 +384,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_calendar->Startup( 162682566 );
+
+
+    m_camera_2->LockOnBody( m_boxes[0].inert_body );
    
 
     return true;

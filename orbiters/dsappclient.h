@@ -32,6 +32,7 @@ protected:
     DrawSpace::Core::Font*                      m_font;
 
     DrawSpace::Dynamics::CameraPoint*           m_camera;
+    DrawSpace::Dynamics::CameraPoint*           m_camera2;
     DrawSpace::Core::FPSMovement                m_fpsmove;
     DrawSpace::Core::FreeMovement               m_freemove;
     

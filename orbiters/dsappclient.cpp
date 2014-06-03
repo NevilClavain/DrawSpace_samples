@@ -111,7 +111,10 @@ Chunk* dsAppClient::build_orbit_drawable( char* p_name, Orbit* p_orbit )
 
 void dsAppClient::OnRenderFrame( void )
 {
-    
+    Matrix cam2_pos;
+    cam2_pos.Translation( 0.0, 1.0, 0.0 );
+
+    m_camera2->SetLocalTransform( cam2_pos );
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
@@ -461,15 +464,19 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", m_cube_body ) );
+    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", NULL ) );
     m_scenegraph.RegisterNode( m_camera );
 
-    //m_chunk->AddChild( m_camera );
+
+    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", m_cube_body ) );
+    m_scenegraph.RegisterNode( m_camera2 );
+
     
-    
+    m_camera2->LockOnBody( m_saturn );
 
 
-    m_scenegraph.SetCurrentCamera( "camera" );
+    //m_scenegraph.SetCurrentCamera( "camera" );
+    m_scenegraph.SetCurrentCamera( "camera2" );
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
