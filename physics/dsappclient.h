@@ -35,6 +35,8 @@ protected:
     DrawSpace::Core::FPSMovement                m_fpsmove;
 
     DrawSpace::Dynamics::CameraPoint*           m_camera_2;
+    DrawSpace::Core::LinearMovement*            m_linear_mvt;
+    DrawSpace::Core::CircularMovement*          m_circular_mvt;
     
 
 

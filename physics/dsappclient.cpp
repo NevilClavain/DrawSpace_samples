@@ -30,12 +30,22 @@ dsAppClient::~dsAppClient( void )
 void dsAppClient::OnRenderFrame( void )
 {
 
+    /*
     Matrix cam2_pos;
-    cam2_pos.Translation( 1.0, 2.7, 6.0 );
+    cam2_pos.Translation( 1.0, 4.7, 6.0 );
 
     m_camera_2->SetLocalTransform( cam2_pos );
+    */
+    
 
-
+    if( m_linear_mvt->GetTranslationLength() < 1.0 )
+    {
+        m_linear_mvt->SetSpeed( 2.5 );
+    }
+    else if( m_linear_mvt->GetTranslationLength() > 18.0 )
+    {
+        m_linear_mvt->SetSpeed( -2.5 );
+    }
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
@@ -386,7 +396,21 @@ bool dsAppClient::OnIdleAppInit( void )
     m_calendar->Startup( 162682566 );
 
 
-    m_camera_2->LockOnBody( m_boxes[0].inert_body );
+    //m_camera_2->LockOnBody( m_boxes[0].inert_body );
+
+    m_linear_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LinearMovement, DrawSpace::Core::LinearMovement );
+    m_linear_mvt->Init( Vector( -5.0, 2.7, 9.0, 1.0 ), Vector( 0.0, 0.0, -1.0, 1.0 ), /*-90.0*/ 0.0, 0.0 );
+
+
+    m_circular_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
+    m_circular_mvt->Init( Vector( 0.0, 0.5, 0.0, 1.0 ), 10.0, Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
+
+    //m_camera_2->RegisterMovement( m_linear_mvt );
+
+    m_camera_2->RegisterMovement( m_circular_mvt );
+
+    m_circular_mvt->SetAngularSpeed( 10.0 );
+
    
 
     return true;
