@@ -29,20 +29,31 @@ protected:
 
     DrawSpace::Core::Task<MyPlanet>*                        m_task;
 
-    //////// bullet patch build thread
-    HANDLE                                                  m_buildmeshe_request_event;
+    DrawSpace::Core::Mediator*                              m_mediator;
 
+    DrawSpace::Core::Mediator::Event*                       m_buildmeshe_event;
+
+    DrawSpace::Utils::Mutex                                 m_meshe_ready_mutex;
+    bool                                                    m_meshe_ready;
+
+
+
+    //////// bullet patch build thread
+    
+    //HANDLE                                                  m_buildmeshe_request_event;
+/*
     DrawSpace::Utils::Mutex                                 m_buildmeshe_inputs_mutex;
 
     DrawSpace::Core::Meshe                                  m_buildmeshe_patchmeshe[9];
     dsreal                                                  m_buildmeshe_sidelength[9];
     dsreal                                                  m_buildmeshe_xpos[9], m_buildmeshe_ypos[9];
     int                                                     m_buildmeshe_patch_orientation[9];
+*/
+   
+    //HANDLE                                                  m_buildmeshe_done_event; 
+    
 
-    bool                                                    m_buildmeshe_collision_state;
 
-
-    HANDLE                                                  m_buildmeshe_done_event; 
 
 
     void on_planet_event( int p_currentface );

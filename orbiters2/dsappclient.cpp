@@ -23,11 +23,12 @@ MyPlanet::MyPlanet( const dsstring& p_name, dsreal p_ray ) :
 m_name( p_name ),
 m_ray( /*12000000.0*/ /*600000.0*/ p_ray * 1000.0 ),
 m_collision_state( false ),
-m_buildmeshe_collision_state( false ),
 m_player_relative( false ),
 m_player_body( NULL ),
 m_suspend_update( false )
 {
+    m_mediator = Mediator::GetInstance();
+
     m_world.Initialize();
 
     m_drawable = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
@@ -44,6 +45,7 @@ m_suspend_update( false )
     dsstring reqevtname = p_name + dsstring( "_ReqBuildMesheEvent" );
     dsstring doneevtname = p_name + dsstring( "_DoneBuildMesheEvent" );
 
+    /*
     m_buildmeshe_request_event = CreateEvent( 
         NULL,               // default security attributes
         TRUE,               // manual-reset event
@@ -57,6 +59,18 @@ m_suspend_update( false )
         FALSE,              // initial state is nonsignaled
         doneevtname.c_str()  // object name
         );
+    */
+
+
+    m_buildmeshe_event = m_mediator->CreateEvent( reqevtname );
+    
+    m_buildmeshe_event->args->AddProp<Meshe*>( "patchmeshe" );
+    m_buildmeshe_event->args->AddProp<dsreal>( "sidelength" );
+    m_buildmeshe_event->args->AddProp<dsreal>( "xpos" );
+    m_buildmeshe_event->args->AddProp<dsreal>( "ypos" );
+    m_buildmeshe_event->args->AddProp<int>( "orientation" );
+
+
 
     m_task->Startup( this );
 }
@@ -95,6 +109,8 @@ void MyPlanet::on_planet_event( int p_currentface )
         {
             Planet::Patch* curr_patch = m_drawable->GetFaceCurrentLeaf( p_currentface );
 
+
+            /*
             m_buildmeshe_inputs_mutex.WaitInfinite();
 
             m_buildmeshe_patchmeshe[0] = *( m_drawable->GetPatcheMeshe() );
@@ -126,6 +142,34 @@ void MyPlanet::on_planet_event( int p_currentface )
             
 
             SetEvent( m_buildmeshe_request_event );
+            */
+
+            dsreal xpos, ypos;
+            curr_patch->GetPos( xpos, ypos );
+
+
+            if( m_collision_state )
+            {
+                m_orbiter->RemoveFromWorld();
+                m_orbiter->UnsetKinematic();
+            }
+
+            m_suspend_update = true;
+
+            m_meshe_ready_mutex.WaitInfinite();
+            m_meshe_ready = false;
+            m_meshe_ready_mutex.Release();
+
+
+
+
+            m_buildmeshe_event->args->SetPropValue<Meshe*>( "patchmeshe", m_drawable->GetPatcheMeshe() );
+            m_buildmeshe_event->args->SetPropValue<dsreal>( "sidelength", curr_patch->GetSideLength() / m_ray );
+            m_buildmeshe_event->args->SetPropValue<dsreal>( "xpos", xpos / m_ray );
+            m_buildmeshe_event->args->SetPropValue<dsreal>( "ypos", ypos / m_ray );
+            m_buildmeshe_event->args->SetPropValue<int>( "orientation", curr_patch->GetOrientation() );
+
+            m_buildmeshe_event->Notify();            
 
             ////////////////////////////////////////////////
         }
@@ -140,7 +184,7 @@ void MyPlanet::on_planet_event( int p_currentface )
                 m_orbiter->UnsetKinematic();
             }
             m_collision_state = false;
-            m_buildmeshe_collision_state = false;
+
         }
     }
 }
@@ -229,6 +273,7 @@ void MyPlanet::Update( DrawSpace::Dynamics::InertBody* p_player_body )
         }
         else
         {
+            /*
             if( m_suspend_update && WAIT_OBJECT_0 == WaitForSingleObject( m_buildmeshe_done_event, 0 ) )
             {
                 // bullet meshe build done
@@ -241,21 +286,44 @@ void MyPlanet::Update( DrawSpace::Dynamics::InertBody* p_player_body )
                 m_suspend_update = false;
             }
             else
-            {   
+            { 
+            */
 
-                DrawSpace::Utils::Matrix camera_pos;
+            if( m_suspend_update )
+            {
+                bool read_status = m_meshe_ready_mutex.Wait( 0 );
 
-                m_player_body->GetLastLocalWorldTrans( camera_pos );
+                if( read_status )
+                {
+                    bool meshe_ready = m_meshe_ready;
+                    m_meshe_ready_mutex.Release();
 
-                DrawSpace::Utils::Vector hotpoint;
+                    if( meshe_ready )
+                    {
+                        // bullet meshe build done
+                        m_orbiter->AddToWorld();
+                        m_collision_state = true;
 
-                hotpoint[0] = camera_pos( 3, 0 );
-                hotpoint[1] = camera_pos( 3, 1 );
-                hotpoint[2] = camera_pos( 3, 2 );
+                        m_suspend_update = false;
+                       
+                    }
 
-                m_drawable->UpdateHotPoint( hotpoint );
-                m_drawable->Compute();
+                }
             }
+
+            DrawSpace::Utils::Matrix camera_pos;
+
+            m_player_body->GetLastLocalWorldTrans( camera_pos );
+
+            DrawSpace::Utils::Vector hotpoint;
+
+            hotpoint[0] = camera_pos( 3, 0 );
+            hotpoint[1] = camera_pos( 3, 1 );
+            hotpoint[2] = camera_pos( 3, 2 );
+
+            m_drawable->UpdateHotPoint( hotpoint );
+            m_drawable->Compute();
+
         }
     }
     else
@@ -382,6 +450,7 @@ void MyPlanet::Run( void )
 {
     while( 1 )
     {
+/*
         DWORD wait = WaitForSingleObject( m_buildmeshe_request_event, INFINITE );
 
         if( WAIT_OBJECT_0 == wait )
@@ -396,16 +465,6 @@ void MyPlanet::Run( void )
             dsreal sidelength[9];
             dsreal xpos[9], ypos[9];
             
-            /*
-            for( long i = 0; i < 9; i++ )
-            {
-                patchmeshe[i] = m_buildmeshe_patchmeshe[i];
-                sidelength[i] = m_buildmeshe_sidelength[i];
-                xpos[i] = m_buildmeshe_xpos[i];
-                ypos[i] = m_buildmeshe_ypos[i];
-                patch_orientation[i] = m_buildmeshe_patch_orientation[i];
-            }
-            */
 
             patchmeshe[0] = m_buildmeshe_patchmeshe[0];
             sidelength[0] = m_buildmeshe_sidelength[0];
@@ -444,8 +503,64 @@ void MyPlanet::Run( void )
             ResetEvent( m_buildmeshe_request_event );
             SetEvent( m_buildmeshe_done_event );
 
-            m_buildmeshe_collision_state = true;
 
+
+        }
+
+        */
+
+
+
+        Mediator::Event* last_event = m_mediator->Wait();
+
+        if( last_event->name == m_buildmeshe_event->name )
+        {
+
+            //localy copy inputs
+
+            DrawSpace::Core::Meshe patchmeshe;
+            int patch_orientation;
+            dsreal sidelength;
+            dsreal xpos, ypos;
+            
+
+            patchmeshe = *( last_event->args->GetPropValue<Meshe*>( "patchmeshe" ) );
+            patch_orientation = last_event->args->GetPropValue<int>( "orientation" );
+            sidelength = last_event->args->GetPropValue<dsreal>( "sidelength" );
+            xpos = last_event->args->GetPropValue<dsreal>( "xpos" );
+            ypos = last_event->args->GetPropValue<dsreal>( "ypos" );
+
+
+            ////////////////////////////// do the work
+
+            Meshe final_meshe;
+
+            build_meshe( patchmeshe, patch_orientation, sidelength, xpos, ypos, final_meshe );
+
+
+            Body::Parameters params;
+
+
+            params.mass = 0.0;
+            params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
+            params.initial_rot.Identity();
+            
+            params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
+            params.shape_descr.meshe = final_meshe;
+
+        
+
+            m_orbiter->SetKinematic( params );
+
+
+            ////////////////////////////////////////////
+
+            //m_meshebuilddone_event->Notify();
+            //SetEvent( m_meshebuilddone_event->system_event );
+
+            m_meshe_ready_mutex.WaitInfinite();
+            m_meshe_ready = true;
+            m_meshe_ready_mutex.Release();
         }
 
         Sleep( 25 );
@@ -1048,7 +1163,8 @@ void dsAppClient::OnRenderFrame( void )
 
 bool dsAppClient::OnIdleAppInit( void )
 {
-    World::m_scale = 0.5;
+    //World::m_scale = 0.5;
+    World::m_scale = 1.0;
 
 
     bool status;

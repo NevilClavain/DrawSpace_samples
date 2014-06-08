@@ -396,14 +396,14 @@ bool dsAppClient::OnIdleAppInit( void )
     m_calendar->Startup( 162682566 );
 
 
-    //m_camera_2->LockOnBody( m_boxes[0].inert_body );
+    m_camera_2->LockOnBody( m_boxes[0].inert_body );
 
     m_linear_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LinearMovement, DrawSpace::Core::LinearMovement );
     m_linear_mvt->Init( Vector( -5.0, 2.7, 9.0, 1.0 ), Vector( 0.0, 0.0, -1.0, 1.0 ), /*-90.0*/ 0.0, 0.0 );
 
 
     m_circular_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
-    m_circular_mvt->Init( Vector( 0.0, 0.5, 0.0, 1.0 ), 10.0, Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
+    m_circular_mvt->Init( Vector( 0.0, 0.5, 0.0, 1.0 ), Vector( 5.0, 10.0, 0.0, 1.0 ), Vector( 1.0, 0.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
 
     //m_camera_2->RegisterMovement( m_linear_mvt );
 
