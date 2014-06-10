@@ -16,7 +16,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
-#define SHIP_MASS 5.0
+#define SHIP_MASS 50.0
 
 
 MyPlanet::MyPlanet( const dsstring& p_name, dsreal p_ray ) : 
@@ -40,26 +40,13 @@ m_suspend_update( false )
     m_planet_evt_cb = _DRAWSPACE_NEW_( PlanetEvtCb, PlanetEvtCb( this, &MyPlanet::on_planet_event ) );
     m_drawable->RegisterEventHandler( m_planet_evt_cb );
 
-    m_task = _DRAWSPACE_NEW_( Task<MyPlanet>, Task<MyPlanet> );
+
+
+    //m_task = _DRAWSPACE_NEW_( Task<MyPlanet>, Task<MyPlanet> );
 
     dsstring reqevtname = p_name + dsstring( "_ReqBuildMesheEvent" );
     dsstring doneevtname = p_name + dsstring( "_DoneBuildMesheEvent" );
 
-    /*
-    m_buildmeshe_request_event = CreateEvent( 
-        NULL,               // default security attributes
-        TRUE,               // manual-reset event
-        FALSE,              // initial state is nonsignaled
-        reqevtname.c_str() // object name
-        );
-
-    m_buildmeshe_done_event = CreateEvent( 
-        NULL,               // default security attributes
-        TRUE,               // manual-reset event
-        FALSE,              // initial state is nonsignaled
-        doneevtname.c_str()  // object name
-        );
-    */
 
 
     m_buildmeshe_event = m_mediator->CreateEvent( reqevtname );
@@ -71,8 +58,17 @@ m_suspend_update( false )
     m_buildmeshe_event->args->AddProp<int>( "orientation" );
 
 
+    m_runner_evt_cb = _DRAWSPACE_NEW_( RunnerEvtCb, RunnerEvtCb( this, &MyPlanet::on_meshebuild_request ) );
+    m_runner = _DRAWSPACE_NEW_( Runner, Runner );
 
-    m_task->Startup( this );
+    m_runner->RegisterEventHandler( m_buildmeshe_event, m_runner_evt_cb );
+
+
+    //m_task->Startup( this );
+
+
+    m_task = _DRAWSPACE_NEW_( Task<Runner>, Task<Runner> );
+    m_task->Startup( m_runner );
 }
 
 MyPlanet::~MyPlanet( void )
@@ -109,41 +105,6 @@ void MyPlanet::on_planet_event( int p_currentface )
         {
             Planet::Patch* curr_patch = m_drawable->GetFaceCurrentLeaf( p_currentface );
 
-
-            /*
-            m_buildmeshe_inputs_mutex.WaitInfinite();
-
-            m_buildmeshe_patchmeshe[0] = *( m_drawable->GetPatcheMeshe() );
-
-            m_buildmeshe_sidelength[0] = curr_patch->GetSideLength() / m_ray;
-
-            dsreal xpos, ypos;
-            curr_patch->GetPos( xpos, ypos );
-
-            m_buildmeshe_xpos[0] = xpos / m_ray;
-            m_buildmeshe_ypos[0] = ypos / m_ray;
-
-            m_buildmeshe_patch_orientation[0] = curr_patch->GetOrientation();
-
-
-
-            m_buildmeshe_inputs_mutex.Release();
-
-            // suspend planet update until meshe build is terminated
-
-            m_suspend_update = true;
-
-            
-            if( m_collision_state )
-            {
-                m_orbiter->RemoveFromWorld();
-                m_orbiter->UnsetKinematic();
-            }
-            
-
-            SetEvent( m_buildmeshe_request_event );
-            */
-
             dsreal xpos, ypos;
             curr_patch->GetPos( xpos, ypos );
 
@@ -159,9 +120,6 @@ void MyPlanet::on_planet_event( int p_currentface )
             m_meshe_ready_mutex.WaitInfinite();
             m_meshe_ready = false;
             m_meshe_ready_mutex.Release();
-
-
-
 
             m_buildmeshe_event->args->SetPropValue<Meshe*>( "patchmeshe", m_drawable->GetPatcheMeshe() );
             m_buildmeshe_event->args->SetPropValue<dsreal>( "sidelength", curr_patch->GetSideLength() / m_ray );
@@ -187,6 +145,54 @@ void MyPlanet::on_planet_event( int p_currentface )
 
         }
     }
+}
+
+void MyPlanet::on_meshebuild_request( PropertyPool* p_args )
+{
+    //localy copy inputs
+
+    DrawSpace::Core::Meshe patchmeshe;
+    int patch_orientation;
+    dsreal sidelength;
+    dsreal xpos, ypos;
+
+
+    patchmeshe = *( p_args->GetPropValue<Meshe*>( "patchmeshe" ) );
+    patch_orientation = p_args->GetPropValue<int>( "orientation" );
+    sidelength = p_args->GetPropValue<dsreal>( "sidelength" );
+    xpos = p_args->GetPropValue<dsreal>( "xpos" );
+    ypos = p_args->GetPropValue<dsreal>( "ypos" );
+
+
+    ////////////////////////////// do the work
+
+    Meshe final_meshe;
+
+    build_meshe( patchmeshe, patch_orientation, sidelength, xpos, ypos, final_meshe );
+
+
+    Body::Parameters params;
+
+
+    params.mass = 0.0;
+    params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
+    params.initial_rot.Identity();
+
+    params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
+    params.shape_descr.meshe = final_meshe;
+
+
+
+    m_orbiter->SetKinematic( params );
+
+
+    ////////////////////////////////////////////
+
+    m_meshe_ready_mutex.WaitInfinite();
+    m_meshe_ready = true;
+    m_meshe_ready_mutex.Release();
+
+    Sleep( 25 );
 }
 
 dsreal MyPlanet::GetAltitud( void )
@@ -273,22 +279,6 @@ void MyPlanet::Update( DrawSpace::Dynamics::InertBody* p_player_body )
         }
         else
         {
-            /*
-            if( m_suspend_update && WAIT_OBJECT_0 == WaitForSingleObject( m_buildmeshe_done_event, 0 ) )
-            {
-                // bullet meshe build done
-
-                m_orbiter->AddToWorld();
-
-                ResetEvent( m_buildmeshe_done_event );
-                m_collision_state = true;
-
-                m_suspend_update = false;
-            }
-            else
-            { 
-            */
-
             if( m_suspend_update )
             {
                 bool read_status = m_meshe_ready_mutex.Wait( 0 );
@@ -446,71 +436,11 @@ void MyPlanet::build_meshe( DrawSpace::Core::Meshe& p_patchmeshe, int p_patch_or
     }
 }
 
+/*
 void MyPlanet::Run( void )
 {
     while( 1 )
     {
-/*
-        DWORD wait = WaitForSingleObject( m_buildmeshe_request_event, INFINITE );
-
-        if( WAIT_OBJECT_0 == wait )
-        {
-
-            m_buildmeshe_inputs_mutex.WaitInfinite();
-
-            //localy copy inputs
-
-            DrawSpace::Core::Meshe patchmeshe[9];
-            int patch_orientation[9];
-            dsreal sidelength[9];
-            dsreal xpos[9], ypos[9];
-            
-
-            patchmeshe[0] = m_buildmeshe_patchmeshe[0];
-            sidelength[0] = m_buildmeshe_sidelength[0];
-            xpos[0] = m_buildmeshe_xpos[0];
-            ypos[0] = m_buildmeshe_ypos[0];
-            patch_orientation[0] = m_buildmeshe_patch_orientation[0];
-
-
-            m_buildmeshe_inputs_mutex.Release();
-
-
-            ////////////////////////////// do the work
-
-            Meshe final_meshe;
-
-            build_meshe( patchmeshe[0], patch_orientation[0], sidelength[0], xpos[0], ypos[0], final_meshe );
-
-
-            Body::Parameters params;
-
-
-            params.mass = 0.0;
-            params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
-            params.initial_rot.Identity();
-            
-            params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
-            params.shape_descr.meshe = final_meshe;
-
-        
-
-            m_orbiter->SetKinematic( params );
-
-            ////////////////////////////////////////////
-
-
-            ResetEvent( m_buildmeshe_request_event );
-            SetEvent( m_buildmeshe_done_event );
-
-
-
-        }
-
-        */
-
-
-
         Mediator::Event* last_event = m_mediator->Wait();
 
         if( last_event->name == m_buildmeshe_event->name )
@@ -566,6 +496,7 @@ void MyPlanet::Run( void )
         Sleep( 25 );
     }
 }
+*/
 
 bool MyPlanet::IsPlayerRelative( void )
 {
@@ -1429,33 +1360,33 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case 'E':
 
-            m_ship->ApplyUpPitch( 1.0 );
+            m_ship->ApplyUpPitch( 50.0 );
             break;
 
         case 'C':
 
-            m_ship->ApplyDownPitch( 1.0 );
+            m_ship->ApplyDownPitch( 50.0 );
             break;
 
         case 'S':
 
-            m_ship->ApplyLeftYaw( 1.0 );
+            m_ship->ApplyLeftYaw( 50.0 );
             break;
 
         case 'F':
 
-            m_ship->ApplyRightYaw( 1.0 );
+            m_ship->ApplyRightYaw( 50.0 );
             break;
 
 
         case 'Z':
 
-            m_ship->ApplyLeftRoll( 1.0 );
+            m_ship->ApplyLeftRoll( 50.0 );
             break;
 
         case 'R':
 
-            m_ship->ApplyRightRoll( 1.0 );
+            m_ship->ApplyRightRoll( 50.0 );
             break;
 
 
@@ -1466,17 +1397,17 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case VK_RETURN:
 
-            m_ship->ApplyFwdForce( 3000.0 );
+            m_ship->ApplyFwdForce( 30000.0 );
             break;
 
         case VK_UP:
 
-            m_ship->ApplyFwdForce( -3000.0 );
+            m_ship->ApplyFwdForce( -30000.0 );
             break;
 
         case VK_DOWN:
 
-            m_ship->ApplyDownForce( -100.0 );
+            m_ship->ApplyDownForce( -1000.0 );
             break;
 
 

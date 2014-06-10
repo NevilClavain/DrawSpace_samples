@@ -9,13 +9,17 @@ class MyPlanet
 {
 protected:
 
-    typedef DrawSpace::Core::CallBack<MyPlanet, void, int> PlanetEvtCb;
+    typedef DrawSpace::Core::CallBack<MyPlanet, void, int>                              PlanetEvtCb;
+
+    typedef DrawSpace::Core::CallBack<MyPlanet, void, DrawSpace::Core::PropertyPool*>   RunnerEvtCb;
 
     DrawSpace::Dynamics::World                              m_world;
     dsstring                                                m_name;
     DrawSpace::Dynamics::Orbiter*                           m_orbiter;
     DrawSpace::Planet::Body*                                m_drawable;
     PlanetEvtCb*                                            m_planet_evt_cb;
+
+    RunnerEvtCb*                                            m_runner_evt_cb;
 
     dsreal                                                  m_ray;
 
@@ -27,7 +31,8 @@ protected:
     bool                                                    m_player_relative;
     bool                                                    m_suspend_update;
 
-    DrawSpace::Core::Task<MyPlanet>*                        m_task;
+    //DrawSpace::Core::Task<MyPlanet>*                        m_task;
+    DrawSpace::Core::Task<DrawSpace::Core::Runner>*         m_task;
 
     DrawSpace::Core::Mediator*                              m_mediator;
 
@@ -36,27 +41,12 @@ protected:
     DrawSpace::Utils::Mutex                                 m_meshe_ready_mutex;
     bool                                                    m_meshe_ready;
 
-
-
-    //////// bullet patch build thread
-    
-    //HANDLE                                                  m_buildmeshe_request_event;
-/*
-    DrawSpace::Utils::Mutex                                 m_buildmeshe_inputs_mutex;
-
-    DrawSpace::Core::Meshe                                  m_buildmeshe_patchmeshe[9];
-    dsreal                                                  m_buildmeshe_sidelength[9];
-    dsreal                                                  m_buildmeshe_xpos[9], m_buildmeshe_ypos[9];
-    int                                                     m_buildmeshe_patch_orientation[9];
-*/
-   
-    //HANDLE                                                  m_buildmeshe_done_event; 
-    
-
-
+    DrawSpace::Core::Runner*                                m_runner;
 
 
     void on_planet_event( int p_currentface );
+
+    void on_meshebuild_request( DrawSpace::Core::PropertyPool* p_args );
 
     void build_meshe( DrawSpace::Core::Meshe& p_patchmeshe, int p_patch_orientation, dsreal p_sidelength, dsreal p_xpos, dsreal p_ypos, DrawSpace::Core::Meshe& p_outmeshe );
 
@@ -80,11 +70,9 @@ public:
 
     void ApplyGravity( void );
 
-    //void Update( const DrawSpace::Utils::Vector& p_hotpoint );
-
     void Update( DrawSpace::Dynamics::InertBody* p_player_body );
 
-    void Run( void );
+    //void Run( void );
 
     bool IsPlayerRelative( void );
 
