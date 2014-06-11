@@ -1226,6 +1226,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_calendar->Startup( 0 );
 
+
+    std::vector<dsstring> cameras;
+    m_scenegraph.GetCamerasList( cameras );
         
     return true;
 }
