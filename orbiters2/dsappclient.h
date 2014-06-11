@@ -31,7 +31,6 @@ protected:
     bool                                                    m_player_relative;
     bool                                                    m_suspend_update;
 
-    //DrawSpace::Core::Task<MyPlanet>*                        m_task;
     DrawSpace::Core::Task<DrawSpace::Core::Runner>*         m_task;
 
     DrawSpace::Core::Mediator*                              m_mediator;
@@ -72,8 +71,6 @@ public:
 
     void Update( DrawSpace::Dynamics::InertBody* p_player_body );
 
-    //void Run( void );
-
     bool IsPlayerRelative( void );
 
     void GetName( dsstring& p_name );
@@ -103,13 +100,17 @@ protected:
     DrawSpace::Interface::FontImport*           m_font_import;
     DrawSpace::Core::Font*                      m_font;
 
-    /*
-    DrawSpace::Camera*                          m_camera;
-    DrawSpace::Camera*                          m_camera2;
-    */
 
     DrawSpace::Dynamics::CameraPoint*           m_camera;
     DrawSpace::Dynamics::CameraPoint*           m_camera2;
+
+    DrawSpace::Dynamics::CameraPoint*           m_camera3;
+    DrawSpace::Core::CircularMovement*          m_circular_mvt;
+
+    DrawSpace::Dynamics::CameraPoint*           m_camera4;
+
+
+    DrawSpace::Dynamics::CameraPoint*           m_curr_camera;
 
     DrawSpace::Core::FPSMovement                m_fpsmove;
     DrawSpace::Core::FreeMovement               m_freemove;

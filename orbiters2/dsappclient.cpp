@@ -42,7 +42,6 @@ m_suspend_update( false )
 
 
 
-    //m_task = _DRAWSPACE_NEW_( Task<MyPlanet>, Task<MyPlanet> );
 
     dsstring reqevtname = p_name + dsstring( "_ReqBuildMesheEvent" );
     dsstring doneevtname = p_name + dsstring( "_DoneBuildMesheEvent" );
@@ -62,10 +61,6 @@ m_suspend_update( false )
     m_runner = _DRAWSPACE_NEW_( Runner, Runner );
 
     m_runner->RegisterEventHandler( m_buildmeshe_event, m_runner_evt_cb );
-
-
-    //m_task->Startup( this );
-
 
     m_task = _DRAWSPACE_NEW_( Task<Runner>, Task<Runner> );
     m_task->Startup( m_runner );
@@ -436,68 +431,6 @@ void MyPlanet::build_meshe( DrawSpace::Core::Meshe& p_patchmeshe, int p_patch_or
     }
 }
 
-/*
-void MyPlanet::Run( void )
-{
-    while( 1 )
-    {
-        Mediator::Event* last_event = m_mediator->Wait();
-
-        if( last_event->name == m_buildmeshe_event->name )
-        {
-
-            //localy copy inputs
-
-            DrawSpace::Core::Meshe patchmeshe;
-            int patch_orientation;
-            dsreal sidelength;
-            dsreal xpos, ypos;
-            
-
-            patchmeshe = *( last_event->args->GetPropValue<Meshe*>( "patchmeshe" ) );
-            patch_orientation = last_event->args->GetPropValue<int>( "orientation" );
-            sidelength = last_event->args->GetPropValue<dsreal>( "sidelength" );
-            xpos = last_event->args->GetPropValue<dsreal>( "xpos" );
-            ypos = last_event->args->GetPropValue<dsreal>( "ypos" );
-
-
-            ////////////////////////////// do the work
-
-            Meshe final_meshe;
-
-            build_meshe( patchmeshe, patch_orientation, sidelength, xpos, ypos, final_meshe );
-
-
-            Body::Parameters params;
-
-
-            params.mass = 0.0;
-            params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
-            params.initial_rot.Identity();
-            
-            params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
-            params.shape_descr.meshe = final_meshe;
-
-        
-
-            m_orbiter->SetKinematic( params );
-
-
-            ////////////////////////////////////////////
-
-            //m_meshebuilddone_event->Notify();
-            //SetEvent( m_meshebuilddone_event->system_event );
-
-            m_meshe_ready_mutex.WaitInfinite();
-            m_meshe_ready = true;
-            m_meshe_ready_mutex.Release();
-        }
-
-        Sleep( 25 );
-    }
-}
-*/
-
 bool MyPlanet::IsPlayerRelative( void )
 {
     return m_player_relative;
@@ -562,51 +495,6 @@ void dsAppClient::compute_player_view_transform( void )
     cam_base_pos.Translation( 0.0, 2.8, 11.4 );
 
     /////////////////////////////////////////////////////
-
-
-    /*
-    if( m_player_view_linear_acc[2] > 0.0 )
-    {
-        dsreal limit = ( m_player_view_linear_acc[2] / ( 8000.0 / SHIP_MASS ) );
-        if( m_player_view_pos[2] < limit )
-        {
-            m_player_view_linear_speed[2] = SPEED;
-        }
-        else
-        {
-            m_player_view_linear_speed[2] = 0.0;
-        }
-    }
-    else if( m_player_view_linear_acc[2] < 0.0 )
-    {
-        dsreal limit = ( m_player_view_linear_acc[2] / ( 8000.0 / SHIP_MASS ) );
-        if( m_player_view_pos[2] > limit )
-        {
-            m_player_view_linear_speed[2] = -SPEED;
-        }
-        else
-        {
-            m_player_view_linear_speed[2] = 0.0;
-        }
-    }
-    else
-    {
-        if( m_player_view_pos[2] > 0.1 )
-        {
-            m_player_view_linear_speed[2] = -SPEED;
-        }
-
-        else if( m_player_view_pos[2] < -0.1 )
-        {
-            m_player_view_linear_speed[2] = SPEED;
-        }
-
-        else
-        {
-            m_player_view_linear_speed[2] = 0.0;
-        }
-    }
-    */
 
     if( m_player_view_linear_acc[2] > 0.0 )
     {
@@ -1285,6 +1173,26 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterNode( m_camera2 );
 
 
+    m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", m_ship ) );
+    m_scenegraph.RegisterNode( m_camera3 );
+
+
+    m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera4", m_ship ) );
+    m_scenegraph.RegisterNode( m_camera4 );
+
+
+    m_circular_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
+    m_circular_mvt->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 5.0, 0.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
+
+    m_camera3->RegisterMovement( m_circular_mvt );
+
+    m_camera3->LockOnBody( m_ship );
+
+    m_camera4->RegisterMovement( m_circular_mvt );
+    m_camera4->LockOnBody( m_planet->GetOrbiter() );
+
+
+
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     
@@ -1311,7 +1219,7 @@ bool dsAppClient::OnIdleAppInit( void )
     //m_scenegraph.SetCurrentCamera( "camera" );
     m_scenegraph.SetCurrentCamera( "camera2" );
 
-
+    m_curr_camera = m_camera2;
 
 
     //m_calendar->Startup( 162682566 );
@@ -1344,13 +1252,6 @@ void dsAppClient::OnKeyPress( long p_key )
             break;
 
         case 'W':
-
-            /*
-            if( m_speed < 1.0 )
-            {
-                m_speed = 0.0;
-            }
-            */
 
             m_timer.TranslationSpeedDec( &m_speed, m_speed_speed );
             m_speed_speed *= 1.06;
@@ -1411,52 +1312,14 @@ void dsAppClient::OnKeyPress( long p_key )
             break;
 
 
-        case 'I':
-            m_player_view_linear_acc[2] = 500.0;
+        case VK_LEFT:
+
+            m_circular_mvt->SetAngularSpeed( 30.0 );
             break;
 
-        case 'K':
-            m_player_view_linear_acc[2] = -500.0;
-            break;
+        case VK_RIGHT:
 
-        case 'U':
-            m_player_view_linear_acc[1] = 500.0;
-            break;
-
-        case 'J':
-            m_player_view_linear_acc[1] = -500.0;
-            break;
-
-        case 'Y':
-
-            m_player_view_angular_acc[0] = 1.0;
-            break;
-
-        case 'H':
-
-            m_player_view_angular_acc[0] = -1.0;
-            break;
-
-
-        case 'T':
-
-            m_player_view_angular_acc[2] = 1.0;
-            break;
-
-        case 'G':
-
-            m_player_view_angular_acc[2] = -1.0;
-            break;
-
-
-        case 'N':
-
-            m_player_view_angular_acc[1] = 1.0;
-            break;
-
-        case 'V':
-
-            m_player_view_angular_acc[1] = -1.0;
+            m_circular_mvt->SetAngularSpeed( -30.0 );
             break;
 
 
@@ -1483,37 +1346,9 @@ void dsAppClient::OnEndKeyPress( long p_key )
             m_speed = 0.0;
             break;
 
-
-        case 'I':
-        case 'K':
-
-            m_player_view_linear_acc[2] = 0.0;
-            break;
-
-
-        case 'U':
-        case 'J':
-
-            m_player_view_linear_acc[1] = 0.0;
-            break;
-
-        case 'Y':
-        case 'H':
-
-            m_player_view_angular_acc[0] = 0.0;
-            break;
-
-
-        case 'T':
-        case 'G':
-
-            m_player_view_angular_acc[2] = 0.0;
-            break;
-
-        case 'V':
-        case 'N':
-
-            m_player_view_angular_acc[1] = 0.0;
+        case VK_LEFT:
+        case VK_RIGHT:
+            m_circular_mvt->SetAngularSpeed( 0.0 );
             break;
 
     }
@@ -1555,9 +1390,24 @@ void dsAppClient::OnKeyPulse( long p_key )
             break;
 
         case VK_F9:
-            break;
 
-        case VK_F10:
+            if( m_curr_camera == m_camera2 )
+            {
+                m_scenegraph.SetCurrentCamera( "camera3" );
+                m_curr_camera = m_camera3;
+            }
+            else if( m_curr_camera == m_camera3 )
+            {
+                m_scenegraph.SetCurrentCamera( "camera4" );
+                m_curr_camera = m_camera4;
+            }
+            else if( m_curr_camera == m_camera4 )
+            {
+                m_scenegraph.SetCurrentCamera( "camera2" );
+                m_curr_camera = m_camera2;
+            }
+
+            
 
             break;
 
