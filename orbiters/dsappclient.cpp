@@ -62,8 +62,12 @@ Orbiter* dsAppClient::build_planet( char* p_name, char* p_texture )
     DrawSpace::Dynamics::Body::Parameters sphere_params;
     sphere_params.shape_descr.sphere_radius = 0.5;
     sphere_params.shape_descr.shape = DrawSpace::Dynamics::Body::SPHERE_SHAPE;
+    /*
     sphere_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
     sphere_params.initial_rot.Identity();
+    */
+
+    sphere_params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
 
     Orbiter* orbiter = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Orbiter, DrawSpace::Dynamics::Orbiter( &m_world, chunk ) );
 
@@ -387,8 +391,13 @@ bool dsAppClient::OnIdleAppInit( void )
     cube_params.mass = 50.0;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
+
+    /*
     cube_params.initial_pos = DrawSpace::Utils::Vector( 5.0, 0.0, -10.0, 1.0 );
     cube_params.initial_rot.Identity();
+    */
+
+    cube_params.initial_attitude.Translation( 50.0, 0.0, -10.0 );
 
     m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, chunk, cube_params ) );
 
@@ -431,8 +440,10 @@ bool dsAppClient::OnIdleAppInit( void )
     cube_params.mass = 50.0;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
-    cube_params.initial_pos = DrawSpace::Utils::Vector( 5.0, 0.0, -100.0, 1.0 );
-    cube_params.initial_rot.Identity();
+    //cube_params.initial_pos = DrawSpace::Utils::Vector( 5.0, 0.0, -100.0, 1.0 );
+    //cube_params.initial_rot.Identity();
+
+    cube_params.initial_attitude.Translation( 5.0, 0.0, -100.0 );
 
     m_cube_body_2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, chunk, cube_params ) );
 

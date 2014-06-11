@@ -269,8 +269,13 @@ bool dsAppClient::OnIdleAppInit( void )
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
     cube_params.mass = 50.0;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    /*
     cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 10.5, 0.0, 1.0 );
     cube_params.initial_rot.Identity();
+    */
+
+    cube_params.initial_attitude.Translation( 0.0, 10.5, 0.0 );
+
 
     m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, m_chunk, cube_params ) );
 
@@ -279,8 +284,13 @@ bool dsAppClient::OnIdleAppInit( void )
     ground_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 100.0, 0.0, 100., 1.0 );
     ground_params.mass = 0.0;
     ground_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+
+    /*
     ground_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
     ground_params.initial_rot.Identity();
+    */
+
+    ground_params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
 
     m_ground_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, m_ground, ground_params ) );
 

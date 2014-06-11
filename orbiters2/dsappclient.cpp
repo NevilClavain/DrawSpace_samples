@@ -170,8 +170,12 @@ void MyPlanet::on_meshebuild_request( PropertyPool* p_args )
 
 
     params.mass = 0.0;
+    /*
     params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
     params.initial_rot.Identity();
+    */
+
+    params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
 
     params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
     params.shape_descr.meshe = final_meshe;
@@ -1156,8 +1160,12 @@ bool dsAppClient::OnIdleAppInit( void )
     cube_params.mass = SHIP_MASS;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 2.0, 0.5, 4.0, 1.0 );
+    /*
     cube_params.initial_pos = DrawSpace::Utils::Vector( 265000000.0, 0.0, -10.0, 1.0 );
     cube_params.initial_rot.Identity();
+    */
+
+    cube_params.initial_attitude.Translation( 265000000.0, 0.0, -10.0 );
 
     m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, m_ship_drawable, cube_params ) );
 
@@ -1182,7 +1190,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_circular_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
-    m_circular_mvt->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 5.0, 0.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
+    m_circular_mvt->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 35.0, 0.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
 
     m_camera3->RegisterMovement( m_circular_mvt );
 
