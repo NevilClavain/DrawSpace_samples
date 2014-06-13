@@ -82,6 +82,10 @@ class dsAppClient : public DrawSpace::App
 {
 protected:
 
+    typedef DrawSpace::Core::CallBack2<dsAppClient, void, DrawSpace::Scenegraph::CameraEvent, DrawSpace::Core::TransformNode*>   CameraEvtCb;
+
+    typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Dynamics::Body::Event>   BodyEvtCb;
+
     static dsAppClient*                         m_instance;
 
     DrawSpace::Scenegraph                       m_scenegraph;
@@ -184,10 +188,16 @@ protected:
     MyPlanet*                                   m_relative_planet;
 
 
+    CameraEvtCb*                                m_camera_evt_cb;
+    BodyEvtCb*                                  m_body_evt_cb;
+
+
     dsAppClient( void );
 
     void compute_player_view_transform( void );
 
+    void on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, DrawSpace::Core::TransformNode* p_node );
+    void on_body_event( DrawSpace::Dynamics::Body::Event p_event );
 
 public:
 

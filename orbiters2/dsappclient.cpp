@@ -483,6 +483,10 @@ m_relative_planet( NULL )
 
 
     m_player_view_theta = m_player_view_phi = m_player_view_rho = 0.0;
+
+    m_camera_evt_cb = _DRAWSPACE_NEW_( CameraEvtCb, CameraEvtCb( this, &dsAppClient::on_camera_event ) );
+
+    m_body_evt_cb = _DRAWSPACE_NEW_( BodyEvtCb, BodyEvtCb( this, &dsAppClient::on_body_event ) );
 }
 
 dsAppClient::~dsAppClient( void )
@@ -1172,6 +1176,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
+    m_scenegraph.RegisterCameraEvtHandler( m_camera_evt_cb );
+
 
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera" ) );
     m_scenegraph.RegisterNode( m_camera );
@@ -1237,6 +1243,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
     std::vector<dsstring> cameras;
     m_scenegraph.GetCamerasList( cameras );
+
+
+    m_ship->RegisterEvtHandler( m_body_evt_cb );
         
     return true;
 }
@@ -1477,4 +1486,14 @@ void dsAppClient::SetLastPlayerShipGravity( const DrawSpace::Utils::Vector& p_gr
 void dsAppClient::SetRelativePlanet( MyPlanet* p_planet )
 {
     m_relative_planet = p_planet;
+}
+
+void dsAppClient::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, DrawSpace::Core::TransformNode* p_node )
+{
+    _asm nop
+}
+
+void dsAppClient::on_body_event( DrawSpace::Dynamics::Body::Event p_event )
+{
+    _asm nop
 }
