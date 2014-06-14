@@ -88,17 +88,19 @@ bool MyPlanet::GetCollisionState( void )
     return m_collision_state;
 }
 
-void MyPlanet::on_planet_event( int p_currentface )
+void MyPlanet::on_planet_event( Planet::Body* p_body, int p_currentface )
 {
     long tri_index = 0;
 
-    dsreal alt = m_drawable->GetAltitud();
+    //dsreal alt = m_drawable->GetAltitud();
+    dsreal alt = p_body->GetAltitud();
 
     if( alt < 1000.0 )
     {
         if( !m_suspend_update )
         {
-            Planet::Patch* curr_patch = m_drawable->GetFaceCurrentLeaf( p_currentface );
+            //Planet::Patch* curr_patch = m_drawable->GetFaceCurrentLeaf( p_currentface );
+            Planet::Patch* curr_patch = p_body->GetFaceCurrentLeaf( p_currentface );
 
             dsreal xpos, ypos;
             curr_patch->GetPos( xpos, ypos );
@@ -116,7 +118,9 @@ void MyPlanet::on_planet_event( int p_currentface )
             m_meshe_ready = false;
             m_meshe_ready_mutex.Release();
 
-            m_buildmeshe_event->args->SetPropValue<Meshe*>( "patchmeshe", m_drawable->GetPatcheMeshe() );
+            //m_buildmeshe_event->args->SetPropValue<Meshe*>( "patchmeshe", m_drawable->GetPatcheMeshe() );
+
+            m_buildmeshe_event->args->SetPropValue<Meshe*>( "patchmeshe", p_body->GetPatcheMeshe() );
             m_buildmeshe_event->args->SetPropValue<dsreal>( "sidelength", curr_patch->GetSideLength() / m_ray );
             m_buildmeshe_event->args->SetPropValue<dsreal>( "xpos", xpos / m_ray );
             m_buildmeshe_event->args->SetPropValue<dsreal>( "ypos", ypos / m_ray );
@@ -1488,12 +1492,12 @@ void dsAppClient::SetRelativePlanet( MyPlanet* p_planet )
     m_relative_planet = p_planet;
 }
 
-void dsAppClient::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, DrawSpace::Core::TransformNode* p_node )
+void dsAppClient::on_camera_event( Scenegraph::CameraEvent p_event, TransformNode* p_node )
 {
     _asm nop
 }
 
-void dsAppClient::on_body_event( DrawSpace::Dynamics::Body::Event p_event )
+void dsAppClient::on_body_event( Body::Event p_event, Body* p_body )
 {
     _asm nop
 }

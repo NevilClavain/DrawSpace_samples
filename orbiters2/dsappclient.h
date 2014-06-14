@@ -9,7 +9,7 @@ class MyPlanet
 {
 protected:
 
-    typedef DrawSpace::Core::CallBack<MyPlanet, void, int>                              PlanetEvtCb;
+    typedef DrawSpace::Core::CallBack2<MyPlanet, void, DrawSpace::Planet::Body*, int>   PlanetEvtCb;
 
     typedef DrawSpace::Core::CallBack<MyPlanet, void, DrawSpace::Core::PropertyPool*>   RunnerEvtCb;
 
@@ -43,7 +43,7 @@ protected:
     DrawSpace::Core::Runner*                                m_runner;
 
 
-    void on_planet_event( int p_currentface );
+    void on_planet_event( DrawSpace::Planet::Body* p_body, int p_currentface );
 
     void on_meshebuild_request( DrawSpace::Core::PropertyPool* p_args );
 
@@ -84,7 +84,7 @@ protected:
 
     typedef DrawSpace::Core::CallBack2<dsAppClient, void, DrawSpace::Scenegraph::CameraEvent, DrawSpace::Core::TransformNode*>   CameraEvtCb;
 
-    typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Dynamics::Body::Event>   BodyEvtCb;
+    typedef DrawSpace::Core::CallBack2<dsAppClient, void, DrawSpace::Dynamics::Body::Event, DrawSpace::Dynamics::Body*>   BodyEvtCb;
 
     static dsAppClient*                         m_instance;
 
@@ -197,7 +197,7 @@ protected:
     void compute_player_view_transform( void );
 
     void on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, DrawSpace::Core::TransformNode* p_node );
-    void on_body_event( DrawSpace::Dynamics::Body::Event p_event );
+    void on_body_event( DrawSpace::Dynamics::Body::Event p_event, DrawSpace::Dynamics::Body* p_body );
 
 public:
 
