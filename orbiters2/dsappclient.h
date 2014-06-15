@@ -10,25 +10,36 @@ class MyPlanet
 protected:
 
     typedef DrawSpace::Core::CallBack2<MyPlanet, void, DrawSpace::Planet::Body*, int>   PlanetEvtCb;
-
     typedef DrawSpace::Core::CallBack<MyPlanet, void, DrawSpace::Core::PropertyPool*>   RunnerEvtCb;
+
+    typedef struct
+    {
+        bool attached;
+        DrawSpace::Dynamics::InertBody* body;
+
+    } RegisteredBody;
 
     DrawSpace::Dynamics::World                              m_world;
     dsstring                                                m_name;
     DrawSpace::Dynamics::Orbiter*                           m_orbiter;
     DrawSpace::Planet::Body*                                m_drawable;
-    PlanetEvtCb*                                            m_planet_evt_cb;
-
+    //PlanetEvtCb*                                            m_planet_evt_cb;
     RunnerEvtCb*                                            m_runner_evt_cb;
 
     dsreal                                                  m_ray;
 
     bool                                                    m_collision_state;
 
-    std::vector<DrawSpace::Dynamics::InertBody*>            m_attached_bodies;
-    DrawSpace::Dynamics::InertBody*                         m_player_body;
+    //std::vector<DrawSpace::Dynamics::InertBody*>            m_attached_bodies;
+    //DrawSpace::Dynamics::InertBody*                         m_player_body;
 
-    bool                                                    m_player_relative;
+    std::vector<RegisteredBody>                             m_registered_bodies;
+    std::vector<DrawSpace::Dynamics::CameraPoint*>          m_registered_cameras;
+
+    //bool                                                    m_player_relative;
+
+
+
     bool                                                    m_suspend_update;
 
     DrawSpace::Core::Task<DrawSpace::Core::Runner>*         m_task;
@@ -43,11 +54,15 @@ protected:
     DrawSpace::Core::Runner*                                m_runner;
 
 
-    void on_planet_event( DrawSpace::Planet::Body* p_body, int p_currentface );
+    //void on_planet_event( DrawSpace::Planet::Body* p_body, int p_currentface );
 
     void on_meshebuild_request( DrawSpace::Core::PropertyPool* p_args );
 
     void build_meshe( DrawSpace::Core::Meshe& p_patchmeshe, int p_patch_orientation, dsreal p_sidelength, dsreal p_xpos, dsreal p_ypos, DrawSpace::Core::Meshe& p_outmeshe );
+
+    void attach_body( DrawSpace::Dynamics::InertBody* p_body );
+    void detach_body( DrawSpace::Dynamics::InertBody* p_body );
+
 
 public:
 
@@ -62,18 +77,53 @@ public:
 
     dsreal GetAltitud( void );
 
-    void AttachBody( DrawSpace::Dynamics::InertBody* p_body );
-    void DetachBody( DrawSpace::Dynamics::InertBody* p_body );
     
 
 
-    void ApplyGravity( void );
+    //void ApplyGravity( void );
+    //void Update( DrawSpace::Dynamics::InertBody* p_player_body );
+    //bool IsPlayerRelative( void );
 
-    void Update( DrawSpace::Dynamics::InertBody* p_player_body );
+    void ManageBodies( void );
 
-    bool IsPlayerRelative( void );
+    void RegisterInertBody( DrawSpace::Dynamics::InertBody* p_body );
+    void RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera );
 
     void GetName( dsstring& p_name );
+
+};
+
+
+class PlayerCameraPoint : public DrawSpace::Dynamics::CameraPoint
+{
+protected:
+
+    typedef DrawSpace::Core::CallBack2<PlayerCameraPoint, void, DrawSpace::Planet::Body*, int>                                              PlanetEvtCb;
+
+    typedef DrawSpace::Core::CallBack2<PlayerCameraPoint, void, DrawSpace::Scenegraph::CameraEvent, DrawSpace::Core::TransformNode*>        CameraEvtCb;
+
+    typedef DrawSpace::Core::CallBack2<PlayerCameraPoint, void, DrawSpace::Dynamics::Body::Event, DrawSpace::Dynamics::Body*>               BodyEvtCb;
+
+
+    PlanetEvtCb*                        m_planet_evt_cb;
+    CameraEvtCb*                        m_camera_evt_cb;
+    BodyEvtCb*                          m_body_evt_cb;
+
+    DrawSpace::Dynamics::Orbiter*       m_ref_body;
+
+
+
+    void on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, DrawSpace::Core::TransformNode* p_node );
+
+    void on_body_event( DrawSpace::Dynamics::Body::Event p_event, DrawSpace::Dynamics::Body* p_body );
+
+    void on_planet_event( DrawSpace::Planet::Body* p_body, int p_currentface );
+
+
+public:
+
+    PlayerCameraPoint( const dsstring& p_name, DrawSpace::Dynamics::Body* p_body, DrawSpace::Scenegraph* p_scenegraph );
+    virtual ~PlayerCameraPoint( void );
 
 };
 
@@ -106,7 +156,8 @@ protected:
 
 
     DrawSpace::Dynamics::CameraPoint*           m_camera;
-    DrawSpace::Dynamics::CameraPoint*           m_camera2;
+    
+    PlayerCameraPoint*                          m_camera2;
 
     DrawSpace::Dynamics::CameraPoint*           m_camera3;
     DrawSpace::Core::CircularMovement*          m_circular_mvt;
@@ -188,16 +239,20 @@ protected:
     MyPlanet*                                   m_relative_planet;
 
 
+    /*
     CameraEvtCb*                                m_camera_evt_cb;
     BodyEvtCb*                                  m_body_evt_cb;
+    */
 
 
     dsAppClient( void );
 
     void compute_player_view_transform( void );
 
+    /*
     void on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, DrawSpace::Core::TransformNode* p_node );
     void on_body_event( DrawSpace::Dynamics::Body::Event p_event, DrawSpace::Dynamics::Body* p_body );
+    */
 
 public:
 
