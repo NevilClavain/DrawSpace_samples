@@ -98,10 +98,6 @@ bool MyPlanet::GetCollisionState( void )
 
 void MyPlanet::on_planet_event( Planet::Body* p_body, int p_currentface )
 {
-    // provisoire
-    return;
-
-
     if( "" == m_current_camerapoint )
     {
         return;
