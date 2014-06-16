@@ -610,6 +610,20 @@ void MyPlanet::ManageBodies( void )
 
                 //////
 
+
+                if( m_collision_state )
+                {
+                    if( !m_suspend_update )
+                    {
+                        m_orbiter->RemoveFromWorld();
+                        m_orbiter->UnsetKinematic();
+                    }
+                    m_collision_state = false;
+                }
+
+
+                //////
+
                 for( size_t i = 0; i < m_relative_evt_handlers.size(); i++ )
                 {
                     ( *( m_relative_evt_handlers[i] ) )( NULL );
