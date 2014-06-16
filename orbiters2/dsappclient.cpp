@@ -27,7 +27,8 @@ m_ray( /*12000000.0*/ /*600000.0*/ p_ray * 1000.0 ),
 m_collision_state( false ),
 //m_player_relative( false ),
 //m_player_body( NULL ),
-m_suspend_update( false )
+m_suspend_update( false ),
+m_collisionmeshebuild_counter( 0 )
 {
     m_mediator = Mediator::GetInstance();
 
@@ -335,7 +336,9 @@ void MyPlanet::Update( void )
                         // bullet meshe build done
                         m_orbiter->AddToWorld();
                         m_collision_state = true;
-                        m_suspend_update = false;                       
+                        m_suspend_update = false;
+
+                        m_collisionmeshebuild_counter++;
                     }
                 }
             }
@@ -374,6 +377,11 @@ void MyPlanet::Update( void )
             }
         }
     }
+}
+
+long MyPlanet::GetCollisionMesheBuildCount( void )
+{
+    return m_collisionmeshebuild_counter;
 }
 
 /*
@@ -1258,8 +1266,13 @@ void dsAppClient::OnRenderFrame( void )
         dsstring planet_name;
         m_relative_planet->GetName( planet_name );
         renderer->DrawText( 0, 255, 0, 10, 135, "relative to : %s altitud = %f", planet_name.c_str(), m_relative_planet->GetAltitud() );
-        renderer->DrawText( 0, 255, 0, 10, 155, "collision state %d", m_relative_planet->GetCollisionState() );
+        //renderer->DrawText( 0, 255, 0, 10, 155, "collision state %d", m_relative_planet->GetCollisionState() );
     }
+
+
+    renderer->DrawText( 0, 255, 0, 10, 195, "planet01 : %d %d", m_planet->GetCollisionState(), m_planet->GetCollisionMesheBuildCount() );
+    renderer->DrawText( 0, 255, 0, 10, 215, "moon : %d %d", m_moon->GetCollisionState(), m_moon->GetCollisionMesheBuildCount() );
+
 
     Vector tf, tt;
     Vector tf2, tt2;

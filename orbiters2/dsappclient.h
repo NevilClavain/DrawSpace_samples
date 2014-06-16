@@ -59,6 +59,7 @@ protected:
     dsreal                                                      m_ray;
 
     bool                                                        m_collision_state;
+    long                                                        m_collisionmeshebuild_counter;
 
     //std::vector<DrawSpace::Dynamics::InertBody*>            m_attached_bodies;
     //DrawSpace::Dynamics::InertBody*                         m_player_body;
@@ -111,6 +112,7 @@ public:
     DrawSpace::Dynamics::World*     GetWorld( void );
 
     bool GetCollisionState( void );
+    long GetCollisionMesheBuildCount( void );
 
     dsreal GetAltitud( void );
 
