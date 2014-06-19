@@ -171,6 +171,10 @@ protected:
     DrawSpace::Dynamics::CameraPoint*           m_camera4;
 
 
+    DrawSpace::Dynamics::CameraPoint*           m_camera5;
+    DrawSpace::Core::LongLatMovement*           m_longlat_mvt;
+
+
     DrawSpace::Dynamics::CameraPoint*           m_curr_camera;
 
     DrawSpace::Core::FPSMovement                m_fpsmove;

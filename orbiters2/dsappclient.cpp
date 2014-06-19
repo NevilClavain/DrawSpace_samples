@@ -273,7 +273,13 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
 
         if( m_registered_camerapoints.count( current_camera_name ) > 0 )
         {
+            dsstring previous_currentcamera = m_current_camerapoint;
             m_current_camerapoint = current_camera_name;
+
+            if( previous_currentcamera != "" )
+            {
+                m_registered_camerapoints[previous_currentcamera].hot = false;
+            }
             
             switch( m_registered_camerapoints[m_current_camerapoint].type )
             {
@@ -293,6 +299,13 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
                 case FREE_ON_PLANET:
                     {
                         // TODO
+                        m_registered_camerapoints[m_current_camerapoint].hot = true;
+
+                        for( size_t i = 0; i < m_relative_evt_handlers.size(); i++ )
+                        {
+                            ( *( m_relative_evt_handlers[i] ) )( this );
+                        }
+
                     }
                     break;
 
@@ -362,6 +375,17 @@ void MyPlanet::Update( void )
                 case FREE_ON_PLANET:
                     {
                         // TODO
+
+                        m_registered_camerapoints[m_current_camerapoint].camera->GetLocalTransform( camera_pos );
+
+                        DrawSpace::Utils::Vector hotpoint;
+
+                        hotpoint[0] = camera_pos( 3, 0 );
+                        hotpoint[1] = camera_pos( 3, 1 );
+                        hotpoint[2] = camera_pos( 3, 2 );
+
+                        m_drawable->UpdateHotPoint( hotpoint );
+                        m_drawable->Compute();
                     }
                     break;
 
@@ -1222,6 +1246,11 @@ void dsAppClient::OnRenderFrame( void )
 
     compute_player_view_transform();
     m_camera2->SetLocalTransform( m_player_view_transform );
+
+
+    Matrix id;
+    id.Identity();
+    m_camera5->SetLocalTransform( id );
     
     Matrix origin;
     origin.Identity();
@@ -1549,6 +1578,19 @@ bool dsAppClient::OnIdleAppInit( void )
     m_camera4->LockOnBody( m_planet->GetOrbiter() );
 
 
+    m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera5", m_planet->GetOrbiter() ) );
+    m_scenegraph.RegisterNode( m_camera5 );
+
+    m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+
+    m_longlat_mvt->Init( 0.0, 0.0, 400031.0, 7.0, -1.0 );
+    m_camera5->RegisterLongLatMovement( m_longlat_mvt );
+    //m_camera5->RegisterMovement( m_longlat_mvt );
+
+
+
+
+
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
@@ -1583,12 +1625,14 @@ bool dsAppClient::OnIdleAppInit( void )
     m_planet->RegisterCameraPoint( m_camera2, true );
     m_planet->RegisterCameraPoint( m_camera3, true );
     m_planet->RegisterCameraPoint( m_camera4, true );
+    m_planet->RegisterCameraPoint( m_camera5, false );
 
 
     m_moon->RegisterInertBody( m_ship );
     m_moon->RegisterCameraPoint( m_camera2, true );
     m_moon->RegisterCameraPoint( m_camera3, true );
     m_moon->RegisterCameraPoint( m_camera4, true );
+    m_moon->RegisterCameraPoint( m_camera5, false );
 
 
     m_scenegraph.RegisterCameraEvtHandler( m_planet->GetCameraEvtCb() );
@@ -1778,10 +1822,16 @@ void dsAppClient::OnKeyPulse( long p_key )
             }
             else if( m_curr_camera == m_camera4 )
             {
+                m_scenegraph.SetCurrentCamera( "camera5" );
+                m_curr_camera = m_camera5;
+            }
+            else if( m_curr_camera == m_camera5 )
+            {
                 m_scenegraph.SetCurrentCamera( "camera2" );
                 m_curr_camera = m_camera2;
             }
-          
+
+
             break;
 
     }
