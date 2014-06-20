@@ -288,10 +288,14 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
                         if( m_registered_bodies[m_registered_camerapoints[m_current_camerapoint].attached_body].attached )
                         {
                             m_registered_camerapoints[m_current_camerapoint].hot = true;
+                            notify_relative_to_planet_event( true );    
                         }
                         else
                         {
                             m_registered_camerapoints[m_current_camerapoint].hot = false;
+                            m_drawable->ResetMeshes();
+
+                            notify_relative_to_planet_event( false );
                         }
                     }
                     break;
@@ -301,11 +305,7 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
                         // TODO
                         m_registered_camerapoints[m_current_camerapoint].hot = true;
 
-                        for( size_t i = 0; i < m_relative_evt_handlers.size(); i++ )
-                        {
-                            ( *( m_relative_evt_handlers[i] ) )( this );
-                        }
-
+                        notify_relative_to_planet_event( true );
                     }
                     break;
 
@@ -648,9 +648,12 @@ void MyPlanet::ManageBodies( void )
 
                 //////
 
-                for( size_t i = 0; i < m_relative_evt_handlers.size(); i++ )
+                // si la camera active est bien liee au body concernee
+                if( m_current_camerapoint != "" && 
+                    m_registered_camerapoints[m_current_camerapoint].type == INERTBODY_LINKED &&   
+                    m_registered_camerapoints[m_current_camerapoint].attached_body == it->second.body )
                 {
-                    ( *( m_relative_evt_handlers[i] ) )( NULL );
+                    notify_relative_to_planet_event( false );
                 }
             }
         }
@@ -697,15 +700,24 @@ void MyPlanet::ManageBodies( void )
 
                 /////
 
-                for( size_t i = 0; i < m_relative_evt_handlers.size(); i++ )
+                if( m_current_camerapoint != "" && 
+                    m_registered_camerapoints[m_current_camerapoint].type == INERTBODY_LINKED &&   
+                    m_registered_camerapoints[m_current_camerapoint].attached_body == it->second.body )
                 {
-                    ( *( m_relative_evt_handlers[i] ) )( this );
+                    notify_relative_to_planet_event( true );
                 }
             }
         }
     }
 }
 
+void MyPlanet::notify_relative_to_planet_event( bool p_relative )
+{
+    for( size_t i = 0; i < m_relative_evt_handlers.size(); i++ )
+    {
+        ( *( m_relative_evt_handlers[i] ) )( ( p_relative ? this : NULL ) );
+    }
+}
 
 void MyPlanet::build_meshe( DrawSpace::Core::Meshe& p_patchmeshe, int p_patch_orientation, dsreal p_sidelength, dsreal p_xpos, dsreal p_ypos, DrawSpace::Core::Meshe& p_outmeshe )
 {
@@ -1717,7 +1729,7 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case VK_RETURN:
 
-            m_ship->ApplyFwdForce( 30000.0 );
+            m_ship->ApplyFwdForce( 11000.0 );
             break;
 
         case VK_UP:

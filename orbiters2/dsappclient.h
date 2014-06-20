@@ -95,6 +95,8 @@ protected:
 
     bool body_find_attached_camera( DrawSpace::Dynamics::InertBody* p_body, dsstring& p_name );
 
+    void notify_relative_to_planet_event( bool p_relative );
+
 
     void on_planet_event( DrawSpace::Planet::Body* p_body, int p_currentface );
     void on_meshebuild_request( DrawSpace::Core::PropertyPool* p_args );
