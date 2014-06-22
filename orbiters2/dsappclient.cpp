@@ -13,6 +13,7 @@ using namespace DrawSpace::Dynamics;
 
 dsAppClient* dsAppClient::m_instance = NULL;
 
+
 _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
@@ -288,24 +289,19 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
                         if( m_registered_bodies[m_registered_camerapoints[m_current_camerapoint].attached_body].attached )
                         {
                             m_registered_camerapoints[m_current_camerapoint].hot = true;
-                            notify_relative_to_planet_event( true );    
                         }
                         else
                         {
                             m_registered_camerapoints[m_current_camerapoint].hot = false;
-                            m_drawable->ResetMeshes();
 
-                            notify_relative_to_planet_event( false );
+                            m_drawable->ResetMeshes();
                         }
                     }
                     break;
 
                 case FREE_ON_PLANET:
                     {
-                        // TODO
                         m_registered_camerapoints[m_current_camerapoint].hot = true;
-
-                        notify_relative_to_planet_event( true );
                     }
                     break;
 
@@ -647,7 +643,7 @@ void MyPlanet::ManageBodies( void )
 
 
                 //////
-
+                /*
                 // si la camera active est bien liee au body concernee
                 if( m_current_camerapoint != "" && 
                     m_registered_camerapoints[m_current_camerapoint].type == INERTBODY_LINKED &&   
@@ -655,6 +651,7 @@ void MyPlanet::ManageBodies( void )
                 {
                     notify_relative_to_planet_event( false );
                 }
+                */
             }
         }
         else
@@ -700,12 +697,14 @@ void MyPlanet::ManageBodies( void )
 
                 /////
 
+                /*
                 if( m_current_camerapoint != "" && 
                     m_registered_camerapoints[m_current_camerapoint].type == INERTBODY_LINKED &&   
                     m_registered_camerapoints[m_current_camerapoint].attached_body == it->second.body )
                 {
                     notify_relative_to_planet_event( true );
                 }
+                */
             }
         }
     }
@@ -853,11 +852,12 @@ m_relative_planet( NULL )
     m_player_view_theta = m_player_view_phi = m_player_view_rho = 0.0;
 
     /*
-    m_camera_evt_cb = _DRAWSPACE_NEW_( CameraEvtCb, CameraEvtCb( this, &dsAppClient::on_camera_event ) );
     m_body_evt_cb = _DRAWSPACE_NEW_( BodyEvtCb, BodyEvtCb( this, &dsAppClient::on_body_event ) );
     */
 
     m_planetrelative_evt_cb = _DRAWSPACE_NEW_( PlanetRelativeEvtCb, PlanetRelativeEvtCb( this, &dsAppClient::on_relative_to_planet ) );
+
+    m_camera_evt_cb = _DRAWSPACE_NEW_( CameraEvtCb, CameraEvtCb( this, &dsAppClient::on_camera_event ) );
 }
 
 dsAppClient::~dsAppClient( void )
@@ -1560,7 +1560,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    //m_scenegraph.RegisterCameraEvtHandler( m_camera_evt_cb );
+    m_scenegraph.RegisterCameraEvtHandler( m_camera_evt_cb );
 
 
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera" ) );
@@ -1633,6 +1633,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_curr_camera = m_camera2;
 
 
+    
+
     m_planet->RegisterInertBody( m_ship );
     m_planet->RegisterCameraPoint( m_camera2, true );
     m_planet->RegisterCameraPoint( m_camera3, true );
@@ -1644,7 +1646,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_moon->RegisterCameraPoint( m_camera2, true );
     m_moon->RegisterCameraPoint( m_camera3, true );
     m_moon->RegisterCameraPoint( m_camera4, true );
-    m_moon->RegisterCameraPoint( m_camera5, false );
+    
 
 
     m_scenegraph.RegisterCameraEvtHandler( m_planet->GetCameraEvtCb() );
@@ -1659,6 +1661,33 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     return true;
+}
+
+void dsAppClient::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, DrawSpace::Core::TransformNode* p_node )
+{
+    if( DrawSpace::Scenegraph::ACTIVE == p_event )
+    {
+        if( !p_node )
+        {
+            return;
+        }
+
+        dsstring current_camera_name;
+        p_node->GetName( current_camera_name );
+
+
+        // camera == INERTBODY_LINKED ?
+        //    si body associe relatif a une planete
+        //        m_relative_planet = planet_associee
+        //    sinon
+        //        m_relative_planet = NULL
+
+
+        // camera == FREE_ON_PLANET ?
+        //    
+        //  m_relative_planet = planet_associee
+
+    }
 }
 
 void dsAppClient::OnAppInit( void )

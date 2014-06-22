@@ -65,6 +65,7 @@ protected:
     //DrawSpace::Dynamics::InertBody*                         m_player_body;
 
     std::map<DrawSpace::Dynamics::InertBody*, RegisteredBody>   m_registered_bodies;
+
     std::map<dsstring, RegisteredCamera>                        m_registered_camerapoints;
     dsstring                                                    m_current_camerapoint;
 
@@ -143,6 +144,8 @@ class dsAppClient : public DrawSpace::App
 protected:
 
     typedef DrawSpace::Core::CallBack<dsAppClient, void, MyPlanet*> PlanetRelativeEvtCb;
+
+    typedef DrawSpace::Core::CallBack2<dsAppClient, void, DrawSpace::Scenegraph::CameraEvent, DrawSpace::Core::TransformNode*>         CameraEvtCb;
 
     static dsAppClient*                         m_instance;
 
@@ -257,11 +260,14 @@ protected:
     */
 
     PlanetRelativeEvtCb*                        m_planetrelative_evt_cb;
+    CameraEvtCb*                                m_camera_evt_cb;
 
 
     dsAppClient( void );
 
     void on_relative_to_planet( MyPlanet* p_planet );
+
+    void on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, DrawSpace::Core::TransformNode* p_node );
 
     void compute_player_view_transform( void );
 
