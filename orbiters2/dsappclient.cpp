@@ -327,6 +327,9 @@ void MyPlanet::Update( void )
     {
         if( m_registered_camerapoints[m_current_camerapoint].hot )
         {
+            m_registered_camerapoints[m_current_camerapoint].camera->SetRelativeAltitude( m_drawable->GetAltitud() );
+            m_registered_camerapoints[m_current_camerapoint].camera->SetRelativeOrbiter( m_orbiter );
+
             if( m_suspend_update )
             {
                 bool read_status = m_meshe_ready_mutex.Wait( 0 );
@@ -392,6 +395,11 @@ void MyPlanet::Update( void )
                     break;
             }
         }
+        else
+        {
+            m_registered_camerapoints[m_current_camerapoint].camera->SetRelativeOrbiter( NULL );
+            m_registered_camerapoints[m_current_camerapoint].camera->SetRelativeAltitude( 0.0 );
+        }
     }
 }
 
@@ -400,105 +408,6 @@ long MyPlanet::GetCollisionMesheBuildCount( void )
     return m_collisionmeshebuild_counter;
 }
 
-/*
-void MyPlanet::Update( DrawSpace::Dynamics::InertBody* p_player_body )
-{
-    if( m_player_relative )
-    {
-        DrawSpace::Utils::Matrix playerbodypos;
-        p_player_body->GetLastLocalWorldTrans( playerbodypos );
-
-        DrawSpace::Utils::Vector playerbodypos2;
-        playerbodypos2[0] = playerbodypos( 3, 0 );
-        playerbodypos2[1] = playerbodypos( 3, 1 );
-        playerbodypos2[2] = playerbodypos( 3, 2 );
-
-        dsreal rel_alt = ( playerbodypos2.Length() / m_ray );
-
-        if( rel_alt >= 1.2 )
-        {
-            DetachBody( p_player_body );
-            m_player_relative = false;
-            m_player_body = NULL;
-
-            dsAppClient::GetInstance()->SetRelativePlanet( NULL );
-        }
-        else
-        {
-            if( m_suspend_update )
-            {
-                bool read_status = m_meshe_ready_mutex.Wait( 0 );
-
-                if( read_status )
-                {
-                    bool meshe_ready = m_meshe_ready;
-                    m_meshe_ready_mutex.Release();
-
-                    if( meshe_ready )
-                    {
-                        // bullet meshe build done
-                        m_orbiter->AddToWorld();
-                        m_collision_state = true;
-
-                        m_suspend_update = false;
-                       
-                    }
-
-                }
-            }
-
-            DrawSpace::Utils::Matrix camera_pos;
-
-            m_player_body->GetLastLocalWorldTrans( camera_pos );
-
-            DrawSpace::Utils::Vector hotpoint;
-
-            hotpoint[0] = camera_pos( 3, 0 );
-            hotpoint[1] = camera_pos( 3, 1 );
-            hotpoint[2] = camera_pos( 3, 2 );
-
-            m_drawable->UpdateHotPoint( hotpoint );
-            m_drawable->Compute();
-
-        }
-    }
-    else
-    {
-        DrawSpace::Utils::Matrix playerbodypos;
-        p_player_body->GetLastLocalWorldTrans( playerbodypos );
-
-        DrawSpace::Utils::Vector playerbodypos2;
-        playerbodypos2[0] = playerbodypos( 3, 0 );
-        playerbodypos2[1] = playerbodypos( 3, 1 );
-        playerbodypos2[2] = playerbodypos( 3, 2 );
-
-        DrawSpace::Utils::Matrix planetbodypos;
-        m_orbiter->GetLastWorldTransformation( planetbodypos );
-
-        DrawSpace::Utils::Vector planetbodypos2;
-        planetbodypos2[0] = planetbodypos( 3, 0 );
-        planetbodypos2[1] = planetbodypos( 3, 1 );
-        planetbodypos2[2] = planetbodypos( 3, 2 );
-
-        Vector delta;
-
-        delta[0] = planetbodypos2[0] - playerbodypos2[0];
-        delta[1] = planetbodypos2[1] - playerbodypos2[1];
-        delta[2] = planetbodypos2[2] - playerbodypos2[2];
-        delta[3] = 1.0;
-
-        if( ( delta.Length() / m_ray ) < 1.1 )
-        {
-            AttachBody( p_player_body );
-            m_player_relative = true;
-            m_suspend_update = false;
-            m_player_body = p_player_body;
-
-            dsAppClient::GetInstance()->SetRelativePlanet( this );
-        }
-    }
-}
-*/
 
 void MyPlanet::RegisterInertBody( DrawSpace::Dynamics::InertBody* p_body )
 {
@@ -625,7 +534,7 @@ void MyPlanet::ManageBodies( void )
                 dsstring body_camera_name;
                 if( body_find_attached_camera( it->second.body, body_camera_name ) )
                 {
-                    m_registered_camerapoints[body_camera_name].hot = false;
+                    m_registered_camerapoints[body_camera_name].hot = false;                    
                 }
 
                 //////
@@ -692,7 +601,7 @@ void MyPlanet::ManageBodies( void )
                 dsstring body_camera_name;
                 if( body_find_attached_camera( it->second.body, body_camera_name ) )
                 {
-                    m_registered_camerapoints[body_camera_name].hot = true;
+                    m_registered_camerapoints[body_camera_name].hot = true;                    
                 }
 
                 /////
@@ -814,7 +723,8 @@ m_mouselb( false ),
 m_mouserb( false ), 
 m_speed( 0.0 ), 
 m_speed_speed( 5.0 ),
-m_relative_planet( NULL )
+m_relative_planet( NULL ),
+m_curr_camera( NULL )
 {    
     _INIT_LOGGER( "orbiters2.conf" )  
     m_w_title = "orbiters 2 test";
@@ -857,7 +767,6 @@ m_relative_planet( NULL )
 
     m_planetrelative_evt_cb = _DRAWSPACE_NEW_( PlanetRelativeEvtCb, PlanetRelativeEvtCb( this, &dsAppClient::on_relative_to_planet ) );
 
-    m_camera_evt_cb = _DRAWSPACE_NEW_( CameraEvtCb, CameraEvtCb( this, &dsAppClient::on_camera_event ) );
 }
 
 dsAppClient::~dsAppClient( void )
@@ -1312,6 +1221,7 @@ void dsAppClient::OnRenderFrame( void )
 
     renderer->DrawText( 0, 255, 0, 10, 115, "contact = %d", m_ship->GetContactState() );
 
+    /*
     if( m_relative_planet )
     {       
         dsstring planet_name;
@@ -1319,10 +1229,65 @@ void dsAppClient::OnRenderFrame( void )
         renderer->DrawText( 0, 255, 0, 10, 135, "relative to : %s altitud = %f", planet_name.c_str(), m_relative_planet->GetAltitud() );
         //renderer->DrawText( 0, 255, 0, 10, 155, "collision state %d", m_relative_planet->GetCollisionState() );
     }
+    */
+    
+    // current camera infos
+
+    dsstring camera_name;
+
+    if( m_curr_camera )
+    {
+        m_curr_camera->GetName( camera_name );
+        renderer->DrawText( 0, 255, 0, 10, 150, "Camera : %s", camera_name.c_str() );
+
+        CameraPoint::Infos cam_infos;
+
+        m_curr_camera->GetInfos( cam_infos );
+
+        if( cam_infos.attached_to_body )
+        {
+            renderer->DrawText( 0, 255, 0, 10, 170, "Attached to : %s", cam_infos.attached_body_classname.c_str() );
+        }
+
+        if( cam_infos.locked_on_body )
+        {
+            renderer->DrawText( 0, 255, 0, 10, 190, "Locked on body" );
+        }
+        else if( cam_infos.locked_on_transformnode )
+        {
+            renderer->DrawText( 0, 255, 0, 10, 190, "Locked on transform node" );
+        }
+        else
+        {
+            renderer->DrawText( 0, 255, 0, 10, 190, "No lock target" );
+        }
+
+        if( cam_infos.has_movement )
+        {
+            renderer->DrawText( 0, 255, 0, 10, 210, "Associated movement : %s", cam_infos.movement_classname.c_str() );
+        }
+        else
+        {
+            renderer->DrawText( 0, 255, 0, 10, 210, "No associated movement" );
+        }
+
+        if( cam_infos.has_longlatmovement )
+        {
+            renderer->DrawText( 0, 255, 0, 10, 230, "On longlat movement" );
+        }
+
+        if( cam_infos.relative_orbiter )
+        {
+            renderer->DrawText( 0, 255, 0, 10, 250, "Relative to an orbiter" );
+            renderer->DrawText( 0, 255, 0, 10, 270, "Altitude = %.2f m", cam_infos.altitud );
+        }
+    }
 
 
-    renderer->DrawText( 0, 255, 0, 10, 195, "planet01 : %d %d", m_planet->GetCollisionState(), m_planet->GetCollisionMesheBuildCount() );
-    renderer->DrawText( 0, 255, 0, 10, 215, "moon : %d %d", m_moon->GetCollisionState(), m_moon->GetCollisionMesheBuildCount() );
+
+
+    //renderer->DrawText( 0, 255, 0, 10, 195, "planet01 : %d %d", m_planet->GetCollisionState(), m_planet->GetCollisionMesheBuildCount() );
+    //renderer->DrawText( 0, 255, 0, 10, 215, "moon : %d %d", m_moon->GetCollisionState(), m_moon->GetCollisionMesheBuildCount() );
 
 
     Vector tf, tt;
@@ -1338,6 +1303,7 @@ void dsAppClient::OnRenderFrame( void )
     m_ship->GetTotalTorque( tt );
 
     
+    /*
     if( m_relative_planet )
     {
         // remove gravity effect
@@ -1348,6 +1314,7 @@ void dsAppClient::OnRenderFrame( void )
         tf[1] = tf[1] - 0.5 * m_player_ship_gravity[1];
         tf[2] = tf[2] - 0.5 * m_player_ship_gravity[2];
     }
+    */
 
     
     ship_trans.Transform( &tf, &tf2 );
@@ -1560,8 +1527,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    m_scenegraph.RegisterCameraEvtHandler( m_camera_evt_cb );
-
 
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera" ) );
     m_scenegraph.RegisterNode( m_camera );
@@ -1663,32 +1628,6 @@ bool dsAppClient::OnIdleAppInit( void )
     return true;
 }
 
-void dsAppClient::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, DrawSpace::Core::TransformNode* p_node )
-{
-    if( DrawSpace::Scenegraph::ACTIVE == p_event )
-    {
-        if( !p_node )
-        {
-            return;
-        }
-
-        dsstring current_camera_name;
-        p_node->GetName( current_camera_name );
-
-
-        // camera == INERTBODY_LINKED ?
-        //    si body associe relatif a une planete
-        //        m_relative_planet = planet_associee
-        //    sinon
-        //        m_relative_planet = NULL
-
-
-        // camera == FREE_ON_PLANET ?
-        //    
-        //  m_relative_planet = planet_associee
-
-    }
-}
 
 void dsAppClient::OnAppInit( void )
 {

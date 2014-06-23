@@ -253,12 +253,6 @@ protected:
 
     MyPlanet*                                   m_relative_planet;
 
-
-    /*
-    CameraEvtCb*                                m_camera_evt_cb;
-    BodyEvtCb*                                  m_body_evt_cb;
-    */
-
     PlanetRelativeEvtCb*                        m_planetrelative_evt_cb;
     CameraEvtCb*                                m_camera_evt_cb;
 
@@ -266,8 +260,6 @@ protected:
     dsAppClient( void );
 
     void on_relative_to_planet( MyPlanet* p_planet );
-
-    void on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, DrawSpace::Core::TransformNode* p_node );
 
     void compute_player_view_transform( void );
 
