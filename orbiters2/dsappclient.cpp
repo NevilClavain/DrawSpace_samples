@@ -288,12 +288,12 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
                     {
                         if( m_registered_bodies[m_registered_camerapoints[m_current_camerapoint].attached_body].attached )
                         {
-                            m_registered_camerapoints[m_current_camerapoint].hot = true;
+                            m_registered_camerapoints[m_current_camerapoint].hot = true;                            
                         }
                         else
                         {
                             m_registered_camerapoints[m_current_camerapoint].hot = false;
-
+                         
                             m_drawable->ResetMeshes();
                         }
                     }
@@ -301,7 +301,7 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
 
                 case FREE_ON_PLANET:
                     {
-                        m_registered_camerapoints[m_current_camerapoint].hot = true;
+                        m_registered_camerapoints[m_current_camerapoint].hot = true;                        
                     }
                     break;
 
@@ -327,9 +327,6 @@ void MyPlanet::Update( void )
     {
         if( m_registered_camerapoints[m_current_camerapoint].hot )
         {
-            m_registered_camerapoints[m_current_camerapoint].camera->SetRelativeAltitude( m_drawable->GetAltitud() );
-            m_registered_camerapoints[m_current_camerapoint].camera->SetRelativeOrbiter( m_orbiter );
-
             if( m_suspend_update )
             {
                 bool read_status = m_meshe_ready_mutex.Wait( 0 );
@@ -395,10 +392,13 @@ void MyPlanet::Update( void )
                     break;
             }
         }
-        else
+
+        CameraPoint::Infos cam_infos;
+        m_registered_camerapoints[m_current_camerapoint].camera->GetInfos( cam_infos );
+
+        if( cam_infos.relative_orbiter && cam_infos.relative_orbiter == m_orbiter )
         {
-            m_registered_camerapoints[m_current_camerapoint].camera->SetRelativeOrbiter( NULL );
-            m_registered_camerapoints[m_current_camerapoint].camera->SetRelativeAltitude( 0.0 );
+            m_registered_camerapoints[m_current_camerapoint].camera->SetRelativeAltitude( m_drawable->GetAltitud() );
         }
     }
 }
@@ -462,6 +462,8 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
 
                     reg_camera.type = FREE_ON_PLANET;
                     reg_camera.attached_body = NULL;
+
+                    reg_camera.camera->SetRelativeOrbiter( m_orbiter );
                 }
                 else
                 {
@@ -489,17 +491,15 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
     return true;
 }
 
-bool MyPlanet::body_find_attached_camera( DrawSpace::Dynamics::InertBody* p_body, dsstring& p_name )
+void MyPlanet::body_find_attached_camera( DrawSpace::Dynamics::InertBody* p_body, /*dsstring& p_name*/ std::vector<dsstring>& p_name )
 {
     for( std::map<dsstring, RegisteredCamera>::iterator it = m_registered_camerapoints.begin(); it != m_registered_camerapoints.end(); ++it )
     {
         if( it->second.camera->GetAttachedBody() == p_body )
         {
-            p_name = it->first;
-            return true;
+            p_name.push_back( it->first );            
         }
-    }
-    return false;
+    }    
 }
 
 void MyPlanet::ManageBodies( void )
@@ -531,11 +531,26 @@ void MyPlanet::ManageBodies( void )
                 detach_body( it->second.body );
 
                 // rechercher si une camera enregistree est associee a ce body
-                dsstring body_camera_name;
+                //dsstring body_camera_name;
+
+                /*
                 if( body_find_attached_camera( it->second.body, body_camera_name ) )
                 {
-                    m_registered_camerapoints[body_camera_name].hot = false;                    
+                    m_registered_camerapoints[body_camera_name].hot = false;
+
+                    m_registered_camerapoints[body_camera_name].camera->SetRelativeOrbiter( NULL );
                 }
+                */
+
+                std::vector<dsstring> cameras;
+                body_find_attached_camera( it->second.body, cameras );
+
+                for( long i = 0; i < cameras.size(); i++ )
+                {
+                    m_registered_camerapoints[cameras[i]].hot = false;
+                    m_registered_camerapoints[cameras[i]].camera->SetRelativeOrbiter( NULL );
+                }
+
 
                 //////
 
@@ -552,15 +567,6 @@ void MyPlanet::ManageBodies( void )
 
 
                 //////
-                /*
-                // si la camera active est bien liee au body concernee
-                if( m_current_camerapoint != "" && 
-                    m_registered_camerapoints[m_current_camerapoint].type == INERTBODY_LINKED &&   
-                    m_registered_camerapoints[m_current_camerapoint].attached_body == it->second.body )
-                {
-                    notify_relative_to_planet_event( false );
-                }
-                */
             }
         }
         else
@@ -598,22 +604,28 @@ void MyPlanet::ManageBodies( void )
 
                 // rechercher si une camera enregistree est associee a ce body
 
+                /*
                 dsstring body_camera_name;
                 if( body_find_attached_camera( it->second.body, body_camera_name ) )
                 {
-                    m_registered_camerapoints[body_camera_name].hot = true;                    
+                    m_registered_camerapoints[body_camera_name].hot = true;
+
+                    m_registered_camerapoints[body_camera_name].camera->SetRelativeOrbiter( m_orbiter );
                 }
+                */
 
                 /////
 
-                /*
-                if( m_current_camerapoint != "" && 
-                    m_registered_camerapoints[m_current_camerapoint].type == INERTBODY_LINKED &&   
-                    m_registered_camerapoints[m_current_camerapoint].attached_body == it->second.body )
+                std::vector<dsstring> cameras;
+                body_find_attached_camera( it->second.body, cameras );
+
+                for( long i = 0; i < cameras.size(); i++ )
                 {
-                    notify_relative_to_planet_event( true );
+                    m_registered_camerapoints[cameras[i]].hot = true;
+                    m_registered_camerapoints[cameras[i]].camera->SetRelativeOrbiter( m_orbiter );
                 }
-                */
+
+
             }
         }
     }

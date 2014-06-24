@@ -94,7 +94,9 @@ protected:
     void attach_body( DrawSpace::Dynamics::InertBody* p_body );
     void detach_body( DrawSpace::Dynamics::InertBody* p_body );
 
-    bool body_find_attached_camera( DrawSpace::Dynamics::InertBody* p_body, dsstring& p_name );
+    //bool body_find_attached_camera( DrawSpace::Dynamics::InertBody* p_body, dsstring& p_name );
+
+    void body_find_attached_camera( DrawSpace::Dynamics::InertBody* p_body, std::vector<dsstring>& p_name );
 
     void notify_relative_to_planet_event( bool p_relative );
 
