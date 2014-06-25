@@ -299,15 +299,17 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
                     }
                     break;
 
-                case FREE_ON_PLANET:
+                case FREE_ON_PLANET:                
                     {
-                        m_registered_camerapoints[m_current_camerapoint].hot = true;                        
+                        m_registered_camerapoints[m_current_camerapoint].hot = true;
                     }
                     break;
 
+
                 case FREE:
                     {
-                        // TODO
+                        m_registered_camerapoints[m_current_camerapoint].hot = false;
+                        m_drawable->ResetMeshes();
                     }
                     break;
             }
@@ -368,10 +370,8 @@ void MyPlanet::Update( void )
                     }
                     break;
 
-                case FREE_ON_PLANET:
+                case FREE_ON_PLANET:                
                     {
-                        // TODO
-
                         m_registered_camerapoints[m_current_camerapoint].camera->GetLocalTransform( camera_pos );
 
                         DrawSpace::Utils::Vector hotpoint;
@@ -382,12 +382,6 @@ void MyPlanet::Update( void )
 
                         m_drawable->UpdateHotPoint( hotpoint );
                         m_drawable->Compute();
-                    }
-                    break;
-
-                case FREE:
-                    {
-                        // TODO
                     }
                     break;
             }
@@ -545,7 +539,7 @@ void MyPlanet::ManageBodies( void )
                 std::vector<dsstring> cameras;
                 body_find_attached_camera( it->second.body, cameras );
 
-                for( long i = 0; i < cameras.size(); i++ )
+                for( size_t i = 0; i < cameras.size(); i++ )
                 {
                     m_registered_camerapoints[cameras[i]].hot = false;
                     m_registered_camerapoints[cameras[i]].camera->SetRelativeOrbiter( NULL );
@@ -619,7 +613,7 @@ void MyPlanet::ManageBodies( void )
                 std::vector<dsstring> cameras;
                 body_find_attached_camera( it->second.body, cameras );
 
-                for( long i = 0; i < cameras.size(); i++ )
+                for( size_t i = 0; i < cameras.size(); i++ )
                 {
                     m_registered_camerapoints[cameras[i]].hot = true;
                     m_registered_camerapoints[cameras[i]].camera->SetRelativeOrbiter( m_orbiter );
@@ -1584,7 +1578,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     
-    m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 ) );
+    m_freemove.Init( DrawSpace::Utils::Vector( 265000000.0, 0.0, 0.0, 1.0 ) );
 
 
     m_camera->RegisterMovement( &m_freemove );
@@ -1603,8 +1597,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_calendar->RegisterOrbit( m_orbit2 );
 
 
-
-    //m_scenegraph.SetCurrentCamera( "camera" );
     m_scenegraph.SetCurrentCamera( "camera2" );
 
     m_curr_camera = m_camera2;
@@ -1617,12 +1609,14 @@ bool dsAppClient::OnIdleAppInit( void )
     m_planet->RegisterCameraPoint( m_camera3, true );
     m_planet->RegisterCameraPoint( m_camera4, true );
     m_planet->RegisterCameraPoint( m_camera5, false );
+    m_planet->RegisterCameraPoint( m_camera, false );
 
 
     m_moon->RegisterInertBody( m_ship );
     m_moon->RegisterCameraPoint( m_camera2, true );
     m_moon->RegisterCameraPoint( m_camera3, true );
     m_moon->RegisterCameraPoint( m_camera4, true );
+    m_moon->RegisterCameraPoint( m_camera, false );
     
 
 
@@ -1818,6 +1812,12 @@ void dsAppClient::OnKeyPulse( long p_key )
                 m_curr_camera = m_camera5;
             }
             else if( m_curr_camera == m_camera5 )
+            {
+                m_scenegraph.SetCurrentCamera( "camera" );
+                m_curr_camera = m_camera;
+            }
+
+            else if( m_curr_camera == m_camera )
             {
                 m_scenegraph.SetCurrentCamera( "camera2" );
                 m_curr_camera = m_camera2;
