@@ -124,10 +124,7 @@ public:
     CameraEvtCb* GetCameraEvtCb( void );
 
 
-    //void ApplyGravity( void );
-
-    //void Update( DrawSpace::Dynamics::InertBody* p_player_body );
-
+    void ApplyGravity( void );
 
     void ManageBodies( void );
     void Update( void );
@@ -226,8 +223,6 @@ protected:
 
     ///////////////////////////////////////////////////////////
 
-    DrawSpace::Utils::Vector                    m_player_ship_gravity;
-
     DrawSpace::Utils::Matrix                    m_player_view_transform;
 
     DrawSpace::Utils::Vector                    m_player_view_pos;
@@ -255,13 +250,11 @@ protected:
 
     MyPlanet*                                   m_relative_planet;
 
-    PlanetRelativeEvtCb*                        m_planetrelative_evt_cb;
+
     CameraEvtCb*                                m_camera_evt_cb;
 
 
     dsAppClient( void );
-
-    void on_relative_to_planet( MyPlanet* p_planet );
 
     void compute_player_view_transform( void );
 
@@ -293,11 +286,6 @@ public:
     virtual void OnMouseRightButtonDown( long p_xm, long p_ym );
     virtual void OnMouseRightButtonUp( long p_xm, long p_ym );
     virtual void OnAppEvent( WPARAM p_wParam, LPARAM p_lParam );
-
-    virtual DrawSpace::Dynamics::Rocket* GetPlayerShip( void );
-    virtual void SetLastPlayerShipGravity( const DrawSpace::Utils::Vector& p_gravity );
-
-    //virtual void SetRelativePlanet( MyPlanet* p_planet );
 };
 
 #endif

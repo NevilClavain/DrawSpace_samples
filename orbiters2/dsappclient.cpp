@@ -233,10 +233,9 @@ void MyPlanet::detach_body( DrawSpace::Dynamics::InertBody* p_body )
     m_registered_bodies[p_body].attached = false;
 }
 
-// PROVISOIRE
-/*
 void MyPlanet::ApplyGravity( void )
 {
+    /*
     for( size_t i = 0; i < m_attached_bodies.size(); i++ )
     {
         DrawSpace::Utils::Matrix local_pos;
@@ -257,8 +256,28 @@ void MyPlanet::ApplyGravity( void )
             dsAppClient::GetInstance()->SetLastPlayerShipGravity( gravity );
         }
     }
+    */
+
+    for( std::map<DrawSpace::Dynamics::InertBody*, RegisteredBody>::iterator it = m_registered_bodies.begin(); it != m_registered_bodies.end(); ++it )
+    {
+        if( it->second.attached )
+        {
+            DrawSpace::Utils::Matrix local_pos;
+            it->second.body->GetLastLocalWorldTrans( local_pos );
+
+            Vector gravity;
+
+            gravity[0] = -local_pos( 3, 0 );
+            gravity[1] = -local_pos( 3, 1 );
+            gravity[2] = -local_pos( 3, 2 );
+            gravity[3] = 1.0;
+            gravity.Normalize();
+            gravity.Scale( SHIP_MASS * 9.81 );
+
+            it->second.body->ApplyForce( gravity );
+        }
+    }
 }
-*/
 
 void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, DrawSpace::Core::TransformNode* p_node )
 {
@@ -766,13 +785,6 @@ m_curr_camera( NULL )
 
 
     m_player_view_theta = m_player_view_phi = m_player_view_rho = 0.0;
-
-    /*
-    m_body_evt_cb = _DRAWSPACE_NEW_( BodyEvtCb, BodyEvtCb( this, &dsAppClient::on_body_event ) );
-    */
-
-    m_planetrelative_evt_cb = _DRAWSPACE_NEW_( PlanetRelativeEvtCb, PlanetRelativeEvtCb( this, &dsAppClient::on_relative_to_planet ) );
-
 }
 
 dsAppClient::~dsAppClient( void )
@@ -1185,8 +1197,8 @@ void dsAppClient::OnRenderFrame( void )
     m_orbit->OrbitStep( origin );
 
 
-    //m_planet->ApplyGravity();
-    //m_moon->ApplyGravity();
+    m_planet->ApplyGravity();
+    m_moon->ApplyGravity();
 
     m_ship->Update();
 
@@ -1227,15 +1239,6 @@ void dsAppClient::OnRenderFrame( void )
 
     renderer->DrawText( 0, 255, 0, 10, 115, "contact = %d", m_ship->GetContactState() );
 
-    /*
-    if( m_relative_planet )
-    {       
-        dsstring planet_name;
-        m_relative_planet->GetName( planet_name );
-        renderer->DrawText( 0, 255, 0, 10, 135, "relative to : %s altitud = %f", planet_name.c_str(), m_relative_planet->GetAltitud() );
-        //renderer->DrawText( 0, 255, 0, 10, 155, "collision state %d", m_relative_planet->GetCollisionState() );
-    }
-    */
     
     // current camera infos
 
@@ -1308,21 +1311,7 @@ void dsAppClient::OnRenderFrame( void )
     m_ship->GetTotalForce( tf );
     m_ship->GetTotalTorque( tt );
 
-    
-    /*
-    if( m_relative_planet )
-    {
-        // remove gravity effect
-
-        // had to scale my ship gravity vector by 0.5, but dont understand why...
-
-        tf[0] = tf[0] - 0.5 * m_player_ship_gravity[0];
-        tf[1] = tf[1] - 0.5 * m_player_ship_gravity[1];
-        tf[2] = tf[2] - 0.5 * m_player_ship_gravity[2];
-    }
-    */
-
-    
+         
     ship_trans.Transform( &tf, &tf2 );
     ship_trans.Transform( &tt, &tt2 );
         
@@ -1331,10 +1320,6 @@ void dsAppClient::OnRenderFrame( void )
     m_player_view_angular_acc[2] = -tt2[2];
     m_player_view_angular_acc[1] = -tt2[1];
     m_player_view_angular_acc[0] = -tt2[0];
-
-
-
-
 
 
 
@@ -1623,9 +1608,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterCameraEvtHandler( m_planet->GetCameraEvtCb() );
     m_scenegraph.RegisterCameraEvtHandler( m_moon->GetCameraEvtCb() );
 
-    m_planet->RegisterRelativeEventHandler( m_planetrelative_evt_cb );
-    m_moon->RegisterRelativeEventHandler( m_planetrelative_evt_cb );
-
 
     //m_calendar->Startup( 162682566 );
     m_calendar->Startup( 0 );
@@ -1868,24 +1850,4 @@ void dsAppClient::OnAppEvent( WPARAM p_wParam, LPARAM p_lParam )
 
 }
 
-DrawSpace::Dynamics::Rocket* dsAppClient::GetPlayerShip( void )
-{
-    return m_ship;
-}
 
-void dsAppClient::SetLastPlayerShipGravity( const DrawSpace::Utils::Vector& p_gravity )
-{
-    m_player_ship_gravity = p_gravity;
-}
-
-/*
-void dsAppClient::SetRelativePlanet( MyPlanet* p_planet )
-{
-    m_relative_planet = p_planet;
-}
-*/
-
-void dsAppClient::on_relative_to_planet( MyPlanet* p_planet )
-{
-    m_relative_planet = p_planet;
-}
