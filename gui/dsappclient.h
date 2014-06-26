@@ -57,6 +57,9 @@ protected:
     WidgetEventHandler*                                                             m_mouserightbuttonup_eventhandler;
 
 
+    dsreal                                                                          m_widget_rot;
+
+
     dsAppClient( void );
 
     void on_mousein( DrawSpace::Gui::Widget* p_widget );

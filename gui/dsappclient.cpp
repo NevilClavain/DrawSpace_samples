@@ -17,7 +17,8 @@ m_xangle( 0.0 ),
 m_zangle( 0.0 ), 
 m_mouselb( false ), 
 m_xmouse( 0 ), 
-m_ymouse( 0 )
+m_ymouse( 0 ),
+m_widget_rot( 0.0 )
 {    
     _INIT_LOGGER( "gui.conf" )  
     m_w_title = "gui test";
@@ -61,6 +62,10 @@ void dsAppClient::OnRenderFrame( void )
     m_scenegraph.ComputeTransformations( m_timer );
    
 
+
+    m_timer.AngleSpeedInc( &m_widget_rot, 45.0 );
+
+    m_image1->SetRotationAngle( m_widget_rot );
 
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
