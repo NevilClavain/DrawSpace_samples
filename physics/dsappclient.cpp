@@ -98,24 +98,30 @@ void dsAppClient::OnRenderFrame( void )
 
     renderer->DrawText( 0, 255, 0, 10, 85, "%s", date.c_str() );
 
+  
+    ///////////////////////////////////////////
 
-    Vector v1;
-    m_camera_2->GetLockedBodyCenter( v1 );
+    Matrix cube0_pos;
+    Vector cube0_pos_v;
+    dsreal center_x, center_y;
 
-    renderer->DrawText( 0, 255, 0, 10, 105, "%f %f %f", v1[0], v1[1], v1[2] );
+    m_boxes[0].inert_body->GetLastWorldTransformation( cube0_pos );
+
+    cube0_pos_v[0] = cube0_pos( 3, 0 );
+    cube0_pos_v[1] = cube0_pos( 3, 1 );
+    cube0_pos_v[2] = cube0_pos( 3, 2 );
+    cube0_pos_v[3] = 1.0;
+
+    m_scenegraph.PointProjection( cube0_pos_v, center_x, center_y );
+
+    renderer->DrawText( 0, 255, 0, 10, 105, "%f %f", center_x, center_y );
 
 
+    ///////////////////////////////////////////
 
 
     renderer->FlipScreen();
 
-    /*
-    m_timer.Update();
-    if( m_timer.IsReady() )
-    {
-        m_world.StepSimulation( m_timer.GetFPS() );
-    }
-    */
 
     m_calendar->Run();
 }
