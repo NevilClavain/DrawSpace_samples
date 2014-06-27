@@ -54,6 +54,9 @@ protected:
 
     DrawSpace::Dynamics::Calendar*              m_calendar;
 
+
+    dsreal                                      m_zoom;
+
     typedef struct
     {
         //DrawSpace::Drawable* drawable;

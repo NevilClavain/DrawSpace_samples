@@ -16,7 +16,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_box_count( 0 ), m_box_texture( 0 ), m_fpsmove( true )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_box_count( 0 ), m_box_texture( 0 ), m_fpsmove( true ), m_zoom( 1.0 )
 {    
     _INIT_LOGGER( "physics.conf" )  
     m_w_title = "physics test";    
@@ -364,8 +364,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    //m_scenegraph.SetCurrentCamera( "camera" );
-    m_scenegraph.SetCurrentCamera( "camera2" );
+    m_scenegraph.SetCurrentCamera( "camera" );
+    //m_scenegraph.SetCurrentCamera( "camera2" );
 
     m_camera->RegisterMovement( &m_fpsmove );
 
@@ -511,6 +511,24 @@ void dsAppClient::OnKeyPulse( long p_key )
         case VK_F7:
             {
             }
+            break;
+
+        case VK_PRIOR:
+
+            m_timer.TranslationSpeedInc( &m_zoom, 2.0 );
+            Maths::Clamp( 0.01, 50.0, m_zoom );
+
+            m_camera->UpdateProjectionZNear( m_zoom );
+
+            break;
+
+        case VK_NEXT:
+
+            m_timer.TranslationSpeedDec( &m_zoom, 2.0 );
+            Maths::Clamp( 0.01, 50.0, m_zoom );
+
+            m_camera->UpdateProjectionZNear( m_zoom );
+
             break;
 
     }
