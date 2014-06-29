@@ -57,6 +57,8 @@ protected:
 
     dsreal                                      m_zoom;
 
+    DrawSpace::Image*                           m_image1;
+
     typedef struct
     {
         //DrawSpace::Drawable* drawable;

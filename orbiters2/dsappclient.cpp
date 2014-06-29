@@ -748,7 +748,6 @@ m_mouselb( false ),
 m_mouserb( false ), 
 m_speed( 0.0 ), 
 m_speed_speed( 5.0 ),
-m_relative_planet( NULL ),
 m_curr_camera( NULL )
 {    
     _INIT_LOGGER( "orbiters2.conf" )  
@@ -1183,8 +1182,11 @@ void dsAppClient::OnRenderFrame( void )
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
 
 
+    m_cube_body->Update();
+
+
     compute_player_view_transform();
-    m_camera2->SetLocalTransform( m_player_view_transform );
+    //m_camera2->SetLocalTransform( m_player_view_transform ); // PROVISOIRE
 
 
     Matrix id;
@@ -1207,6 +1209,35 @@ void dsAppClient::OnRenderFrame( void )
            
     m_scenegraph.ComputeTransformations( m_timer );
 
+    //////////////////////////////////////////////////////////////
+
+    /*
+    m_text_widget->SetVirtualTranslation( 100, 75 );
+    m_reticle_widget->Transform();
+    m_reticle_widget->Draw();
+    */
+
+    Matrix cube0_pos;
+    Vector cube0_pos_v;
+    dsreal center_x, center_y;
+
+    m_cube_body->GetLastWorldTransformation( cube0_pos );
+
+    cube0_pos_v[0] = cube0_pos( 3, 0 );
+    cube0_pos_v[1] = cube0_pos( 3, 1 );
+    cube0_pos_v[2] = cube0_pos( 3, 2 );
+    cube0_pos_v[3] = 1.0;
+
+    m_scenegraph.PointProjection( cube0_pos_v, center_x, center_y );
+
+
+    m_text_widget->GetImage()->SetTranslation( center_x, center_y );
+
+
+
+
+    //////////////////////////////////////////////////////////////
+
 
     //m_planet->Update( m_ship );
     //m_moon->Update( m_ship );
@@ -1220,6 +1251,9 @@ void dsAppClient::OnRenderFrame( void )
 
 
     m_texturepass->GetRenderingQueue()->Draw();
+
+    //m_text_widget->Draw();
+
     m_finalpass->GetRenderingQueue()->Draw();
 
 
@@ -1347,6 +1381,21 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
 
+    /////////////////////////////////////
+
+
+    status = DrawSpace::Utils::LoadFontImportPlugin( "cbfgfont.dll", "cbfgfont_plugin" );
+    m_font_import = DrawSpace::Utils::InstanciateFontImportFromPlugin( "cbfgfont_plugin" );
+    m_font = _DRAWSPACE_NEW_( Font, Font );
+    m_font->SetImporter( m_font_import );
+
+    status = m_font->Build( "mangalfont.bmp", "mangalfont.csv" );
+    if( !status )
+    {
+        return false;
+    }
+
+
     /////////////////////////////////////    
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -1422,6 +1471,55 @@ bool dsAppClient::OnIdleAppInit( void )
     
     
     //////////////////////////////////////////////////////////////
+
+
+
+    m_chunk = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+
+    m_chunk->RegisterPassSlot( "texture_pass" );
+    m_chunk->SetRenderer( renderer );
+
+    m_chunk->SetName( "box" );
+    
+    m_chunk->GetMeshe()->SetImporter( m_meshe_import );
+
+    m_chunk->GetMeshe()->LoadFromFile( "object.ac", 0 );    
+
+    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    m_chunk->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "tex07.jpg" ) ), 0 );
+
+
+
+    m_chunk->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
+
+    m_scenegraph.RegisterNode( m_chunk );
+
+
+    DrawSpace::Dynamics::Body::Parameters cube_params;
+    cube_params.mass = 50.0;
+    cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
+
+
+    cube_params.initial_attitude.Translation( 0.0, 0.0, -20.0 );
+
+
+    m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, m_chunk, cube_params ) );
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////
 
 
     m_planet = _DRAWSPACE_NEW_( MyPlanet, MyPlanet( "planet01", 400.0 ) );
@@ -1502,16 +1600,12 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterNode( m_ship_drawable );
 
 
-    DrawSpace::Dynamics::Body::Parameters cube_params;
+    //DrawSpace::Dynamics::Body::Parameters cube_params;
     cube_params.mass = SHIP_MASS;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 2.0, 0.5, 4.0, 1.0 );
-    /*
-    cube_params.initial_pos = DrawSpace::Utils::Vector( 265000000.0, 0.0, -10.0, 1.0 );
-    cube_params.initial_rot.Identity();
-    */
 
-    cube_params.initial_attitude.Translation( 265000000.0, 0.0, -10.0 );
+    cube_params.initial_attitude.Translation( /*265000000.0*/0.0, 0.0, 0.0 );
 
     m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, m_ship_drawable, cube_params ) );
 
@@ -1559,11 +1653,71 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
+    ///////////////////////////////////////////////////////////////
+
+
+    m_reticle_widget = _DRAWSPACE_NEW_( ReticleWidget, ReticleWidget( "reticle_widget", (long)20, (long)20, &m_scenegraph, NULL ) );
+    
+
+
+
+    m_text_widget = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget", DRAWSPACE_GUI_WIDTH, DRAWSPACE_GUI_HEIGHT, m_font, true, m_reticle_widget ) );
+
+    m_text_widget->GetBackgroundImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_text_widget->GetBackgroundImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+
+
+    m_text_widget->GetBackgroundImage()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget->GetBackgroundImage()->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_text_widget->GetBackgroundImage()->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "reticle.bmp" ) ), 0 );
+    m_text_widget->GetBackgroundImage()->GetTexture( 0 )->LoadFromFile();
+
+
+  
+    m_text_widget->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_text_widget->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+
+    m_text_widget->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_text_widget->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add"  ) );
+    m_text_widget->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always"  ) );
+    m_text_widget->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one"  ) );
+    m_text_widget->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha"  ) );
+    m_text_widget->GetImage()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+
+    m_text_widget->GetImage()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget->GetImage()->GetFx()->GetShader( 1 )->LoadFromFile();
+
+
+    m_text_widget->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
+    m_text_widget->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
+    m_text_widget->GetText()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget->GetText()->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_text_widget->GetText()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_text_widget->GetText()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+
+    m_text_widget->GetText()->AddShaderParameter( 1, "color", 0 );
+    m_text_widget->GetText()->SetShaderRealVector( "color", Utils::Vector( 1.0, 1.0, 0.0, 1.0 ) );
+
+    m_text_widget->GetImage()->SetOrderNumber( 20000 );
+    m_text_widget->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
+
+    m_text_widget->RegisterToPass( m_finalpass );
+
+
+    m_reticle_widget->LockOnBody( /*m_planet->GetOrbiter()*/ m_cube_body );
+
+
+    ///////////////////////////////////////////////////////////////
+
+
+
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     
-    m_freemove.Init( DrawSpace::Utils::Vector( 265000000.0, 0.0, 0.0, 1.0 ) );
+    m_freemove.Init( DrawSpace::Utils::Vector( /*265000000.0*/ 50.0, 0.0, 0.0, 1.0 ) );
 
 
     m_camera->RegisterMovement( &m_freemove );
@@ -1607,6 +1761,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_scenegraph.RegisterCameraEvtHandler( m_planet->GetCameraEvtCb() );
     m_scenegraph.RegisterCameraEvtHandler( m_moon->GetCameraEvtCb() );
+
+    ///////////////////////////////////////////////////////////////
 
 
     //m_calendar->Startup( 162682566 );

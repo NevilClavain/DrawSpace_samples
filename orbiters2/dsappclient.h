@@ -220,6 +220,10 @@ protected:
     DrawSpace::Chunk*                           m_ship_drawable;
 
 
+    DrawSpace::Dynamics::InertBody*             m_cube_body;
+    DrawSpace::Chunk*                           m_chunk;
+
+
 
     ///////////////////////////////////////////////////////////
 
@@ -248,7 +252,10 @@ protected:
 
     ////////////////////////////////////////////////////////////
 
-    MyPlanet*                                   m_relative_planet;
+
+    DrawSpace::Gui::ReticleWidget*              m_reticle_widget;
+    DrawSpace::Gui::TextWidget*                 m_text_widget;
+
 
 
     CameraEvtCb*                                m_camera_evt_cb;
