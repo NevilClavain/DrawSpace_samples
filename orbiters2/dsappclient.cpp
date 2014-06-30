@@ -1196,7 +1196,7 @@ void dsAppClient::OnRenderFrame( void )
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
 
 
-    m_cube_body->Update();
+    
 
 
     compute_player_view_transform();
@@ -1217,6 +1217,7 @@ void dsAppClient::OnRenderFrame( void )
     m_moon->ApplyGravity();
 
     m_ship->Update();
+    m_cube_body->Update();
 
 
 
@@ -1237,6 +1238,7 @@ void dsAppClient::OnRenderFrame( void )
 
     m_planet->Update();
     m_moon->Update();
+    
 
     m_planet->ManageBodies();
     m_moon->ManageBodies();
@@ -1352,6 +1354,8 @@ void dsAppClient::OnRenderFrame( void )
     renderer->FlipScreen();
 
     m_calendar->Run();
+
+    
 
     m_freemove.SetSpeed( m_speed );
 }
@@ -1766,7 +1770,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_longlat_mvt2 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    m_longlat_mvt2->Init( -21.0009, 20.0, 400001.0, 0.0, 0.0 );
+    m_longlat_mvt2->Init( -21.0039, 20.0004, 400000.5, 0.0, 0.0 );
     m_longlat_mvt2->Compute( m_timer );
     Matrix llres;
     m_longlat_mvt2->GetResult( llres );
