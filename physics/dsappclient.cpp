@@ -190,7 +190,7 @@ void dsAppClient::create_box( void )
     cube_params.initial_rot.Identity();
     */
 
-    cube_params.initial_attitude.Translation( 0.0, 10.5, 0.0 );
+    cube_params.initial_attitude.Translation( 0.0, 10.5, -25.0 );
 
 
     DrawSpace::Dynamics::InertBody* cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, chunk, cube_params ) );

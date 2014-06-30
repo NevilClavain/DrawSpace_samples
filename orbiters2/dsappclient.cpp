@@ -432,6 +432,18 @@ void MyPlanet::RegisterInertBody( DrawSpace::Dynamics::InertBody* p_body )
     m_registered_bodies[p_body] = reg_body;
 }
 
+void MyPlanet::RegisterIncludedInertBody( DrawSpace::Dynamics::InertBody* p_body, const DrawSpace::Utils::Matrix& p_initmat )
+{
+    RegisteredBody reg_body;
+
+    reg_body.attached = true;
+    reg_body.body = p_body;
+
+    m_registered_bodies[p_body] = reg_body;
+
+    p_body->IncludeTo( m_orbiter, p_initmat );
+}
+
 bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, bool p_update_meshe )
 {   
     RegisteredCamera reg_camera;
@@ -798,6 +810,7 @@ void dsAppClient::compute_player_view_transform( void )
 {
     Matrix cam_base_pos;
     cam_base_pos.Translation( 0.0, 2.8, 11.4 );
+
 
     /////////////////////////////////////////////////////
 
@@ -1167,6 +1180,7 @@ void dsAppClient::compute_player_view_transform( void )
     tf.PushMatrix( rotz );
     tf.BuildResult();
     tf.GetResult( &m_player_view_transform );
+
 }
 
 void dsAppClient::OnRenderFrame( void )
@@ -1186,7 +1200,7 @@ void dsAppClient::OnRenderFrame( void )
 
 
     compute_player_view_transform();
-    //m_camera2->SetLocalTransform( m_player_view_transform ); // PROVISOIRE
+    m_camera2->SetLocalTransform( m_player_view_transform );
 
 
     Matrix id;
@@ -1211,36 +1225,14 @@ void dsAppClient::OnRenderFrame( void )
 
     //////////////////////////////////////////////////////////////
 
-    /*
+    
     m_text_widget->SetVirtualTranslation( 100, 75 );
     m_reticle_widget->Transform();
     m_reticle_widget->Draw();
-    */
-
-    Matrix cube0_pos;
-    Vector cube0_pos_v;
-    dsreal center_x, center_y;
-
-    m_cube_body->GetLastWorldTransformation( cube0_pos );
-
-    cube0_pos_v[0] = cube0_pos( 3, 0 );
-    cube0_pos_v[1] = cube0_pos( 3, 1 );
-    cube0_pos_v[2] = cube0_pos( 3, 2 );
-    cube0_pos_v[3] = 1.0;
-
-    m_scenegraph.PointProjection( cube0_pos_v, center_x, center_y );
-
-
-    m_text_widget->GetImage()->SetTranslation( center_x, center_y );
-
-
-
+    
 
     //////////////////////////////////////////////////////////////
 
-
-    //m_planet->Update( m_ship );
-    //m_moon->Update( m_ship );
 
 
     m_planet->Update();
@@ -1252,7 +1244,7 @@ void dsAppClient::OnRenderFrame( void )
 
     m_texturepass->GetRenderingQueue()->Draw();
 
-    //m_text_widget->Draw();
+    m_text_widget->Draw();
 
     m_finalpass->GetRenderingQueue()->Draw();
 
@@ -1507,16 +1499,18 @@ bool dsAppClient::OnIdleAppInit( void )
     DrawSpace::Dynamics::Body::Parameters cube_params;
     cube_params.mass = 50.0;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
-    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
+    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 ); //DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
 
 
-    cube_params.initial_attitude.Translation( 0.0, 0.0, -20.0 );
+    //cube_params.initial_attitude.Translation( 265000000.0, 0.0, -20.0 );
+
+    //cube_params.initial_attitude = llres;
 
 
     m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, m_chunk, cube_params ) );
 
 
-
+    
 
 
     ///////////////////////////////////////////////////////////////
@@ -1605,7 +1599,7 @@ bool dsAppClient::OnIdleAppInit( void )
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 2.0, 0.5, 4.0, 1.0 );
 
-    cube_params.initial_attitude.Translation( /*265000000.0*/0.0, 0.0, 0.0 );
+    cube_params.initial_attitude.Translation( 265000000.0, 0.0, 0.0 );
 
     m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, m_ship_drawable, cube_params ) );
 
@@ -1644,8 +1638,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterNode( m_camera5 );
 
     m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-
-    m_longlat_mvt->Init( 0.0, 0.0, 400031.0, 7.0, -1.0 );
+    m_longlat_mvt->Init( -21.0, 20.0, 400000.5, 0.0, 0.0 );
     m_camera5->RegisterLongLatMovement( m_longlat_mvt );
     //m_camera5->RegisterMovement( m_longlat_mvt );
 
@@ -1706,7 +1699,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_text_widget->RegisterToPass( m_finalpass );
 
 
-    m_reticle_widget->LockOnBody( /*m_planet->GetOrbiter()*/ m_cube_body );
+    m_reticle_widget->LockOnBody( /*m_moon->GetOrbiter()*/ m_cube_body );
+    //m_reticle_widget->LockOnTransformNode( m_camera5 );
 
 
     ///////////////////////////////////////////////////////////////
@@ -1717,7 +1711,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     
-    m_freemove.Init( DrawSpace::Utils::Vector( /*265000000.0*/ 50.0, 0.0, 0.0, 1.0 ) );
+    m_freemove.Init( DrawSpace::Utils::Vector( 265000000.0, 0.0, 50.0, 1.0 ) );
 
 
     m_camera->RegisterMovement( &m_freemove );
@@ -1736,9 +1730,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_calendar->RegisterOrbit( m_orbit2 );
 
 
-    m_scenegraph.SetCurrentCamera( "camera2" );
+    m_scenegraph.SetCurrentCamera( "camera5" );
 
-    m_curr_camera = m_camera2;
+    m_curr_camera = m_camera5;
 
 
     
@@ -1747,7 +1741,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_planet->RegisterCameraPoint( m_camera2, true );
     m_planet->RegisterCameraPoint( m_camera3, true );
     m_planet->RegisterCameraPoint( m_camera4, true );
-    m_planet->RegisterCameraPoint( m_camera5, false );
+    m_planet->RegisterCameraPoint( m_camera5, /*false*/ true );
     m_planet->RegisterCameraPoint( m_camera, false );
 
 
@@ -1755,7 +1749,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_moon->RegisterCameraPoint( m_camera2, true );
     m_moon->RegisterCameraPoint( m_camera3, true );
     m_moon->RegisterCameraPoint( m_camera4, true );
-    m_moon->RegisterCameraPoint( m_camera, false );
+    m_moon->RegisterCameraPoint( m_camera, /*false*/ true );
     
 
 
@@ -1763,6 +1757,24 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterCameraEvtHandler( m_moon->GetCameraEvtCb() );
 
     ///////////////////////////////////////////////////////////////
+
+
+    //m_camera5->LockOnBody( m_moon->GetOrbiter() );
+    //m_camera5->LockOnBody( m_ship );
+    m_camera5->LockOnBody( m_cube_body );
+
+
+
+    m_longlat_mvt2 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    m_longlat_mvt2->Init( -21.0009, 20.0, 400001.0, 0.0, 0.0 );
+    m_longlat_mvt2->Compute( m_timer );
+    Matrix llres;
+    m_longlat_mvt2->GetResult( llres );
+
+    m_planet->RegisterIncludedInertBody( m_cube_body, llres );
+
+
+
 
 
     //m_calendar->Startup( 162682566 );
@@ -1790,14 +1802,14 @@ void dsAppClient::OnKeyPress( long p_key )
 
 
             m_timer.TranslationSpeedInc( &m_speed, m_speed_speed );
-            m_speed_speed *= 1.03;
+            m_speed_speed *= 1.83;
           
             break;
 
         case 'W':
 
             m_timer.TranslationSpeedDec( &m_speed, m_speed_speed );
-            m_speed_speed *= 1.06;
+            m_speed_speed *= 1.86;
  
             break;
 

@@ -130,6 +130,7 @@ public:
     void Update( void );
 
     void RegisterInertBody( DrawSpace::Dynamics::InertBody* p_body );
+    void RegisterIncludedInertBody( DrawSpace::Dynamics::InertBody* p_body, const DrawSpace::Utils::Matrix& p_initmat );
     bool RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, bool p_update_meshe );
     void RegisterRelativeEventHandler( PlanetRelativeEventHandler* p_handler );
 
@@ -177,6 +178,9 @@ protected:
 
     DrawSpace::Dynamics::CameraPoint*           m_camera5;
     DrawSpace::Core::LongLatMovement*           m_longlat_mvt;
+
+
+    DrawSpace::Core::LongLatMovement*           m_longlat_mvt2;
 
 
     DrawSpace::Dynamics::CameraPoint*           m_curr_camera;
