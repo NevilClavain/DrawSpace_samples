@@ -51,7 +51,12 @@ protected:
     DrawSpace::Dynamics::World                                  m_world;
     dsstring                                                    m_name;
     DrawSpace::Dynamics::Orbiter*                               m_orbiter;
-    DrawSpace::Planet::Body*                                    m_drawable;
+    
+    //DrawSpace::Planet::Body*                                    m_drawable;
+    DrawSpace::Planet::Drawing*                                 m_drawable;
+    DrawSpace::Planet::Body*                                    m_planetbody;
+
+
     PlanetEvtCb*                                                m_planet_evt_cb;
     RunnerEvtCb*                                                m_runner_evt_cb;
     CameraEvtCb*                                                m_camera_evt_cb;
@@ -112,7 +117,8 @@ public:
     MyPlanet( const dsstring& p_name, dsreal p_ray );
     ~MyPlanet( void );
 
-    DrawSpace::Planet::Body* GetDrawable( void );
+    DrawSpace::Planet::Drawing* GetDrawable( void );
+    DrawSpace::Planet::Body* GetPlanetBody( void );
     DrawSpace::Dynamics::Orbiter*   GetOrbiter( void );
     DrawSpace::Dynamics::World*     GetWorld( void );
 

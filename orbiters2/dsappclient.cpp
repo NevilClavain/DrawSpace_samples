@@ -35,14 +35,18 @@ m_collisionmeshebuild_counter( 0 )
 
     m_world.Initialize();
 
-    m_drawable = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
+    
+    //m_drawable = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
+    m_planetbody = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
+    m_drawable = _DRAWSPACE_NEW_( DrawSpace::Planet::Drawing, DrawSpace::Planet::Drawing );
     m_drawable->SetName( p_name );
     m_drawable->SetRenderer( DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface );
-
+    
     m_orbiter = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Orbiter, DrawSpace::Dynamics::Orbiter( &m_world, m_drawable ) );
 
     m_planet_evt_cb = _DRAWSPACE_NEW_( PlanetEvtCb, PlanetEvtCb( this, &MyPlanet::on_planet_event ) );
-    m_drawable->RegisterEventHandler( m_planet_evt_cb );
+    //m_drawable->RegisterEventHandler( m_planet_evt_cb );
+    m_planetbody->RegisterEventHandler( m_planet_evt_cb );
 
 
     m_camera_evt_cb = _DRAWSPACE_NEW_( CameraEvtCb, CameraEvtCb( this, &MyPlanet::on_camera_event ) );
@@ -82,10 +86,16 @@ MyPlanet::CameraEvtCb* MyPlanet::GetCameraEvtCb( void )
     return m_camera_evt_cb;
 }
 
-DrawSpace::Planet::Body* MyPlanet::GetDrawable( void )
+DrawSpace::Planet::Drawing* MyPlanet::GetDrawable( void )
 {
     return m_drawable;
 }
+
+DrawSpace::Planet::Body* MyPlanet::GetPlanetBody( void )
+{
+    return m_planetbody;
+}
+
 
 DrawSpace::Dynamics::Orbiter* MyPlanet::GetOrbiter( void )
 {
@@ -208,7 +218,8 @@ void MyPlanet::on_meshebuild_request( PropertyPool* p_args )
 
 dsreal MyPlanet::GetAltitud( void )
 {
-    return m_drawable->GetAltitud();
+    //return m_drawable->GetAltitud();
+    return m_planetbody->GetAltitud();
 }
 
 DrawSpace::Dynamics::World* MyPlanet::GetWorld( void )
@@ -313,7 +324,8 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
                         {
                             m_registered_camerapoints[m_current_camerapoint].hot = false;
                          
-                            m_drawable->ResetMeshes();
+                            //m_drawable->ResetMeshes();
+                            m_planetbody->ResetMeshes();
                         }
                     }
                     break;
@@ -328,7 +340,8 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
                 case FREE:
                     {
                         m_registered_camerapoints[m_current_camerapoint].hot = false;
-                        m_drawable->ResetMeshes();
+                        //m_drawable->ResetMeshes();
+                        m_planetbody->ResetMeshes();
                     }
                     break;
             }
@@ -383,8 +396,14 @@ void MyPlanet::Update( void )
                         hotpoint[1] = camera_pos( 3, 1 );
                         hotpoint[2] = camera_pos( 3, 2 );
 
+                        /*
                         m_drawable->UpdateHotPoint( hotpoint );
                         m_drawable->Compute();
+                        */
+
+                        m_planetbody->UpdateHotPoint( hotpoint );
+                        m_planetbody->Compute();
+
                         
                     }
                     break;
@@ -399,8 +418,14 @@ void MyPlanet::Update( void )
                         hotpoint[1] = camera_pos( 3, 1 );
                         hotpoint[2] = camera_pos( 3, 2 );
 
+                        /*
                         m_drawable->UpdateHotPoint( hotpoint );
                         m_drawable->Compute();
+                        */
+
+                        m_planetbody->UpdateHotPoint( hotpoint );
+                        m_planetbody->Compute();
+
                     }
                     break;
             }
@@ -411,7 +436,8 @@ void MyPlanet::Update( void )
 
         if( cam_infos.relative_orbiter && cam_infos.relative_orbiter == m_orbiter )
         {
-            m_registered_camerapoints[m_current_camerapoint].camera->SetRelativeAltitude( m_drawable->GetAltitud() );
+            //m_registered_camerapoints[m_current_camerapoint].camera->SetRelativeAltitude( m_drawable->GetAltitud() );
+            m_registered_camerapoints[m_current_camerapoint].camera->SetRelativeAltitude( m_planetbody->GetAltitud() );
         }
     }
 }
@@ -1364,6 +1390,7 @@ bool dsAppClient::OnIdleAppInit( void )
 {
     //World::m_scale = 0.5;
     World::m_scale = 1.0;
+    DrawSpace::Planet::Body::BuildPlanetMeshe();
 
 
     bool status;
@@ -1531,7 +1558,8 @@ bool dsAppClient::OnIdleAppInit( void )
     }
     m_scenegraph.RegisterNode( m_planet->GetDrawable() );
 
-    m_planet->GetDrawable()->Initialize();
+    //m_planet->GetDrawable()->Initialize();
+    m_planet->GetPlanetBody()->Initialize();
 
     
 
@@ -1554,7 +1582,7 @@ bool dsAppClient::OnIdleAppInit( void )
     }
     m_scenegraph.RegisterNode( m_moon->GetDrawable() );
 
-    m_moon->GetDrawable()->Initialize();
+    m_moon->GetPlanetBody()->Initialize();
 
     m_centroid2 = _DRAWSPACE_NEW_( Centroid, Centroid );
     m_centroid2->SetOrbiter( m_moon->GetOrbiter() );
@@ -1734,9 +1762,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_calendar->RegisterOrbit( m_orbit2 );
 
 
-    m_scenegraph.SetCurrentCamera( "camera5" );
+    m_scenegraph.SetCurrentCamera( "camera2" );
 
-    m_curr_camera = m_camera5;
+    m_curr_camera = m_camera2;
 
 
     
@@ -1765,7 +1793,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //m_camera5->LockOnBody( m_moon->GetOrbiter() );
     //m_camera5->LockOnBody( m_ship );
-    m_camera5->LockOnBody( m_cube_body );
+    //m_camera5->LockOnBody( m_cube_body );
 
 
 
@@ -1778,6 +1806,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_planet->RegisterIncludedInertBody( m_cube_body, llres );
 
 
+    m_planet->GetDrawable()->SetCurrentPlanetBody( m_planet->GetPlanetBody() );
 
 
 
