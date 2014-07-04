@@ -21,6 +21,231 @@ _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
 
+Fragment::Fragment( const dsstring& p_name, DrawSpace::Planet::Body* p_planetbody, DrawSpace::Dynamics::Collider* p_collider, dsreal p_planetray ) :
+m_planetbody( p_planetbody ), 
+m_collider( p_collider ),
+m_suspend_update( false ),
+m_collision_state( false ),
+m_planetray( p_planetray )
+{
+    DrawSpace::Core::Mediator* mediator = Mediator::GetInstance();
+
+    m_runner = _DRAWSPACE_NEW_( Runner, Runner );
+
+    m_planet_evt_cb = _DRAWSPACE_NEW_( PlanetEvtCb, PlanetEvtCb( this, &Fragment::on_planet_event ) );
+    m_planetbody->RegisterEventHandler( m_planet_evt_cb );
+
+
+    m_runner_evt_cb = _DRAWSPACE_NEW_( RunnerEvtCb, RunnerEvtCb( this, &Fragment::on_meshebuild_request ) );
+
+
+    dsstring reqevtname = p_name + dsstring( "_ReqBuildMesheEvent" );
+    dsstring doneevtname = p_name + dsstring( "_DoneBuildMesheEvent" );
+
+    m_buildmeshe_event = mediator->CreateEvent( reqevtname );
+    
+    m_buildmeshe_event->args->AddProp<Meshe*>( "patchmeshe" );
+    m_buildmeshe_event->args->AddProp<dsreal>( "sidelength" );
+    m_buildmeshe_event->args->AddProp<dsreal>( "xpos" );
+    m_buildmeshe_event->args->AddProp<dsreal>( "ypos" );
+    m_buildmeshe_event->args->AddProp<int>( "orientation" );
+
+    m_runner->RegisterEventHandler( m_buildmeshe_event, m_runner_evt_cb );
+
+    m_task = _DRAWSPACE_NEW_( Task<Runner>, Task<Runner> );
+    m_task->Startup( m_runner );
+}
+
+Fragment::~Fragment( void )
+{
+    _DRAWSPACE_DELETE_( m_runner );
+}
+
+void Fragment::on_planet_event( DrawSpace::Planet::Body* p_body, int p_currentface )
+{
+    long tri_index = 0;
+    dsreal alt = p_body->GetAltitud();
+
+    if( alt < 1000.0 )
+    {
+        if( !m_suspend_update )
+        {
+            Planet::Patch* curr_patch = p_body->GetFaceCurrentLeaf( p_currentface );
+
+            dsreal xpos, ypos;
+            curr_patch->GetPos( xpos, ypos );
+
+
+            if( m_collision_state )
+            {
+                m_collider->RemoveFromWorld();
+                m_collider->UnsetKinematic();
+            }
+
+            m_suspend_update = true;
+
+            m_meshe_ready_mutex.WaitInfinite();
+            m_meshe_ready = false;
+            m_meshe_ready_mutex.Release();
+
+
+            m_buildmeshe_event->args->SetPropValue<Meshe*>( "patchmeshe", p_body->GetPatcheMeshe() );
+            m_buildmeshe_event->args->SetPropValue<dsreal>( "sidelength", curr_patch->GetSideLength() / m_planetray );
+            m_buildmeshe_event->args->SetPropValue<dsreal>( "xpos", xpos / m_planetray );
+            m_buildmeshe_event->args->SetPropValue<dsreal>( "ypos", ypos / m_planetray );
+            m_buildmeshe_event->args->SetPropValue<int>( "orientation", curr_patch->GetOrientation() );
+
+            m_buildmeshe_event->Notify();            
+
+            ////////////////////////////////////////////////
+        }
+    }
+    else
+    {
+        if( m_collision_state )
+        {
+            if( !m_suspend_update )
+            {
+                m_collider->RemoveFromWorld();
+                m_collider->UnsetKinematic();
+            }
+            m_collision_state = false;
+        }
+    }
+}
+
+
+void Fragment::on_meshebuild_request( PropertyPool* p_args )
+{
+    //localy copy inputs
+
+    DrawSpace::Core::Meshe patchmeshe;
+    int patch_orientation;
+    dsreal sidelength;
+    dsreal xpos, ypos;
+
+
+    patchmeshe = *( p_args->GetPropValue<Meshe*>( "patchmeshe" ) );
+    patch_orientation = p_args->GetPropValue<int>( "orientation" );
+    sidelength = p_args->GetPropValue<dsreal>( "sidelength" );
+    xpos = p_args->GetPropValue<dsreal>( "xpos" );
+    ypos = p_args->GetPropValue<dsreal>( "ypos" );
+
+
+    ////////////////////////////// do the work
+
+    Meshe final_meshe;
+    build_meshe( patchmeshe, patch_orientation, sidelength, xpos, ypos, final_meshe );
+
+
+    Body::Parameters params;
+
+
+    params.mass = 0.0;
+
+    params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
+
+    params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
+    params.shape_descr.meshe = final_meshe;
+
+    m_collider->SetKinematic( params );
+
+    ////////////////////////////////////////////
+
+    m_meshe_ready_mutex.WaitInfinite();
+    m_meshe_ready = true;
+    m_meshe_ready_mutex.Release();
+
+    Sleep( 25 );
+
+}
+
+
+void Fragment::build_meshe( DrawSpace::Core::Meshe& p_patchmeshe, int p_patch_orientation, dsreal p_sidelength, dsreal p_xpos, dsreal p_ypos, DrawSpace::Core::Meshe& p_outmeshe )
+{
+    for( long i = 0; i < p_patchmeshe.GetVertexListSize(); i++ )
+    {                
+
+        Vertex v, v2, v3;
+        p_patchmeshe.GetVertex( i, v );
+
+        v.x = v.x * p_sidelength / 2.0;
+        v.y = v.y * p_sidelength / 2.0;
+        v.z = v.z * p_sidelength / 2.0;
+
+        v.x += p_xpos;
+        v.y += p_ypos;
+
+        switch( p_patch_orientation )
+        {
+            case Planet::Patch::FrontPlanetFace:
+
+                v2.x = v.x;
+                v2.y = v.y;
+                v2.z = 1.0;
+                break;
+
+            case Planet::Patch::RearPlanetFace:
+
+                v2.x = -v.x;
+                v2.y = v.y;
+                v2.z = -1.0;
+                break;
+
+            case Planet::Patch::LeftPlanetFace:
+
+                v2.x = -1.0;
+                v2.y = v.y;
+                v2.z = v.x;
+                break;
+
+            case Planet::Patch::RightPlanetFace:
+
+                v2.x = 1.0;
+                v2.y = v.y;
+                v2.z = -v.x;
+                break;
+
+            case Planet::Patch::TopPlanetFace:
+
+                v2.x = v.x;
+                v2.y = 1.0;
+                v2.z = -v.y;
+                break;
+
+            case Planet::Patch::BottomPlanetFace:
+
+                v2.x = v.x;
+                v2.y = -1.0;
+                v2.z = v.y;
+                break;
+        }
+
+        dsreal xtemp = v2.x;
+        dsreal ytemp = v2.y;
+        dsreal ztemp = v2.z;
+
+        v2.x = xtemp * sqrt( 1.0 - ytemp * ytemp * 0.5 - ztemp * ztemp * 0.5 + ytemp * ytemp * ztemp * ztemp / 3.0 );
+        v2.y = ytemp * sqrt( 1.0 - ztemp * ztemp * 0.5 - xtemp * xtemp * 0.5 + xtemp * xtemp * ztemp * ztemp / 3.0 );
+        v2.z = ztemp * sqrt( 1.0 - xtemp * xtemp * 0.5 - ytemp * ytemp * 0.5 + xtemp * xtemp * ytemp * ytemp / 3.0 );
+
+        v3.x = v2.x * m_planetray;
+        v3.y = v2.y * m_planetray;
+        v3.z = v2.z * m_planetray;
+
+        p_outmeshe.AddVertex( v3 );
+    }
+
+    for( long i = 0; i < p_patchmeshe.GetTrianglesListSize(); i++ )
+    {
+        Triangle t;
+        p_patchmeshe.GetTriangles( i, t );
+        p_outmeshe.AddTriangle( t );
+    }
+}
+
+
+
 
 MyPlanet::MyPlanet( const dsstring& p_name, dsreal p_ray ) : 
 m_name( p_name ),
@@ -448,7 +673,7 @@ long MyPlanet::GetCollisionMesheBuildCount( void )
 }
 
 
-void MyPlanet::RegisterInertBody( DrawSpace::Dynamics::InertBody* p_body )
+void MyPlanet::RegisterInertBody( const dsstring& p_bodyname, DrawSpace::Dynamics::InertBody* p_body )
 {
     RegisteredBody reg_body;
 
@@ -456,9 +681,17 @@ void MyPlanet::RegisterInertBody( DrawSpace::Dynamics::InertBody* p_body )
     reg_body.body = p_body;
 
     m_registered_bodies[p_body] = reg_body;
+
+    DrawSpace::Planet::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray ) );
+    Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
+
+    dsstring final_name = m_name + dsstring( " " ) + p_bodyname;
+    Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray ) );
+
+    m_planetfragments_table[p_body->GetDrawable()] = planet_fragment;
 }
 
-void MyPlanet::RegisterIncludedInertBody( DrawSpace::Dynamics::InertBody* p_body, const DrawSpace::Utils::Matrix& p_initmat )
+void MyPlanet::RegisterIncludedInertBody( const dsstring& p_bodyname, DrawSpace::Dynamics::InertBody* p_body, const DrawSpace::Utils::Matrix& p_initmat )
 {
     RegisteredBody reg_body;
 
@@ -1769,7 +2002,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     
 
-    m_planet->RegisterInertBody( m_ship );
+    m_planet->RegisterInertBody( "ship", m_ship );
     m_planet->RegisterCameraPoint( m_camera2, true );
     m_planet->RegisterCameraPoint( m_camera3, true );
     m_planet->RegisterCameraPoint( m_camera4, true );
@@ -1777,7 +2010,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_planet->RegisterCameraPoint( m_camera, false );
 
 
-    m_moon->RegisterInertBody( m_ship );
+    m_moon->RegisterInertBody( "ship", m_ship );
     m_moon->RegisterCameraPoint( m_camera2, true );
     m_moon->RegisterCameraPoint( m_camera3, true );
     m_moon->RegisterCameraPoint( m_camera4, true );
@@ -1803,7 +2036,7 @@ bool dsAppClient::OnIdleAppInit( void )
     Matrix llres;
     m_longlat_mvt2->GetResult( llres );
 
-    m_planet->RegisterIncludedInertBody( m_cube_body, llres );
+    m_planet->RegisterIncludedInertBody( "simple_cube", m_cube_body, llres );
 
 
     m_planet->GetDrawable()->SetCurrentPlanetBody( m_planet->GetPlanetBody() );
