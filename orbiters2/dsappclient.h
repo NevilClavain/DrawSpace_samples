@@ -5,6 +5,8 @@
 #include <dsapp.h>
 
 
+class MyPlanet;
+
 class Fragment
 {
 protected:
@@ -31,8 +33,15 @@ protected:
 
     dsreal                                                      m_planetray;
 
+    bool                                                        m_hot;
 
 
+    DrawSpace::Dynamics::CameraPoint*                           m_camera;
+    DrawSpace::Dynamics::InertBody*                             m_inertbody;
+
+
+    dsstring                                                    m_name;
+    
     void on_meshebuild_request( DrawSpace::Core::PropertyPool* p_args );
     void on_planet_event( DrawSpace::Planet::Body* p_body, int p_currentface );
 
@@ -42,6 +51,13 @@ public:
 
     Fragment( const dsstring& p_name, DrawSpace::Planet::Body* p_planetbody, DrawSpace::Dynamics::Collider* p_collider, dsreal p_planetray );
     virtual ~Fragment( void );
+
+    void Update( MyPlanet* p_owner );    
+    void SetHotState( bool p_hotstate );
+    void SetCamera( DrawSpace::Dynamics::CameraPoint* p_camera );
+    void SetInertBody( DrawSpace::Dynamics::InertBody* p_body );
+
+    DrawSpace::Planet::Body* GetPlanetBody( void );
 
 };
 
@@ -54,20 +70,6 @@ public:
     typedef DrawSpace::Core::BaseCallback<void, MyPlanet*>                                                                          PlanetRelativeEventHandler;
 
 protected:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -94,7 +96,7 @@ protected:
 
     typedef struct
     {
-        bool                                hot;
+        //bool                                hot;
         bool                                update_meshe;
 
         CameraType                          type;
@@ -196,6 +198,8 @@ public:
 
     void GetName( dsstring& p_name );
 
+    void GetCameraHotpoint( const dsstring& p_name, DrawSpace::Utils::Matrix& p_outmat );
+   
 };
 
 

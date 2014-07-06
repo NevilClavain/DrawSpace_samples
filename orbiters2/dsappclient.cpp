@@ -26,7 +26,10 @@ m_planetbody( p_planetbody ),
 m_collider( p_collider ),
 m_suspend_update( false ),
 m_collision_state( false ),
-m_planetray( p_planetray )
+m_planetray( p_planetray ),
+m_hot( false ),
+m_camera( NULL ),
+m_inertbody( NULL )
 {
     DrawSpace::Core::Mediator* mediator = Mediator::GetInstance();
 
@@ -38,6 +41,7 @@ m_planetray( p_planetray )
 
     m_runner_evt_cb = _DRAWSPACE_NEW_( RunnerEvtCb, RunnerEvtCb( this, &Fragment::on_meshebuild_request ) );
 
+    m_name = p_name;
 
     dsstring reqevtname = p_name + dsstring( "_ReqBuildMesheEvent" );
     dsstring doneevtname = p_name + dsstring( "_DoneBuildMesheEvent" );
@@ -59,6 +63,26 @@ m_planetray( p_planetray )
 Fragment::~Fragment( void )
 {
     _DRAWSPACE_DELETE_( m_runner );
+}
+
+void Fragment::SetHotState( bool p_hotstate )
+{
+    m_hot = p_hotstate;
+}
+
+DrawSpace::Planet::Body* Fragment::GetPlanetBody( void )
+{
+    return m_planetbody;
+}
+
+void Fragment::SetCamera( DrawSpace::Dynamics::CameraPoint* p_camera )
+{
+    m_camera = p_camera;
+}
+
+void Fragment::SetInertBody( DrawSpace::Dynamics::InertBody* p_body )
+{
+    m_inertbody = p_body;
 }
 
 void Fragment::on_planet_event( DrawSpace::Planet::Body* p_body, int p_currentface )
@@ -244,6 +268,68 @@ void Fragment::build_meshe( DrawSpace::Core::Meshe& p_patchmeshe, int p_patch_or
     }
 }
 
+void Fragment::Update( MyPlanet* p_owner )
+{
+    if( m_suspend_update )
+    {
+        bool read_status = m_meshe_ready_mutex.Wait( 0 );
+
+        if( read_status )
+        {
+            bool meshe_ready = m_meshe_ready;
+            m_meshe_ready_mutex.Release();
+
+            if( meshe_ready )
+            {
+                // bullet meshe build done
+                m_collider->AddToWorld();
+                m_collision_state = true;
+                m_suspend_update = false;                
+            }
+        }
+    }
+
+    if( m_hot )
+    {
+
+        Matrix camera_pos;
+        bool inject_hotpoint = false;
+
+        if( m_camera )
+        {
+            dsstring camera_name;
+
+            m_camera->GetName( camera_name );
+            p_owner->GetCameraHotpoint( camera_name, camera_pos );
+            
+            inject_hotpoint = true;
+        }
+        else if( m_inertbody )
+        {
+            m_inertbody->GetLastLocalWorldTrans( camera_pos );
+            inject_hotpoint = true;
+        }
+
+        if( inject_hotpoint )
+        {
+            DrawSpace::Utils::Vector hotpoint;
+
+            hotpoint[0] = camera_pos( 3, 0 );
+            hotpoint[1] = camera_pos( 3, 1 );
+            hotpoint[2] = camera_pos( 3, 2 );
+
+            m_planetbody->UpdateHotPoint( hotpoint );
+            m_planetbody->Compute();
+
+            if( m_camera )
+            {
+                CameraPoint::Infos cam_infos;
+                m_camera->GetInfos( cam_infos );
+                m_camera->SetRelativeAltitude( m_planetbody->GetAltitud() );
+            }
+        }
+    }    
+}
 
 
 
@@ -262,6 +348,8 @@ m_collisionmeshebuild_counter( 0 )
 
     
     //m_drawable = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
+
+
     m_planetbody = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
     m_drawable = _DRAWSPACE_NEW_( DrawSpace::Planet::Drawing, DrawSpace::Planet::Drawing );
     m_drawable->SetName( p_name );
@@ -269,13 +357,16 @@ m_collisionmeshebuild_counter( 0 )
     
     m_orbiter = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Orbiter, DrawSpace::Dynamics::Orbiter( &m_world, m_drawable ) );
 
+    /*
     m_planet_evt_cb = _DRAWSPACE_NEW_( PlanetEvtCb, PlanetEvtCb( this, &MyPlanet::on_planet_event ) );
-    //m_drawable->RegisterEventHandler( m_planet_evt_cb );
     m_planetbody->RegisterEventHandler( m_planet_evt_cb );
+    */
 
 
     m_camera_evt_cb = _DRAWSPACE_NEW_( CameraEvtCb, CameraEvtCb( this, &MyPlanet::on_camera_event ) );
 
+
+    /*
     dsstring reqevtname = p_name + dsstring( "_ReqBuildMesheEvent" );
     dsstring doneevtname = p_name + dsstring( "_DoneBuildMesheEvent" );
 
@@ -297,6 +388,7 @@ m_collisionmeshebuild_counter( 0 )
 
     m_task = _DRAWSPACE_NEW_( Task<Runner>, Task<Runner> );
     m_task->Startup( m_runner );
+    */
 }
 
 MyPlanet::~MyPlanet( void )
@@ -334,6 +426,7 @@ bool MyPlanet::GetCollisionState( void )
 
 void MyPlanet::on_planet_event( Planet::Body* p_body, int p_currentface )
 {
+    /*
     if( "" == m_current_camerapoint )
     {
         return;
@@ -393,6 +486,7 @@ void MyPlanet::on_planet_event( Planet::Body* p_body, int p_currentface )
             m_collision_state = false;
         }
     }
+    */
 }
 
 
@@ -529,6 +623,34 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
 
         if( m_registered_camerapoints.count( current_camera_name ) > 0 )
         {
+            m_current_camerapoint = current_camera_name;
+
+            Fragment* fragment = m_planetfragments_table[p_node];
+
+            m_drawable->SetCurrentPlanetBody( fragment->GetPlanetBody() );
+
+        }
+        else
+        {
+            // camera non enregistree
+            m_current_camerapoint = "";
+        }
+    }
+
+    // revoir
+/*
+    if( DrawSpace::Scenegraph::ACTIVE == p_event )
+    {
+        if( !p_node )
+        {
+            return;
+        }
+
+        dsstring current_camera_name;
+        p_node->GetName( current_camera_name );
+
+        if( m_registered_camerapoints.count( current_camera_name ) > 0 )
+        {
             dsstring previous_currentcamera = m_current_camerapoint;
             m_current_camerapoint = current_camera_name;
 
@@ -549,7 +671,6 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
                         {
                             m_registered_camerapoints[m_current_camerapoint].hot = false;
                          
-                            //m_drawable->ResetMeshes();
                             m_planetbody->ResetMeshes();
                         }
                     }
@@ -565,7 +686,7 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
                 case FREE:
                     {
                         m_registered_camerapoints[m_current_camerapoint].hot = false;
-                        //m_drawable->ResetMeshes();
+
                         m_planetbody->ResetMeshes();
                     }
                     break;
@@ -577,11 +698,39 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
             m_current_camerapoint = "";
         }
     }
+    */
 }
 
 
+void MyPlanet::GetCameraHotpoint( const dsstring& p_name, DrawSpace::Utils::Matrix& p_outmat )
+{
+    if( m_registered_camerapoints.count( p_name ) == 0 )
+    {
+        return;
+    }
+
+    if( INERTBODY_LINKED == m_registered_camerapoints[p_name].type )
+    {
+        m_registered_camerapoints[p_name].attached_body->GetLastLocalWorldTrans( p_outmat );
+    }
+    else if( FREE_ON_PLANET == m_registered_camerapoints[p_name].type )
+    {
+        m_registered_camerapoints[p_name].camera->GetLocalTransform( p_outmat );
+    }
+}
+
 void MyPlanet::Update( void )
 {
+    for( std::map<DrawSpace::Core::TransformNode*, Fragment*>::iterator it = m_planetfragments_table.begin(); it != m_planetfragments_table.end(); ++it )
+    {
+        it->second->Update( this );
+    }
+
+
+
+    // revoir
+
+/*
     if( m_current_camerapoint != "" )
     {
         if( m_registered_camerapoints[m_current_camerapoint].hot )
@@ -621,10 +770,6 @@ void MyPlanet::Update( void )
                         hotpoint[1] = camera_pos( 3, 1 );
                         hotpoint[2] = camera_pos( 3, 2 );
 
-                        /*
-                        m_drawable->UpdateHotPoint( hotpoint );
-                        m_drawable->Compute();
-                        */
 
                         m_planetbody->UpdateHotPoint( hotpoint );
                         m_planetbody->Compute();
@@ -643,10 +788,6 @@ void MyPlanet::Update( void )
                         hotpoint[1] = camera_pos( 3, 1 );
                         hotpoint[2] = camera_pos( 3, 2 );
 
-                        /*
-                        m_drawable->UpdateHotPoint( hotpoint );
-                        m_drawable->Compute();
-                        */
 
                         m_planetbody->UpdateHotPoint( hotpoint );
                         m_planetbody->Compute();
@@ -665,6 +806,8 @@ void MyPlanet::Update( void )
             m_registered_camerapoints[m_current_camerapoint].camera->SetRelativeAltitude( m_planetbody->GetAltitud() );
         }
     }
+
+    */
 }
 
 long MyPlanet::GetCollisionMesheBuildCount( void )
@@ -682,13 +825,17 @@ void MyPlanet::RegisterInertBody( const dsstring& p_bodyname, DrawSpace::Dynamic
 
     m_registered_bodies[p_body] = reg_body;
 
-    DrawSpace::Planet::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray ) );
+    DrawSpace::Planet::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
     Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
 
     dsstring final_name = m_name + dsstring( " " ) + p_bodyname;
     Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray ) );
 
     m_planetfragments_table[p_body->GetDrawable()] = planet_fragment;
+
+    planet_fragment->SetInertBody( p_body );
+
+    planet_body->Initialize();
 }
 
 void MyPlanet::RegisterIncludedInertBody( const dsstring& p_bodyname, DrawSpace::Dynamics::InertBody* p_body, const DrawSpace::Utils::Matrix& p_initmat )
@@ -701,6 +848,18 @@ void MyPlanet::RegisterIncludedInertBody( const dsstring& p_bodyname, DrawSpace:
     m_registered_bodies[p_body] = reg_body;
 
     p_body->IncludeTo( m_orbiter, p_initmat );
+
+    DrawSpace::Planet::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
+    Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
+
+    dsstring final_name = m_name + dsstring( " " ) + p_bodyname;
+    Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray ) );
+
+    m_planetfragments_table[p_body->GetDrawable()] = planet_fragment;
+
+    planet_fragment->SetInertBody( p_body );
+
+    planet_body->Initialize();
 }
 
 bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, bool p_update_meshe )
@@ -710,8 +869,8 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
     dsstring camera_name;
     p_camera->GetName( camera_name );
 
-    reg_camera.update_meshe = p_update_meshe;
-    reg_camera.hot = false;
+    //reg_camera.update_meshe = p_update_meshe;
+    //reg_camera.hot = false;
     reg_camera.camera = p_camera;
 
     ////
@@ -772,6 +931,29 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
     ////
 
     m_registered_camerapoints[camera_name] = reg_camera;
+
+
+    DrawSpace::Planet::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
+    Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
+
+    dsstring final_name = m_name + dsstring( " " ) + camera_name;
+    Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray ) );
+
+    m_planetfragments_table[p_camera] = planet_fragment;
+
+    planet_body->Initialize();
+
+    if( FREE_ON_PLANET == reg_camera.type )
+    {
+        planet_fragment->SetHotState( true );
+    }
+    else
+    {
+        planet_fragment->SetHotState( false );
+    }
+
+    planet_fragment->SetCamera( p_camera );
+
     return true;
 }
 
@@ -788,17 +970,11 @@ void MyPlanet::body_find_attached_camera( DrawSpace::Dynamics::InertBody* p_body
 
 void MyPlanet::ManageBodies( void )
 {
-    //for( size_t i = 0; i < m_registered_bodies.size(); i++ )
-
-    for( std::map<DrawSpace::Dynamics::InertBody*, RegisteredBody>::iterator it = m_registered_bodies.begin();
-        it != m_registered_bodies.end(); ++it )
+    for( std::map<DrawSpace::Dynamics::InertBody*, RegisteredBody>::iterator it = m_registered_bodies.begin(); it != m_registered_bodies.end(); ++it )
     {
-        //if( m_registered_bodies[i].attached )
-
         if( it->second.attached )
         {
             DrawSpace::Utils::Matrix bodypos;
-            //m_registered_bodies[i].body->GetLastLocalWorldTrans( bodypos );
 
             it->second.body->GetLastLocalWorldTrans( bodypos );
 
@@ -811,21 +987,120 @@ void MyPlanet::ManageBodies( void )
 
             if( rel_alt >= 1.2 )
             {
-                //detach_body( m_registered_bodies[i].body );
+
                 detach_body( it->second.body );
 
                 // rechercher si une camera enregistree est associee a ce body
-                //dsstring body_camera_name;
+                std::vector<dsstring> cameras;
+                body_find_attached_camera( it->second.body, cameras );
+
+                for( size_t i = 0; i < cameras.size(); i++ )
+                {
+                    m_registered_camerapoints[cameras[i]].camera->SetRelativeOrbiter( NULL );
+                    Fragment* fragment = m_planetfragments_table[m_registered_camerapoints[cameras[i]].camera];
+                    fragment->SetHotState( false );
+
+                }
+
+
+                //////
 
                 /*
-                if( body_find_attached_camera( it->second.body, body_camera_name ) )
+                if( m_collision_state )
                 {
-                    m_registered_camerapoints[body_camera_name].hot = false;
-
-                    m_registered_camerapoints[body_camera_name].camera->SetRelativeOrbiter( NULL );
+                    if( !m_suspend_update )
+                    {
+                        m_orbiter->RemoveFromWorld();
+                        m_orbiter->UnsetKinematic();
+                    }
+                    m_collision_state = false;
                 }
                 */
 
+                DrawSpace::Core::TransformNode* node;                
+                node = it->second.body->GetDrawable();
+
+                Fragment* fragment = m_planetfragments_table[node];
+
+                //////
+            }
+        }
+        else
+        {
+            DrawSpace::Utils::Matrix bodypos;
+
+            it->second.body->GetLastLocalWorldTrans( bodypos );
+
+            DrawSpace::Utils::Vector bodypos2;
+            bodypos2[0] = bodypos( 3, 0 );
+            bodypos2[1] = bodypos( 3, 1 );
+            bodypos2[2] = bodypos( 3, 2 );
+
+            DrawSpace::Utils::Matrix planetbodypos;
+            m_orbiter->GetLastWorldTransformation( planetbodypos );
+
+            DrawSpace::Utils::Vector planetbodypos2;
+            planetbodypos2[0] = planetbodypos( 3, 0 );
+            planetbodypos2[1] = planetbodypos( 3, 1 );
+            planetbodypos2[2] = planetbodypos( 3, 2 );
+
+            Vector delta;
+
+            delta[0] = planetbodypos2[0] - bodypos2[0];
+            delta[1] = planetbodypos2[1] - bodypos2[1];
+            delta[2] = planetbodypos2[2] - bodypos2[2];
+            delta[3] = 1.0;
+
+            dsreal rel_alt = delta.Length() / m_ray;
+
+            if( rel_alt < 1.1 )
+            {
+
+                attach_body( it->second.body );
+
+                /////
+
+                std::vector<dsstring> cameras;
+                body_find_attached_camera( it->second.body, cameras );
+
+                for( size_t i = 0; i < cameras.size(); i++ )
+                {
+                    m_registered_camerapoints[cameras[i]].camera->SetRelativeOrbiter( m_orbiter );
+
+                    Fragment* fragment = m_planetfragments_table[m_registered_camerapoints[cameras[i]].camera];
+                    fragment->SetHotState( true );
+                }
+            }
+        }
+    }
+
+
+    // revoir
+
+    /*
+    for( std::map<DrawSpace::Dynamics::InertBody*, RegisteredBody>::iterator it = m_registered_bodies.begin();
+        it != m_registered_bodies.end(); ++it )
+    {
+
+        if( it->second.attached )
+        {
+            DrawSpace::Utils::Matrix bodypos;
+
+            it->second.body->GetLastLocalWorldTrans( bodypos );
+
+            DrawSpace::Utils::Vector bodypos2;
+            bodypos2[0] = bodypos( 3, 0 );
+            bodypos2[1] = bodypos( 3, 1 );
+            bodypos2[2] = bodypos( 3, 2 );
+
+            dsreal rel_alt = ( bodypos2.Length() / m_ray );
+
+            if( rel_alt >= 1.2 )
+            {
+
+                detach_body( it->second.body );
+
+                // rechercher si une camera enregistree est associee a ce body
                 std::vector<dsstring> cameras;
                 body_find_attached_camera( it->second.body, cameras );
 
@@ -856,7 +1131,7 @@ void MyPlanet::ManageBodies( void )
         else
         {
             DrawSpace::Utils::Matrix bodypos;
-            //m_registered_bodies[i].body->GetLastLocalWorldTrans( bodypos );
+
             it->second.body->GetLastLocalWorldTrans( bodypos );
 
             DrawSpace::Utils::Vector bodypos2;
@@ -883,20 +1158,8 @@ void MyPlanet::ManageBodies( void )
 
             if( rel_alt < 1.1 )
             {
-                //attach_body( m_registered_bodies[i].body );
+
                 attach_body( it->second.body );
-
-                // rechercher si une camera enregistree est associee a ce body
-
-                /*
-                dsstring body_camera_name;
-                if( body_find_attached_camera( it->second.body, body_camera_name ) )
-                {
-                    m_registered_camerapoints[body_camera_name].hot = true;
-
-                    m_registered_camerapoints[body_camera_name].camera->SetRelativeOrbiter( m_orbiter );
-                }
-                */
 
                 /////
 
@@ -913,6 +1176,7 @@ void MyPlanet::ManageBodies( void )
             }
         }
     }
+    */
 }
 
 void MyPlanet::notify_relative_to_planet_event( bool p_relative )
@@ -1792,7 +2056,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterNode( m_planet->GetDrawable() );
 
     //m_planet->GetDrawable()->Initialize();
-    m_planet->GetPlanetBody()->Initialize();
+    //m_planet->GetPlanetBody()->Initialize();
 
     
 
@@ -1815,7 +2079,7 @@ bool dsAppClient::OnIdleAppInit( void )
     }
     m_scenegraph.RegisterNode( m_moon->GetDrawable() );
 
-    m_moon->GetPlanetBody()->Initialize();
+    //m_moon->GetPlanetBody()->Initialize();
 
     m_centroid2 = _DRAWSPACE_NEW_( Centroid, Centroid );
     m_centroid2->SetOrbiter( m_moon->GetOrbiter() );
@@ -1896,7 +2160,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_camera3->LockOnBody( m_ship );
 
     m_camera4->RegisterMovement( m_circular_mvt );
-    m_camera4->LockOnBody( m_planet->GetOrbiter() );
+    m_camera4->LockOnBody( /*m_planet->GetOrbiter()*/ m_cube_body );
 
 
     m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera5", m_planet->GetOrbiter() ) );
@@ -1995,9 +2259,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_calendar->RegisterOrbit( m_orbit2 );
 
 
-    m_scenegraph.SetCurrentCamera( "camera2" );
+    m_scenegraph.SetCurrentCamera( "camera5" );
 
-    m_curr_camera = m_camera2;
+    m_curr_camera = m_camera5;
 
 
     
@@ -2026,7 +2290,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //m_camera5->LockOnBody( m_moon->GetOrbiter() );
     //m_camera5->LockOnBody( m_ship );
-    //m_camera5->LockOnBody( m_cube_body );
+    m_camera5->LockOnBody( m_cube_body );
 
 
 
@@ -2039,8 +2303,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_planet->RegisterIncludedInertBody( "simple_cube", m_cube_body, llres );
 
 
-    m_planet->GetDrawable()->SetCurrentPlanetBody( m_planet->GetPlanetBody() );
-
+    /**/
+    //m_planet->GetDrawable()->SetCurrentPlanetBody( m_planet->GetPlanetBody() );
+    /**/
 
 
     //m_calendar->Startup( 162682566 );
@@ -2110,6 +2375,12 @@ void dsAppClient::OnKeyPress( long p_key )
 
             m_ship->ApplyRightRoll( 50.0 );
             break;
+
+        case 'T':
+
+            m_ship->ApplyFwdForce( 510000.0 );
+            break;
+
 
 
         case VK_SPACE:
