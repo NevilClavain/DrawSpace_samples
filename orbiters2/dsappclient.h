@@ -59,6 +59,8 @@ public:
     void SetCamera( DrawSpace::Dynamics::CameraPoint* p_camera );
     void SetInertBody( DrawSpace::Dynamics::InertBody* p_body );
 
+    void RemoveColliderFromWorld( void );
+
     DrawSpace::Planet::Body* GetPlanetBody( void );
 
 };

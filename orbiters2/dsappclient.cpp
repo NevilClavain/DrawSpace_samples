@@ -148,6 +148,19 @@ void Fragment::on_planet_event( DrawSpace::Planet::Body* p_body, int p_currentfa
     }
 }
 
+void Fragment::RemoveColliderFromWorld( void )
+{
+    if( m_collision_state )
+    {
+        if( !m_suspend_update )
+        {
+            m_collider->RemoveFromWorld();
+            m_collider->UnsetKinematic();
+        }
+        m_collision_state = false;
+    }
+}
+
 
 void Fragment::on_meshebuild_request( PropertyPool* p_args )
 {
@@ -1043,6 +1056,7 @@ void MyPlanet::ManageBodies( void )
                 node = it->second.body->GetDrawable();
 
                 Fragment* fragment = m_planetfragments_table[node];
+                fragment->RemoveColliderFromWorld();
 
                 //////
             }
