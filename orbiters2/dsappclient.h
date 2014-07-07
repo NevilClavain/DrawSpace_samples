@@ -39,6 +39,8 @@ protected:
     DrawSpace::Dynamics::CameraPoint*                           m_camera;
     DrawSpace::Dynamics::InertBody*                             m_inertbody;
 
+    bool                                                        m_collisions;
+
 
     dsstring                                                    m_name;
     
@@ -49,7 +51,7 @@ protected:
 
 public:
 
-    Fragment( const dsstring& p_name, DrawSpace::Planet::Body* p_planetbody, DrawSpace::Dynamics::Collider* p_collider, dsreal p_planetray );
+    Fragment( const dsstring& p_name, DrawSpace::Planet::Body* p_planetbody, DrawSpace::Dynamics::Collider* p_collider, dsreal p_planetray, bool p_collisions );
     virtual ~Fragment( void );
 
     void Update( MyPlanet* p_owner );    

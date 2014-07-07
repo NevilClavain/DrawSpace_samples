@@ -21,7 +21,7 @@ _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
 
-Fragment::Fragment( const dsstring& p_name, DrawSpace::Planet::Body* p_planetbody, DrawSpace::Dynamics::Collider* p_collider, dsreal p_planetray ) :
+Fragment::Fragment( const dsstring& p_name, DrawSpace::Planet::Body* p_planetbody, DrawSpace::Dynamics::Collider* p_collider, dsreal p_planetray, bool p_collisions ) :
 m_planetbody( p_planetbody ), 
 m_collider( p_collider ),
 m_suspend_update( false ),
@@ -29,35 +29,40 @@ m_collision_state( false ),
 m_planetray( p_planetray ),
 m_hot( false ),
 m_camera( NULL ),
-m_inertbody( NULL )
+m_inertbody( NULL ),
+m_collisions( p_collisions )
 {
-    DrawSpace::Core::Mediator* mediator = Mediator::GetInstance();
-
-    m_runner = _DRAWSPACE_NEW_( Runner, Runner );
-
-    m_planet_evt_cb = _DRAWSPACE_NEW_( PlanetEvtCb, PlanetEvtCb( this, &Fragment::on_planet_event ) );
-    m_planetbody->RegisterEventHandler( m_planet_evt_cb );
-
-
-    m_runner_evt_cb = _DRAWSPACE_NEW_( RunnerEvtCb, RunnerEvtCb( this, &Fragment::on_meshebuild_request ) );
-
     m_name = p_name;
 
-    dsstring reqevtname = p_name + dsstring( "_ReqBuildMesheEvent" );
-    dsstring doneevtname = p_name + dsstring( "_DoneBuildMesheEvent" );
+    if( m_collisions )
+    {
 
-    m_buildmeshe_event = mediator->CreateEvent( reqevtname );
-    
-    m_buildmeshe_event->args->AddProp<Meshe*>( "patchmeshe" );
-    m_buildmeshe_event->args->AddProp<dsreal>( "sidelength" );
-    m_buildmeshe_event->args->AddProp<dsreal>( "xpos" );
-    m_buildmeshe_event->args->AddProp<dsreal>( "ypos" );
-    m_buildmeshe_event->args->AddProp<int>( "orientation" );
+        DrawSpace::Core::Mediator* mediator = Mediator::GetInstance();
 
-    m_runner->RegisterEventHandler( m_buildmeshe_event, m_runner_evt_cb );
+        m_runner = _DRAWSPACE_NEW_( Runner, Runner );
 
-    m_task = _DRAWSPACE_NEW_( Task<Runner>, Task<Runner> );
-    m_task->Startup( m_runner );
+        m_planet_evt_cb = _DRAWSPACE_NEW_( PlanetEvtCb, PlanetEvtCb( this, &Fragment::on_planet_event ) );
+        m_planetbody->RegisterEventHandler( m_planet_evt_cb );
+
+        m_runner_evt_cb = _DRAWSPACE_NEW_( RunnerEvtCb, RunnerEvtCb( this, &Fragment::on_meshebuild_request ) );
+       
+        dsstring reqevtname = p_name + dsstring( "_ReqBuildMesheEvent" );
+        dsstring doneevtname = p_name + dsstring( "_DoneBuildMesheEvent" );
+
+        m_buildmeshe_event = mediator->CreateEvent( reqevtname );
+        
+        m_buildmeshe_event->args->AddProp<Meshe*>( "patchmeshe" );
+        m_buildmeshe_event->args->AddProp<dsreal>( "sidelength" );
+        m_buildmeshe_event->args->AddProp<dsreal>( "xpos" );
+        m_buildmeshe_event->args->AddProp<dsreal>( "ypos" );
+        m_buildmeshe_event->args->AddProp<int>( "orientation" );
+
+        m_runner->RegisterEventHandler( m_buildmeshe_event, m_runner_evt_cb );
+
+        m_task = _DRAWSPACE_NEW_( Task<Runner>, Task<Runner> );
+        m_task->Startup( m_runner );
+
+    }
 }
 
 Fragment::~Fragment( void )
@@ -87,6 +92,11 @@ void Fragment::SetInertBody( DrawSpace::Dynamics::InertBody* p_body )
 
 void Fragment::on_planet_event( DrawSpace::Planet::Body* p_body, int p_currentface )
 {
+    if( !m_collisions )
+    {
+        return;
+    }
+
     long tri_index = 0;
     dsreal alt = p_body->GetAltitud();
 
@@ -141,6 +151,11 @@ void Fragment::on_planet_event( DrawSpace::Planet::Body* p_body, int p_currentfa
 
 void Fragment::on_meshebuild_request( PropertyPool* p_args )
 {
+    if( !m_collisions )
+    {
+        return;
+    }
+
     //localy copy inputs
 
     DrawSpace::Core::Meshe patchmeshe;
@@ -723,7 +738,8 @@ void MyPlanet::Update( void )
 {
     for( std::map<DrawSpace::Core::TransformNode*, Fragment*>::iterator it = m_planetfragments_table.begin(); it != m_planetfragments_table.end(); ++it )
     {
-        it->second->Update( this );
+        Fragment* curr = it->second;
+        curr->Update( this );
     }
 
 
@@ -829,7 +845,8 @@ void MyPlanet::RegisterInertBody( const dsstring& p_bodyname, DrawSpace::Dynamic
     Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
 
     dsstring final_name = m_name + dsstring( " " ) + p_bodyname;
-    Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray ) );
+    Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray, true ) );
+    planet_fragment->SetHotState( false );
 
     m_planetfragments_table[p_body->GetDrawable()] = planet_fragment;
 
@@ -853,7 +870,8 @@ void MyPlanet::RegisterIncludedInertBody( const dsstring& p_bodyname, DrawSpace:
     Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
 
     dsstring final_name = m_name + dsstring( " " ) + p_bodyname;
-    Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray ) );
+    Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray, true ) );
+    planet_fragment->SetHotState( true );
 
     m_planetfragments_table[p_body->GetDrawable()] = planet_fragment;
 
@@ -868,6 +886,8 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
 
     dsstring camera_name;
     p_camera->GetName( camera_name );
+
+    bool collisions = false;
 
     //reg_camera.update_meshe = p_update_meshe;
     //reg_camera.hot = false;
@@ -886,6 +906,8 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
             {
                 reg_camera.type = INERTBODY_LINKED;
                 reg_camera.attached_body = inert_body;
+
+                collisions = true;
             }
             else
             {
@@ -937,7 +959,7 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
     Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
 
     dsstring final_name = m_name + dsstring( " " ) + camera_name;
-    Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray ) );
+    Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray, collisions ) );
 
     m_planetfragments_table[p_camera] = planet_fragment;
 
