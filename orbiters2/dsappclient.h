@@ -84,8 +84,10 @@ protected:
 
     typedef struct
     {
-        bool attached;
+        bool                            attached;
         DrawSpace::Dynamics::InertBody* body;
+
+        Fragment*                       fragment;
 
     } RegisteredBody;
 
@@ -107,6 +109,8 @@ protected:
         DrawSpace::Dynamics::InertBody*     attached_body;
 
         DrawSpace::Dynamics::CameraPoint*   camera;
+
+        Fragment*                           fragment;
 
 
     } RegisteredCamera;
@@ -152,7 +156,9 @@ protected:
     std::vector<PlanetRelativeEventHandler*>                    m_relative_evt_handlers;
 
 
-    std::map<DrawSpace::Core::TransformNode*, Fragment*>        m_planetfragments_table;
+    //std::map<DrawSpace::Core::TransformNode*, Fragment*>        m_planetfragments_table;
+
+    std::vector<Fragment*>                                      m_planetfragments_list;
 
 
     void build_meshe( DrawSpace::Core::Meshe& p_patchmeshe, int p_patch_orientation, dsreal p_sidelength, dsreal p_xpos, dsreal p_ypos, DrawSpace::Core::Meshe& p_outmeshe );

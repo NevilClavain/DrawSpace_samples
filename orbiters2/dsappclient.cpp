@@ -653,9 +653,18 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
         {
             m_current_camerapoint = current_camera_name;
 
-            Fragment* fragment = m_planetfragments_table[p_node];
-
-            m_drawable->SetCurrentPlanetBody( fragment->GetPlanetBody() );
+            //Fragment* fragment = m_planetfragments_table[p_node];
+            //m_drawable->SetCurrentPlanetBody( fragment->GetPlanetBody() );
+            for( std::map<dsstring, RegisteredCamera>::iterator it = m_registered_camerapoints.begin(); it != m_registered_camerapoints.end(); ++it )
+            {
+                if( it->second.camera == p_node )
+                {
+                    Fragment* fragment = it->second.fragment;
+                    m_drawable->SetCurrentPlanetBody( fragment->GetPlanetBody() );
+                    
+                    break;
+                }
+            }
 
         }
         else
@@ -664,69 +673,6 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
             m_current_camerapoint = "";
         }
     }
-
-    // revoir
-/*
-    if( DrawSpace::Scenegraph::ACTIVE == p_event )
-    {
-        if( !p_node )
-        {
-            return;
-        }
-
-        dsstring current_camera_name;
-        p_node->GetName( current_camera_name );
-
-        if( m_registered_camerapoints.count( current_camera_name ) > 0 )
-        {
-            dsstring previous_currentcamera = m_current_camerapoint;
-            m_current_camerapoint = current_camera_name;
-
-            if( previous_currentcamera != "" )
-            {
-                m_registered_camerapoints[previous_currentcamera].hot = false;
-            }
-            
-            switch( m_registered_camerapoints[m_current_camerapoint].type )
-            {
-                case INERTBODY_LINKED:
-                    {
-                        if( m_registered_bodies[m_registered_camerapoints[m_current_camerapoint].attached_body].attached )
-                        {
-                            m_registered_camerapoints[m_current_camerapoint].hot = true;                            
-                        }
-                        else
-                        {
-                            m_registered_camerapoints[m_current_camerapoint].hot = false;
-                         
-                            m_planetbody->ResetMeshes();
-                        }
-                    }
-                    break;
-
-                case FREE_ON_PLANET:                
-                    {
-                        m_registered_camerapoints[m_current_camerapoint].hot = true;
-                    }
-                    break;
-
-
-                case FREE:
-                    {
-                        m_registered_camerapoints[m_current_camerapoint].hot = false;
-
-                        m_planetbody->ResetMeshes();
-                    }
-                    break;
-            }
-        }
-        else
-        {
-            // camera non enregistree
-            m_current_camerapoint = "";
-        }
-    }
-    */
 }
 
 
@@ -749,11 +695,20 @@ void MyPlanet::GetCameraHotpoint( const dsstring& p_name, DrawSpace::Utils::Matr
 
 void MyPlanet::Update( void )
 {
+    for( size_t i = 0; i < m_planetfragments_list.size(); i++ )
+    {
+        Fragment* curr = m_planetfragments_list[i];
+        curr->Update( this );        
+    }
+
+
+    /*
     for( std::map<DrawSpace::Core::TransformNode*, Fragment*>::iterator it = m_planetfragments_table.begin(); it != m_planetfragments_table.end(); ++it )
     {
         Fragment* curr = it->second;
         curr->Update( this );
     }
+    */
 
 
 
@@ -852,8 +807,6 @@ void MyPlanet::RegisterInertBody( const dsstring& p_bodyname, DrawSpace::Dynamic
     reg_body.attached = false;
     reg_body.body = p_body;
 
-    m_registered_bodies[p_body] = reg_body;
-
     DrawSpace::Planet::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
     Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
 
@@ -861,11 +814,15 @@ void MyPlanet::RegisterInertBody( const dsstring& p_bodyname, DrawSpace::Dynamic
     Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray, true ) );
     planet_fragment->SetHotState( false );
 
-    m_planetfragments_table[p_body->GetDrawable()] = planet_fragment;
+    //m_planetfragments_table[p_body->GetDrawable()] = planet_fragment;
+    m_planetfragments_list.push_back( planet_fragment );
+    reg_body.fragment = planet_fragment;
 
     planet_fragment->SetInertBody( p_body );
 
     planet_body->Initialize();
+
+    m_registered_bodies[p_body] = reg_body;
 }
 
 void MyPlanet::RegisterIncludedInertBody( const dsstring& p_bodyname, DrawSpace::Dynamics::InertBody* p_body, const DrawSpace::Utils::Matrix& p_initmat )
@@ -874,8 +831,6 @@ void MyPlanet::RegisterIncludedInertBody( const dsstring& p_bodyname, DrawSpace:
 
     reg_body.attached = true;
     reg_body.body = p_body;
-
-    m_registered_bodies[p_body] = reg_body;
 
     p_body->IncludeTo( m_orbiter, p_initmat );
 
@@ -886,11 +841,16 @@ void MyPlanet::RegisterIncludedInertBody( const dsstring& p_bodyname, DrawSpace:
     Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray, true ) );
     planet_fragment->SetHotState( true );
 
-    m_planetfragments_table[p_body->GetDrawable()] = planet_fragment;
+    //m_planetfragments_table[p_body->GetDrawable()] = planet_fragment;
+    m_planetfragments_list.push_back( planet_fragment );
+    reg_body.fragment = planet_fragment;
+
 
     planet_fragment->SetInertBody( p_body );
 
     planet_body->Initialize();
+
+    m_registered_bodies[p_body] = reg_body;
 }
 
 bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, bool p_update_meshe )
@@ -919,6 +879,7 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
             {
                 reg_camera.type = INERTBODY_LINKED;
                 reg_camera.attached_body = inert_body;
+                reg_camera.fragment = m_registered_bodies[inert_body].fragment;
 
                 collisions = true;
             }
@@ -941,7 +902,23 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
                     reg_camera.type = FREE_ON_PLANET;
                     reg_camera.attached_body = NULL;
 
+
+                    DrawSpace::Planet::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
+                    Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
+
+                    dsstring final_name = m_name + dsstring( " " ) + camera_name;
+                    Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray, collisions ) );
+
+                    planet_body->Initialize();
+
+                    planet_fragment->SetHotState( true );
+                    planet_fragment->SetCamera( p_camera );
+
+                    reg_camera.fragment = planet_fragment;
+
                     reg_camera.camera->SetRelativeOrbiter( m_orbiter );
+
+                    m_planetfragments_list.push_back( planet_fragment );
                 }
                 else
                 {
@@ -961,6 +938,23 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
         // camera libre (attachee a aucun body)
         reg_camera.type = FREE;
         reg_camera.attached_body = NULL;
+
+
+        DrawSpace::Planet::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
+        Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
+
+        dsstring final_name = m_name + dsstring( " " ) + camera_name;
+        Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray, collisions ) );
+
+        planet_body->Initialize();
+
+        planet_fragment->SetHotState( false );
+        planet_fragment->SetCamera( p_camera );
+
+        reg_camera.fragment = planet_fragment;
+
+        m_planetfragments_list.push_back( planet_fragment );
+
     }
 
     ////
@@ -968,13 +962,14 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
     m_registered_camerapoints[camera_name] = reg_camera;
 
 
+    /*
     DrawSpace::Planet::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
     Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
 
     dsstring final_name = m_name + dsstring( " " ) + camera_name;
     Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray, collisions ) );
 
-    m_planetfragments_table[p_camera] = planet_fragment;
+    //m_planetfragments_table[p_camera] = planet_fragment;
 
     planet_body->Initialize();
 
@@ -988,6 +983,7 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
     }
 
     planet_fragment->SetCamera( p_camera );
+    */
 
     return true;
 }
@@ -1032,7 +1028,9 @@ void MyPlanet::ManageBodies( void )
                 for( size_t i = 0; i < cameras.size(); i++ )
                 {
                     m_registered_camerapoints[cameras[i]].camera->SetRelativeOrbiter( NULL );
-                    Fragment* fragment = m_planetfragments_table[m_registered_camerapoints[cameras[i]].camera];
+                    //Fragment* fragment = m_planetfragments_table[m_registered_camerapoints[cameras[i]].camera];
+
+                    Fragment* fragment = m_registered_camerapoints[cameras[i]].fragment;
                     fragment->SetHotState( false );
 
                 }
@@ -1055,7 +1053,9 @@ void MyPlanet::ManageBodies( void )
                 DrawSpace::Core::TransformNode* node;                
                 node = it->second.body->GetDrawable();
 
-                Fragment* fragment = m_planetfragments_table[node];
+                //Fragment* fragment = m_planetfragments_table[node];
+
+                Fragment* fragment = it->second.fragment;
                 fragment->RemoveColliderFromWorld();
 
                 //////
@@ -1103,7 +1103,10 @@ void MyPlanet::ManageBodies( void )
                 {
                     m_registered_camerapoints[cameras[i]].camera->SetRelativeOrbiter( m_orbiter );
 
-                    Fragment* fragment = m_planetfragments_table[m_registered_camerapoints[cameras[i]].camera];
+                    //Fragment* fragment = m_planetfragments_table[m_registered_camerapoints[cameras[i]].camera];
+
+                    Fragment* fragment = m_registered_camerapoints[cameras[i]].fragment;
+
                     fragment->SetHotState( true );
                 }
             }
@@ -2331,7 +2334,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_longlat_mvt2 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    m_longlat_mvt2->Init( -21.0039, 20.0004, 400000.5, 0.0, 0.0 );
+    m_longlat_mvt2->Init( -21.0039, 20.0004, 400002.5, 0.0, 0.0 );
     m_longlat_mvt2->Compute( m_timer );
     Matrix llres;
     m_longlat_mvt2->GetResult( llres );
