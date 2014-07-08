@@ -76,12 +76,6 @@ public:
 protected:
 
 
-
-    typedef DrawSpace::Core::CallBack2<MyPlanet, void, DrawSpace::Planet::Body*, int>                                               PlanetEvtCb;
-    typedef DrawSpace::Core::CallBack<MyPlanet, void, DrawSpace::Core::PropertyPool*>                                               RunnerEvtCb;
-    
-
-
     typedef struct
     {
         bool                            attached;
@@ -102,7 +96,6 @@ protected:
 
     typedef struct
     {
-        //bool                                hot;
         bool                                update_meshe;
 
         CameraType                          type;
@@ -115,68 +108,26 @@ protected:
 
     } RegisteredCamera;
 
+    dsreal                                                      m_ray;
+
     DrawSpace::Dynamics::World                                  m_world;
     dsstring                                                    m_name;
     DrawSpace::Dynamics::Orbiter*                               m_orbiter;
-    
-    //DrawSpace::Planet::Body*                                    m_drawable;
+        
     DrawSpace::Planet::Drawing*                                 m_drawable;
-    DrawSpace::Planet::Body*                                    m_planetbody;
-
-
-    PlanetEvtCb*                                                m_planet_evt_cb;
-    RunnerEvtCb*                                                m_runner_evt_cb;
+    
     CameraEvtCb*                                                m_camera_evt_cb;
-
-    dsreal                                                      m_ray;
-
-    bool                                                        m_collision_state;
-    long                                                        m_collisionmeshebuild_counter;
-
-
+      
     std::map<DrawSpace::Dynamics::InertBody*, RegisteredBody>   m_registered_bodies;
-
     std::map<dsstring, RegisteredCamera>                        m_registered_camerapoints;
     dsstring                                                    m_current_camerapoint;
 
-
-    bool                                                        m_suspend_update;
-
-    DrawSpace::Core::Task<DrawSpace::Core::Runner>*             m_task;
-
-    DrawSpace::Core::Mediator*                                  m_mediator;
-
-    DrawSpace::Core::Mediator::Event*                           m_buildmeshe_event;
-
-    DrawSpace::Utils::Mutex                                     m_meshe_ready_mutex;
-    bool                                                        m_meshe_ready;
-
-    DrawSpace::Core::Runner*                                    m_runner;
-
-    std::vector<PlanetRelativeEventHandler*>                    m_relative_evt_handlers;
-
-
-    //std::map<DrawSpace::Core::TransformNode*, Fragment*>        m_planetfragments_table;
-
     std::vector<Fragment*>                                      m_planetfragments_list;
 
-
-    void build_meshe( DrawSpace::Core::Meshe& p_patchmeshe, int p_patch_orientation, dsreal p_sidelength, dsreal p_xpos, dsreal p_ypos, DrawSpace::Core::Meshe& p_outmeshe );
     void attach_body( DrawSpace::Dynamics::InertBody* p_body );
     void detach_body( DrawSpace::Dynamics::InertBody* p_body );
-
-    //bool body_find_attached_camera( DrawSpace::Dynamics::InertBody* p_body, dsstring& p_name );
-
     void body_find_attached_camera( DrawSpace::Dynamics::InertBody* p_body, std::vector<dsstring>& p_name );
-
-    void notify_relative_to_planet_event( bool p_relative );
-
-
-    void on_planet_event( DrawSpace::Planet::Body* p_body, int p_currentface );
-    void on_meshebuild_request( DrawSpace::Core::PropertyPool* p_args );
     void on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, DrawSpace::Core::TransformNode* p_node );
-
-
 
 public:
 
@@ -188,11 +139,7 @@ public:
     DrawSpace::Dynamics::Orbiter*   GetOrbiter( void );
     DrawSpace::Dynamics::World*     GetWorld( void );
 
-    bool GetCollisionState( void );
-    long GetCollisionMesheBuildCount( void );
-
-    dsreal GetAltitud( void );
-
+    
     CameraEvtCb* GetCameraEvtCb( void );
 
 
@@ -204,7 +151,7 @@ public:
     void RegisterInertBody( const dsstring& p_bodyname, DrawSpace::Dynamics::InertBody* p_body );
     void RegisterIncludedInertBody( const dsstring& p_bodyname, DrawSpace::Dynamics::InertBody* p_body, const DrawSpace::Utils::Matrix& p_initmat );
     bool RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, bool p_update_meshe );
-    void RegisterRelativeEventHandler( PlanetRelativeEventHandler* p_handler );
+
 
     void GetName( dsstring& p_name );
 

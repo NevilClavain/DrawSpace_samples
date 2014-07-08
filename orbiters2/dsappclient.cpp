@@ -68,6 +68,7 @@ m_collisions( p_collisions )
 Fragment::~Fragment( void )
 {
     _DRAWSPACE_DELETE_( m_runner );
+    _DRAWSPACE_DELETE_( m_task );
 }
 
 void Fragment::SetHotState( bool p_hotstate )
@@ -363,67 +364,28 @@ void Fragment::Update( MyPlanet* p_owner )
 
 MyPlanet::MyPlanet( const dsstring& p_name, dsreal p_ray ) : 
 m_name( p_name ),
-m_ray( /*12000000.0*/ /*600000.0*/ p_ray * 1000.0 ),
-m_collision_state( false ),
-//m_player_relative( false ),
-//m_player_body( NULL ),
-m_suspend_update( false ),
-m_collisionmeshebuild_counter( 0 )
+m_ray( /*12000000.0*/ /*600000.0*/ p_ray * 1000.0 )
 {
-    m_mediator = Mediator::GetInstance();
 
     m_world.Initialize();
 
-    
-    //m_drawable = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
-
-
-    m_planetbody = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
+       
     m_drawable = _DRAWSPACE_NEW_( DrawSpace::Planet::Drawing, DrawSpace::Planet::Drawing );
     m_drawable->SetName( p_name );
     m_drawable->SetRenderer( DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface );
     
     m_orbiter = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Orbiter, DrawSpace::Dynamics::Orbiter( &m_world, m_drawable ) );
 
-    /*
-    m_planet_evt_cb = _DRAWSPACE_NEW_( PlanetEvtCb, PlanetEvtCb( this, &MyPlanet::on_planet_event ) );
-    m_planetbody->RegisterEventHandler( m_planet_evt_cb );
-    */
 
 
     m_camera_evt_cb = _DRAWSPACE_NEW_( CameraEvtCb, CameraEvtCb( this, &MyPlanet::on_camera_event ) );
-
-
-    /*
-    dsstring reqevtname = p_name + dsstring( "_ReqBuildMesheEvent" );
-    dsstring doneevtname = p_name + dsstring( "_DoneBuildMesheEvent" );
-
-
-
-    m_buildmeshe_event = m_mediator->CreateEvent( reqevtname );
-    
-    m_buildmeshe_event->args->AddProp<Meshe*>( "patchmeshe" );
-    m_buildmeshe_event->args->AddProp<dsreal>( "sidelength" );
-    m_buildmeshe_event->args->AddProp<dsreal>( "xpos" );
-    m_buildmeshe_event->args->AddProp<dsreal>( "ypos" );
-    m_buildmeshe_event->args->AddProp<int>( "orientation" );
-
-
-    m_runner_evt_cb = _DRAWSPACE_NEW_( RunnerEvtCb, RunnerEvtCb( this, &MyPlanet::on_meshebuild_request ) );
-    m_runner = _DRAWSPACE_NEW_( Runner, Runner );
-
-    m_runner->RegisterEventHandler( m_buildmeshe_event, m_runner_evt_cb );
-
-    m_task = _DRAWSPACE_NEW_( Task<Runner>, Task<Runner> );
-    m_task->Startup( m_runner );
-    */
 }
 
 MyPlanet::~MyPlanet( void )
 {
     _DRAWSPACE_DELETE_( m_orbiter );
     _DRAWSPACE_DELETE_( m_drawable );
-    _DRAWSPACE_DELETE_( m_task );
+    
 }
 
 MyPlanet::CameraEvtCb* MyPlanet::GetCameraEvtCb( void )
@@ -436,10 +398,6 @@ DrawSpace::Planet::Drawing* MyPlanet::GetDrawable( void )
     return m_drawable;
 }
 
-DrawSpace::Planet::Body* MyPlanet::GetPlanetBody( void )
-{
-    return m_planetbody;
-}
 
 
 DrawSpace::Dynamics::Orbiter* MyPlanet::GetOrbiter( void )
@@ -447,127 +405,6 @@ DrawSpace::Dynamics::Orbiter* MyPlanet::GetOrbiter( void )
     return m_orbiter;
 }
 
-bool MyPlanet::GetCollisionState( void )
-{
-    return m_collision_state;
-}
-
-void MyPlanet::on_planet_event( Planet::Body* p_body, int p_currentface )
-{
-    /*
-    if( "" == m_current_camerapoint )
-    {
-        return;
-    }
-
-    if( !m_registered_camerapoints[m_current_camerapoint].update_meshe )
-    {
-        return;
-    }
-
-    long tri_index = 0;
-    dsreal alt = p_body->GetAltitud();
-
-    if( alt < 1000.0 )
-    {
-        if( !m_suspend_update )
-        {
-            Planet::Patch* curr_patch = p_body->GetFaceCurrentLeaf( p_currentface );
-
-            dsreal xpos, ypos;
-            curr_patch->GetPos( xpos, ypos );
-
-
-            if( m_collision_state )
-            {
-                m_orbiter->RemoveFromWorld();
-                m_orbiter->UnsetKinematic();
-            }
-
-            m_suspend_update = true;
-
-            m_meshe_ready_mutex.WaitInfinite();
-            m_meshe_ready = false;
-            m_meshe_ready_mutex.Release();
-
-
-            m_buildmeshe_event->args->SetPropValue<Meshe*>( "patchmeshe", p_body->GetPatcheMeshe() );
-            m_buildmeshe_event->args->SetPropValue<dsreal>( "sidelength", curr_patch->GetSideLength() / m_ray );
-            m_buildmeshe_event->args->SetPropValue<dsreal>( "xpos", xpos / m_ray );
-            m_buildmeshe_event->args->SetPropValue<dsreal>( "ypos", ypos / m_ray );
-            m_buildmeshe_event->args->SetPropValue<int>( "orientation", curr_patch->GetOrientation() );
-
-            m_buildmeshe_event->Notify();            
-
-            ////////////////////////////////////////////////
-        }
-    }
-    else
-    {
-        if( m_collision_state )
-        {
-            if( !m_suspend_update )
-            {
-                m_orbiter->RemoveFromWorld();
-                m_orbiter->UnsetKinematic();
-            }
-            m_collision_state = false;
-        }
-    }
-    */
-}
-
-
-void MyPlanet::on_meshebuild_request( PropertyPool* p_args )
-{
-    //localy copy inputs
-
-    DrawSpace::Core::Meshe patchmeshe;
-    int patch_orientation;
-    dsreal sidelength;
-    dsreal xpos, ypos;
-
-
-    patchmeshe = *( p_args->GetPropValue<Meshe*>( "patchmeshe" ) );
-    patch_orientation = p_args->GetPropValue<int>( "orientation" );
-    sidelength = p_args->GetPropValue<dsreal>( "sidelength" );
-    xpos = p_args->GetPropValue<dsreal>( "xpos" );
-    ypos = p_args->GetPropValue<dsreal>( "ypos" );
-
-
-    ////////////////////////////// do the work
-
-    Meshe final_meshe;
-
-    build_meshe( patchmeshe, patch_orientation, sidelength, xpos, ypos, final_meshe );
-
-
-    Body::Parameters params;
-
-
-    params.mass = 0.0;
-
-    params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
-
-    params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
-    params.shape_descr.meshe = final_meshe;
-
-    m_orbiter->SetKinematic( params );
-
-    ////////////////////////////////////////////
-
-    m_meshe_ready_mutex.WaitInfinite();
-    m_meshe_ready = true;
-    m_meshe_ready_mutex.Release();
-
-    Sleep( 25 );
-}
-
-dsreal MyPlanet::GetAltitud( void )
-{
-    //return m_drawable->GetAltitud();
-    return m_planetbody->GetAltitud();
-}
 
 DrawSpace::Dynamics::World* MyPlanet::GetWorld( void )
 {
@@ -593,29 +430,6 @@ void MyPlanet::detach_body( DrawSpace::Dynamics::InertBody* p_body )
 
 void MyPlanet::ApplyGravity( void )
 {
-    /*
-    for( size_t i = 0; i < m_attached_bodies.size(); i++ )
-    {
-        DrawSpace::Utils::Matrix local_pos;
-        m_attached_bodies[i]->GetLastLocalWorldTrans( local_pos );
-
-        Vector gravity;
-        gravity[0] = -local_pos( 3, 0 );
-        gravity[1] = -local_pos( 3, 1 );
-        gravity[2] = -local_pos( 3, 2 );
-        gravity[3] = 1.0;
-        gravity.Normalize();
-        gravity.Scale( SHIP_MASS * 9.81 );
-
-        m_attached_bodies[i]->ApplyForce( gravity );
-
-        if( m_attached_bodies[i] == dsAppClient::GetInstance()->GetPlayerShip() )
-        {
-            dsAppClient::GetInstance()->SetLastPlayerShipGravity( gravity );
-        }
-    }
-    */
-
     for( std::map<DrawSpace::Dynamics::InertBody*, RegisteredBody>::iterator it = m_registered_bodies.begin(); it != m_registered_bodies.end(); ++it )
     {
         if( it->second.attached )
@@ -653,8 +467,6 @@ void MyPlanet::on_camera_event( DrawSpace::Scenegraph::CameraEvent p_event, Draw
         {
             m_current_camerapoint = current_camera_name;
 
-            //Fragment* fragment = m_planetfragments_table[p_node];
-            //m_drawable->SetCurrentPlanetBody( fragment->GetPlanetBody() );
             for( std::map<dsstring, RegisteredCamera>::iterator it = m_registered_camerapoints.begin(); it != m_registered_camerapoints.end(); ++it )
             {
                 if( it->second.camera == p_node )
@@ -700,105 +512,7 @@ void MyPlanet::Update( void )
         Fragment* curr = m_planetfragments_list[i];
         curr->Update( this );        
     }
-
-
-    /*
-    for( std::map<DrawSpace::Core::TransformNode*, Fragment*>::iterator it = m_planetfragments_table.begin(); it != m_planetfragments_table.end(); ++it )
-    {
-        Fragment* curr = it->second;
-        curr->Update( this );
-    }
-    */
-
-
-
-    // revoir
-
-/*
-    if( m_current_camerapoint != "" )
-    {
-        if( m_registered_camerapoints[m_current_camerapoint].hot )
-        {
-            if( m_suspend_update )
-            {
-                bool read_status = m_meshe_ready_mutex.Wait( 0 );
-
-                if( read_status )
-                {
-                    bool meshe_ready = m_meshe_ready;
-                    m_meshe_ready_mutex.Release();
-
-                    if( meshe_ready )
-                    {
-                        // bullet meshe build done
-                        m_orbiter->AddToWorld();
-                        m_collision_state = true;
-                        m_suspend_update = false;
-
-                        m_collisionmeshebuild_counter++;
-                    }
-                }
-            }
-
-            DrawSpace::Utils::Matrix camera_pos;
-
-            switch( m_registered_camerapoints[m_current_camerapoint].type )
-            {
-                case INERTBODY_LINKED:
-                    {
-                        m_registered_camerapoints[m_current_camerapoint].attached_body->GetLastLocalWorldTrans( camera_pos );
-
-                        DrawSpace::Utils::Vector hotpoint;
-
-                        hotpoint[0] = camera_pos( 3, 0 );
-                        hotpoint[1] = camera_pos( 3, 1 );
-                        hotpoint[2] = camera_pos( 3, 2 );
-
-
-                        m_planetbody->UpdateHotPoint( hotpoint );
-                        m_planetbody->Compute();
-
-                        
-                    }
-                    break;
-
-                case FREE_ON_PLANET:                
-                    {
-                        m_registered_camerapoints[m_current_camerapoint].camera->GetLocalTransform( camera_pos );
-
-                        DrawSpace::Utils::Vector hotpoint;
-
-                        hotpoint[0] = camera_pos( 3, 0 );
-                        hotpoint[1] = camera_pos( 3, 1 );
-                        hotpoint[2] = camera_pos( 3, 2 );
-
-
-                        m_planetbody->UpdateHotPoint( hotpoint );
-                        m_planetbody->Compute();
-
-                    }
-                    break;
-            }
-        }
-
-        CameraPoint::Infos cam_infos;
-        m_registered_camerapoints[m_current_camerapoint].camera->GetInfos( cam_infos );
-
-        if( cam_infos.relative_orbiter && cam_infos.relative_orbiter == m_orbiter )
-        {
-            //m_registered_camerapoints[m_current_camerapoint].camera->SetRelativeAltitude( m_drawable->GetAltitud() );
-            m_registered_camerapoints[m_current_camerapoint].camera->SetRelativeAltitude( m_planetbody->GetAltitud() );
-        }
-    }
-
-    */
 }
-
-long MyPlanet::GetCollisionMesheBuildCount( void )
-{
-    return m_collisionmeshebuild_counter;
-}
-
 
 void MyPlanet::RegisterInertBody( const dsstring& p_bodyname, DrawSpace::Dynamics::InertBody* p_body )
 {
@@ -814,7 +528,6 @@ void MyPlanet::RegisterInertBody( const dsstring& p_bodyname, DrawSpace::Dynamic
     Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray, true ) );
     planet_fragment->SetHotState( false );
 
-    //m_planetfragments_table[p_body->GetDrawable()] = planet_fragment;
     m_planetfragments_list.push_back( planet_fragment );
     reg_body.fragment = planet_fragment;
 
@@ -841,7 +554,6 @@ void MyPlanet::RegisterIncludedInertBody( const dsstring& p_bodyname, DrawSpace:
     Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray, true ) );
     planet_fragment->SetHotState( true );
 
-    //m_planetfragments_table[p_body->GetDrawable()] = planet_fragment;
     m_planetfragments_list.push_back( planet_fragment );
     reg_body.fragment = planet_fragment;
 
@@ -862,8 +574,6 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
 
     bool collisions = false;
 
-    //reg_camera.update_meshe = p_update_meshe;
-    //reg_camera.hot = false;
     reg_camera.camera = p_camera;
 
     ////
@@ -961,30 +671,6 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
 
     m_registered_camerapoints[camera_name] = reg_camera;
 
-
-    /*
-    DrawSpace::Planet::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
-    Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
-
-    dsstring final_name = m_name + dsstring( " " ) + camera_name;
-    Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray, collisions ) );
-
-    //m_planetfragments_table[p_camera] = planet_fragment;
-
-    planet_body->Initialize();
-
-    if( FREE_ON_PLANET == reg_camera.type )
-    {
-        planet_fragment->SetHotState( true );
-    }
-    else
-    {
-        planet_fragment->SetHotState( false );
-    }
-
-    planet_fragment->SetCamera( p_camera );
-    */
-
     return true;
 }
 
@@ -1028,32 +714,17 @@ void MyPlanet::ManageBodies( void )
                 for( size_t i = 0; i < cameras.size(); i++ )
                 {
                     m_registered_camerapoints[cameras[i]].camera->SetRelativeOrbiter( NULL );
-                    //Fragment* fragment = m_planetfragments_table[m_registered_camerapoints[cameras[i]].camera];
 
                     Fragment* fragment = m_registered_camerapoints[cameras[i]].fragment;
                     fragment->SetHotState( false );
 
                 }
 
-
                 //////
-
-                /*
-                if( m_collision_state )
-                {
-                    if( !m_suspend_update )
-                    {
-                        m_orbiter->RemoveFromWorld();
-                        m_orbiter->UnsetKinematic();
-                    }
-                    m_collision_state = false;
-                }
-                */
 
                 DrawSpace::Core::TransformNode* node;                
                 node = it->second.body->GetDrawable();
 
-                //Fragment* fragment = m_planetfragments_table[node];
 
                 Fragment* fragment = it->second.fragment;
                 fragment->RemoveColliderFromWorld();
@@ -1103,8 +774,6 @@ void MyPlanet::ManageBodies( void )
                 {
                     m_registered_camerapoints[cameras[i]].camera->SetRelativeOrbiter( m_orbiter );
 
-                    //Fragment* fragment = m_planetfragments_table[m_registered_camerapoints[cameras[i]].camera];
-
                     Fragment* fragment = m_registered_camerapoints[cameras[i]].fragment;
 
                     fragment->SetHotState( true );
@@ -1112,207 +781,9 @@ void MyPlanet::ManageBodies( void )
             }
         }
     }
-
-
-    // revoir
-
-    /*
-    for( std::map<DrawSpace::Dynamics::InertBody*, RegisteredBody>::iterator it = m_registered_bodies.begin();
-        it != m_registered_bodies.end(); ++it )
-    {
-
-        if( it->second.attached )
-        {
-            DrawSpace::Utils::Matrix bodypos;
-
-            it->second.body->GetLastLocalWorldTrans( bodypos );
-
-            DrawSpace::Utils::Vector bodypos2;
-            bodypos2[0] = bodypos( 3, 0 );
-            bodypos2[1] = bodypos( 3, 1 );
-            bodypos2[2] = bodypos( 3, 2 );
-
-            dsreal rel_alt = ( bodypos2.Length() / m_ray );
-
-            if( rel_alt >= 1.2 )
-            {
-
-                detach_body( it->second.body );
-
-                // rechercher si une camera enregistree est associee a ce body
-                std::vector<dsstring> cameras;
-                body_find_attached_camera( it->second.body, cameras );
-
-                for( size_t i = 0; i < cameras.size(); i++ )
-                {
-                    m_registered_camerapoints[cameras[i]].hot = false;
-                    m_registered_camerapoints[cameras[i]].camera->SetRelativeOrbiter( NULL );
-                }
-
-
-                //////
-
-
-                if( m_collision_state )
-                {
-                    if( !m_suspend_update )
-                    {
-                        m_orbiter->RemoveFromWorld();
-                        m_orbiter->UnsetKinematic();
-                    }
-                    m_collision_state = false;
-                }
-
-
-                //////
-            }
-        }
-        else
-        {
-            DrawSpace::Utils::Matrix bodypos;
-
-            it->second.body->GetLastLocalWorldTrans( bodypos );
-
-            DrawSpace::Utils::Vector bodypos2;
-            bodypos2[0] = bodypos( 3, 0 );
-            bodypos2[1] = bodypos( 3, 1 );
-            bodypos2[2] = bodypos( 3, 2 );
-
-            DrawSpace::Utils::Matrix planetbodypos;
-            m_orbiter->GetLastWorldTransformation( planetbodypos );
-
-            DrawSpace::Utils::Vector planetbodypos2;
-            planetbodypos2[0] = planetbodypos( 3, 0 );
-            planetbodypos2[1] = planetbodypos( 3, 1 );
-            planetbodypos2[2] = planetbodypos( 3, 2 );
-
-            Vector delta;
-
-            delta[0] = planetbodypos2[0] - bodypos2[0];
-            delta[1] = planetbodypos2[1] - bodypos2[1];
-            delta[2] = planetbodypos2[2] - bodypos2[2];
-            delta[3] = 1.0;
-
-            dsreal rel_alt = delta.Length() / m_ray;
-
-            if( rel_alt < 1.1 )
-            {
-
-                attach_body( it->second.body );
-
-                /////
-
-                std::vector<dsstring> cameras;
-                body_find_attached_camera( it->second.body, cameras );
-
-                for( size_t i = 0; i < cameras.size(); i++ )
-                {
-                    m_registered_camerapoints[cameras[i]].hot = true;
-                    m_registered_camerapoints[cameras[i]].camera->SetRelativeOrbiter( m_orbiter );
-                }
-
-
-            }
-        }
-    }
-    */
 }
 
-void MyPlanet::notify_relative_to_planet_event( bool p_relative )
-{
-    for( size_t i = 0; i < m_relative_evt_handlers.size(); i++ )
-    {
-        ( *( m_relative_evt_handlers[i] ) )( ( p_relative ? this : NULL ) );
-    }
-}
 
-void MyPlanet::build_meshe( DrawSpace::Core::Meshe& p_patchmeshe, int p_patch_orientation, dsreal p_sidelength, dsreal p_xpos, dsreal p_ypos, DrawSpace::Core::Meshe& p_outmeshe )
-{
-    for( long i = 0; i < p_patchmeshe.GetVertexListSize(); i++ )
-    {                
-
-        Vertex v, v2, v3;
-        p_patchmeshe.GetVertex( i, v );
-
-        v.x = v.x * p_sidelength / 2.0;
-        v.y = v.y * p_sidelength / 2.0;
-        v.z = v.z * p_sidelength / 2.0;
-
-        v.x += p_xpos;
-        v.y += p_ypos;
-
-        switch( p_patch_orientation )
-        {
-            case Planet::Patch::FrontPlanetFace:
-
-                v2.x = v.x;
-                v2.y = v.y;
-                v2.z = 1.0;
-                break;
-
-            case Planet::Patch::RearPlanetFace:
-
-                v2.x = -v.x;
-                v2.y = v.y;
-                v2.z = -1.0;
-                break;
-
-            case Planet::Patch::LeftPlanetFace:
-
-                v2.x = -1.0;
-                v2.y = v.y;
-                v2.z = v.x;
-                break;
-
-            case Planet::Patch::RightPlanetFace:
-
-                v2.x = 1.0;
-                v2.y = v.y;
-                v2.z = -v.x;
-                break;
-
-            case Planet::Patch::TopPlanetFace:
-
-                v2.x = v.x;
-                v2.y = 1.0;
-                v2.z = -v.y;
-                break;
-
-            case Planet::Patch::BottomPlanetFace:
-
-                v2.x = v.x;
-                v2.y = -1.0;
-                v2.z = v.y;
-                break;
-        }
-
-        dsreal xtemp = v2.x;
-        dsreal ytemp = v2.y;
-        dsreal ztemp = v2.z;
-
-        v2.x = xtemp * sqrt( 1.0 - ytemp * ytemp * 0.5 - ztemp * ztemp * 0.5 + ytemp * ytemp * ztemp * ztemp / 3.0 );
-        v2.y = ytemp * sqrt( 1.0 - ztemp * ztemp * 0.5 - xtemp * xtemp * 0.5 + xtemp * xtemp * ztemp * ztemp / 3.0 );
-        v2.z = ztemp * sqrt( 1.0 - xtemp * xtemp * 0.5 - ytemp * ytemp * 0.5 + xtemp * xtemp * ytemp * ytemp / 3.0 );
-
-        v3.x = v2.x * m_ray;
-        v3.y = v2.y * m_ray;
-        v3.z = v2.z * m_ray;
-
-        p_outmeshe.AddVertex( v3 );
-    }
-
-    for( long i = 0; i < p_patchmeshe.GetTrianglesListSize(); i++ )
-    {
-        Triangle t;
-        p_patchmeshe.GetTriangles( i, t );
-        p_outmeshe.AddTriangle( t );
-    }
-}
-
-void MyPlanet::RegisterRelativeEventHandler( PlanetRelativeEventHandler* p_handler )
-{
-    m_relative_evt_handlers.push_back( p_handler );
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
