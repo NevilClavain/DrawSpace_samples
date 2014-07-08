@@ -58,6 +58,8 @@ public:
     void SetHotState( bool p_hotstate );
     void SetCamera( DrawSpace::Dynamics::CameraPoint* p_camera );
     void SetInertBody( DrawSpace::Dynamics::InertBody* p_body );
+    DrawSpace::Dynamics::CameraPoint* GetCamera( void );
+    DrawSpace::Dynamics::InertBody* GetInertBody( void );
 
     void RemoveColliderFromWorld( void );
 

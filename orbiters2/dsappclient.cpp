@@ -350,14 +350,27 @@ void Fragment::Update( MyPlanet* p_owner )
             m_planetbody->UpdateHotPoint( hotpoint );
             m_planetbody->Compute();
 
+            /*
             if( m_camera )
             {
                 CameraPoint::Infos cam_infos;
                 m_camera->GetInfos( cam_infos );
                 m_camera->SetRelativeAltitude( m_planetbody->GetAltitud() );
             }
+            */
         }
     }    
+}
+
+
+CameraPoint* Fragment::GetCamera( void )
+{
+    return m_camera;
+}
+
+InertBody* Fragment::GetInertBody( void )
+{
+    return m_inertbody;
 }
 
 
@@ -510,7 +523,31 @@ void MyPlanet::Update( void )
     for( size_t i = 0; i < m_planetfragments_list.size(); i++ )
     {
         Fragment* curr = m_planetfragments_list[i];
-        curr->Update( this );        
+
+        curr->Update( this );
+
+        InertBody* inertbody = curr->GetInertBody();
+        CameraPoint* camera = curr->GetCamera();
+
+        if( inertbody )
+        {
+            if( inertbody->GetRefBody() == m_orbiter )
+            {
+                std::vector<dsstring> cameras;
+                body_find_attached_camera( inertbody, cameras );
+
+                for( size_t i = 0; i < cameras.size(); i++ )
+                {
+                    m_registered_camerapoints[cameras[i]].camera->SetRelativeAltitude( curr->GetPlanetBody()->GetAltitud() );
+                }
+            }
+        }
+        else if( camera )
+        {
+            CameraPoint::Infos cam_infos;
+            camera->GetInfos( cam_infos );
+            camera->SetRelativeAltitude( curr->GetPlanetBody()->GetAltitud() );
+        }       
     }
 }
 
@@ -782,9 +819,6 @@ void MyPlanet::ManageBodies( void )
         }
     }
 }
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
