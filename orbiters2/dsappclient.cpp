@@ -1713,8 +1713,12 @@ bool dsAppClient::OnIdleAppInit( void )
     m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
     m_longlat_mvt->Init( -21.0, 20.0, 400000.5, 0.0, 0.0 );
     m_camera5->RegisterLongLatMovement( m_longlat_mvt );
-    //m_camera5->RegisterMovement( m_longlat_mvt );
 
+    m_circular_mvt2 = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
+    m_circular_mvt2->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 25.0, 0.9, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
+    m_camera5->RegisterMovement( m_circular_mvt2 );
+    m_circular_mvt2->SetAngularSpeed( 25.0 );
+    
 
 
 
@@ -1839,7 +1843,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_longlat_mvt2 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    m_longlat_mvt2->Init( -21.0039, 20.0004, 400002.5, 0.0, 0.0 );
+    m_longlat_mvt2->Init( -21.0000, 20.000, 400002.5, 0.0, 0.0 );
     m_longlat_mvt2->Compute( m_timer );
     Matrix llres;
     m_longlat_mvt2->GetResult( llres );

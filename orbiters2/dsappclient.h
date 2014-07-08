@@ -201,6 +201,7 @@ protected:
 
     DrawSpace::Dynamics::CameraPoint*           m_camera5;
     DrawSpace::Core::LongLatMovement*           m_longlat_mvt;
+    DrawSpace::Core::CircularMovement*          m_circular_mvt2;
 
 
     DrawSpace::Core::LongLatMovement*           m_longlat_mvt2;
