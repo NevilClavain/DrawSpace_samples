@@ -1780,6 +1780,16 @@ bool dsAppClient::OnIdleAppInit( void )
     //m_reticle_widget->LockOnTransformNode( m_camera5 );
 
 
+    DrawSpace::Gui::ReticleWidget::ClippingParams clp;
+    clp.clipping_policy = DrawSpace::Gui::ReticleWidget::CLIPPING_HOLD;
+    clp.xmin = -0.5;
+    clp.xmax = 0.5;
+    clp.ymin = -0.375;
+    clp.ymax = 0.375;
+
+    m_reticle_widget->SetClippingParams( clp );
+
+
     ///////////////////////////////////////////////////////////////
 
 
@@ -1834,6 +1844,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterCameraEvtHandler( m_moon->GetCameraEvtCb() );
 
     ///////////////////////////////////////////////////////////////
+
 
 
     //m_camera5->LockOnBody( m_moon->GetOrbiter() );
