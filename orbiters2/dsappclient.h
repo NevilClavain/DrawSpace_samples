@@ -166,6 +166,8 @@ class dsAppClient : public DrawSpace::App
 {
 protected:
 
+    typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Gui::Widget*>   WidgetEventHandler;
+
     typedef DrawSpace::Core::CallBack<dsAppClient, void, MyPlanet*> PlanetRelativeEvtCb;
 
     typedef DrawSpace::Core::CallBack2<dsAppClient, void, DrawSpace::Scenegraph::CameraEvent, DrawSpace::Core::TransformNode*>         CameraEvtCb;
@@ -287,6 +289,13 @@ protected:
 
 
     CameraEvtCb*                                m_camera_evt_cb;
+
+    DrawSpace::SystemMouseInputProvider         m_mouse_input;
+
+    WidgetEventHandler*                         m_mouseleftbuttondown_eventhandler;
+
+
+    void on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget );
 
 
     dsAppClient( void );

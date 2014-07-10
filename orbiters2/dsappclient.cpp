@@ -863,6 +863,9 @@ m_curr_camera( NULL )
 
 
     m_player_view_theta = m_player_view_phi = m_player_view_rho = 0.0;
+
+
+    m_mouseleftbuttondown_eventhandler = _DRAWSPACE_NEW_( WidgetEventHandler, WidgetEventHandler( this, &dsAppClient::on_mouseleftbuttondown ) );
 }
 
 dsAppClient::~dsAppClient( void )
@@ -1434,6 +1437,9 @@ bool dsAppClient::OnIdleAppInit( void )
     DrawSpace::Planet::Body::BuildPlanetMeshe();
 
 
+    RegisterMouseInputEventsProvider( &m_mouse_input );
+
+
     bool status;
 
     status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
@@ -1726,7 +1732,7 @@ bool dsAppClient::OnIdleAppInit( void )
     ///////////////////////////////////////////////////////////////
 
 
-    m_reticle_widget = _DRAWSPACE_NEW_( ReticleWidget, ReticleWidget( "reticle_widget", (long)20, (long)20, &m_scenegraph, NULL ) );
+    m_reticle_widget = _DRAWSPACE_NEW_( ReticleWidget, ReticleWidget( "reticle_widget", (long)10, (long)10, &m_scenegraph, NULL ) );
     
 
 
@@ -1788,6 +1794,11 @@ bool dsAppClient::OnIdleAppInit( void )
     clp.ymax = 0.375;
 
     m_reticle_widget->SetClippingParams( clp );
+
+    m_reticle_widget->RegisterMouseLeftButtonDownEventHandler( m_mouseleftbuttondown_eventhandler );
+
+
+    m_mouse_input.RegisterWidget( m_reticle_widget );
 
 
     ///////////////////////////////////////////////////////////////
@@ -2114,4 +2125,7 @@ void dsAppClient::OnAppEvent( WPARAM p_wParam, LPARAM p_lParam )
 
 }
 
+void dsAppClient::on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget )
+{
 
+}
