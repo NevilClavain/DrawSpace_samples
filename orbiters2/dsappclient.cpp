@@ -1390,7 +1390,12 @@ void dsAppClient::OnRenderFrame( void )
         }
     }
 
+    renderer->DrawText( 0, 255, 0, 10, 300, "reticle distance = %f", m_reticle_widget->GetLastDistance() );
 
+    if( m_curr_camera == m_camera5 || m_curr_camera == m_camera4 )
+    {
+        renderer->DrawText( 0, 255, 0, 10, 320, "locked object distance = %f", m_curr_camera->GetLockedObjectDistance() );
+    }
 
 
     //renderer->DrawText( 0, 255, 0, 10, 195, "planet01 : %d %d", m_planet->GetCollisionState(), m_planet->GetCollisionMesheBuildCount() );
