@@ -1343,6 +1343,14 @@ void dsAppClient::OnRenderFrame( void )
 
     renderer->DrawText( 0, 255, 0, 10, 115, "contact = %d", m_ship->GetContactState() );
 
+
+    int x_reticle, y_reticle;
+
+    m_reticle_widget->GetScreenPos( x_reticle, y_reticle );
+
+    renderer->DrawText( 0, 255, 0, x_reticle - 40, y_reticle - 40, "%.3f km", m_reticle_widget->GetLastDistance() / 1000.0 );
+
+
     
     // current camera infos
 
