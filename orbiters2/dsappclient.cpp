@@ -1298,6 +1298,12 @@ void dsAppClient::OnRenderFrame( void )
 
     
     m_text_widget->SetVirtualTranslation( 100, 75 );
+    m_text_widget_2->SetVirtualTranslation( -60, 160 );
+
+    char distance[64];
+    sprintf( distance, "%.3f km", m_reticle_widget->GetLastDistance() / 1000.0 );
+
+    m_text_widget_2->SetText( -40, 0, 30, dsstring( distance ), DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
     m_reticle_widget->Transform();
     m_reticle_widget->Draw();
     
@@ -1785,6 +1791,55 @@ bool dsAppClient::OnIdleAppInit( void )
     m_text_widget->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
 
     m_text_widget->RegisterToPass( m_finalpass );
+
+
+
+
+
+
+
+
+    m_text_widget_2 = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget_2", 1200, 360, m_font, false, m_text_widget ) );
+    
+    m_text_widget_2->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_text_widget_2->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+
+    m_text_widget_2->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_text_widget_2->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add"  ) );
+    m_text_widget_2->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always"  ) );
+    m_text_widget_2->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one"  ) );
+    m_text_widget_2->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha"  ) );
+    m_text_widget_2->GetImage()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+
+    m_text_widget_2->GetImage()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget_2->GetImage()->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_text_widget_2->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
+    m_text_widget_2->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
+    m_text_widget_2->GetText()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget_2->GetText()->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_text_widget_2->GetText()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_text_widget_2->GetText()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_text_widget_2->GetText()->AddShaderParameter( 1, "color", 0 );
+    m_text_widget_2->GetText()->SetShaderRealVector( "color", Utils::Vector( 0.0, 1.0, 0.0, 1.0 ) );
+
+
+    m_text_widget_2->GetImage()->SetOrderNumber( 20000 );
+    m_text_widget_2->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
+
+    m_text_widget_2->RegisterToPass( m_finalpass );
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     m_reticle_widget->LockOnBody( /*m_moon->GetOrbiter()*/ m_cube_body );

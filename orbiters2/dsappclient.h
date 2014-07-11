@@ -285,6 +285,7 @@ protected:
 
     DrawSpace::Gui::ReticleWidget*              m_reticle_widget;
     DrawSpace::Gui::TextWidget*                 m_text_widget;
+    DrawSpace::Gui::TextWidget*                 m_text_widget_2;
 
 
 

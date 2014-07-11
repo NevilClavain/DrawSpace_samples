@@ -79,7 +79,7 @@ void dsAppClient::OnRenderFrame( void )
     
     if( last_fps != current_fps )
     {
-        m_text_widget->SetText( 5, 120, 40, fps, DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
+        m_text_widget->SetText( 5, 120, 60, fps, DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
 
         m_fpstext_widget->SetText( 0, 0, 70, fps, DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
         last_fps = current_fps;		
@@ -95,7 +95,7 @@ void dsAppClient::OnRenderFrame( void )
     
     m_text_widget->SetVirtualTranslation( 160, 110 );
     
-    m_text_widget_2->SetVirtualTranslation( 10, 120 );
+    m_text_widget_2->SetVirtualTranslation( -60, 120 );
 
     m_text_widget_3->SetVirtualTranslation( 100, 100 );
 
@@ -233,7 +233,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_text_widget->GetText()->AddShaderParameter( 1, "color", 0 );
-    m_text_widget->GetText()->SetShaderRealVector( "color", Utils::Vector( 1.0, 1.0, 0.0, 1.0 ) );
+    m_text_widget->GetText()->SetShaderRealVector( "color", Utils::Vector( 0.0, 0.0, 1.0, 1.0 ) );
 
     m_text_widget->GetImage()->SetOrderNumber( 20000 );
     m_text_widget->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
