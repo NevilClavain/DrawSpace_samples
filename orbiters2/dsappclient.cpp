@@ -1272,10 +1272,11 @@ void dsAppClient::OnRenderFrame( void )
     compute_player_view_transform();
     m_camera2->SetLocalTransform( m_player_view_transform );
 
-
+    /*
     Matrix id;
     id.Identity();
     m_camera5->SetLocalTransform( id );
+    */
     
     Matrix origin;
     origin.Identity();
@@ -1746,6 +1747,14 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
 
+    m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera6" ) );
+    m_scenegraph.RegisterNode( m_camera6 );
+
+    m_spectator_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::SpectatorMovement, DrawSpace::Core::SpectatorMovement );
+
+    m_spectator_mvt->Init( m_ship, 10.0, 10000, m_timer, "camera6_spectator_timer" );
+
+    m_camera6->RegisterMovement( m_spectator_mvt );
 
 
     ///////////////////////////////////////////////////////////////
@@ -2137,6 +2146,12 @@ void dsAppClient::OnKeyPulse( long p_key )
                 m_curr_camera = m_camera5;
             }
             else if( m_curr_camera == m_camera5 )
+            {
+                m_scenegraph.SetCurrentCamera( "camera6" );
+                m_curr_camera = m_camera6;
+            }
+
+            else if( m_curr_camera == m_camera6 )
             {
                 m_scenegraph.SetCurrentCamera( "camera" );
                 m_curr_camera = m_camera;

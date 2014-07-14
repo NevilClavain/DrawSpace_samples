@@ -206,6 +206,10 @@ protected:
     DrawSpace::Core::CircularMovement*          m_circular_mvt2;
 
 
+    DrawSpace::Dynamics::CameraPoint*           m_camera6;
+    DrawSpace::Core::SpectatorMovement*         m_spectator_mvt;
+
+
     DrawSpace::Core::LongLatMovement*           m_longlat_mvt2;
 
 
