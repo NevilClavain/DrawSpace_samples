@@ -1747,14 +1747,15 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
 
-    m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera6" ) );
+    m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera6", m_planet->GetOrbiter() ) );
     m_scenegraph.RegisterNode( m_camera6 );
 
     m_spectator_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::SpectatorMovement, DrawSpace::Core::SpectatorMovement );
 
-    m_spectator_mvt->Init( m_ship, 10.0, 10000, m_timer, "camera6_spectator_timer" );
+    m_spectator_mvt->Init( m_ship, 16.0, 8000, m_timer, "camera6_spectator_timer", true );
 
     m_camera6->RegisterMovement( m_spectator_mvt );
+    m_camera6->LockOnBody( m_ship );
 
 
     ///////////////////////////////////////////////////////////////
@@ -1916,15 +1917,18 @@ bool dsAppClient::OnIdleAppInit( void )
     m_planet->RegisterCameraPoint( m_camera2, true );
     m_planet->RegisterCameraPoint( m_camera3, true );
     m_planet->RegisterCameraPoint( m_camera4, true );
-    m_planet->RegisterCameraPoint( m_camera5, /*false*/ true );
+    m_planet->RegisterCameraPoint( m_camera5, true );
     m_planet->RegisterCameraPoint( m_camera, false );
+
+    m_planet->RegisterCameraPoint( m_camera6, true );
 
 
     m_moon->RegisterInertBody( "ship", m_ship );
     m_moon->RegisterCameraPoint( m_camera2, true );
     m_moon->RegisterCameraPoint( m_camera3, true );
     m_moon->RegisterCameraPoint( m_camera4, true );
-    m_moon->RegisterCameraPoint( m_camera, /*false*/ true );
+    m_moon->RegisterCameraPoint( m_camera, true );
+    m_moon->RegisterCameraPoint( m_camera6, true );
     
 
 
