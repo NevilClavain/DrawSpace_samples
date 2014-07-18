@@ -1269,8 +1269,8 @@ void dsAppClient::OnRenderFrame( void )
     
 
 
-    compute_player_view_transform();
-    m_camera2->SetLocalTransform( m_player_view_transform );
+    //compute_player_view_transform();
+    //m_camera2->SetLocalTransform( m_player_view_transform );
 
     /*
     Matrix id;
@@ -1416,7 +1416,7 @@ void dsAppClient::OnRenderFrame( void )
     //renderer->DrawText( 0, 255, 0, 10, 195, "planet01 : %d %d", m_planet->GetCollisionState(), m_planet->GetCollisionMesheBuildCount() );
     //renderer->DrawText( 0, 255, 0, 10, 215, "moon : %d %d", m_moon->GetCollisionState(), m_moon->GetCollisionMesheBuildCount() );
 
-
+    /*
     Vector tf, tt;
     Vector tf2, tt2;
 
@@ -1438,6 +1438,7 @@ void dsAppClient::OnRenderFrame( void )
     m_player_view_angular_acc[2] = -tt2[2];
     m_player_view_angular_acc[1] = -tt2[1];
     m_player_view_angular_acc[0] = -tt2[0];
+    */
 
 
 
@@ -1708,10 +1709,15 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera" ) );
     m_scenegraph.RegisterNode( m_camera );
-
     
     m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", m_ship ) );
     m_scenegraph.RegisterNode( m_camera2 );
+
+    m_head_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::HeadMovement, DrawSpace::Core::HeadMovement );
+    m_head_mvt->Init( m_ship, 1.0, 8000.0, Vector( 0.0, 2.8, 11.4, 1.0 ) );
+
+    m_camera2->RegisterMovement( m_head_mvt );
+
 
 
     m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", m_ship ) );
@@ -1752,9 +1758,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_spectator_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::SpectatorMovement, DrawSpace::Core::SpectatorMovement );
 
-    m_spectator_mvt->Init( m_ship, 10.0, 10000, m_timer, "camera6_spectator_timer" );
+    m_spectator_mvt->Init( m_ship, 10.0, 10000, m_timer, "camera6_spectator_timer", false );
 
     m_camera6->RegisterMovement( m_spectator_mvt );
+
+    m_camera6->LockOnBody( m_ship );
 
 
     ///////////////////////////////////////////////////////////////
