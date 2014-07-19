@@ -602,14 +602,12 @@ void MyPlanet::RegisterIncludedInertBody( const dsstring& p_bodyname, DrawSpace:
     m_registered_bodies[p_body] = reg_body;
 }
 
-bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, bool p_update_meshe )
+bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera )
 {   
     RegisteredCamera reg_camera;
 
     dsstring camera_name;
     p_camera->GetName( camera_name );
-
-    bool collisions = false;
 
     reg_camera.camera = p_camera;
 
@@ -627,8 +625,6 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
                 reg_camera.type = INERTBODY_LINKED;
                 reg_camera.attached_body = inert_body;
                 reg_camera.fragment = m_registered_bodies[inert_body].fragment;
-
-                collisions = true;
             }
             else
             {
@@ -654,7 +650,7 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
                     Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
 
                     dsstring final_name = m_name + dsstring( " " ) + camera_name;
-                    Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray, collisions ) );
+                    Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray, false ) );
 
                     planet_body->Initialize();
 
@@ -691,7 +687,7 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, 
         Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
 
         dsstring final_name = m_name + dsstring( " " ) + camera_name;
-        Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray, collisions ) );
+        Fragment* planet_fragment = _DRAWSPACE_NEW_( Fragment, Fragment( final_name, planet_body, collider, m_ray, false ) );
 
         planet_body->Initialize();
 
@@ -1922,21 +1918,21 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
     m_planet->RegisterInertBody( "ship", m_ship );
-    m_planet->RegisterCameraPoint( m_camera2, true );
-    m_planet->RegisterCameraPoint( m_camera3, true );
-    m_planet->RegisterCameraPoint( m_camera4, true );
-    m_planet->RegisterCameraPoint( m_camera5, true );
-    m_planet->RegisterCameraPoint( m_camera, false );
+    m_planet->RegisterCameraPoint( m_camera2 );
+    m_planet->RegisterCameraPoint( m_camera3 );
+    m_planet->RegisterCameraPoint( m_camera4 );
+    m_planet->RegisterCameraPoint( m_camera5 );
+    m_planet->RegisterCameraPoint( m_camera );
 
-    m_planet->RegisterCameraPoint( m_camera6, true );
+    m_planet->RegisterCameraPoint( m_camera6 );
 
 
     m_moon->RegisterInertBody( "ship", m_ship );
-    m_moon->RegisterCameraPoint( m_camera2, true );
-    m_moon->RegisterCameraPoint( m_camera3, true );
-    m_moon->RegisterCameraPoint( m_camera4, true );
-    m_moon->RegisterCameraPoint( m_camera, true );
-    m_moon->RegisterCameraPoint( m_camera6, true );
+    m_moon->RegisterCameraPoint( m_camera2 );
+    m_moon->RegisterCameraPoint( m_camera3 );
+    m_moon->RegisterCameraPoint( m_camera4 );
+    m_moon->RegisterCameraPoint( m_camera );
+    m_moon->RegisterCameraPoint( m_camera6 );
     
 
 

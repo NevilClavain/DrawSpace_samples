@@ -152,7 +152,7 @@ public:
 
     void RegisterInertBody( const dsstring& p_bodyname, DrawSpace::Dynamics::InertBody* p_body );
     void RegisterIncludedInertBody( const dsstring& p_bodyname, DrawSpace::Dynamics::InertBody* p_body, const DrawSpace::Utils::Matrix& p_initmat );
-    bool RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera, bool p_update_meshe );
+    bool RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera );
 
 
     void GetName( dsstring& p_name );
