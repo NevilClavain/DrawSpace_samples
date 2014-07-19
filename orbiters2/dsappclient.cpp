@@ -21,7 +21,7 @@ _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
 
-Fragment::Fragment( const dsstring& p_name, DrawSpace::Planet::Body* p_planetbody, DrawSpace::Dynamics::Collider* p_collider, dsreal p_planetray, bool p_collisions ) :
+Fragment::Fragment( const dsstring& p_name, DrawSpace::SphericalLOD::Body* p_planetbody, DrawSpace::Dynamics::Collider* p_collider, dsreal p_planetray, bool p_collisions ) :
 m_planetbody( p_planetbody ), 
 m_collider( p_collider ),
 m_suspend_update( false ),
@@ -41,8 +41,8 @@ m_collisions( p_collisions )
 
         m_runner = _DRAWSPACE_NEW_( Runner, Runner );
 
-        m_planet_evt_cb = _DRAWSPACE_NEW_( PlanetEvtCb, PlanetEvtCb( this, &Fragment::on_planet_event ) );
-        m_planetbody->RegisterEventHandler( m_planet_evt_cb );
+        m_spherelod_evt_cb = _DRAWSPACE_NEW_( PlanetEvtCb, PlanetEvtCb( this, &Fragment::on_spherelod_event ) );
+        m_planetbody->RegisterEventHandler( m_spherelod_evt_cb );
 
         m_runner_evt_cb = _DRAWSPACE_NEW_( RunnerEvtCb, RunnerEvtCb( this, &Fragment::on_meshebuild_request ) );
        
@@ -76,7 +76,7 @@ void Fragment::SetHotState( bool p_hotstate )
     m_hot = p_hotstate;
 }
 
-DrawSpace::Planet::Body* Fragment::GetPlanetBody( void )
+DrawSpace::SphericalLOD::Body* Fragment::GetPlanetBody( void )
 {
     return m_planetbody;
 }
@@ -91,7 +91,7 @@ void Fragment::SetInertBody( DrawSpace::Dynamics::InertBody* p_body )
     m_inertbody = p_body;
 }
 
-void Fragment::on_planet_event( DrawSpace::Planet::Body* p_body, int p_currentface )
+void Fragment::on_spherelod_event( DrawSpace::SphericalLOD::Body* p_body, int p_currentface )
 {
     if( !m_collisions )
     {
@@ -105,7 +105,7 @@ void Fragment::on_planet_event( DrawSpace::Planet::Body* p_body, int p_currentfa
     {
         if( !m_suspend_update )
         {
-            Planet::Patch* curr_patch = p_body->GetFaceCurrentLeaf( p_currentface );
+            SphericalLOD::Patch* curr_patch = p_body->GetFaceCurrentLeaf( p_currentface );
 
             dsreal xpos, ypos;
             curr_patch->GetPos( xpos, ypos );
@@ -231,42 +231,42 @@ void Fragment::build_meshe( DrawSpace::Core::Meshe& p_patchmeshe, int p_patch_or
 
         switch( p_patch_orientation )
         {
-            case Planet::Patch::FrontPlanetFace:
+            case SphericalLOD::Patch::FrontPlanetFace:
 
                 v2.x = v.x;
                 v2.y = v.y;
                 v2.z = 1.0;
                 break;
 
-            case Planet::Patch::RearPlanetFace:
+            case SphericalLOD::Patch::RearPlanetFace:
 
                 v2.x = -v.x;
                 v2.y = v.y;
                 v2.z = -1.0;
                 break;
 
-            case Planet::Patch::LeftPlanetFace:
+            case SphericalLOD::Patch::LeftPlanetFace:
 
                 v2.x = -1.0;
                 v2.y = v.y;
                 v2.z = v.x;
                 break;
 
-            case Planet::Patch::RightPlanetFace:
+            case SphericalLOD::Patch::RightPlanetFace:
 
                 v2.x = 1.0;
                 v2.y = v.y;
                 v2.z = -v.x;
                 break;
 
-            case Planet::Patch::TopPlanetFace:
+            case SphericalLOD::Patch::TopPlanetFace:
 
                 v2.x = v.x;
                 v2.y = 1.0;
                 v2.z = -v.y;
                 break;
 
-            case Planet::Patch::BottomPlanetFace:
+            case SphericalLOD::Patch::BottomPlanetFace:
 
                 v2.x = v.x;
                 v2.y = -1.0;
@@ -383,7 +383,7 @@ m_ray( /*12000000.0*/ /*600000.0*/ p_ray * 1000.0 )
     m_world.Initialize();
 
        
-    m_drawable = _DRAWSPACE_NEW_( DrawSpace::Planet::Drawing, DrawSpace::Planet::Drawing );
+    m_drawable = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::Drawing, DrawSpace::SphericalLOD::Drawing );
     m_drawable->SetName( p_name );
     m_drawable->SetRenderer( DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface );
     
@@ -406,7 +406,7 @@ MyPlanet::CameraEvtCb* MyPlanet::GetCameraEvtCb( void )
     return m_camera_evt_cb;
 }
 
-DrawSpace::Planet::Drawing* MyPlanet::GetDrawable( void )
+DrawSpace::SphericalLOD::Drawing* MyPlanet::GetDrawable( void )
 {
     return m_drawable;
 }
@@ -558,7 +558,7 @@ void MyPlanet::RegisterInertBody( const dsstring& p_bodyname, DrawSpace::Dynamic
     reg_body.attached = false;
     reg_body.body = p_body;
 
-    DrawSpace::Planet::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
+    DrawSpace::SphericalLOD::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::Body, DrawSpace::SphericalLOD::Body( m_ray * 2.0 ) );
     Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
 
     dsstring final_name = m_name + dsstring( " " ) + p_bodyname;
@@ -584,7 +584,7 @@ void MyPlanet::RegisterIncludedInertBody( const dsstring& p_bodyname, DrawSpace:
 
     p_body->IncludeTo( m_orbiter, p_initmat );
 
-    DrawSpace::Planet::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
+    DrawSpace::SphericalLOD::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::Body, DrawSpace::SphericalLOD::Body( m_ray * 2.0 ) );
     Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
 
     dsstring final_name = m_name + dsstring( " " ) + p_bodyname;
@@ -646,7 +646,7 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera )
                     reg_camera.attached_body = NULL;
 
 
-                    DrawSpace::Planet::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
+                    DrawSpace::SphericalLOD::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::Body, DrawSpace::SphericalLOD::Body( m_ray * 2.0 ) );
                     Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
 
                     dsstring final_name = m_name + dsstring( " " ) + camera_name;
@@ -683,7 +683,7 @@ bool MyPlanet::RegisterCameraPoint( DrawSpace::Dynamics::CameraPoint* p_camera )
         reg_camera.attached_body = NULL;
 
 
-        DrawSpace::Planet::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::Planet::Body, DrawSpace::Planet::Body( m_ray * 2.0 ) );
+        DrawSpace::SphericalLOD::Body* planet_body = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::Body, DrawSpace::SphericalLOD::Body( m_ray * 2.0 ) );
         Collider* collider = _DRAWSPACE_NEW_( Collider, Collider( &m_world ) );
 
         dsstring final_name = m_name + dsstring( " " ) + camera_name;
@@ -1451,7 +1451,7 @@ bool dsAppClient::OnIdleAppInit( void )
 {
     //World::m_scale = 0.5;
     World::m_scale = 1.0;
-    DrawSpace::Planet::Body::BuildPlanetMeshe();
+    DrawSpace::SphericalLOD::Body::BuildMeshe();
 
 
     RegisterMouseInputEventsProvider( &m_mouse_input );

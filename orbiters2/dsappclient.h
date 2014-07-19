@@ -11,18 +11,18 @@ class Fragment
 {
 protected:
 
-    typedef DrawSpace::Core::CallBack2<Fragment, void, DrawSpace::Planet::Body*, int>      PlanetEvtCb;
-    typedef DrawSpace::Core::CallBack<Fragment, void, DrawSpace::Core::PropertyPool*>      RunnerEvtCb;
+    typedef DrawSpace::Core::CallBack2<Fragment, void, DrawSpace::SphericalLOD::Body*, int>     PlanetEvtCb;
+    typedef DrawSpace::Core::CallBack<Fragment, void, DrawSpace::Core::PropertyPool*>           RunnerEvtCb;
 
 
-    DrawSpace::Planet::Body*                                    m_planetbody;
+    DrawSpace::SphericalLOD::Body*                              m_planetbody;
     DrawSpace::Dynamics::Collider*                              m_collider;
 
     DrawSpace::Core::Mediator::Event*                           m_buildmeshe_event;
     DrawSpace::Core::Runner*                                    m_runner;
     DrawSpace::Core::Task<DrawSpace::Core::Runner>*             m_task;
 
-    PlanetEvtCb*                                                m_planet_evt_cb;
+    PlanetEvtCb*                                                m_spherelod_evt_cb;
     RunnerEvtCb*                                                m_runner_evt_cb;
 
     bool                                                        m_suspend_update;
@@ -45,13 +45,13 @@ protected:
     dsstring                                                    m_name;
     
     void on_meshebuild_request( DrawSpace::Core::PropertyPool* p_args );
-    void on_planet_event( DrawSpace::Planet::Body* p_body, int p_currentface );
+    void on_spherelod_event( DrawSpace::SphericalLOD::Body* p_body, int p_currentface );
 
     void build_meshe( DrawSpace::Core::Meshe& p_patchmeshe, int p_patch_orientation, dsreal p_sidelength, dsreal p_xpos, dsreal p_ypos, DrawSpace::Core::Meshe& p_outmeshe );
 
 public:
 
-    Fragment( const dsstring& p_name, DrawSpace::Planet::Body* p_planetbody, DrawSpace::Dynamics::Collider* p_collider, dsreal p_planetray, bool p_collisions );
+    Fragment( const dsstring& p_name, DrawSpace::SphericalLOD::Body* p_planetbody, DrawSpace::Dynamics::Collider* p_collider, dsreal p_planetray, bool p_collisions );
     virtual ~Fragment( void );
 
     void Update( MyPlanet* p_owner );    
@@ -63,7 +63,7 @@ public:
 
     void RemoveColliderFromWorld( void );
 
-    DrawSpace::Planet::Body* GetPlanetBody( void );
+    DrawSpace::SphericalLOD::Body* GetPlanetBody( void );
 
 };
 
@@ -116,7 +116,7 @@ protected:
     dsstring                                                    m_name;
     DrawSpace::Dynamics::Orbiter*                               m_orbiter;
         
-    DrawSpace::Planet::Drawing*                                 m_drawable;
+    DrawSpace::SphericalLOD::Drawing*                           m_drawable;
     
     CameraEvtCb*                                                m_camera_evt_cb;
       
@@ -136,8 +136,8 @@ public:
     MyPlanet( const dsstring& p_name, dsreal p_ray );
     ~MyPlanet( void );
 
-    DrawSpace::Planet::Drawing* GetDrawable( void );
-    DrawSpace::Planet::Body* GetPlanetBody( void );
+    DrawSpace::SphericalLOD::Drawing* GetDrawable( void );
+    DrawSpace::SphericalLOD::Body* GetPlanetBody( void );
     DrawSpace::Dynamics::Orbiter*   GetOrbiter( void );
     DrawSpace::Dynamics::World*     GetWorld( void );
 
