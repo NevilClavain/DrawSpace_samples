@@ -192,8 +192,10 @@ protected:
 
 
     DrawSpace::Dynamics::CameraPoint*           m_camera;
+
     
     DrawSpace::Dynamics::CameraPoint*           m_camera2;
+    DrawSpace::Core::HeadMovement*              m_head_mvt;
 
     DrawSpace::Dynamics::CameraPoint*           m_camera3;
     DrawSpace::Core::CircularMovement*          m_circular_mvt;
