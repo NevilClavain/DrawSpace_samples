@@ -136,8 +136,7 @@ public:
     MyPlanet( const dsstring& p_name, dsreal p_ray );
     ~MyPlanet( void );
 
-    DrawSpace::SphericalLOD::Drawing* GetDrawable( void );
-    DrawSpace::SphericalLOD::Body* GetPlanetBody( void );
+    DrawSpace::SphericalLOD::Drawing* GetDrawable( void );    
     DrawSpace::Dynamics::Orbiter*   GetOrbiter( void );
     DrawSpace::Dynamics::World*     GetWorld( void );
 
