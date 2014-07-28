@@ -58,6 +58,8 @@ protected:
 
     DrawSpace::Core::LongLatMovement*           m_longlat_mvt2;
 
+    DrawSpace::Core::LongLatMovement*           m_longlat_mvt3;
+
 
     DrawSpace::Dynamics::CameraPoint*           m_curr_camera;
 
@@ -107,6 +109,9 @@ protected:
     DrawSpace::Dynamics::InertBody*             m_cube_body;
     DrawSpace::Chunk*                           m_chunk;
 
+
+    DrawSpace::Chunk*                           m_building;
+    DrawSpace::Dynamics::Collider*              m_building_collider;
 
 
     ///////////////////////////////////////////////////////////

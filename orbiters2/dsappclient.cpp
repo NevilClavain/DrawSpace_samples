@@ -490,7 +490,13 @@ void dsAppClient::OnRenderFrame( void )
     m_ship->Update();
     m_cube_body->Update();
 
+    Matrix bld_pos;
+    //bld_pos.Translation( 265000000.0, 0.0, -200.0 );
+    bld_pos.Identity();
 
+    
+
+    m_building_collider->Update( m_timer, bld_pos );
 
            
     m_scenegraph.ComputeTransformations( m_timer );
@@ -519,6 +525,9 @@ void dsAppClient::OnRenderFrame( void )
 
     m_planet->ManageBodies();
     m_moon->ManageBodies();
+
+
+    
 
 
     m_texturepass->GetRenderingQueue()->Draw();
@@ -808,8 +817,59 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, m_chunk, cube_params ) );
 
+    ///////////////////////////////////////////////////////////////
+
+
+    m_building = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+
+    m_building->RegisterPassSlot( "texture_pass" );
+    m_building->SetRenderer( renderer );
+
+    m_building->SetName( "building" );
+    
+    m_building->GetMeshe()->SetImporter( m_meshe_import );
+
+    m_building->GetMeshe()->LoadFromFile( "building3.ac", 0 );  
+
+
+
+    m_building->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_building->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_building->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_building->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_building->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_building->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_building->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_building->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    m_building->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "building3.bmp" ) ), 0 );
+
+
+
+
+
+
+    m_building->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
+
+    m_scenegraph.RegisterNode( m_building );
+
+  
+    
+    DrawSpace::Dynamics::Body::Parameters bld_params;
+    bld_params.mass = 0.0;
+    bld_params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
+    bld_params.shape_descr.meshe = *( m_building->GetMeshe() );
+
+    bld_params.initial_attitude.Translation( 265000000.0, 0.0, -800.0 );
 
     
+
+    m_building_collider = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Collider, DrawSpace::Dynamics::Collider( m_building ) );
+
+    m_building_collider->SetKinematic( bld_params );
+
+    //m_building_collider->AddToWorld( & m_world );
 
 
     ///////////////////////////////////////////////////////////////
@@ -1072,7 +1132,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_reticle_widget->LockOnBody( /*m_moon->GetOrbiter()*/ m_cube_body );
+    //m_reticle_widget->LockOnBody( /*m_moon->GetOrbiter()*/ /*m_cube_body*/ m_building_collider );
+
+    m_reticle_widget->LockOnTransformNode( m_building );
     //m_reticle_widget->LockOnTransformNode( m_camera5 );
 
 
@@ -1164,6 +1226,15 @@ bool dsAppClient::OnIdleAppInit( void )
     m_longlat_mvt2->GetResult( llres );
 
     m_planet->RegisterIncludedInertBody( "simple_cube", m_cube_body, llres );
+
+
+    m_longlat_mvt3 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    m_longlat_mvt3->Init( -21.0000, 20.0089, 400114.0, 0.0, 0.0 );
+
+    m_building_collider->RegisterMovement( m_longlat_mvt3 );
+
+
+    m_planet->RegisterCollider( m_building_collider );
 
 
     /**/
