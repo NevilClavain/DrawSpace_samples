@@ -570,7 +570,7 @@ void dsAppClient::OnRenderFrame( void )
 
     m_reticle_widget->GetScreenPos( x_reticle, y_reticle );
 
-    renderer->DrawText( 0, 255, 0, x_reticle - 40, y_reticle - 40, "%.3f km", m_reticle_widget->GetLastDistance() / 1000.0 );
+    //renderer->DrawText( 0, 255, 0, x_reticle - 40, y_reticle - 40, "%.3f km", m_reticle_widget->GetLastDistance() / 1000.0 );
 
 
     
@@ -995,7 +995,7 @@ bool dsAppClient::OnIdleAppInit( void )
     
     m_ship_drawable->GetMeshe()->SetImporter( m_meshe_import );
 
-    m_ship_drawable->GetMeshe()->LoadFromFile( "object3.ac", 0 );    
+    m_ship_drawable->GetMeshe()->LoadFromFile( "survey.ac", 0 );    
 
     m_ship_drawable->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_ship_drawable->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
@@ -1007,7 +1007,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ship_drawable->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     m_ship_drawable->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
-    m_ship_drawable->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "tex07.jpg" ) ), 0 );
+    m_ship_drawable->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "surveyship_color.jpg" ) ), 0 );
 
 
 
@@ -1019,8 +1019,8 @@ bool dsAppClient::OnIdleAppInit( void )
     //DrawSpace::Dynamics::Body::Parameters cube_params;
     cube_params.mass = SHIP_MASS;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
-    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 2.0, 0.5, 4.0, 1.0 );
-
+    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285, 21.4704 / 2.0, 81.911, 1.0 );
+    
     cube_params.initial_attitude.Translation( 265000000.0, 0.0, 0.0 );
 
     m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, m_ship_drawable, cube_params ) );
@@ -1036,7 +1036,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterNode( m_camera2 );
 
     m_head_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::HeadMovement, DrawSpace::Core::HeadMovement );
-    m_head_mvt->Init( m_ship, 1.0, 8000.0, Vector( 0.0, 2.8, 11.4, 1.0 ) );
+    //m_head_mvt->Init( m_ship, 1.0, 8000.0, Vector( 0.0, 2.8, 11.4, 1.0 ) );
+
+    m_head_mvt->Init( m_ship, 1.0, 8000.0, Vector( 0.0, 25.0, 110.0, 1.0 ) );
 
     m_camera2->RegisterMovement( m_head_mvt );
 
@@ -1051,7 +1053,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_circular_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
-    m_circular_mvt->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 35.0, 0.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
+    m_circular_mvt->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 385.0, 90.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
 
     m_camera3->RegisterMovement( m_circular_mvt );
 
@@ -1371,38 +1373,38 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case 'E':
 
-            m_ship->ApplyUpPitch( 50.0 );
+            m_ship->ApplyUpPitch( 50000.0 );
             break;
 
         case 'C':
 
-            m_ship->ApplyDownPitch( 50.0 );
+            m_ship->ApplyDownPitch( 50000.0 );
             break;
 
         case 'S':
 
-            m_ship->ApplyLeftYaw( 50.0 );
+            m_ship->ApplyLeftYaw( 50000.0 );
             break;
 
         case 'F':
 
-            m_ship->ApplyRightYaw( 50.0 );
+            m_ship->ApplyRightYaw( 50000.0 );
             break;
 
 
         case 'Z':
 
-            m_ship->ApplyLeftRoll( 50.0 );
+            m_ship->ApplyLeftRoll( 50000.0 );
             break;
 
         case 'R':
 
-            m_ship->ApplyRightRoll( 50.0 );
+            m_ship->ApplyRightRoll( 50000.0 );
             break;
 
         case 'T':
 
-            m_ship->ApplyFwdForce( 510000.0 );
+            m_ship->ApplyFwdForce( 51000000.0 );
             break;
 
 
@@ -1414,7 +1416,7 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case VK_RETURN:
 
-            m_ship->ApplyFwdForce( 11000.0 );
+            m_ship->ApplyFwdForce( 110000.0 );
             break;
 
         case VK_UP:
@@ -1424,7 +1426,7 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case VK_DOWN:
 
-            m_ship->ApplyDownForce( -1000.0 );
+            m_ship->ApplyDownForce( -10000.0 );
             break;
 
 
