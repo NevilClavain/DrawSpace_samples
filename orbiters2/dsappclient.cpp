@@ -494,9 +494,21 @@ void dsAppClient::OnRenderFrame( void )
     //bld_pos.Translation( 265000000.0, 0.0, -200.0 );
     bld_pos.Identity();
 
-    
+
+    Matrix cam7_pos;
+    cam7_pos.Translation( 0.0, 0.0, 4.0 );
+    m_camera7->SetLocalTransform( cam7_pos );
+
+
+    Matrix cam8_pos;
+    cam8_pos.Translation( 0.0, 130.0, 0.0 );
+    m_camera8->SetLocalTransform( cam8_pos );
+
 
     m_building_collider->Update( m_timer, bld_pos );
+
+
+    m_socle_collider->Update( m_timer, bld_pos );
 
            
     m_scenegraph.ComputeTransformations( m_timer );
@@ -861,15 +873,61 @@ bool dsAppClient::OnIdleAppInit( void )
     bld_params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
     bld_params.shape_descr.meshe = *( m_building->GetMeshe() );
 
-    bld_params.initial_attitude.Translation( 265000000.0, 0.0, -800.0 );
 
-    
-
+   
     m_building_collider = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Collider, DrawSpace::Dynamics::Collider( m_building ) );
 
     m_building_collider->SetKinematic( bld_params );
+    
 
-    //m_building_collider->AddToWorld( & m_world );
+    ///////////////////////////////////////////////////////////////
+
+    m_socle = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+
+    m_socle->RegisterPassSlot( "texture_pass" );
+    m_socle->SetRenderer( renderer );
+
+    m_socle->SetName( "socle" );
+    
+    m_socle->GetMeshe()->SetImporter( m_meshe_import );
+
+    m_socle->GetMeshe()->LoadFromFile( "socle.ac", 0 );  
+
+
+
+    m_socle->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_socle->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_socle->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_socle->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_socle->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_socle->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_socle->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_socle->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    m_socle->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "socle.bmp" ) ), 0 );
+
+
+
+
+
+
+    m_socle->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
+
+    m_scenegraph.RegisterNode( m_socle );
+
+  
+    
+    DrawSpace::Dynamics::Body::Parameters socle_params;
+    socle_params.mass = 0.0;
+    socle_params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
+    socle_params.shape_descr.meshe = *( m_socle->GetMeshe() );
+
+
+   
+    m_socle_collider = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Collider, DrawSpace::Dynamics::Collider( m_socle ) );
+
+    m_socle_collider->SetKinematic( socle_params );
 
 
     ///////////////////////////////////////////////////////////////
@@ -1030,6 +1088,20 @@ bool dsAppClient::OnIdleAppInit( void )
     m_camera6->LockOnBody( m_ship );
 
 
+
+
+    m_camera7 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera7", m_cube_body ) );
+    m_scenegraph.RegisterNode( m_camera7 );
+
+
+
+    m_camera8 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera8", m_building_collider ) );
+    m_scenegraph.RegisterNode( m_camera8 );
+
+    m_camera8->LockOnBody( m_cube_body );
+
+
+
     ///////////////////////////////////////////////////////////////
 
 
@@ -1134,7 +1206,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //m_reticle_widget->LockOnBody( /*m_moon->GetOrbiter()*/ /*m_cube_body*/ m_building_collider );
 
-    m_reticle_widget->LockOnTransformNode( m_building );
+    m_reticle_widget->LockOnTransformNode( /*m_building*/ m_socle );
     //m_reticle_widget->LockOnTransformNode( m_camera5 );
 
 
@@ -1180,12 +1252,46 @@ bool dsAppClient::OnIdleAppInit( void )
     m_calendar->RegisterOrbit( m_orbit2 );
 
 
-    m_scenegraph.SetCurrentCamera( "camera5" );
+    m_scenegraph.SetCurrentCamera( "camera7" );
 
-    m_curr_camera = m_camera5;
+    m_curr_camera = m_camera7;
 
 
     
+
+    m_longlat_mvt2 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    m_longlat_mvt2->Init( -21.0000, 20.000, 400014.5, 0.0, 0.0 );
+    m_longlat_mvt2->Compute( m_timer );
+    Matrix llres;
+    m_longlat_mvt2->GetResult( llres );
+
+    m_planet->RegisterIncludedInertBody( "simple_cube", m_cube_body, llres );
+
+
+    m_longlat_mvt3 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    m_longlat_mvt3->Init( -21.0000, 20.0089, 400114.0, 80.0, 0.0 );
+
+    m_building_collider->RegisterMovement( m_longlat_mvt3 );
+
+
+    m_planet->RegisterCollider( m_building_collider );
+
+
+
+
+
+
+    m_longlat_mvt4 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    m_longlat_mvt4->Init( -21.0929, 20.0000, 400129.0, 40.0, 0.0 );
+
+    m_socle_collider->RegisterMovement( m_longlat_mvt4 );
+
+
+    m_planet->RegisterCollider( m_socle_collider );
+
+
+
+
 
     m_planet->RegisterInertBody( "ship", m_ship );
     m_planet->RegisterCameraPoint( m_camera2 );
@@ -1195,6 +1301,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_planet->RegisterCameraPoint( m_camera );
 
     m_planet->RegisterCameraPoint( m_camera6 );
+    m_planet->RegisterCameraPoint( m_camera7 );
+    m_planet->RegisterCameraPoint( m_camera8 );
 
 
     m_moon->RegisterInertBody( "ship", m_ship );
@@ -1217,24 +1325,6 @@ bool dsAppClient::OnIdleAppInit( void )
     //m_camera5->LockOnBody( m_ship );
     m_camera5->LockOnBody( m_cube_body );
 
-
-
-    m_longlat_mvt2 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    m_longlat_mvt2->Init( -21.0000, 20.000, 400002.5, 0.0, 0.0 );
-    m_longlat_mvt2->Compute( m_timer );
-    Matrix llres;
-    m_longlat_mvt2->GetResult( llres );
-
-    m_planet->RegisterIncludedInertBody( "simple_cube", m_cube_body, llres );
-
-
-    m_longlat_mvt3 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    m_longlat_mvt3->Init( -21.0000, 20.0089, 400114.0, 0.0, 0.0 );
-
-    m_building_collider->RegisterMovement( m_longlat_mvt3 );
-
-
-    m_planet->RegisterCollider( m_building_collider );
 
 
     /**/
@@ -1439,6 +1529,18 @@ void dsAppClient::OnKeyPulse( long p_key )
             }
 
             else if( m_curr_camera == m_camera6 )
+            {
+                m_scenegraph.SetCurrentCamera( "camera7" );
+                m_curr_camera = m_camera7;
+            }
+
+            else if( m_curr_camera == m_camera7 )
+            {
+                m_scenegraph.SetCurrentCamera( "camera8" );
+                m_curr_camera = m_camera8;
+            }
+
+            else if( m_curr_camera == m_camera8 )
             {
                 m_scenegraph.SetCurrentCamera( "camera" );
                 m_curr_camera = m_camera;

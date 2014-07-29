@@ -56,9 +56,16 @@ protected:
     DrawSpace::Core::SpectatorMovement*         m_spectator_mvt;
 
 
+    DrawSpace::Dynamics::CameraPoint*           m_camera7;
+    DrawSpace::Dynamics::CameraPoint*           m_camera8;
+
+
     DrawSpace::Core::LongLatMovement*           m_longlat_mvt2;
 
     DrawSpace::Core::LongLatMovement*           m_longlat_mvt3;
+
+
+    DrawSpace::Core::LongLatMovement*           m_longlat_mvt4;
 
 
     DrawSpace::Dynamics::CameraPoint*           m_curr_camera;
@@ -112,6 +119,10 @@ protected:
 
     DrawSpace::Chunk*                           m_building;
     DrawSpace::Dynamics::Collider*              m_building_collider;
+
+    DrawSpace::Chunk*                           m_socle;
+    DrawSpace::Dynamics::Collider*              m_socle_collider;
+
 
 
     ///////////////////////////////////////////////////////////
