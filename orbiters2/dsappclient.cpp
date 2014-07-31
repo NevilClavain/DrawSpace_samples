@@ -633,6 +633,21 @@ void dsAppClient::OnRenderFrame( void )
         renderer->DrawText( 0, 255, 0, 10, 320, "locked object distance = %f", m_curr_camera->GetLockedObjectDistance() );
     }
 
+    long c1, c2;
+
+    DrawSpace::Planetoid::Fragment* ship_planet_fragment = m_planet->GetRegisteredBodyPlanetFragment( m_ship );
+
+    ship_planet_fragment->GetCollisionMesheBuildStats( c1, c2 );
+
+    if( c1 == c2 )
+    {
+        renderer->DrawText( 0, 255, 0, 10, 350, "c1 = %d c2 = %d", c1, c2 );
+    }
+    else
+    {
+        renderer->DrawText( 255, 0, 0, 10, 350, "c1 = %d c2 = %d", c1, c2 );
+    }
+
 
     //renderer->DrawText( 0, 255, 0, 10, 195, "planet01 : %d %d", m_planet->GetCollisionState(), m_planet->GetCollisionMesheBuildCount() );
     //renderer->DrawText( 0, 255, 0, 10, 215, "moon : %d %d", m_moon->GetCollisionState(), m_moon->GetCollisionMesheBuildCount() );
