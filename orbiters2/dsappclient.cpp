@@ -958,6 +958,14 @@ bool dsAppClient::OnIdleAppInit( void )
     for( long i = 0; i < 6; i++ )
     {
         m_planet->GetDrawable()->SetNodeFromPassSpecificFx( "texture_pass", i, "main_fx" );
+
+        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.bmp" ) ), 0 );
+        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetTexture( 0 )->LoadFromFile();
+
+
+        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mapcolor.bmp" ) ), 1 );
+        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetTexture( 1 )->LoadFromFile();
+
     }
     m_scenegraph.RegisterNode( m_planet->GetDrawable() );
 
@@ -984,6 +992,13 @@ bool dsAppClient::OnIdleAppInit( void )
     for( long i = 0; i < 6; i++ )
     {
         m_moon->GetDrawable()->SetNodeFromPassSpecificFx( "texture_pass", i, "main_fx" );
+
+        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.bmp" ) ), 0 );
+        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetTexture( 0 )->LoadFromFile();
+
+        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mapcolor.bmp" ) ), 1 );
+        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetTexture( 1 )->LoadFromFile();
+
     }
     m_scenegraph.RegisterNode( m_moon->GetDrawable() );
 
@@ -1034,7 +1049,7 @@ bool dsAppClient::OnIdleAppInit( void )
     //DrawSpace::Dynamics::Body::Parameters cube_params;
     cube_params.mass = SHIP_MASS;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
-    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285, 21.4704 / 2.0, 81.911, 1.0 );
+    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285 / 2.0, 21.4704 / 2.0, 81.911 / 2.0, 1.0 );
     
     cube_params.initial_attitude.Translation( 265000000.0, 0.0, 0.0 );
 

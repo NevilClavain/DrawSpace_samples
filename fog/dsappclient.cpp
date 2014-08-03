@@ -49,7 +49,7 @@ void dsAppClient::OnRenderFrame( void )
     m_timer.Update();
     if( m_timer.IsReady() )
     {
-        m_world.StepSimulation( m_timer.GetFPS() );
+        m_world.StepSimulation( m_timer.GetFPS(), 15 );
     }
 }
 
