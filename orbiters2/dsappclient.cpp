@@ -959,8 +959,8 @@ bool dsAppClient::OnIdleAppInit( void )
     {
         m_planet->GetDrawable()->SetNodeFromPassSpecificFx( "texture_pass", i, "main_fx" );
 
-        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.bmp" ) ), 0 );
-        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetTexture( 0 )->LoadFromFile();
+        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetVertexTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.bmp" ) ), 0 );
+        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetVertexTexture( 0 )->LoadFromFile();
 
 
         m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mapcolor.bmp" ) ), 1 );
@@ -993,8 +993,8 @@ bool dsAppClient::OnIdleAppInit( void )
     {
         m_moon->GetDrawable()->SetNodeFromPassSpecificFx( "texture_pass", i, "main_fx" );
 
-        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.bmp" ) ), 0 );
-        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetTexture( 0 )->LoadFromFile();
+        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetVertexTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.bmp" ) ), 0 );
+        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetVertexTexture( 0 )->LoadFromFile();
 
         m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mapcolor.bmp" ) ), 1 );
         m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetTexture( 1 )->LoadFromFile();

@@ -104,6 +104,7 @@ void dsAppClient::OnRenderFrame( void )
     Matrix cube0_pos;
     Vector cube0_pos_v;
     dsreal center_x, center_y;
+    dsreal out_z;
 
     m_boxes[0].inert_body->GetLastWorldTransformation( cube0_pos );
 
@@ -112,7 +113,7 @@ void dsAppClient::OnRenderFrame( void )
     cube0_pos_v[2] = cube0_pos( 3, 2 );
     cube0_pos_v[3] = 1.0;
 
-    m_scenegraph.PointProjection( cube0_pos_v, center_x, center_y );
+    m_scenegraph.PointProjection( cube0_pos_v, center_x, center_y, out_z );
 
     m_image1->SetTranslation( center_x, center_y );
 
