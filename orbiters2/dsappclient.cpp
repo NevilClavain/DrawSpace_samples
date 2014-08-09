@@ -959,18 +959,18 @@ bool dsAppClient::OnIdleAppInit( void )
     {
         m_planet->GetDrawable()->SetNodeFromPassSpecificFx( "texture_pass", i, "main_fx" );
 
+        /*
         m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetVertexTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.bmp" ) ), 0 );
         m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetVertexTexture( 0 )->LoadFromFile();
 
 
-        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mapcolor.bmp" ) ), 1 );
-        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetTexture( 1 )->LoadFromFile();
+        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mapcolor.bmp" ) ), 0 );
+        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetTexture( 0 )->LoadFromFile();
+        */
 
     }
     m_scenegraph.RegisterNode( m_planet->GetDrawable() );
 
-    //m_planet->GetDrawable()->Initialize();
-    //m_planet->GetPlanetBody()->Initialize();
 
     
 
@@ -993,16 +993,18 @@ bool dsAppClient::OnIdleAppInit( void )
     {
         m_moon->GetDrawable()->SetNodeFromPassSpecificFx( "texture_pass", i, "main_fx" );
 
+        /*
         m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetVertexTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.bmp" ) ), 0 );
         m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetVertexTexture( 0 )->LoadFromFile();
 
-        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mapcolor.bmp" ) ), 1 );
-        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetTexture( 1 )->LoadFromFile();
+        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mapcolor.bmp" ) ), 0 );
+        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetTexture( 0 )->LoadFromFile();
+        */
 
     }
     m_scenegraph.RegisterNode( m_moon->GetDrawable() );
 
-    //m_moon->GetPlanetBody()->Initialize();
+    
 
     m_centroid2 = _DRAWSPACE_NEW_( Centroid, Centroid );
     m_centroid2->SetOrbiter( m_moon->GetOrbiter() );
@@ -1536,6 +1538,19 @@ void dsAppClient::OnKeyPulse( long p_key )
 
             m_calendar->SetTimeFactor( Calendar::SEC_1DAY_TIME );
             break;
+
+            /*
+        case VK_F8:
+            {
+
+                DrawSpace::SphericalLOD::Maps* maps = m_planet->GetDrawable()->GetBody()->GetFaceMapsFactory( DrawSpace::SphericalLOD::Patch::FrontPlanetFace );
+
+                dsreal alt = maps->GetAltFromLocalPoint( Vector( 0.499, 0.499, 0.0, 1.0 ) );
+
+            }
+
+            break;
+            */
 
         case VK_F9:
 
