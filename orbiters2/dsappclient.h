@@ -12,10 +12,6 @@ protected:
     typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Gui::Widget*>   WidgetEventHandler;
 
 
-    typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Planetoid::Body*> PlanetRelativeEvtCb;
-
-    typedef DrawSpace::Core::CallBack2<dsAppClient, void, DrawSpace::Scenegraph::CameraEvent, DrawSpace::Core::TransformNode*>         CameraEvtCb;
-
     static dsAppClient*                         m_instance;
 
     DrawSpace::Scenegraph                       m_scenegraph;
@@ -159,7 +155,7 @@ protected:
 
 
 
-    CameraEvtCb*                                m_camera_evt_cb;
+
 
     DrawSpace::SystemMouseInputProvider         m_mouse_input;
 
