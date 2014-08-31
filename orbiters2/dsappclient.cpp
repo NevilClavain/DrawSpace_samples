@@ -803,6 +803,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_chunk = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
+    m_chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
     m_chunk->RegisterPassSlot( "texture_pass" );
     m_chunk->SetRenderer( renderer );
 
@@ -848,6 +850,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_building = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+
+    m_building->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
     m_building->RegisterPassSlot( "texture_pass" );
     m_building->SetRenderer( renderer );
@@ -898,6 +902,8 @@ bool dsAppClient::OnIdleAppInit( void )
     ///////////////////////////////////////////////////////////////
 
     m_socle = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+
+    m_socle->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
     m_socle->RegisterPassSlot( "texture_pass" );
     m_socle->SetRenderer( renderer );
@@ -1019,6 +1025,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_ship_drawable = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+
+    m_ship_drawable->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
     m_ship_drawable->RegisterPassSlot( "texture_pass" );
     m_ship_drawable->SetRenderer( renderer );

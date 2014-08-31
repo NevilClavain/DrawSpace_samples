@@ -34,6 +34,8 @@ Orbiter* dsAppClient::build_planet( char* p_name, char* p_texture )
 
     chunk = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
+    chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
     chunk->RegisterPassSlot( "texture_pass" );
     chunk->SetRenderer( renderer );
     chunk->SetName( p_name );
@@ -83,6 +85,8 @@ Chunk* dsAppClient::build_orbit_drawable( char* p_name, Orbit* p_orbit )
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
     chunk = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+
+    chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
     chunk->RegisterPassSlot( "texture_pass" );
     chunk->SetRenderer( renderer );
@@ -359,6 +363,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     chunk = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
+    chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
     chunk->RegisterPassSlot( "texture_pass" );
     chunk->SetRenderer( renderer );
 
@@ -408,6 +414,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     chunk = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+
+    chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
     chunk->RegisterPassSlot( "texture_pass" );
     chunk->SetRenderer( renderer );

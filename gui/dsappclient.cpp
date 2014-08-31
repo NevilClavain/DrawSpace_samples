@@ -164,6 +164,8 @@ bool dsAppClient::OnIdleAppInit( void )
     
     m_chunk = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
+    m_chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
     m_chunk->RegisterPassSlot( "texture_pass" );
     m_chunk->SetRenderer( renderer );
     m_chunk->SetName( "cube" );
