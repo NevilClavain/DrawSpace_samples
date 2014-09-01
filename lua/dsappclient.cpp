@@ -99,6 +99,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_fogblendpass->CreateViewportQuad();
 
 
+    m_fogblendpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_fogblendpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogblend.vsh", false ) ) );
     m_fogblendpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogblend.psh", false ) ) );
     m_fogblendpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -115,6 +116,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
     m_finalpass->CreateViewportQuad();
+    m_finalpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_finalpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -147,6 +149,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->GetMeshe()->SetImporter( m_meshe_import );
     m_chunk->GetMeshe()->LoadFromFile( "object.ac", 0 );
 
+    m_chunk->GetNodeFromPass( "fogint_pass" )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_chunk->GetNodeFromPass( "fogint_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.vsh", false ) ) );
     m_chunk->GetNodeFromPass( "fogint_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.psh", false ) ) );
     m_chunk->GetNodeFromPass( "fogint_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -158,6 +161,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->GetNodeFromPass( "fogint_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     
 
+    m_chunk->GetNodeFromPass( "texture_pass" )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -191,6 +195,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_ground->GetMeshe()->LoadFromFile( "grid.ac", 0 );
 
+    m_ground->GetNodeFromPass( "fogint_pass" )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_ground->GetNodeFromPass( "fogint_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.vsh", false ) ) );
     m_ground->GetNodeFromPass( "fogint_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.psh", false ) ) );
     m_ground->GetNodeFromPass( "fogint_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -203,6 +208,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->GetNodeFromPass( "fogint_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
 
 
+    m_ground->GetNodeFromPass( "texture_pass" )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_ground->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_ground->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_ground->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -240,6 +246,8 @@ bool dsAppClient::OnIdleAppInit( void )
     status = m_mytext->Initialize();
 
     m_mytext->SetText( 3, 16, 8, "Fog test" );
+
+    m_mytext->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_mytext->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_mytext->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_mytext->GetFx()->GetShader( 0 )->LoadFromFile();

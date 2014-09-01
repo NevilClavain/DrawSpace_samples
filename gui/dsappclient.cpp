@@ -145,6 +145,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
     m_finalpass->CreateViewportQuad();
+
+    m_finalpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_finalpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -175,6 +177,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->GetMeshe()->SetImporter( m_meshe_import );
     m_chunk->GetMeshe()->LoadFromFile( "object.ac", 0 );
 
+    m_chunk->GetNodeFromPass( "texture_pass" )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -210,6 +213,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_text_widget = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget", 25, 15, m_font, true, NULL ) );
 
+    m_text_widget->GetBackgroundImage()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_text_widget->GetBackgroundImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_text_widget->GetBackgroundImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_text_widget->GetBackgroundImage()->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -220,12 +224,14 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
   
+    m_text_widget->GetImage()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_text_widget->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_text_widget->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_text_widget->GetImage()->GetFx()->GetShader( 0 )->LoadFromFile();
     m_text_widget->GetImage()->GetFx()->GetShader( 1 )->LoadFromFile();
 
 
+    m_text_widget->GetText()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_text_widget->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
     m_text_widget->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
     m_text_widget->GetText()->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -254,6 +260,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_text_widget_2 = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget_2", 50, 50, m_font, true, m_text_widget ) );
 
+    m_text_widget_2->GetBackgroundImage()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_text_widget_2->GetBackgroundImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_text_widget_2->GetBackgroundImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_text_widget_2->GetBackgroundImage()->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -262,11 +269,13 @@ bool dsAppClient::OnIdleAppInit( void )
     m_text_widget_2->GetBackgroundImage()->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "shelby.jpg" ) ), 0 );
     m_text_widget_2->GetBackgroundImage()->GetTexture( 0 )->LoadFromFile();
 
+    m_text_widget_2->GetImage()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_text_widget_2->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_text_widget_2->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_text_widget_2->GetImage()->GetFx()->GetShader( 0 )->LoadFromFile();
     m_text_widget_2->GetImage()->GetFx()->GetShader( 1 )->LoadFromFile();
 
+    m_text_widget_2->GetText()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_text_widget_2->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
     m_text_widget_2->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
     m_text_widget_2->GetText()->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -296,11 +305,13 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_text_widget_3 = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget_3", 70, 50, m_font, false, NULL ) );
 
+    m_text_widget_3->GetImage()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_text_widget_3->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
     m_text_widget_3->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
     m_text_widget_3->GetImage()->GetFx()->GetShader( 0 )->LoadFromFile();
     m_text_widget_3->GetImage()->GetFx()->GetShader( 1 )->LoadFromFile();
 
+    m_text_widget_3->GetText()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_text_widget_3->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
     m_text_widget_3->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
     m_text_widget_3->GetText()->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -320,6 +331,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_fpstext_widget = _DRAWSPACE_NEW_( TextWidget, TextWidget( "fps_text_widget", 20, 10, m_font, false, NULL ) );
 
+    m_fpstext_widget->GetText()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_fpstext_widget->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
     m_fpstext_widget->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
     m_fpstext_widget->GetText()->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -330,6 +342,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_fpstext_widget->GetText()->AddShaderParameter( 1, "color", 0 );
     m_fpstext_widget->GetText()->SetShaderRealVector( "color", Utils::Vector( 0.0, 1.0, 0.0, 1.0 ) );
 
+    m_fpstext_widget->GetImage()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_fpstext_widget->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
     m_fpstext_widget->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
     m_fpstext_widget->GetImage()->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -347,6 +360,8 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////////
     
     m_image1 = _DRAWSPACE_NEW_( Image, Image( (long)8, (long)8 ) );
+
+    m_image1->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
 
     m_image1->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texturekeyed.vsh", false ) ) );
     m_image1->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texturekeyed.psh", false ) ) );

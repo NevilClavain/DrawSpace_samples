@@ -140,6 +140,7 @@ void dsAppClient::create_box( void )
 
     chunk = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
+    chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
     chunk->RegisterPassSlot( "texture_pass" );
     chunk->SetRenderer( renderer );
 
@@ -152,6 +153,7 @@ void dsAppClient::create_box( void )
 
     chunk->GetMeshe()->LoadFromFile( "object.ac", 0 );    
 
+    chunk->GetNodeFromPass( "texture_pass" )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     chunk->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -234,6 +236,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
     m_finalpass->CreateViewportQuad();
+    m_finalpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_finalpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -258,6 +261,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_ground = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
+    m_ground->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
     m_ground->RegisterPassSlot( "texture_pass" );
     m_ground->SetRenderer( renderer );
     m_ground->SetName( "ground" );
@@ -269,6 +273,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->GetMeshe()->LoadFromFile( "grid.ac", 0 );
     
 
+    m_ground->GetNodeFromPass( "texture_pass" )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_ground->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_ground->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_ground->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
@@ -358,6 +363,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_image1 = _DRAWSPACE_NEW_( Image, Image( (long)8, (long)8 ) );
 
+    m_image1->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_image1->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_image1->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_image1->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
