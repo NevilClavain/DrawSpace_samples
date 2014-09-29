@@ -157,6 +157,17 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
     m_chunk->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
+    
+    Texture* mytexture = _DRAWSPACE_NEW_( Texture, Texture );
+    dsstring test_text = "hello this is \n"\
+                           " a text with\n"\
+                           "multiples lines";
+
+
+    mytexture->ParseProperties( test_text );
+
+
+
     m_scenegraph.RegisterNode( m_chunk );
 
     dsstring md5_string_1;

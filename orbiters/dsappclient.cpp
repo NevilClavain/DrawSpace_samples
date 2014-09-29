@@ -258,7 +258,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
     m_spacebox->RegisterPassSlot( "texture_pass" );
-    m_spacebox->SetRenderer( renderer );
+
     m_spacebox->SetName( "spacebox" );
 
 
