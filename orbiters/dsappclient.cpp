@@ -499,8 +499,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_camera2->LockOnBody( m_saturn );
 
 
-    //m_scenegraph.SetCurrentCamera( "camera" );
-    m_scenegraph.SetCurrentCamera( "camera2" );
+    m_scenegraph.SetCurrentCamera( "camera" );
+    //m_scenegraph.SetCurrentCamera( "camera2" );
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();

@@ -1091,7 +1091,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_head_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::HeadMovement, DrawSpace::Core::HeadMovement );
     //m_head_mvt->Init( m_ship, 1.0, 8000.0, Vector( 0.0, 2.8, 11.4, 1.0 ) );
 
-    m_head_mvt->Init( m_ship, 1.0, 8000.0, Vector( 0.0, 25.0, 110.0, 1.0 ) );
+    m_head_mvt->Init( 1.0, 8000.0, Vector( 0.0, 25.0, 110.0, 1.0 ) );
+    m_head_mvt->SetRefBody( m_ship );
+
 
     m_camera2->RegisterMovement( m_head_mvt );
 
@@ -1135,7 +1137,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_spectator_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::SpectatorMovement, DrawSpace::Core::SpectatorMovement );
 
-    m_spectator_mvt->Init( m_ship, 16.0, 8000, m_timer, "camera6_spectator_timer", true );
+    m_spectator_mvt->SetName( "spectator_camera" );
+    m_spectator_mvt->Init( m_ship, 16.0, 8000, true );
 
     m_camera6->RegisterMovement( m_spectator_mvt );
     m_camera6->LockOnBody( m_ship );
