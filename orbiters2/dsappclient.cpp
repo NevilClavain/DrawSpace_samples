@@ -1082,15 +1082,15 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
 
-    //m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera" ) );
-    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    m_camera->SetName( "camera" );
+    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera" ) );
+    //m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
+    //m_camera->SetName( "camera" );
     m_scenegraph.RegisterNode( m_camera );
     
-    //m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", m_ship ) );
-    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    m_camera2->SetName( "camera2" );
-    m_camera2->SetRefBody( m_ship );
+    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", m_ship ) );
+    //m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
+    //m_camera2->SetName( "camera2" );
+    //m_camera2->SetRefBody( m_ship );
     m_scenegraph.RegisterNode( m_camera2 );
 
     m_head_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::HeadMovement, DrawSpace::Core::HeadMovement );
@@ -1104,18 +1104,18 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    //m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", m_ship ) );
-    m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    m_camera3->SetName( "camera3" );
-    m_camera3->SetRefBody( m_ship );
+    m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", m_ship ) );
+    //m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
+    //m_camera3->SetName( "camera3" );
+    //m_camera3->SetRefBody( m_ship );
 
     m_scenegraph.RegisterNode( m_camera3 );
 
 
-    //m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera4", m_ship ) );
-    m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    m_camera4->SetName( "camera4" );
-    m_camera4->SetRefBody( m_ship );
+    m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera4", m_ship ) );
+    //m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
+    //m_camera4->SetName( "camera4" );
+    //m_camera4->SetRefBody( m_ship );
     m_scenegraph.RegisterNode( m_camera4 );
 
 
@@ -1130,10 +1130,10 @@ bool dsAppClient::OnIdleAppInit( void )
     m_camera4->LockOnBody( /*m_planet->GetOrbiter()*/ m_cube_body );
 
 
-    //m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera5", m_planet->GetOrbiter() ) );
-    m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    m_camera5->SetName( "camera5" );
-    m_camera5->SetRefBody( m_planet->GetOrbiter() );
+    m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera5", m_planet->GetOrbiter() ) );
+    //m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
+    //m_camera5->SetName( "camera5" );
+    //m_camera5->SetRefBody( m_planet->GetOrbiter() );
 
     m_scenegraph.RegisterNode( m_camera5 );
 
@@ -1148,10 +1148,10 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
 
-    //m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera6", m_planet->GetOrbiter() ) );
-    m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    m_camera6->SetName( "camera6" );
-    m_camera6->SetRefBody( m_planet->GetOrbiter() );
+    m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera6", m_planet->GetOrbiter() ) );
+    //m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
+    //m_camera6->SetName( "camera6" );
+    //m_camera6->SetRefBody( m_planet->GetOrbiter() );
 
     m_scenegraph.RegisterNode( m_camera6 );
 
@@ -1170,18 +1170,18 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    //m_camera7 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera7", m_cube_body ) );
-    m_camera7 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    m_camera7->SetName( "camera7" );
-    m_camera7->SetRefBody( m_cube_body );
+    m_camera7 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera7", m_cube_body ) );
+    //m_camera7 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
+    //m_camera7->SetName( "camera7" );
+    //m_camera7->SetRefBody( m_cube_body );
     m_scenegraph.RegisterNode( m_camera7 );
 
 
 
-    //m_camera8 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera8", m_building_collider ) );
-    m_camera8 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    m_camera8->SetName( "camera8" );
-    m_camera8->SetRefBody( m_building_collider );
+    m_camera8 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera8", m_building_collider ) );
+    //m_camera8 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
+    //m_camera8->SetName( "camera8" );
+    //m_camera8->SetRefBody( m_building_collider );
     m_scenegraph.RegisterNode( m_camera8 );
 
     m_camera8->LockOnBody( m_cube_body );
