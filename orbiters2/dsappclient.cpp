@@ -580,7 +580,7 @@ void dsAppClient::OnRenderFrame( void )
 
     if( m_curr_camera )
     {
-        m_curr_camera->GetName( camera_name );
+        m_curr_camera->GetSceneName( camera_name );
         renderer->DrawText( 0, 255, 0, 10, 150, "Camera : %s", camera_name.c_str() );
 
         CameraPoint::Infos cam_infos;
@@ -758,7 +758,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
     m_spacebox->RegisterPassSlot( "texture_pass" );
     
-    m_spacebox->SetName( "spacebox" );
+    m_spacebox->SetSceneName( "spacebox" );
 
 
     DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass" );
@@ -815,7 +815,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->RegisterPassSlot( "texture_pass" );
     m_chunk->SetRenderer( renderer );
 
-    m_chunk->SetName( "box" );
+    m_chunk->SetSceneName( "box" );
     
     m_chunk->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -864,7 +864,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_building->RegisterPassSlot( "texture_pass" );
     m_building->SetRenderer( renderer );
 
-    m_building->SetName( "building" );
+    m_building->SetSceneName( "building" );
     
     m_building->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -917,7 +917,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_socle->RegisterPassSlot( "texture_pass" );
     m_socle->SetRenderer( renderer );
 
-    m_socle->SetName( "socle" );
+    m_socle->SetSceneName( "socle" );
     
     m_socle->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -1043,7 +1043,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ship_drawable->RegisterPassSlot( "texture_pass" );
     m_ship_drawable->SetRenderer( renderer );
 
-    m_ship_drawable->SetName( "rocket" );
+    m_ship_drawable->SetSceneName( "rocket" );
     
     m_ship_drawable->GetMeshe()->SetImporter( m_meshe_import );
 

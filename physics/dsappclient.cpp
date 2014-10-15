@@ -147,7 +147,7 @@ void dsAppClient::create_box( void )
     char name[32];
     sprintf( name, "box_%d", m_box_count );
 
-    chunk->SetName( name );
+    chunk->SetSceneName( name );
     
     chunk->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -264,7 +264,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
     m_ground->RegisterPassSlot( "texture_pass" );
     m_ground->SetRenderer( renderer );
-    m_ground->SetName( "ground" );
+    m_ground->SetSceneName( "ground" );
 
     status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
     m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
@@ -297,7 +297,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
     m_spacebox->RegisterPassSlot( "texture_pass" );
 
-    m_spacebox->SetName( "spacebox" );
+    m_spacebox->SetSceneName( "spacebox" );
 
 
     DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass" );

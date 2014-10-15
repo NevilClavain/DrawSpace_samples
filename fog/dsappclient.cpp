@@ -123,7 +123,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->RegisterPassSlot( "fogint_pass" );
     m_chunk->RegisterPassSlot( "texture_pass" );
     m_chunk->SetRenderer( renderer );
-    m_chunk->SetName( "chunk" );
+    m_chunk->SetSceneName( "chunk" );
 
     status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
     m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
@@ -182,7 +182,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->RegisterPassSlot( "fogint_pass" );
     m_ground->RegisterPassSlot( "texture_pass" );
     m_ground->SetRenderer( renderer );
-    m_ground->SetName( "ground" );
+    m_ground->SetSceneName( "ground" );
     
     m_ground->GetMeshe()->SetImporter( m_meshe_import );
 

@@ -170,7 +170,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_chunk->RegisterPassSlot( "texture_pass" );
     m_chunk->SetRenderer( renderer );
-    m_chunk->SetName( "cube" );
+    m_chunk->SetSceneName( "cube" );
 
     status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
     m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );

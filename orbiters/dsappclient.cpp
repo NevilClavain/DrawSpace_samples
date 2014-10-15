@@ -38,7 +38,7 @@ Orbiter* dsAppClient::build_planet( char* p_name, char* p_texture )
 
     chunk->RegisterPassSlot( "texture_pass" );
     chunk->SetRenderer( renderer );
-    chunk->SetName( p_name );
+    chunk->SetSceneName( p_name );
 
     chunk->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -91,7 +91,7 @@ Chunk* dsAppClient::build_orbit_drawable( char* p_name, Orbit* p_orbit )
 
     chunk->RegisterPassSlot( "texture_pass" );
     chunk->SetRenderer( renderer );
-    chunk->SetName( p_name );
+    chunk->SetSceneName( p_name );
 
     Meshe* orb0_meshe = chunk->GetMeshe();
 
@@ -259,7 +259,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
     m_spacebox->RegisterPassSlot( "texture_pass" );
 
-    m_spacebox->SetName( "spacebox" );
+    m_spacebox->SetSceneName( "spacebox" );
 
 
     DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, "texture_pass" );
@@ -371,7 +371,7 @@ bool dsAppClient::OnIdleAppInit( void )
     chunk->RegisterPassSlot( "texture_pass" );
     chunk->SetRenderer( renderer );
 
-    chunk->SetName( "box" );
+    chunk->SetSceneName( "box" );
     
     chunk->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -424,7 +424,7 @@ bool dsAppClient::OnIdleAppInit( void )
     chunk->RegisterPassSlot( "texture_pass" );
     chunk->SetRenderer( renderer );
 
-    chunk->SetName( "box2" );
+    chunk->SetSceneName( "box2" );
     
     chunk->GetMeshe()->SetImporter( m_meshe_import );
 
