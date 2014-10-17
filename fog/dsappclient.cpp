@@ -62,22 +62,38 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_texturepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
 
+    //m_texturepass->SetTargetDimsFromRenderer( false );
+    //m_texturepass->SetTargetDims( 64, 64 );
+    m_texturepass->Initialize();
+    
+
     m_texturepass->GetRenderingQueue()->EnableDepthClearing( true );
     m_texturepass->GetRenderingQueue()->EnableTargetClearing( true );
     m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 145, 230, 230 );
 
+    
+
     //////////////////////////////////////////////////////////////
 
     m_fogintpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "fogint_pass" ) );
+    //m_fogintpass->SetTargetDimsFromRenderer( false );
+    //m_fogintpass->SetTargetDims( 64, 64 );
+    m_fogintpass->Initialize();
+
     m_fogintpass->GetRenderingQueue()->EnableDepthClearing( true );
     m_fogintpass->GetRenderingQueue()->EnableTargetClearing( true );
     m_fogintpass->GetRenderingQueue()->SetTargetClearingColor( 255, 0, 0 );
+    
 
 
     //////////////////////////////////////////////////////////////
 
     m_fogblendpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "fogblend_pass" ) );
+    //m_fogblendpass->SetTargetDimsFromRenderer( false );
+    //m_fogblendpass->SetTargetDims( 64, 64 );
+    m_fogblendpass->Initialize();
     m_fogblendpass->CreateViewportQuad();
+    
 
     m_fogblendpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_fogblendpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogblend.vsh", false ) ) );
@@ -91,10 +107,12 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_fogblendpass->GetViewportQuad()->AddShaderParameter( 1, "fog_color", 0 );
     m_fogblendpass->GetViewportQuad()->SetShaderRealVector( "fog_color", DrawSpace::Utils::Vector( 145.0 / 255.0, 230.0 / 255.0, 230.0 / 255.0, 1.0 ) );
+    
 
     //////////////////////////////////////////////////////////////
 
     m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
+    m_finalpass->Initialize();
     m_finalpass->CreateViewportQuad();
     m_finalpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
@@ -104,6 +122,8 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
     m_finalpass->GetViewportQuad()->SetTexture( m_fogblendpass->GetTargetTexture(), 0 );
+
+    
 
     
     ///////////////////////////////////////////////////////////////
