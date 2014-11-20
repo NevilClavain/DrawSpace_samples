@@ -490,15 +490,15 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", NULL ) );
+    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", NULL, "" ) );
     m_scenegraph.RegisterNode( m_camera );
 
 
-    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", m_cube_body ) );
+    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", m_cube_body, "" ) );
     m_scenegraph.RegisterNode( m_camera2 );
 
     
-    m_camera2->LockOnBody( m_saturn );
+    m_camera2->LockOnBody( "saturn", m_saturn );
 
 
     m_scenegraph.SetCurrentCamera( "camera" );
@@ -511,7 +511,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 20.0, 1.0 ) );
 
 
-    m_camera->RegisterMovement( &m_freemove );
+    m_camera->RegisterMovement( "freemvt", &m_freemove );
 
 
     m_mouse_circularmode = true;

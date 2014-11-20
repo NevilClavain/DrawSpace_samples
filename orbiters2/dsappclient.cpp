@@ -1084,12 +1084,12 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
 
-    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera" ) );
+    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", NULL, "" ) );
     //m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     //m_camera->SetName( "camera" );
     m_scenegraph.RegisterNode( m_camera );
     
-    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", m_ship ) );
+    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", m_ship, "ship" ) );
     //m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     //m_camera2->SetName( "camera2" );
     //m_camera2->SetRefBody( m_ship );
@@ -1102,11 +1102,11 @@ bool dsAppClient::OnIdleAppInit( void )
     m_head_mvt->SetRefBody( m_ship );
 
 
-    m_camera2->RegisterMovement( m_head_mvt );
+    m_camera2->RegisterMovement( "headmvt", m_head_mvt );
 
 
 
-    m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", m_ship ) );
+    m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", m_ship, "ship" ) );
     //m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     //m_camera3->SetName( "camera3" );
     //m_camera3->SetRefBody( m_ship );
@@ -1114,7 +1114,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterNode( m_camera3 );
 
 
-    m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera4", m_ship ) );
+    m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera4", m_ship, "ship" ) );
     //m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     //m_camera4->SetName( "camera4" );
     //m_camera4->SetRefBody( m_ship );
@@ -1124,15 +1124,15 @@ bool dsAppClient::OnIdleAppInit( void )
     m_circular_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
     m_circular_mvt->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 385.0, 90.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
 
-    m_camera3->RegisterMovement( m_circular_mvt );
+    m_camera3->RegisterMovement( "circular_mvt", m_circular_mvt );
 
-    m_camera3->LockOnBody( m_ship );
+    m_camera3->LockOnBody( "ship", m_ship );
 
-    m_camera4->RegisterMovement( m_circular_mvt );
-    m_camera4->LockOnBody( /*m_planet->GetOrbiter()*/ m_cube_body );
+    m_camera4->RegisterMovement( "circular_mvt", m_circular_mvt );
+    m_camera4->LockOnBody( "cube", /*m_planet->GetOrbiter()*/ m_cube_body );
 
 
-    m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera5", m_planet->GetOrbiter() ) );
+    m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera5", m_planet->GetOrbiter(), "planet0" ) );
     //m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     //m_camera5->SetName( "camera5" );
     //m_camera5->SetRefBody( m_planet->GetOrbiter() );
@@ -1141,16 +1141,16 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
     m_longlat_mvt->Init( -21.0, 20.0, 400000.5, 0.0, 0.0 );
-    m_camera5->RegisterLongLatMovement( m_longlat_mvt );
+    m_camera5->RegisterLongLatMovement( "longlatmvt", m_longlat_mvt );
 
     m_circular_mvt2 = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
     m_circular_mvt2->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 25.0, 0.9, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
-    m_camera5->RegisterMovement( m_circular_mvt2 );
+    m_camera5->RegisterMovement( "circular_mvt2", m_circular_mvt2 );
     m_circular_mvt2->SetAngularSpeed( 25.0 );
     
 
 
-    m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera6", m_planet->GetOrbiter() ) );
+    m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera6", m_planet->GetOrbiter(), "planet0" ) );
     //m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     //m_camera6->SetName( "camera6" );
     //m_camera6->SetRefBody( m_planet->GetOrbiter() );
@@ -1164,15 +1164,15 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spectator_mvt->Init( 16.0, 8000, true );
     m_spectator_mvt->SetRefBody( m_ship );
 
-    m_camera6->RegisterMovement( m_spectator_mvt );
-    m_camera6->LockOnBody( m_ship );
+    m_camera6->RegisterMovement( "spectator_mvt", m_spectator_mvt );
+    m_camera6->LockOnBody( "ship", m_ship );
 
-    m_camera6->LockOnBody( m_ship );
-
-
+    m_camera6->LockOnBody( "ship", m_ship );
 
 
-    m_camera7 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera7", m_cube_body ) );
+
+
+    m_camera7 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera7", m_cube_body, "cube_body" ) );
     //m_camera7 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     //m_camera7->SetName( "camera7" );
     //m_camera7->SetRefBody( m_cube_body );
@@ -1180,13 +1180,13 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_camera8 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera8", m_building_collider ) );
+    m_camera8 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera8", m_building_collider, "building" ) );
     //m_camera8 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     //m_camera8->SetName( "camera8" );
     //m_camera8->SetRefBody( m_building_collider );
     m_scenegraph.RegisterNode( m_camera8 );
 
-    m_camera8->LockOnBody( m_cube_body );
+    m_camera8->LockOnBody( "cube", m_cube_body );
 
 
 
@@ -1329,7 +1329,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_freemove.Init( DrawSpace::Utils::Vector( 265000000.0, 0.0, 50.0, 1.0 ) );
 
 
-    m_camera->RegisterMovement( &m_freemove );
+    m_camera->RegisterMovement( "free_mvt", &m_freemove );
 
 
     m_mouse_circularmode = true;
@@ -1416,7 +1416,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //m_camera5->LockOnBody( m_moon->GetOrbiter() );
     //m_camera5->LockOnBody( m_ship );
-    m_camera5->LockOnBody( m_cube_body );
+    m_camera5->LockOnBody( "cube", m_cube_body );
 
 
 

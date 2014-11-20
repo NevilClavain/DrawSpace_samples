@@ -394,11 +394,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
 
-    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera" ) );
+    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", NULL, "" ) );
     m_scenegraph.RegisterNode( m_camera );
 
 
-    m_camera_2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2" ) );
+    m_camera_2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", NULL, "" ) );
     m_scenegraph.RegisterNode( m_camera_2 );
 
 
@@ -412,7 +412,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.SetCurrentCamera( "camera" );
     //m_scenegraph.SetCurrentCamera( "camera2" );
 
-    m_camera->RegisterMovement( &m_fpsmove );
+    m_camera->RegisterMovement( "fpsmvt", &m_fpsmove );
 
 
 
@@ -456,7 +456,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     //m_camera_2->LockOnBody( m_boxes[0].inert_body );
-    m_camera_2->LockOnTransformNode( m_boxes[0].drawable );
+    m_camera_2->LockOnTransformNode( "box", m_boxes[0].drawable );
 
     m_linear_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LinearMovement, DrawSpace::Core::LinearMovement );
     m_linear_mvt->Init( Vector( -5.0, 2.7, 9.0, 1.0 ), Vector( 0.0, 0.0, -1.0, 1.0 ), /*-90.0*/ 0.0, 0.0 );
@@ -467,7 +467,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //m_camera_2->RegisterMovement( m_linear_mvt );
 
-    m_camera_2->RegisterMovement( m_circular_mvt );
+    m_camera_2->RegisterMovement( "circular_mvt", m_circular_mvt );
 
     m_circular_mvt->SetAngularSpeed( 10.0 );
 

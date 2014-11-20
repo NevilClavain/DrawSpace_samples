@@ -88,6 +88,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
+    
     m_fogblendpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "fogblend_pass" ) );
     //m_fogblendpass->SetTargetDimsFromRenderer( false );
     //m_fogblendpass->SetTargetDims( 64, 64 );
@@ -108,9 +109,11 @@ bool dsAppClient::OnIdleAppInit( void )
     m_fogblendpass->GetViewportQuad()->AddShaderParameter( 1, "fog_color", 0 );
     m_fogblendpass->GetViewportQuad()->SetShaderRealVector( "fog_color", DrawSpace::Utils::Vector( 145.0 / 255.0, 230.0 / 255.0, 230.0 / 255.0, 1.0 ) );
     
+    
 
     //////////////////////////////////////////////////////////////
 
+    
     m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
     m_finalpass->Initialize();
     m_finalpass->CreateViewportQuad();
@@ -122,8 +125,7 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
     m_finalpass->GetViewportQuad()->SetTexture( m_fogblendpass->GetTargetTexture(), 0 );
-
-    
+        
 
     
     ///////////////////////////////////////////////////////////////
@@ -283,7 +285,7 @@ bool dsAppClient::OnIdleAppInit( void )
     //m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
     //m_scenegraph.RegisterNode( m_camera );
 
-    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera" ) );
+    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", NULL, "" ) );
     m_scenegraph.RegisterNode( m_camera );
 
     m_scenegraph.SetCurrentCamera( "camera" );
@@ -292,7 +294,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 1.0, 10.0, 1.0 ) );
 
-    m_camera->RegisterMovement( &m_fpsmove );
+    m_camera->RegisterMovement( "fps", &m_fpsmove );
 
     
 
