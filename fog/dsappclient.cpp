@@ -29,10 +29,11 @@ void dsAppClient::OnRenderFrame( void )
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
-    m_cube_body->Update();
+    //m_cube_body->Update();
     m_ground_body->Update();
 
-    m_scenegraph.ComputeTransformations( m_timer );    
+    m_scenegraph.ComputeTransformations( m_timer );  
+    m_scenenodegraph.ComputeTransformations( m_timer );
 
     m_texturepass->GetRenderingQueue()->Draw();
     m_fogintpass->GetRenderingQueue()->Draw();
@@ -133,6 +134,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterPass( m_texturepass );
     m_scenegraph.RegisterPass( m_fogintpass );
 
+    m_scenenodegraph.RegisterPass( m_texturepass );
+    m_scenenodegraph.RegisterPass( m_fogintpass );
+
 
     ///////////////////////////////////////////////////////////////
 
@@ -180,20 +184,23 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
     
-    Texture* mytexture = _DRAWSPACE_NEW_( Texture, Texture );
-    dsstring test_text = "hello this is \n"\
-                           " a text with\n"\
-                           "multiples lines";
-
-
-    mytexture->ParseProperties( test_text );
 
 
 
-    m_scenegraph.RegisterNode( m_chunk );
+    //m_scenegraph.RegisterNode( m_chunk );
+    // temporaire
+    m_chunk->SetScenegraph( &m_scenegraph );
 
-    dsstring md5_string_1;
-    m_chunk->GetMeshe()->GetMD5( md5_string_1 );
+    m_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "chunk" ) );
+    m_chunk_node->SetContent( m_chunk );
+
+
+    //m_scenenodegraph.AddNode( m_chunk_node );
+    m_scenenodegraph.RegisterNode( m_chunk_node );
+
+
+    
+
 
     ///////////////////////////////////////////////////////////////
 
@@ -313,15 +320,20 @@ bool dsAppClient::OnIdleAppInit( void )
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
     cube_params.mass = 50.0;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
-    /*
-    cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 10.5, 0.0, 1.0 );
-    cube_params.initial_rot.Identity();
-    */
 
     cube_params.initial_attitude.Translation( 0.0, 10.5, 0.0 );
 
 
-    m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, m_chunk, cube_params ) );
+    m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, /*m_chunk*/ NULL, cube_params ) );
+
+    m_cube_body_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::InertBody>, SceneNode<DrawSpace::Dynamics::InertBody>( "cube_body" ) );
+    m_cube_body_node->SetContent( m_cube_body );
+
+    m_scenenodegraph.AddNode( m_cube_body_node );
+    m_scenenodegraph.RegisterNode( m_cube_body_node );
+
+    m_chunk_node->LinkTo( m_cube_body_node );
+
 
 
     DrawSpace::Dynamics::Body::Parameters ground_params;
@@ -329,10 +341,6 @@ bool dsAppClient::OnIdleAppInit( void )
     ground_params.mass = 0.0;
     ground_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
 
-    /*
-    ground_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
-    ground_params.initial_rot.Identity();
-    */
 
     ground_params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
 

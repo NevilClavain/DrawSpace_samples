@@ -9,44 +9,49 @@ class dsAppClient : public DrawSpace::App
 {
 protected:
 
-    static dsAppClient*                         m_instance;
+    static dsAppClient*                                                 m_instance;
 
 
-    DrawSpace::Scenegraph                       m_scenegraph;
+    DrawSpace::Scenegraph                                               m_scenegraph;
+    DrawSpace::Core::SceneNodeGraph                                     m_scenenodegraph;
 
-    DrawSpace::FinalPass*                       m_finalpass;
-    DrawSpace::IntermediatePass*                m_fogblendpass;
+    DrawSpace::FinalPass*                                               m_finalpass;
+    DrawSpace::IntermediatePass*                                        m_fogblendpass;
 
-    DrawSpace::IntermediatePass*                m_fogintpass;
-    DrawSpace::IntermediatePass*                m_texturepass;
-
-
-    DrawSpace::Utils::TimeManager               m_timer;
-
-    bool                                        m_mouselb;
-    bool                                        m_mouserb;
-
-    //DrawSpace::Camera*                          m_camera;
-
-    DrawSpace::Dynamics::CameraPoint*           m_camera;
-
-    DrawSpace::Core::FPSMovement                m_fpsmove;
-
-    DrawSpace::Interface::MesheImport*          m_meshe_import;
-    DrawSpace::Chunk*                           m_chunk;
-
-    DrawSpace::Chunk*                           m_ground;
+    DrawSpace::IntermediatePass*                                        m_fogintpass;
+    DrawSpace::IntermediatePass*                                        m_texturepass;
 
 
-    DrawSpace::Interface::FontImport*           m_font_import;
-    DrawSpace::Core::Font*                      m_font;
+    DrawSpace::Utils::TimeManager                                       m_timer;
 
-    DrawSpace::Text*                            m_mytext;
+    bool                                                                m_mouselb;
+    bool                                                                m_mouserb;
 
-    DrawSpace::Dynamics::World                  m_world;
-    DrawSpace::Dynamics::InertBody*             m_cube_body;
+    
 
-    DrawSpace::Dynamics::InertBody*             m_ground_body;
+    DrawSpace::Dynamics::CameraPoint*                                   m_camera;
+
+    DrawSpace::Core::FPSMovement                                        m_fpsmove;
+
+    DrawSpace::Interface::MesheImport*                                  m_meshe_import;
+
+    DrawSpace::Chunk*                                                   m_chunk;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_chunk_node;
+
+    DrawSpace::Chunk*                                                   m_ground;
+
+
+    DrawSpace::Interface::FontImport*                                   m_font_import;
+    DrawSpace::Core::Font*                                              m_font;
+
+    DrawSpace::Text*                                                    m_mytext;
+
+    DrawSpace::Dynamics::World                                          m_world;
+    
+    DrawSpace::Dynamics::InertBody*                                     m_cube_body;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>*         m_cube_body_node;
+
+    DrawSpace::Dynamics::InertBody*                                     m_ground_body;
 
 
 
