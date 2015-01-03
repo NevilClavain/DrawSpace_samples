@@ -4,6 +4,7 @@
 using namespace DrawSpace;
 using namespace DrawSpace::Interface;
 using namespace DrawSpace::Core;
+using namespace DrawSpace::Utils;
 using namespace DrawSpace::Gui;
 
 dsAppClient* dsAppClient::m_instance = NULL;
@@ -25,12 +26,7 @@ dsAppClient::~dsAppClient( void )
 void dsAppClient::OnRenderFrame( void )
 {
 
-    //m_fpsmove.Compute( m_timer, true );
-
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
-
-    //m_cube_body->Update();
-    m_ground_body->Update();
 
     m_scenegraph.ComputeTransformations( m_timer );  
     m_scenenodegraph.ComputeTransformations( m_timer );
@@ -194,8 +190,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "chunk" ) );
     m_chunk_node->SetContent( m_chunk );
 
-
-    //m_scenenodegraph.AddNode( m_chunk_node );
     m_scenenodegraph.RegisterNode( m_chunk_node );
 
 
@@ -245,7 +239,14 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "ground.bmp" ) ), 0 );
     m_ground->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
-    m_scenegraph.RegisterNode( m_ground );
+    //m_scenegraph.RegisterNode( m_ground );
+    // temporaire
+    m_ground->SetScenegraph( &m_scenegraph );
+
+    m_ground_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "ground" ) );
+    m_ground_node->SetContent( m_ground );
+
+    m_scenenodegraph.RegisterNode( m_ground_node );
 
 
 
@@ -344,7 +345,15 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ground_params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
 
-    m_ground_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, m_ground, ground_params ) );
+    m_ground_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, /*m_ground*/NULL, ground_params ) );
+    m_ground_body_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::InertBody>, SceneNode<DrawSpace::Dynamics::InertBody>( "ground_body" ) );
+    m_ground_body_node->SetContent( m_ground_body );
+
+    m_scenenodegraph.AddNode( m_ground_body_node );
+    m_scenenodegraph.RegisterNode( m_ground_body_node );
+
+    m_ground_node->LinkTo( m_ground_body_node );
+
 
 
     m_mouse_circularmode = true;

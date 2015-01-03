@@ -39,6 +39,7 @@ protected:
     DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_chunk_node;
 
     DrawSpace::Chunk*                                                   m_ground;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_ground_node;
 
 
     DrawSpace::Interface::FontImport*                                   m_font_import;
@@ -52,6 +53,7 @@ protected:
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>*         m_cube_body_node;
 
     DrawSpace::Dynamics::InertBody*                                     m_ground_body;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>*         m_ground_body_node;
 
 
 
