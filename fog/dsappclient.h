@@ -30,8 +30,10 @@ protected:
     
 
     DrawSpace::Dynamics::CameraPoint*                                   m_camera;
-
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera_node;
+    
     DrawSpace::Core::FPSMovement                                        m_fpsmove;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::FPSMovement>*           m_fpsmove_node;
 
     DrawSpace::Interface::MesheImport*                                  m_meshe_import;
 

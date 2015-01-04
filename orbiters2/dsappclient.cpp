@@ -487,8 +487,8 @@ void dsAppClient::OnRenderFrame( void )
     m_planet->ApplyGravity();
     m_moon->ApplyGravity();
 
-    m_ship->Update();
-    m_cube_body->Update();
+    m_ship->Update( m_timer );
+    m_cube_body->Update( m_timer );
 
     Matrix bld_pos;
     //bld_pos.Translation( 265000000.0, 0.0, -200.0 );

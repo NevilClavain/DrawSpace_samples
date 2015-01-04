@@ -28,7 +28,7 @@ void dsAppClient::OnRenderFrame( void )
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
-    m_scenegraph.ComputeTransformations( m_timer );  
+    //m_scenegraph.ComputeTransformations( m_timer );  
     m_scenenodegraph.ComputeTransformations( m_timer );
 
     m_texturepass->GetRenderingQueue()->Draw();
@@ -127,8 +127,8 @@ bool dsAppClient::OnIdleAppInit( void )
     
     ///////////////////////////////////////////////////////////////
 
-    m_scenegraph.RegisterPass( m_texturepass );
-    m_scenegraph.RegisterPass( m_fogintpass );
+    //m_scenegraph.RegisterPass( m_texturepass );
+    //m_scenegraph.RegisterPass( m_fogintpass );
 
     m_scenenodegraph.RegisterPass( m_texturepass );
     m_scenenodegraph.RegisterPass( m_fogintpass );
@@ -185,7 +185,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //m_scenegraph.RegisterNode( m_chunk );
     // temporaire
-    m_chunk->SetScenegraph( &m_scenegraph );
+    //m_chunk->SetScenegraph( &m_scenegraph );
 
     m_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "chunk" ) );
     m_chunk_node->SetContent( m_chunk );
@@ -241,7 +241,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //m_scenegraph.RegisterNode( m_ground );
     // temporaire
-    m_ground->SetScenegraph( &m_scenegraph );
+    //m_ground->SetScenegraph( &m_scenegraph );
 
     m_ground_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "ground" ) );
     m_ground_node->SetContent( m_ground );
@@ -290,22 +290,32 @@ bool dsAppClient::OnIdleAppInit( void )
     ///////////////////////////////////////////////////////////////
 
 
-    //m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
-    //m_scenegraph.RegisterNode( m_camera );
-
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", NULL, "" ) );
-    m_scenegraph.RegisterNode( m_camera );
+    m_camera_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera" ) );
+    m_camera_node->SetContent( m_camera );
 
-    m_scenegraph.SetCurrentCamera( "camera" );
+    m_scenenodegraph.RegisterNode( m_camera_node );
 
-    //m_fpsmove.SetTransformNode( m_camera );
 
-    m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 1.0, 10.0, 1.0 ) );
 
-    m_camera->RegisterMovement( "fps", &m_fpsmove );
 
+    //m_scenegraph.RegisterNode( m_camera );
+    //m_scenegraph.SetCurrentCamera( "camera" );
+
+    m_scenenodegraph.SetCurrentCamera( "camera" );
     
 
+    m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 1.0, 10.0, 1.0 ) );
+    m_fpsmove_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::FPSMovement>, SceneNode<DrawSpace::Core::FPSMovement>( "fps_node" ) );
+    m_fpsmove_node->SetContent( &m_fpsmove );
+
+    //m_camera->RegisterMovement( "fps", &m_fpsmove );
+
+    m_scenenodegraph.AddNode( m_fpsmove_node );
+    m_scenenodegraph.RegisterNode( m_fpsmove_node );
+
+    
+    m_camera_node->LinkTo( m_fpsmove_node );
 
 
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();

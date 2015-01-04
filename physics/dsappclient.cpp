@@ -55,12 +55,12 @@ void dsAppClient::OnRenderFrame( void )
     sbtrans.Scale( 20.0, 20.0, 20.0 );
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
 
-    m_ground_body->Update();
+    m_ground_body->Update( m_timer );
 
 
     for( size_t i = 0; i < m_boxes.size(); i++ )
     {
-        m_boxes[i].inert_body->Update();
+        m_boxes[i].inert_body->Update( m_timer );
     }
 
  
