@@ -26,6 +26,11 @@ dsAppClient::~dsAppClient( void )
 void dsAppClient::OnRenderFrame( void )
 {
 
+    Matrix cam2pos;
+    cam2pos.Translation( 0.0, 3.0, 15.0 );
+
+    m_camera2->SetLocalTransform( cam2pos );
+
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
     m_scenenodegraph.ComputeTransformations( m_timer );
@@ -301,6 +306,25 @@ bool dsAppClient::OnIdleAppInit( void )
     m_camera_node->LinkTo( m_fpsmove_node );
 
 
+    ////////// 2nd camera //////////////
+
+    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", NULL, "" ) );
+    m_camera2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera2" ) );
+    m_camera2_node->SetContent( m_camera2 );
+
+    
+
+    m_scenenodegraph.AddNode( m_camera2_node );
+    m_scenenodegraph.RegisterNode( m_camera2_node );
+
+
+    m_scenenodegraph.SetCurrentCamera( "camera2" );
+
+
+
+
+    ////////////////////////////////////
+
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     m_fogintpass->GetRenderingQueue()->UpdateOutputQueue();
     m_fogblendpass->GetRenderingQueue()->UpdateOutputQueue();
@@ -348,6 +372,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground_node->LinkTo( m_ground_body_node );
 
 
+
+    m_camera2->LockOnBody( "cube_body", m_cube_body );
 
     m_mouse_circularmode = true;
 
