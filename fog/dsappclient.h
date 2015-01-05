@@ -10,9 +10,7 @@ class dsAppClient : public DrawSpace::App
 protected:
 
     static dsAppClient*                                                 m_instance;
-
-
-    DrawSpace::Scenegraph                                               m_scenegraph;
+    
     DrawSpace::Core::SceneNodeGraph                                     m_scenenodegraph;
 
     DrawSpace::FinalPass*                                               m_finalpass;

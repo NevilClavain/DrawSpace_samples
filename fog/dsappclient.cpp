@@ -28,7 +28,6 @@ void dsAppClient::OnRenderFrame( void )
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
-    //m_scenegraph.ComputeTransformations( m_timer );  
     m_scenenodegraph.ComputeTransformations( m_timer );
 
     m_texturepass->GetRenderingQueue()->Draw();
@@ -127,8 +126,6 @@ bool dsAppClient::OnIdleAppInit( void )
     
     ///////////////////////////////////////////////////////////////
 
-    //m_scenegraph.RegisterPass( m_texturepass );
-    //m_scenegraph.RegisterPass( m_fogintpass );
 
     m_scenenodegraph.RegisterPass( m_texturepass );
     m_scenenodegraph.RegisterPass( m_fogintpass );
@@ -180,13 +177,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
     
-
-
-
-    //m_scenegraph.RegisterNode( m_chunk );
-    // temporaire
-    //m_chunk->SetScenegraph( &m_scenegraph );
-
     m_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "chunk" ) );
     m_chunk_node->SetContent( m_chunk );
 
@@ -239,9 +229,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "ground.bmp" ) ), 0 );
     m_ground->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
-    //m_scenegraph.RegisterNode( m_ground );
-    // temporaire
-    //m_ground->SetScenegraph( &m_scenegraph );
 
     m_ground_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "ground" ) );
     m_ground_node->SetContent( m_ground );
@@ -299,9 +286,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    //m_scenegraph.RegisterNode( m_camera );
-    //m_scenegraph.SetCurrentCamera( "camera" );
-
     m_scenenodegraph.SetCurrentCamera( "camera" );
     
 
@@ -309,7 +293,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_fpsmove_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::FPSMovement>, SceneNode<DrawSpace::Core::FPSMovement>( "fps_node" ) );
     m_fpsmove_node->SetContent( &m_fpsmove );
 
-    //m_camera->RegisterMovement( "fps", &m_fpsmove );
 
     m_scenenodegraph.AddNode( m_fpsmove_node );
     m_scenenodegraph.RegisterNode( m_fpsmove_node );
