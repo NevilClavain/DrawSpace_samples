@@ -26,11 +26,6 @@ dsAppClient::~dsAppClient( void )
 void dsAppClient::OnRenderFrame( void )
 {
 
-    Matrix cam2pos;
-    cam2pos.Translation( 0.0, 3.0, 15.0 );
-
-    m_camera2->SetLocalTransform( cam2pos );
-
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
     m_scenenodegraph.ComputeTransformations( m_timer );
@@ -44,6 +39,7 @@ void dsAppClient::OnRenderFrame( void )
 
 
     renderer->DrawText( 255, 0, 0, 10, 20, "%d fps", m_timer.GetFPS() );
+    renderer->DrawText( 255, 0, 0, 10, 40, "%s", m_current_camera.c_str() );
 
     renderer->FlipScreen();
 
@@ -314,13 +310,23 @@ bool dsAppClient::OnIdleAppInit( void )
 
     
 
-    m_scenenodegraph.AddNode( m_camera2_node );
+    //m_scenenodegraph.AddNode( m_camera2_node );
     m_scenenodegraph.RegisterNode( m_camera2_node );
 
 
-    m_scenenodegraph.SetCurrentCamera( "camera2" );
+  
+
+    m_circmove.Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( -10.0, 1.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
+    m_circmove.SetAngularSpeed( 40.0 );
+    m_circmove_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::CircularMovement>, SceneNode<DrawSpace::Core::CircularMovement>( "circ_node" ) );
+    m_circmove_node->SetContent( &m_circmove );
 
 
+    m_scenenodegraph.AddNode( m_circmove_node );
+    m_scenenodegraph.RegisterNode( m_circmove_node );
+
+
+    m_camera2_node->LinkTo( m_circmove_node );
 
 
     ////////////////////////////////////
@@ -375,6 +381,12 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_camera2->LockOnBody( "cube_body", m_cube_body );
 
+
+    m_current_camera = "camera2";
+
+
+    m_scenenodegraph.SetCurrentCamera( m_current_camera );
+
     m_mouse_circularmode = true;
 
     return true;
@@ -428,6 +440,23 @@ void dsAppClient::OnEndKeyPress( long p_key )
 
 void dsAppClient::OnKeyPulse( long p_key )
 {
+    switch( p_key )
+    {
+        case VK_F1:
+
+            if( "camera" == m_current_camera )
+            {
+                m_current_camera = "camera2";
+            }
+            else if( "camera2" == m_current_camera )
+            {
+                m_current_camera = "camera";
+            }
+
+            m_scenenodegraph.SetCurrentCamera( m_current_camera );
+
+            break;
+    }
 }
 
 void dsAppClient::OnMouseMove( long p_xm, long p_ym, long p_dx, long p_dy )

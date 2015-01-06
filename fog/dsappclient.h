@@ -36,6 +36,11 @@ protected:
     DrawSpace::Core::FPSMovement                                        m_fpsmove;
     DrawSpace::Core::SceneNode<DrawSpace::Core::FPSMovement>*           m_fpsmove_node;
 
+
+    DrawSpace::Core::CircularMovement                                   m_circmove;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::CircularMovement>*      m_circmove_node;
+
+
     DrawSpace::Interface::MesheImport*                                  m_meshe_import;
 
     DrawSpace::Chunk*                                                   m_chunk;
@@ -59,7 +64,7 @@ protected:
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>*         m_ground_body_node;
 
 
-
+    dsstring                                                            m_current_camera;
 
     dsAppClient( void );
 
