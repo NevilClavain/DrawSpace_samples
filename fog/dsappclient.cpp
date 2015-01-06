@@ -334,6 +334,26 @@ bool dsAppClient::OnIdleAppInit( void )
     m_camera2_node->LinkTo( m_circmove_node );
 
 
+    ////////// 3rd camera //////////////
+
+    m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", NULL, "" ) );
+
+    Matrix cam3_pos;
+    cam3_pos.Translation( 0.0, 0.7, 6.0 );
+
+    m_camera3->SetLocalTransform( cam3_pos );
+
+    m_camera3_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera3" ) );
+    m_camera3_node->SetContent( m_camera3 );
+
+    
+    m_scenenodegraph.RegisterNode( m_camera3_node );
+
+
+ 
+    m_camera3_node->LinkTo( m_circmove_node );
+
+
     ////////////////////////////////////
 
 
@@ -471,6 +491,10 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
+    m_camera3_node->LinkTo( m_cube2_node );
+
+
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -506,12 +530,26 @@ void dsAppClient::OnKeyPress( long p_key )
     {
         case 'Q':
 
-            m_fpsmove.SetSpeed( 6.0 );
+            if( "camera" == m_current_camera )
+            {
+                m_fpsmove.SetSpeed( 6.0 );
+            }
+            else if( "camera3" == m_current_camera )
+            {
+                m_freemove.SetSpeed( 6.0 );
+            }
             break;
 
         case 'W':
 
-            m_fpsmove.SetSpeed( -6.0 );
+            if( "camera" == m_current_camera )
+            {
+                m_fpsmove.SetSpeed( -6.0 );
+            }
+            else
+            {
+                m_freemove.SetSpeed( -6.0 );
+            }
             break;
 
     }
@@ -523,16 +561,17 @@ void dsAppClient::OnEndKeyPress( long p_key )
     switch( p_key )
     {
         case 'Q':
-
-            m_fpsmove.SetSpeed( 0.0 );
-            break;
-
-
         case 'W':
 
-            m_fpsmove.SetSpeed( 0.0 );
-            break;
-
+            if( "camera" == m_current_camera )
+            {
+                m_fpsmove.SetSpeed( 0.0 );
+            }
+            else if( "camera3" == m_current_camera )
+            {
+                m_freemove.SetSpeed( 0.0 );
+            }
+            break;      
     }
 
 }
@@ -549,6 +588,10 @@ void dsAppClient::OnKeyPulse( long p_key )
             }
             else if( "camera2" == m_current_camera )
             {
+                m_current_camera = "camera3";
+            }
+            else if( "camera3" == m_current_camera )
+            {
                 m_current_camera = "camera";
             }
 
@@ -560,9 +603,30 @@ void dsAppClient::OnKeyPulse( long p_key )
 
 void dsAppClient::OnMouseMove( long p_xm, long p_ym, long p_dx, long p_dy )
 {
-	m_fpsmove.RotateYaw( - p_dx / 4.0, m_timer );
+    if( m_mouserb )
+    {
+        if( "camera" == m_current_camera )
+        {
+        }
+        else if( "camera3" == m_current_camera )
+        {
+            m_freemove.RotateRoll( - p_dx / 4.0, m_timer );            
+        }
+    }
 
-	m_fpsmove.RotatePitch( - p_dy / 4.0, m_timer );
+    else
+    {
+        if( "camera" == m_current_camera )
+        {
+	        m_fpsmove.RotateYaw( - p_dx / 4.0, m_timer );
+	        m_fpsmove.RotatePitch( - p_dy / 4.0, m_timer );
+        }
+        else if( "camera3" == m_current_camera )
+        {
+            m_freemove.RotateYaw( - p_dx / 4.0, m_timer );
+            m_freemove.RotatePitch( - p_dy / 4.0, m_timer );
+        }
+    }
 }
 
 void dsAppClient::OnMouseLeftButtonDown( long p_xm, long p_ym )

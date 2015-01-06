@@ -33,6 +33,10 @@ protected:
     DrawSpace::Dynamics::CameraPoint*                                   m_camera2;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera2_node;
 
+    DrawSpace::Dynamics::CameraPoint*                                   m_camera3;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera3_node;
+
+
     DrawSpace::Core::FPSMovement                                        m_fpsmove;
     DrawSpace::Core::SceneNode<DrawSpace::Core::FPSMovement>*           m_fpsmove_node;
 
@@ -59,6 +63,7 @@ protected:
     
     DrawSpace::Dynamics::InertBody*                                     m_cube_body;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>*         m_cube_body_node;
+
 
     DrawSpace::Dynamics::InertBody*                                     m_ground_body;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>*         m_ground_body_node;
