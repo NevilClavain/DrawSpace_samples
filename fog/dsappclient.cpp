@@ -25,6 +25,11 @@ dsAppClient::~dsAppClient( void )
 
 void dsAppClient::OnRenderFrame( void )
 {
+    Matrix pos;
+    pos.Translation( 2.0, 2.0, 0.0 );
+
+    //m_cube2->SetLocalTransform( pos );
+
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
@@ -331,11 +336,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ////////////////////////////////////
 
-    m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
-    m_fogintpass->GetRenderingQueue()->UpdateOutputQueue();
-    m_fogblendpass->GetRenderingQueue()->UpdateOutputQueue();
-    m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
-
 
     m_world.Initialize();
     m_world.SetGravity( DrawSpace::Utils::Vector( 0.0, -9.81, 0.0, 0.0 ) );
@@ -361,7 +361,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     DrawSpace::Dynamics::Body::Parameters ground_params;
-    ground_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 100.0, 0.0, 100., 1.0 );
+    ground_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 100.0, 0.0, 100.0, 1.0 );
     ground_params.mass = 0.0;
     ground_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
 
@@ -382,12 +382,111 @@ bool dsAppClient::OnIdleAppInit( void )
     m_camera2->LockOnBody( "cube_body", m_cube_body );
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
+    m_cube2 = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+
+    m_cube2->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
+    m_cube2->RegisterPassSlot( "fogint_pass" );
+    m_cube2->RegisterPassSlot( "texture_pass" );
+    m_cube2->SetRenderer( renderer );
+    m_cube2->SetSceneName( "cube2" );
+
+        
+    m_cube2->GetMeshe()->SetImporter( m_meshe_import );
+    m_cube2->GetMeshe()->LoadFromFile( "object.ac", 0 );
+
+    m_cube2->GetNodeFromPass( "fogint_pass" )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_cube2->GetNodeFromPass( "fogint_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.vsh", false ) ) );
+    m_cube2->GetNodeFromPass( "fogint_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.psh", false ) ) );
+    m_cube2->GetNodeFromPass( "fogint_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_cube2->GetNodeFromPass( "fogint_pass" )->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_cube2->GetNodeFromPass( "fogint_pass" )->AddShaderParameter( 0, "fog_intensity", 12 );
+    m_cube2->GetNodeFromPass( "fogint_pass" )->SetShaderReal( "fog_intensity", 0.08 );
+
+    m_cube2->GetNodeFromPass( "fogint_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_cube2->GetNodeFromPass( "fogint_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    
+
+    m_cube2->GetNodeFromPass( "texture_pass" )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_cube2->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_cube2->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_cube2->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_cube2->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_cube2->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_cube2->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_cube2->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_cube2->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    m_cube2->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "saturnmap.jpg" ) ), 0 );
+    m_cube2->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
+
+    
+    m_cube2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "cube2" ) );
+    m_cube2_node->SetContent( m_cube2 );
+
+    m_scenenodegraph.RegisterNode( m_cube2_node );
+
+
+
+
+    DrawSpace::Dynamics::Body::Parameters cube2_params;
+    cube2_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
+    cube2_params.mass = 0.0;
+    cube2_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+   
+
+    m_cube2_collider = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Collider, DrawSpace::Dynamics::Collider( NULL ) );
+
+    m_cube2_collider->SetKinematic( cube2_params );
+    m_cube2_collider->AddToWorld( &m_world );
+
+    /*
+    Matrix local_pos;
+    local_pos.Translation( 0.0, -1.5, 0.0 );
+    m_cube2_collider->SetBaseTransform( local_pos );
+    */
+
+    m_cube2_colider_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::Collider>, SceneNode<DrawSpace::Dynamics::Collider>( "cube2_body" ) );
+    m_cube2_colider_node->SetContent( m_cube2_collider );
+    
+    m_scenenodegraph.RegisterNode( m_cube2_colider_node );
+
+    m_cube2_node->LinkTo( m_cube2_colider_node );
+
+
+
+    m_freemove.Init( Vector( 0.8, 2.0, 0.3, 1.0 ) );
+    m_freemove_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::FreeMovement>, SceneNode<DrawSpace::Core::FreeMovement>( "freemvt_node" ) );
+    m_freemove_node->SetContent( &m_freemove );
+
+
+    m_scenenodegraph.AddNode( m_freemove_node );
+    m_scenenodegraph.RegisterNode( m_freemove_node );
+
+    
+    m_cube2_colider_node->LinkTo( m_freemove_node );
+
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+
+
     m_current_camera = "camera2";
-
-
     m_scenenodegraph.SetCurrentCamera( m_current_camera );
 
     m_mouse_circularmode = true;
+
+
+
+    m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
+    m_fogintpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_fogblendpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
+
 
     return true;
 }

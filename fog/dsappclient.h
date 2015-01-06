@@ -64,6 +64,19 @@ protected:
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>*         m_ground_body_node;
 
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    DrawSpace::Core::FreeMovement                                       m_freemove;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::FreeMovement>*          m_freemove_node;
+
+    DrawSpace::Chunk*                                                   m_cube2;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_cube2_node;
+
+    DrawSpace::Dynamics::Collider*                                      m_cube2_collider;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Collider>*          m_cube2_colider_node;
+
+
+
     dsstring                                                            m_current_camera;
 
     dsAppClient( void );
