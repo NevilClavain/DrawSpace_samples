@@ -11,59 +11,71 @@ class dsAppClient : public DrawSpace::App
 {
 protected:
 
-    static dsAppClient*                         m_instance;
+    static dsAppClient*                                                 m_instance;
 
 
-    DrawSpace::Scenegraph                       m_scenegraph;
+    DrawSpace::Core::SceneNodeGraph                                     m_scenenodegraph;
 
 
-    DrawSpace::IntermediatePass*                m_texturepass;
-    DrawSpace::FinalPass*                       m_finalpass;
+    DrawSpace::IntermediatePass*                                        m_texturepass;
+    DrawSpace::FinalPass*                                               m_finalpass;
 
 
-    DrawSpace::Utils::TimeManager               m_timer;
+    DrawSpace::Utils::TimeManager                                       m_timer;
 
-    bool                                        m_mouselb;
-    bool                                        m_mouserb;
+    bool                                                                m_mouselb;
+    bool                                                                m_mouserb;
 
-    DrawSpace::Gui::TextWidget*                 m_fpstext_widget;
+    DrawSpace::Gui::TextWidget*                                         m_fpstext_widget;
 
-    DrawSpace::Interface::FontImport*           m_font_import;
-    DrawSpace::Core::Font*                      m_font;
+    DrawSpace::Interface::FontImport*                                   m_font_import;
+    DrawSpace::Core::Font*                                              m_font;
 
-    DrawSpace::Dynamics::CameraPoint*           m_camera;
-    DrawSpace::Core::FPSMovement                m_fpsmove;
+    DrawSpace::Dynamics::CameraPoint*                                   m_camera;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera_node;
 
-    DrawSpace::Dynamics::CameraPoint*           m_camera_2;
-    DrawSpace::Core::LinearMovement*            m_linear_mvt;
-    DrawSpace::Core::CircularMovement*          m_circular_mvt;
+    DrawSpace::Core::FPSMovement                                        m_fpsmove;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::FPSMovement>*           m_fpsmove_node;
+
+    DrawSpace::Dynamics::CameraPoint*                                   m_camera_2;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera2_node;
+
+    DrawSpace::Core::LinearMovement*                                    m_linear_mvt;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::LinearMovement>*        m_linearmove_node;
+    
     
 
 
-    DrawSpace::Spacebox*                        m_spacebox;
+    DrawSpace::Spacebox*                                                m_spacebox;
+    DrawSpace::Core::SceneNode<DrawSpace::Spacebox>*                    m_spacebox_node;
 
-    DrawSpace::Interface::MesheImport*          m_meshe_import;
+    DrawSpace::Interface::MesheImport*                                  m_meshe_import;
 
-    DrawSpace::Chunk*                           m_ground;
+    DrawSpace::Chunk*                                                   m_ground;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_ground_node;
 
-    int                                         m_box_count;
-    int                                         m_box_texture;
-
-    DrawSpace::Dynamics::World                  m_world;
-    DrawSpace::Dynamics::InertBody*             m_ground_body;
-
-    DrawSpace::Dynamics::Calendar*              m_calendar;
+    DrawSpace::Dynamics::InertBody*                                     m_ground_body;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>*         m_ground_body_node;
 
 
-    dsreal                                      m_zoom;
+    int                                                                 m_box_count;
+    int                                                                 m_box_texture;
 
-    DrawSpace::Image*                           m_image1;
+    DrawSpace::Dynamics::World                                          m_world;
+
+    DrawSpace::Dynamics::Calendar*                                      m_calendar;
+
+
+    dsreal                                                              m_zoom;
+
+    DrawSpace::Image*                                                   m_image1;
 
     typedef struct
-    {
-        //DrawSpace::Drawable* drawable;
-        DrawSpace::Chunk* drawable;
-        DrawSpace::Dynamics::InertBody* inert_body;
+    {        
+        DrawSpace::Chunk*                                               drawable;
+        DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                   drawable_node;
+        DrawSpace::Dynamics::InertBody*                                 inert_body;
+        DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>*     inert_body_node;
 
     } Box;
 

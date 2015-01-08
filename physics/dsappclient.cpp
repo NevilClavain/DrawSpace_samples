@@ -30,14 +30,6 @@ dsAppClient::~dsAppClient( void )
 void dsAppClient::OnRenderFrame( void )
 {
 
-    /*
-    Matrix cam2_pos;
-    cam2_pos.Translation( 1.0, 4.7, 6.0 );
-
-    m_camera_2->SetLocalTransform( cam2_pos );
-    */
-    
-
     if( m_linear_mvt->GetTranslationLength() < 1.0 )
     {
         m_linear_mvt->SetSpeed( 2.5 );
@@ -51,20 +43,10 @@ void dsAppClient::OnRenderFrame( void )
 
 
     DrawSpace::Utils::Matrix sbtrans;
-
     sbtrans.Scale( 20.0, 20.0, 20.0 );
-    m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
+    m_spacebox->SetLocalTransform( sbtrans );
 
-    m_ground_body->Update( m_timer );
-
-
-    for( size_t i = 0; i < m_boxes.size(); i++ )
-    {
-        m_boxes[i].inert_body->Update( m_timer );
-    }
-
- 
-    m_scenegraph.ComputeTransformations( m_timer );    
+    m_scenenodegraph.ComputeTransformations( m_timer );
 
     static long last_fps;
 
@@ -113,7 +95,7 @@ void dsAppClient::OnRenderFrame( void )
     cube0_pos_v[2] = cube0_pos( 3, 2 );
     cube0_pos_v[3] = 1.0;
 
-    m_scenegraph.PointProjection( cube0_pos_v, center_x, center_y, out_z );
+    m_scenenodegraph.PointProjection( cube0_pos_v, center_x, center_y, out_z );
 
     m_image1->SetTranslation( center_x, center_y );
 
@@ -133,6 +115,8 @@ void dsAppClient::create_box( void )
 {
     
     Chunk* chunk;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>* chunk_node;
+
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
 
@@ -146,6 +130,10 @@ void dsAppClient::create_box( void )
 
     char name[32];
     sprintf( name, "box_%d", m_box_count );
+
+    char namebody[32];
+    sprintf( namebody, "body_box_%d", m_box_count );
+
 
     chunk->SetSceneName( name );
     
@@ -179,7 +167,10 @@ void dsAppClient::create_box( void )
 
     chunk->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
-    m_scenegraph.RegisterNode( chunk );
+
+    chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( name ) );
+    chunk_node->SetContent( chunk );
+    m_scenenodegraph.RegisterNode( chunk_node );
 
 
     DrawSpace::Dynamics::InertBody::Parameters cube_params;
@@ -187,22 +178,28 @@ void dsAppClient::create_box( void )
     cube_params.mass = 50.0;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
-
-    /*
-    cube_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 10.5, 0.0, 1.0 );
-    cube_params.initial_rot.Identity();
-    */
-
     cube_params.initial_attitude.Translation( 0.0, 10.5, -25.0 );
 
 
-    DrawSpace::Dynamics::InertBody* cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, chunk, cube_params ) );
+    DrawSpace::Dynamics::InertBody* cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, /*chunk*/NULL, cube_params ) );
+
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>* cube_body_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::InertBody>, SceneNode<DrawSpace::Dynamics::InertBody>( namebody ) );
+    cube_body_node->SetContent( cube_body );
+
+    m_scenenodegraph.AddNode( cube_body_node );
+    m_scenenodegraph.RegisterNode( cube_body_node );
+
+    chunk_node->LinkTo( cube_body_node );
+
+
 
 
     Box box;
 
     box.drawable = chunk;
+    box.drawable_node = chunk_node;
     box.inert_body = cube_body;
+    box.inert_body_node = cube_body_node;
 
     m_boxes.push_back( box );
 
@@ -228,8 +225,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->GetRenderingQueue()->EnableDepthClearing( true );
     m_texturepass->GetRenderingQueue()->EnableTargetClearing( true );
     m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0 );
-    /*
-    */
 
 
 
@@ -251,15 +246,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    m_scenegraph.RegisterPass( m_texturepass );
+    m_scenenodegraph.RegisterPass( m_texturepass );
 
 
     //////////////////////////////////////////////////////////////
 
-    /*
-    status = DrawSpace::Utils::LoadDrawablePlugin( "chunk.dll", "chunk_plugin" );
-    m_ground = DrawSpace::Utils::InstanciateDrawableFromPlugin( "chunk_plugin" );
-    */
 
     m_ground = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
@@ -290,7 +281,12 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "ground.bmp" ) ), 0 );
     m_ground->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
-    m_scenegraph.RegisterNode( m_ground );
+
+    m_ground_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "ground" ) );
+    m_ground_node->SetContent( m_ground );
+
+    m_scenenodegraph.RegisterNode( m_ground_node );
+
 
 
 
@@ -331,9 +327,13 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox->GetNodeFromPass( "texture_pass", Spacebox::RightQuad )->SetOrderNumber( 200 );
 
 
+    
+    m_spacebox_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Spacebox>, SceneNode<DrawSpace::Spacebox>( "spacebox" ) );
+    m_spacebox_node->SetContent( m_spacebox );
 
-    m_scenegraph.RegisterNode( m_spacebox );
-
+    m_scenenodegraph.AddNode( m_spacebox_node );
+    m_scenenodegraph.RegisterNode( m_spacebox_node );
+    
 
 
 
@@ -390,29 +390,77 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
+    m_world.Initialize();
+    m_world.SetGravity( DrawSpace::Utils::Vector( 0.0, -9.81, 0.0, 0.0 ) );
+
+
+
+    create_box();
+
     //////////////////////////////////////////////////////////////
 
-    //m_camera = _DRAWSPACE_NEW_( DrawSpace::Camera, DrawSpace::Camera( "camera" ) );
 
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", NULL, "" ) );
-    m_scenegraph.RegisterNode( m_camera );
+    m_camera_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera" ) );
+    m_camera_node->SetContent( m_camera );
+
+    m_scenenodegraph.RegisterNode( m_camera_node );
+
+
+
+
+
+    m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 0.75, 12.0, 1.0 ) );
+    m_fpsmove_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::FPSMovement>, SceneNode<DrawSpace::Core::FPSMovement>( "fps_node" ) );
+    m_fpsmove_node->SetContent( &m_fpsmove );
+
+    m_scenenodegraph.AddNode( m_fpsmove_node );
+    m_scenenodegraph.RegisterNode( m_fpsmove_node );
+    
+    m_camera_node->LinkTo( m_fpsmove_node );
+
+
+
+
+
+
+
+
 
 
     m_camera_2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", NULL, "" ) );
-    m_scenegraph.RegisterNode( m_camera_2 );
+    m_camera_2->LockOnTransformNode( "box", m_boxes[0].drawable );
+
+    
+    m_camera2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera2" ) );
+    m_camera2_node->SetContent( m_camera_2 );
+
+    m_scenenodegraph.RegisterNode( m_camera2_node );
+
+    
+    
+
+
 
 
     
-    m_fpsmove.Init( DrawSpace::Utils::Vector( 0.0, 0.75, 12.0, 1.0 ) );
 
-    m_mouse_circularmode = true;
+    m_linear_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LinearMovement, DrawSpace::Core::LinearMovement );
+    m_linear_mvt->Init( Vector( -5.0, 2.7, 9.0, 1.0 ), Vector( 0.0, 0.0, -1.0, 1.0 ), /*-90.0*/ 0.0, 0.0 );
+    m_linearmove_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LinearMovement>, SceneNode<DrawSpace::Core::LinearMovement>( "lin_node" ) );
+    m_linearmove_node->SetContent( m_linear_mvt );
+
+
+    m_scenenodegraph.AddNode( m_linearmove_node );
+    m_scenenodegraph.RegisterNode( m_linearmove_node );
+    
+    m_camera2_node->LinkTo( m_linearmove_node );
 
 
 
-    m_scenegraph.SetCurrentCamera( "camera" );
-    //m_scenegraph.SetCurrentCamera( "camera2" );
 
-    m_camera->RegisterMovement( "fpsmvt", &m_fpsmove );
+
+
 
 
 
@@ -424,27 +472,24 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    m_world.Initialize();
-    m_world.SetGravity( DrawSpace::Utils::Vector( 0.0, -9.81, 0.0, 0.0 ) );
 
-    DrawSpace::Dynamics::InertBody::Parameters ground_params;
-    //ground_params.box_dims = DrawSpace::Utils::Vector( 100.0, 0.0, 100., 1.0 );
+    DrawSpace::Dynamics::InertBody::Parameters ground_params;    
     ground_params.mass = 0.0;
-    //ground_params.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     ground_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     ground_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 100.0, 0.0, 100., 1.0 );
-
-    /*
-    ground_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
-    ground_params.initial_rot.Identity();
-    */
-
     ground_params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
 
-    m_ground_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, m_ground, ground_params ) );
+    m_ground_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, /*m_ground*/ NULL, ground_params ) );
+    m_ground_body_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::InertBody>, SceneNode<DrawSpace::Dynamics::InertBody>( "ground_body" ) );
+    m_ground_body_node->SetContent( m_ground_body );
+
+    m_scenenodegraph.AddNode( m_ground_body_node );
+    m_scenenodegraph.RegisterNode( m_ground_body_node );
+
+    m_ground_node->LinkTo( m_ground_body_node );
 
 
-    create_box();
+    
 
     
 
@@ -454,24 +499,10 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_calendar->Startup( 162682566 );
 
+    m_mouse_circularmode = true;
 
-    //m_camera_2->LockOnBody( m_boxes[0].inert_body );
-    m_camera_2->LockOnTransformNode( "box", m_boxes[0].drawable );
-
-    m_linear_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LinearMovement, DrawSpace::Core::LinearMovement );
-    m_linear_mvt->Init( Vector( -5.0, 2.7, 9.0, 1.0 ), Vector( 0.0, 0.0, -1.0, 1.0 ), /*-90.0*/ 0.0, 0.0 );
-
-
-    m_circular_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
-    m_circular_mvt->Init( Vector( 0.0, 0.5, 0.0, 1.0 ), Vector( 5.0, 1.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
-
-    //m_camera_2->RegisterMovement( m_linear_mvt );
-
-    m_camera_2->RegisterMovement( "circular_mvt", m_circular_mvt );
-
-    m_circular_mvt->SetAngularSpeed( 10.0 );
-
-   
+    m_scenenodegraph.SetCurrentCamera( "camera" );
+  
 
     return true;
 }

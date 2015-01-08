@@ -58,10 +58,11 @@ void dsAppClient::OnRenderFrame( void )
     transform.GetResult( &result );
 
     
-    m_scenegraph.SetNodeLocalTransformation( "cube", result );
-    m_scenegraph.ComputeTransformations( m_timer );
-   
+    //m_scenegraph.SetNodeLocalTransformation( "cube", result );
 
+    m_chunk->SetLocalTransform( result );
+    //m_scenegraph.ComputeTransformations( m_timer );
+    m_scenenodegraph.ComputeTransformations( m_timer );
 
     m_timer.AngleSpeedInc( &m_widget_rot, 45.0 );
 
@@ -160,7 +161,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ///////////////////////////////////////////////////////////////
 
-    m_scenegraph.RegisterPass( m_texturepass );
+    //m_scenegraph.RegisterPass( m_texturepass );
+    m_scenenodegraph.RegisterPass( m_texturepass );
 
     ///////////////////////////////////////////////////////////////
 
@@ -193,7 +195,13 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
     m_chunk->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
-    m_scenegraph.RegisterNode( m_chunk );
+    //m_scenegraph.RegisterNode( m_chunk );
+    m_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "chunk" ) );
+    m_chunk_node->SetContent( m_chunk );
+
+    m_scenenodegraph.AddNode( m_chunk_node );
+    m_scenenodegraph.RegisterNode( m_chunk_node );
+
 
 
     /////////////////////////////////////////////////////////////////

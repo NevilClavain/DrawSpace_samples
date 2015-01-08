@@ -16,8 +16,7 @@ protected:
     DrawSpace::FinalPass*                                                           m_finalpass;
     DrawSpace::IntermediatePass*                                                    m_texturepass;
     
-
-    DrawSpace::Scenegraph                                                           m_scenegraph;
+    DrawSpace::Core::SceneNodeGraph                                                 m_scenenodegraph;
 
     DrawSpace::Interface::FontImport*                                               m_font_import;
     DrawSpace::Core::Font*                                                          m_font;
@@ -47,6 +46,7 @@ protected:
 
     DrawSpace::Interface::MesheImport*                                              m_meshe_import;
     DrawSpace::Chunk*                                                               m_chunk;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                                   m_chunk_node;
 
 
     WidgetEventHandler*                                                             m_mousein_eventhandler;
