@@ -34,7 +34,7 @@ void dsAppClient::OnRenderFrame( void )
     {
         m_linear_mvt->SetSpeed( 2.5 );
     }
-    else if( m_linear_mvt->GetTranslationLength() > 18.0 )
+    else if( m_linear_mvt->GetTranslationLength() > 58.0 )
     {
         m_linear_mvt->SetSpeed( -2.5 );
     }
@@ -79,6 +79,7 @@ void dsAppClient::OnRenderFrame( void )
     renderer->DrawText( 255, 0, 0, 30, 50, "%d %d", m_texturepass->GetRenderingQueue()->GetSwitchesCost(), m_texturepass->GetRenderingQueue()->GetTheoricalSwitchesCost() );
 
     renderer->DrawText( 0, 255, 0, 10, 85, "%s", date.c_str() );
+    renderer->DrawText( 255, 0, 0, 10, 70, "%s", m_current_camera.c_str() );
 
   
     ///////////////////////////////////////////
@@ -501,7 +502,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_mouse_circularmode = true;
 
-    m_scenenodegraph.SetCurrentCamera( "camera" );
+    m_current_camera = "camera2";
+    m_scenenodegraph.SetCurrentCamera( m_current_camera );
   
 
     return true;
@@ -589,6 +591,16 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F7:
             {
+                if( "camera" == m_current_camera )
+                {
+                    m_current_camera = "camera2";
+                }
+                else if( "camera2" == m_current_camera )
+                {
+                    m_current_camera = "camera";
+                }
+
+                m_scenenodegraph.SetCurrentCamera( m_current_camera );
             }
             break;
 

@@ -79,7 +79,11 @@ protected:
 
     } Box;
 
-    std::vector<Box>                            m_boxes;
+    std::vector<Box>                                                    m_boxes;
+
+
+    dsstring                                                            m_current_camera;
+
 
     void create_box( void );
 
