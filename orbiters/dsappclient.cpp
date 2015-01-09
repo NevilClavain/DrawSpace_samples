@@ -136,8 +136,8 @@ void dsAppClient::OnRenderFrame( void )
     
 
 
-    m_cube_body->Update();
-    m_cube_body_2->Update();
+    m_cube_body->Update( m_timer );
+    m_cube_body_2->Update( m_timer );
 
 
     
