@@ -37,9 +37,6 @@ protected:
     DrawSpace::Core::FPSMovement                                        m_fpsmove;
     DrawSpace::Core::SceneNode<DrawSpace::Core::FPSMovement>*           m_fpsmove_node;
 
-    DrawSpace::Dynamics::CameraPoint*                                   m_camera_2;
-    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera2_node;
-
     DrawSpace::Core::LinearMovement*                                    m_linear_mvt;
     DrawSpace::Core::SceneNode<DrawSpace::Core::LinearMovement>*        m_linearmove_node;
     

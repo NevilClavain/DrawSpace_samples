@@ -12,65 +12,88 @@ class dsAppClient : public DrawSpace::App
 {
 protected:
 
-    static dsAppClient*                         m_instance;
+    static dsAppClient*                                                 m_instance;
 
-    DrawSpace::Scenegraph                       m_scenegraph;
-
-
-    DrawSpace::IntermediatePass*                m_texturepass;
-    DrawSpace::FinalPass*                       m_finalpass;
+    DrawSpace::Scenegraph                                               m_scenegraph;
+    DrawSpace::Core::SceneNodeGraph                                     m_scenenodegraph;
 
 
-    DrawSpace::Utils::TimeManager               m_timer;
+    DrawSpace::IntermediatePass*                                        m_texturepass;
+    DrawSpace::FinalPass*                                               m_finalpass;
 
-    bool                                        m_mouselb;
-    bool                                        m_mouserb;
 
-    DrawSpace::Gui::TextWidget*                 m_fpstext_widget;
+    DrawSpace::Utils::TimeManager                                       m_timer;
 
-    DrawSpace::Interface::FontImport*           m_font_import;
-    DrawSpace::Core::Font*                      m_font;
+    bool                                                                m_mouselb;
+    bool                                                                m_mouserb;
 
-    DrawSpace::Dynamics::CameraPoint*           m_camera;
-    DrawSpace::Dynamics::CameraPoint*           m_camera2;
-    DrawSpace::Core::FPSMovement                m_fpsmove;
-    DrawSpace::Core::FreeMovement               m_freemove;
-    
-    DrawSpace::Interface::MesheImport*          m_meshe_import;
+    DrawSpace::Gui::TextWidget*                                         m_fpstext_widget;
 
-    //DrawSpace::Interface::Drawable*             m_spacebox;
-    DrawSpace::Spacebox*                        m_spacebox;
-    
+    DrawSpace::Interface::FontImport*                                   m_font_import;
+    DrawSpace::Core::Font*                                              m_font;
 
-    dsreal                                      m_speed;
-    dsreal                                      m_speed_speed;
+    DrawSpace::Dynamics::CameraPoint*                                   m_camera;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera_node;
 
-    DrawSpace::Dynamics::World                  m_world;
 
     
-    DrawSpace::Dynamics::InertBody*             m_cube_body;
-    DrawSpace::Dynamics::InertBody*             m_cube_body_2;
+    DrawSpace::Core::FreeMovement                                       m_freemove;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::FreeMovement>*          m_freemove_node;
 
 
-    DrawSpace::Dynamics::Orbiter*               m_sun;
+    DrawSpace::Chunk*                                                   m_cube;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_cube_node;
 
-    DrawSpace::Dynamics::Orbiter*               m_mars;
-    DrawSpace::Dynamics::Orbit*                 m_mars_orbit;
-    DrawSpace::Dynamics::Centroid*              m_mars_centroid;
-
-    DrawSpace::Dynamics::Orbiter*               m_moon;
-    DrawSpace::Dynamics::Orbit*                 m_moon_orbit;
-    DrawSpace::Dynamics::Centroid*              m_moon_centroid;
+    DrawSpace::Dynamics::InertBody*                                     m_cube_body;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>*         m_cube_body_node;
 
 
-    DrawSpace::Dynamics::Orbiter*               m_saturn;
-    DrawSpace::Dynamics::Orbit*                 m_saturn_orbit;
-    DrawSpace::Dynamics::Centroid*              m_saturn_centroid;
+
+    DrawSpace::Chunk*                                                   m_cube2;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_cube2_node;
+
+    DrawSpace::Dynamics::InertBody*                                     m_cube_body_2;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>*         m_cube_body_2_node;
+
+    
+    DrawSpace::Interface::MesheImport*                                  m_meshe_import;
+
+    
+    DrawSpace::Spacebox*                                                m_spacebox;
+    DrawSpace::Core::SceneNode<DrawSpace::Spacebox>*                    m_spacebox_node;
+    
+
+    dsreal                                                              m_speed;
+    dsreal                                                              m_speed_speed;
+
+    DrawSpace::Dynamics::World                                          m_world;
+
+    
+    
 
 
-    DrawSpace::Dynamics::Calendar*              m_calendar;
 
-    DrawSpace::Chunk*                           m_chunk;
+
+
+    DrawSpace::Dynamics::Orbiter*                                       m_sun;
+
+    DrawSpace::Dynamics::Orbiter*                                       m_mars;
+    DrawSpace::Dynamics::Orbit*                                         m_mars_orbit;
+    DrawSpace::Dynamics::Centroid*                                      m_mars_centroid;
+
+    DrawSpace::Dynamics::Orbiter*                                       m_moon;
+    DrawSpace::Dynamics::Orbit*                                         m_moon_orbit;
+    DrawSpace::Dynamics::Centroid*                                      m_moon_centroid;
+
+
+    DrawSpace::Dynamics::Orbiter*                                       m_saturn;
+    DrawSpace::Dynamics::Orbit*                                         m_saturn_orbit;
+    DrawSpace::Dynamics::Centroid*                                      m_saturn_centroid;
+
+
+    DrawSpace::Dynamics::Calendar*                                      m_calendar;
+
+    
 
 
     DrawSpace::Dynamics::Orbiter*               build_planet( char* p_name, char* p_texture );
