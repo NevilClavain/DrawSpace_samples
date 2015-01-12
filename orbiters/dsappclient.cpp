@@ -27,7 +27,7 @@ dsAppClient::~dsAppClient( void )
 
 }
 
-Orbiter* dsAppClient::build_planet( char* p_name, char* p_texture )
+Chunk* dsAppClient::build_planet_chunk( char* p_name, char* p_texture )
 {
     Chunk* chunk;
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -60,24 +60,7 @@ Orbiter* dsAppClient::build_planet( char* p_name, char* p_texture )
 
     chunk->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
-    m_scenegraph.RegisterNode( chunk );
-
-    DrawSpace::Dynamics::Body::Parameters sphere_params;
-    sphere_params.shape_descr.sphere_radius = 0.5;
-    sphere_params.shape_descr.shape = DrawSpace::Dynamics::Body::SPHERE_SHAPE;
-    /*
-    sphere_params.initial_pos = DrawSpace::Utils::Vector( 0.0, 0.0, 0.0, 1.0 );
-    sphere_params.initial_rot.Identity();
-    */
-
-    sphere_params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
-
-    Orbiter* orbiter = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Orbiter, DrawSpace::Dynamics::Orbiter( &m_world, chunk ) );
-
-    orbiter->SetKinematic( sphere_params );
-    orbiter->AddToWorld();
-
-    return orbiter;
+    return chunk;
 }
 
 Chunk* dsAppClient::build_orbit_drawable( char* p_name, Orbit* p_orbit )
@@ -113,8 +96,7 @@ Chunk* dsAppClient::build_orbit_drawable( char* p_name, Orbit* p_orbit )
 
     chunk->GetNodeFromPass( "texture_pass" )->AddShaderParameter( 1, "thickness", 1 );
     chunk->GetNodeFromPass( "texture_pass" )->SetShaderReal( "thickness", 0.005 );
-
-    m_scenegraph.RegisterNode( chunk );
+    
 
     return chunk;
 }
@@ -146,17 +128,6 @@ void dsAppClient::OnRenderFrame( void )
     Matrix origin;
     origin.Identity();
 
-
-/*
-    m_mars_orbit->OrbitStep( origin );
-    m_saturn_orbit->OrbitStep( origin );
-  */  
-    
-
-    
-
-     
-    //m_scenegraph.ComputeTransformations( m_timer );
     m_scenenodegraph.ComputeTransformations( m_timer );
 
 
@@ -196,15 +167,7 @@ void dsAppClient::OnRenderFrame( void )
 
     renderer->FlipScreen();
 
-    /*
-    m_timer.Update();
-    if( m_timer.IsReady() )
-    {
-        m_world.StepSimulation( m_timer.GetFPS() ); 
 
-
-    }
-    */
 
     m_calendar->Run();
 
@@ -249,7 +212,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    //m_scenegraph.RegisterPass( m_texturepass );
+    
     m_scenenodegraph.RegisterPass( m_texturepass );
 
 
@@ -293,7 +256,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox->GetNodeFromPass( "texture_pass", Spacebox::RightQuad )->SetOrderNumber( 200 );
 
 
-    //m_scenegraph.RegisterNode( m_spacebox );
+    
 
     m_spacebox_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Spacebox>, SceneNode<DrawSpace::Spacebox>( "spacebox" ) );
     m_spacebox_node->SetContent( m_spacebox );
@@ -315,60 +278,328 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-#ifdef _COMMENT_    
+
+
+    //////////////////////////////////////////////
+
+    m_sun_chunk = build_planet_chunk( "sun_chunk", "texture_sun.jpg" );
+    m_sun_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "sun_chunk" ) );
+    m_sun_chunk_node->SetContent( m_sun_chunk );
+
+
+    m_scenenodegraph.AddNode( m_sun_chunk_node );
+    m_scenenodegraph.RegisterNode( m_sun_chunk_node );
+
+
+
+    //////////////////////////////////////////////
+
+
+    m_mars_chunk = build_planet_chunk( "mars_chunk", "mars.jpg" );
+    m_mars_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "mars_chunk" ) );
+    m_mars_chunk_node->SetContent( m_mars_chunk );
+
+    m_scenenodegraph.RegisterNode( m_mars_chunk_node );
+
+
+    m_mars_orbiter = _DRAWSPACE_NEW_( Orbiter, Orbiter( &m_world, NULL ) );
+    m_mars_orbiter->SetOrbitDuration( 1.0 );
+    m_mars_orbiter->SetRevolutionTiltAngle( 33.0 );
+    m_mars_orbiter->SetRevolutionDuration( 1.0 );
+
+
+    DrawSpace::Dynamics::Body::Parameters sphere_params;
+    sphere_params.shape_descr.sphere_radius = 0.5;
+    sphere_params.shape_descr.shape = DrawSpace::Dynamics::Body::SPHERE_SHAPE;
+
+    sphere_params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
+
+    m_mars_orbiter->SetKinematic( sphere_params );
+    m_mars_orbiter->AddToWorld();
+
+
+
+    m_mars_orbiter_node = _DRAWSPACE_NEW_( SceneNode<Orbiter>, SceneNode<Orbiter>( "mars_orbiter" ) );
+    m_mars_orbiter_node->SetContent( m_mars_orbiter );
+
+    m_scenenodegraph.RegisterNode( m_mars_orbiter_node );
+
+    m_mars_chunk_node->LinkTo( m_mars_orbiter_node );
+
+
+    //////////////////////////////////////////////
+
+
+    m_mars_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 16.0, 0.99, 0.0, 9.0, 0.0, 0.0, 1.0, 33.0, 1.0, NULL ) );
+    m_mars_orbit_node = _DRAWSPACE_NEW_( SceneNode<Orbit>, SceneNode<Orbit>( "mars_orbit" ) );
+    m_mars_orbit_node->SetContent( m_mars_orbit );
+
     
-    m_sun = build_planet( "sun", "texture_sun.jpg" );
+    m_scenenodegraph.AddNode( m_mars_orbit_node );
+    m_scenenodegraph.RegisterNode( m_mars_orbit_node );
 
+    m_mars_orbiter_node->LinkTo( m_mars_orbit_node );
+
+
+    ////////////////////////////////////////////////
+
+
+    m_mars_orbit_chunk = build_orbit_drawable( "mars_orbit_chunk", m_mars_orbit );
+    m_mars_orbit_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "mars_orbit_chunk" ) );
+    m_mars_orbit_chunk_node->SetContent( m_mars_orbit_chunk );
 
     
-    m_mars = build_planet( "mars", "mars.jpg" );
+    m_scenenodegraph.AddNode( m_mars_orbit_chunk_node );
+    m_scenenodegraph.RegisterNode( m_mars_orbit_chunk_node );
 
-    m_mars_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
-    m_mars_centroid->SetOrbiter( m_mars );
 
-    m_mars_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 8.0, 0.999, 0.0, /*9.0*/ 0.0, 0.0, 0.0, 1.0, 33.0, 0.0, m_mars_centroid ) );
+    ////////////////////////////////////////////
 
-    m_mars_orbit->RegisterChunk( build_orbit_drawable( "mars_orbit", m_mars_orbit ) );
 
-b
+
+
+    m_moon_chunk = build_planet_chunk( "moon_chunk", "mars.jpg" );
+    m_moon_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "moon_chunk" ) );
+    m_moon_chunk_node->SetContent( m_moon_chunk );
+
+    m_scenenodegraph.RegisterNode( m_moon_chunk_node );
+
+
+
+    m_moon_orbiter = _DRAWSPACE_NEW_( Orbiter, Orbiter( &m_world, NULL ) );
+    m_moon_orbiter->SetOrbitDuration( 0.5 );
+    m_moon_orbiter->SetRevolutionTiltAngle( 0.0 );
+    m_moon_orbiter->SetRevolutionDuration( 0.3 );
+
+
+    sphere_params.shape_descr.sphere_radius = 0.5;
+    sphere_params.shape_descr.shape = DrawSpace::Dynamics::Body::SPHERE_SHAPE;
+    sphere_params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
+
+    m_moon_orbiter->SetKinematic( sphere_params );
+    m_moon_orbiter->AddToWorld();
+
+
+
+    m_moon_orbiter_node = _DRAWSPACE_NEW_( SceneNode<Orbiter>, SceneNode<Orbiter>( "moon_orbiter" ) );
+    m_moon_orbiter_node->SetContent( m_moon_orbiter );
+
+    m_scenenodegraph.RegisterNode( m_moon_orbiter_node );
+
+    m_moon_chunk_node->LinkTo( m_moon_orbiter_node );
+
+
+    //////////////////////////////////////////////
+
+
+    m_moon_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 5.0, 0.45, 0.0, 10.0, 3.0, 0.0, 0.5, 0.0, 0.3, NULL ) );
+    m_moon_orbit_node = _DRAWSPACE_NEW_( SceneNode<Orbit>, SceneNode<Orbit>( "moon_orbit" ) );
+    m_moon_orbit_node->SetContent( m_moon_orbit );
+
+    
+    m_scenenodegraph.RegisterNode( m_moon_orbit_node );
+
+    m_moon_orbiter_node->LinkTo( m_moon_orbit_node );
+
+
+    m_moon_orbit_node->LinkTo( m_mars_orbit_node );
+
+
+    ///////////////////////////////////////////////
+
+    m_moon_orbit_chunk = build_orbit_drawable( "moon_orbit_chunk", m_moon_orbit );
+    m_moon_orbit_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "moon_orbit_chunk" ) );
+    m_moon_orbit_chunk_node->SetContent( m_moon_orbit_chunk );
+
+    
+    
+    m_scenenodegraph.RegisterNode( m_moon_orbit_chunk_node );
+
+
+    m_moon_orbit_chunk_node->LinkTo( m_mars_orbit_node );
+
+
+    //////////////////////////////////////////////
+
+
+
+    m_saturn_root_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 60.0, 0.9999, 8.0, 1.0, 0.0, 0.0, 20.0, 0.0, 1.0, NULL ) );
+    m_saturn_root_orbit_node = _DRAWSPACE_NEW_( SceneNode<Orbit>, SceneNode<Orbit>( "saturn_root_orbit" ) );
+    m_saturn_root_orbit_node->SetContent( m_saturn_root_orbit );
+
+    
+    m_scenenodegraph.AddNode( m_saturn_root_orbit_node );
+    m_scenenodegraph.RegisterNode( m_saturn_root_orbit_node );
+
+
+    //////////////////////////////////////////////
+
+
+    m_saturn_root_orbit_chunk = build_orbit_drawable( "saturn_root_orbit_chunk", m_saturn_root_orbit );
+    m_saturn_root_orbit_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "saturn_root_orbit_chunk" ) );
+    m_saturn_root_orbit_chunk_node->SetContent( m_saturn_root_orbit_chunk );
+
+    
+    m_scenenodegraph.AddNode( m_saturn_root_orbit_chunk_node );
+    m_scenenodegraph.RegisterNode( m_saturn_root_orbit_chunk_node );
+
+
+    ///////////////////////////////////////////////
+
+
+    m_saturn1_chunk = build_planet_chunk( "saturn1_chunk", "saturnmap.jpg" );
+    m_saturn1_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "saturn1_chunk" ) );
+    m_saturn1_chunk_node->SetContent( m_saturn1_chunk );
+
+    m_scenenodegraph.RegisterNode( m_saturn1_chunk_node );
+
+
+    m_saturn1_orbiter = _DRAWSPACE_NEW_( Orbiter, Orbiter( &m_world, NULL ) );
+    m_saturn1_orbiter->SetOrbitDuration( 0.45 );
+    m_saturn1_orbiter->SetRevolutionTiltAngle( 0.0 );
+    m_saturn1_orbiter->SetRevolutionDuration( 0.0 );
+
+
+
+    sphere_params.shape_descr.sphere_radius = 0.5;
+    sphere_params.shape_descr.shape = DrawSpace::Dynamics::Body::SPHERE_SHAPE;
+
+    sphere_params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
+
+    m_saturn1_orbiter->SetKinematic( sphere_params );
+    m_saturn1_orbiter->AddToWorld();
+
+
+
+    m_saturn1_orbiter_node = _DRAWSPACE_NEW_( SceneNode<Orbiter>, SceneNode<Orbiter>( "saturn1_orbiter" ) );
+    m_saturn1_orbiter_node->SetContent( m_saturn1_orbiter );
+
+    m_scenenodegraph.RegisterNode( m_saturn1_orbiter_node );
+
+    m_saturn1_chunk_node->LinkTo( m_saturn1_orbiter_node );
+
+
+    //////////////////////////////////////////////////
+
+
+    m_saturn1_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 9.6, 0.7, 8.0, 1.0, 0.0, 0.0, 0.45, 0.0, 0.0, NULL ) );
+    m_saturn1_orbit_node = _DRAWSPACE_NEW_( SceneNode<Orbit>, SceneNode<Orbit>( "saturn1_orbit" ) );
+    m_saturn1_orbit_node->SetContent( m_saturn1_orbit );
+
+    
+    m_scenenodegraph.RegisterNode( m_saturn1_orbit_node );
+
+
+    m_saturn1_orbiter_node->LinkTo( m_saturn1_orbit_node );
+
+    m_saturn1_orbit_node->LinkTo( m_saturn_root_orbit_node );
+
     
 
 
-    m_moon = build_planet( "moon", "mars.jpg" );
-
-    m_moon_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
-    m_moon_centroid->SetOrbiter( m_moon );
-
-    m_moon_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 5.0, 0.45, 0.0, 10.0, 3.0, 0.0, 0.0001, 0.0, 0.0, m_moon_centroid ) );
-
-    m_moon_orbit->RegisterChunk( build_orbit_drawable( "moon_orbit", m_moon_orbit ) );
+    ///////////////////////////////////////////////////
 
 
-    m_mars_centroid->RegisterSubOrbit( m_moon_orbit );
+    m_saturn1_orbit_chunk = build_orbit_drawable( "saturn1_orbit_chunk", m_saturn1_orbit );
+    m_saturn1_orbit_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "saturn1_orbit_chunk" ) );
+    m_saturn1_orbit_chunk_node->SetContent( m_saturn1_orbit_chunk );
+
+    
+    m_scenenodegraph.RegisterNode( m_saturn1_orbit_chunk_node );
+
+
+    m_saturn1_orbit_chunk_node->LinkTo( m_saturn_root_orbit_node );
+
+
+    ////////////////////////////////////////////////////
+
+
+    m_saturn2_chunk = build_planet_chunk( "saturn2_chunk", "saturnmap.jpg" );
+    m_saturn2_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "saturn2_chunk" ) );
+    m_saturn2_chunk_node->SetContent( m_saturn2_chunk );
+
+    m_scenenodegraph.RegisterNode( m_saturn2_chunk_node );
+
+
+    m_saturn2_orbiter = _DRAWSPACE_NEW_( Orbiter, Orbiter( &m_world, NULL ) );
+    m_saturn2_orbiter->SetOrbitDuration( 0.45 );
+    m_saturn2_orbiter->SetRevolutionTiltAngle( 0.0 );
+    m_saturn2_orbiter->SetRevolutionDuration( 0.0 );
 
 
 
+    sphere_params.shape_descr.sphere_radius = 0.5;
+    sphere_params.shape_descr.shape = DrawSpace::Dynamics::Body::SPHERE_SHAPE;
+
+    sphere_params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
+
+    m_saturn2_orbiter->SetKinematic( sphere_params );
+    m_saturn2_orbiter->AddToWorld();
 
 
-    m_saturn = build_planet( "saturn", "saturnmap.jpg" );
 
-    m_saturn_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
-    m_saturn_centroid->SetOrbiter( m_saturn );
+    m_saturn2_orbiter_node = _DRAWSPACE_NEW_( SceneNode<Orbiter>, SceneNode<Orbiter>( "saturn2_orbiter" ) );
+    m_saturn2_orbiter_node->SetContent( m_saturn1_orbiter );
 
-    m_saturn_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 60.0, 0.9999, 8.0, 1.0, 0.0, 0.0, 20.0, 0.0, 1.0, m_saturn_centroid ) );
+    m_scenenodegraph.RegisterNode( m_saturn2_orbiter_node );
 
-    m_saturn_orbit->RegisterChunk( build_orbit_drawable( "saturn_orbit", m_saturn_orbit ) );
+    m_saturn2_chunk_node->LinkTo( m_saturn2_orbiter_node );
 
-#endif
+    //////////////////////////////////////////////////
+
+
+    m_saturn2_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 9.6, 0.7, 188.0, 1.0, 0.0, 0.0, 0.45, 0.0, 0.0, NULL ) );
+    m_saturn2_orbit_node = _DRAWSPACE_NEW_( SceneNode<Orbit>, SceneNode<Orbit>( "saturn2_orbit" ) );
+    m_saturn2_orbit_node->SetContent( m_saturn2_orbit );
+
+    
+    m_scenenodegraph.RegisterNode( m_saturn2_orbit_node );
+
+
+    m_saturn2_orbiter_node->LinkTo( m_saturn2_orbit_node );
+
+    m_saturn2_orbit_node->LinkTo( m_saturn_root_orbit_node );
+
     
 
+
+    ///////////////////////////////////////////////////
+
+
+    m_saturn2_orbit_chunk = build_orbit_drawable( "saturn2_orbit_chunk", m_saturn2_orbit );
+    m_saturn2_orbit_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "saturn2_orbit_chunk" ) );
+    m_saturn2_orbit_chunk_node->SetContent( m_saturn1_orbit_chunk );
+
+    
+    m_scenenodegraph.RegisterNode( m_saturn2_orbit_chunk_node );
+
+
+    m_saturn2_orbit_chunk_node->LinkTo( m_saturn_root_orbit_node );
+
+
+    ////////////////////////////////////////////////////
+
+
+
+  
 
     m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer ) );
     m_calendar->RegisterWorld( &m_world );
 
+    m_calendar->RegisterOrbit( m_mars_orbit );
+    m_calendar->RegisterOrbiter( m_mars_orbiter );
+
+    m_calendar->RegisterOrbit( m_moon_orbit );
+    m_calendar->RegisterOrbiter( m_moon_orbiter );
 
 
-    
+    m_calendar->RegisterOrbit( m_saturn_root_orbit );
+
+    m_calendar->RegisterOrbit( m_saturn1_orbit );
+    m_calendar->RegisterOrbiter( m_saturn1_orbiter );
+
+    m_calendar->RegisterOrbit( m_saturn2_orbit );
+    m_calendar->RegisterOrbiter( m_saturn2_orbiter );
 
     //////////////////////////////////////////////////////////////
 
@@ -404,7 +635,7 @@ b
     chunk->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
 
-    //m_scenegraph.RegisterNode( chunk );
+    
     m_cube = chunk;
 
     m_cube_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "box" ) );
@@ -472,7 +703,7 @@ b
 
     chunk->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
-    //m_scenegraph.RegisterNode( chunk );
+    
 
     m_cube2 = chunk;
 
@@ -529,7 +760,7 @@ b
 
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", NULL, "" ) );
 
-    //m_scenegraph.RegisterNode( m_camera );
+    
     m_camera_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera" ) );
     m_camera_node->SetContent( m_camera );
     m_scenenodegraph.RegisterNode( m_camera_node );
@@ -549,9 +780,6 @@ b
 
 
 
-    //m_scenegraph.SetCurrentCamera( "camera" );
-    //m_scenegraph.SetCurrentCamera( "camera2" );
-
 
     m_scenenodegraph.SetCurrentCamera( "camera" );
 
@@ -559,19 +787,9 @@ b
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     
 
-    //m_freemove.Init( DrawSpace::Utils::Vector( 0.0, 0.0, 20.0, 1.0 ) );
-
-
-    //m_camera->RegisterMovement( "freemvt", &m_freemove );
-
 
     m_mouse_circularmode = true;
 
-    /*
-    m_calendar->RegisterOrbit( m_mars_orbit );
-    m_calendar->RegisterOrbit( m_moon_orbit );
-    m_calendar->RegisterOrbit( m_saturn_orbit );
-    */
 
 
     //m_calendar->Startup( 162682566 );

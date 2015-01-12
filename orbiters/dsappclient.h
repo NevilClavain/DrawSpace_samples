@@ -14,7 +14,7 @@ protected:
 
     static dsAppClient*                                                 m_instance;
 
-    DrawSpace::Scenegraph                                               m_scenegraph;
+    
     DrawSpace::Core::SceneNodeGraph                                     m_scenenodegraph;
 
 
@@ -73,22 +73,63 @@ protected:
 
 
 
+    DrawSpace::Chunk*                                                   m_sun_chunk;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_sun_chunk_node;
 
 
-    DrawSpace::Dynamics::Orbiter*                                       m_sun;
 
-    DrawSpace::Dynamics::Orbiter*                                       m_mars;
+
+
     DrawSpace::Dynamics::Orbit*                                         m_mars_orbit;
-    DrawSpace::Dynamics::Centroid*                                      m_mars_centroid;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Orbit>*             m_mars_orbit_node;
+    DrawSpace::Dynamics::Orbiter*                                       m_mars_orbiter;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Orbiter>*           m_mars_orbiter_node;
+    DrawSpace::Chunk*                                                   m_mars_chunk;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_mars_chunk_node;
+    DrawSpace::Chunk*                                                   m_mars_orbit_chunk;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_mars_orbit_chunk_node;
 
-    DrawSpace::Dynamics::Orbiter*                                       m_moon;
+
+
+
     DrawSpace::Dynamics::Orbit*                                         m_moon_orbit;
-    DrawSpace::Dynamics::Centroid*                                      m_moon_centroid;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Orbit>*             m_moon_orbit_node;
+    DrawSpace::Dynamics::Orbiter*                                       m_moon_orbiter;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Orbiter>*           m_moon_orbiter_node;
+    DrawSpace::Chunk*                                                   m_moon_chunk;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_moon_chunk_node;
+    DrawSpace::Chunk*                                                   m_moon_orbit_chunk;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_moon_orbit_chunk_node;
 
 
-    DrawSpace::Dynamics::Orbiter*                                       m_saturn;
-    DrawSpace::Dynamics::Orbit*                                         m_saturn_orbit;
-    DrawSpace::Dynamics::Centroid*                                      m_saturn_centroid;
+
+    DrawSpace::Dynamics::Orbit*                                         m_saturn_root_orbit;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Orbit>*             m_saturn_root_orbit_node;
+
+    DrawSpace::Chunk*                                                   m_saturn_root_orbit_chunk;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_saturn_root_orbit_chunk_node;
+
+
+
+    DrawSpace::Dynamics::Orbit*                                         m_saturn1_orbit;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Orbit>*             m_saturn1_orbit_node;
+    DrawSpace::Dynamics::Orbiter*                                       m_saturn1_orbiter;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Orbiter>*           m_saturn1_orbiter_node;
+    DrawSpace::Chunk*                                                   m_saturn1_chunk;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_saturn1_chunk_node;
+    DrawSpace::Chunk*                                                   m_saturn1_orbit_chunk;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_saturn1_orbit_chunk_node;
+
+
+
+    DrawSpace::Dynamics::Orbit*                                         m_saturn2_orbit;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Orbit>*             m_saturn2_orbit_node;
+    DrawSpace::Dynamics::Orbiter*                                       m_saturn2_orbiter;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Orbiter>*           m_saturn2_orbiter_node;
+    DrawSpace::Chunk*                                                   m_saturn2_chunk;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_saturn2_chunk_node;
+    DrawSpace::Chunk*                                                   m_saturn2_orbit_chunk;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_saturn2_orbit_chunk_node;
 
 
     DrawSpace::Dynamics::Calendar*                                      m_calendar;
@@ -96,8 +137,8 @@ protected:
     
 
 
-    DrawSpace::Dynamics::Orbiter*               build_planet( char* p_name, char* p_texture );
-    DrawSpace::Chunk*                           build_orbit_drawable( char* p_name, DrawSpace::Dynamics::Orbit* p_orbit );
+    DrawSpace::Chunk*               build_planet_chunk( char* p_name, char* p_texture );
+    DrawSpace::Chunk*               build_orbit_drawable( char* p_name, DrawSpace::Dynamics::Orbit* p_orbit );
 
 
     
