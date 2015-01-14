@@ -34,6 +34,10 @@ protected:
     DrawSpace::Dynamics::CameraPoint*                                   m_camera;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera_node;
 
+    DrawSpace::Dynamics::CameraPoint*                                   m_camera_2;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera2_node;
+
+
     DrawSpace::Core::FPSMovement                                        m_fpsmove;
     DrawSpace::Core::SceneNode<DrawSpace::Core::FPSMovement>*           m_fpsmove_node;
 

@@ -12,6 +12,8 @@ class dsAppClient : public DrawSpace::App
 {
 protected:
 
+    typedef DrawSpace::Core::CallBack2<dsAppClient, void, DrawSpace::Core::SceneNodeGraph::NodesEvent, DrawSpace::Core::BaseSceneNode*> NodesEventCallback;
+
     static dsAppClient*                                                 m_instance;
 
     
@@ -135,13 +137,16 @@ protected:
     DrawSpace::Dynamics::Calendar*                                      m_calendar;
 
     
+    NodesEventCallback*                                                 m_nodesevent_cb;
+
+    
 
 
     DrawSpace::Chunk*               build_planet_chunk( char* p_name, char* p_texture );
     DrawSpace::Chunk*               build_orbit_drawable( char* p_name, DrawSpace::Dynamics::Orbit* p_orbit );
 
 
-    
+    void                            on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node );
 
     dsAppClient( void );
 

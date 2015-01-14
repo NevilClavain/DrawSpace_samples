@@ -20,6 +20,10 @@ dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_spe
 {    
     _INIT_LOGGER( "orbiters.conf" )  
     m_w_title = "orbiters test";
+
+    m_nodesevent_cb = _DRAWSPACE_NEW_( NodesEventCallback, NodesEventCallback( this, &dsAppClient::on_nodes_event ) );
+
+
 }
 
 dsAppClient::~dsAppClient( void )
@@ -101,6 +105,11 @@ Chunk* dsAppClient::build_orbit_drawable( char* p_name, Orbit* p_orbit )
     return chunk;
 }
 
+void dsAppClient::on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node )
+{
+    _asm nop
+}
+
 void dsAppClient::OnRenderFrame( void )
 {
     Matrix cam2_pos;
@@ -178,6 +187,7 @@ bool dsAppClient::OnIdleAppInit( void )
 {
 
     /////////////////////////////////////
+    
 
     bool status;
     
@@ -580,7 +590,7 @@ bool dsAppClient::OnIdleAppInit( void )
     ////////////////////////////////////////////////////
 
 
-
+    m_scenenodegraph.RegisterNodesEvtHandler( m_nodesevent_cb );
   
 
     m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer ) );
