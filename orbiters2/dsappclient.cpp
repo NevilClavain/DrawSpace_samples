@@ -32,37 +32,6 @@ m_curr_camera( NULL )
     _INIT_LOGGER( "orbiters2.conf" )  
     m_w_title = "orbiters 2 test";
 
-    m_player_view_linear_acc[0] = m_player_view_linear_acc[1] = m_player_view_linear_acc[2] = 0;
-    m_player_view_linear_acc_2[0] = m_player_view_linear_acc_2[1] = m_player_view_linear_acc_2[2] = 0;
-    m_player_view_linear_speed[0] = m_player_view_linear_speed[1] = m_player_view_linear_speed[2] = 0;
-
-    m_player_view_angular_acc[0] = m_player_view_angular_acc[1] = m_player_view_angular_acc[2] = 0;
-    m_player_view_angular_acc_2[0] = m_player_view_angular_acc_2[1] = m_player_view_angular_acc_2[2] = 0;
-    m_player_view_angular_speed[0] = m_player_view_angular_speed[1] = m_player_view_angular_speed[2] = 0;
-
-
-    m_player_view_angular_speed_clamp_up[0] = 0.0;
-    m_player_view_angular_speed_clamp_down[0] = 0.0;
-
-    m_player_view_angular_speed_clamp_up[1] = 0.0;
-    m_player_view_angular_speed_clamp_down[1] = 0.0;
-
-    m_player_view_angular_speed_clamp_up[2] = 0.0;
-    m_player_view_angular_speed_clamp_down[2] = 0.0;
-
-
-    m_player_view_linear_speed_clamp_up[0] = 0.0;
-    m_player_view_linear_speed_clamp_down[0] = 0.0;
-
-    m_player_view_linear_speed_clamp_up[1] = 0.0;
-    m_player_view_linear_speed_clamp_down[1] = 0.0;
-
-    m_player_view_linear_speed_clamp_up[2] = 0.0;
-    m_player_view_linear_speed_clamp_down[2] = 0.0;
-
-
-
-    m_player_view_theta = m_player_view_phi = m_player_view_rho = 0.0;
 
 
     m_mouseleftbuttondown_eventhandler = _DRAWSPACE_NEW_( WidgetEventHandler, WidgetEventHandler( this, &dsAppClient::on_mouseleftbuttondown ) );
@@ -87,67 +56,69 @@ void dsAppClient::OnRenderFrame( void )
     
     DrawSpace::Utils::Matrix sbtrans;
     sbtrans.Scale( 20.0, 20.0, 20.0 );
-    m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
+    //m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
+    m_spacebox->SetLocalTransform( sbtrans );
 
        
     Matrix origin;
     origin.Identity();
 
-    m_orbit->OrbitStep( origin );
+    //m_orbit->OrbitStep( origin );
 
 
-    m_planet->ApplyGravity();
-    m_moon->ApplyGravity();
+    //m_planet->ApplyGravity();
+    //m_moon->ApplyGravity();
 
-    m_ship->Update( m_timer );
-    m_cube_body->Update( m_timer );
+    //m_ship->Update( m_timer );
+    //m_cube_body->Update( m_timer );
 
-    Matrix bld_pos;
-    bld_pos.Identity();
-
-
-    Matrix cam7_pos;
-    cam7_pos.Translation( 0.0, 0.0, 4.0 );
-    m_camera7->SetLocalTransform( cam7_pos );
+    //Matrix bld_pos;
+    //bld_pos.Identity();
 
 
-    Matrix cam8_pos;
-    cam8_pos.Translation( 0.0, 130.0, 0.0 );
-    m_camera8->SetLocalTransform( cam8_pos );
+    //Matrix cam7_pos;
+    //cam7_pos.Translation( 0.0, 0.0, 4.0 );
+    //m_camera7->SetLocalTransform( cam7_pos );
 
 
-    m_building_collider->Update( m_timer, bld_pos );
+    //Matrix cam8_pos;
+    //cam8_pos.Translation( 0.0, 130.0, 0.0 );
+    //m_camera8->SetLocalTransform( cam8_pos );
 
 
-    m_socle_collider->Update( m_timer, bld_pos );
+    //m_building_collider->Update( m_timer, bld_pos );
+
+
+    //m_socle_collider->Update( m_timer, bld_pos );
 
            
-    m_scenegraph.ComputeTransformations( m_timer );
+    //m_scenegraph.ComputeTransformations( m_timer );
+    m_scenenodegraph.ComputeTransformations( m_timer );
 
     //////////////////////////////////////////////////////////////
 
     
-    m_text_widget->SetVirtualTranslation( 100, 75 );
-    m_text_widget_2->SetVirtualTranslation( -60, 160 );
+    //m_text_widget->SetVirtualTranslation( 100, 75 );
+    //m_text_widget_2->SetVirtualTranslation( -60, 160 );
 
-    char distance[64];
-    sprintf( distance, "%.3f km", m_reticle_widget->GetLastDistance() / 1000.0 );
+    //char distance[64];
+    //sprintf( distance, "%.3f km", m_reticle_widget->GetLastDistance() / 1000.0 );
 
-    m_text_widget_2->SetText( -40, 0, 30, dsstring( distance ), DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
-    m_reticle_widget->Transform();
-    m_reticle_widget->Draw();
+    //m_text_widget_2->SetText( -40, 0, 30, dsstring( distance ), DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
+    //m_reticle_widget->Transform();
+    //m_reticle_widget->Draw();
     
 
     //////////////////////////////////////////////////////////////
 
 
 
-    m_planet->Update();
-    m_moon->Update();
+    //m_planet->Update();
+    //m_moon->Update();
     
 
-    m_planet->ManageBodies();
-    m_moon->ManageBodies();
+    //m_planet->ManageBodies();
+    //m_moon->ManageBodies();
 
 
     
@@ -155,7 +126,7 @@ void dsAppClient::OnRenderFrame( void )
 
     m_texturepass->GetRenderingQueue()->Draw();
 
-    m_text_widget->Draw();
+    //m_text_widget->Draw();
 
     m_finalpass->GetRenderingQueue()->Draw();
 
@@ -177,13 +148,12 @@ void dsAppClient::OnRenderFrame( void )
     renderer->DrawText( 0, 255, 0, 10, 115, "contact = %d", m_ship->GetContactState() );
 
 
-    int x_reticle, y_reticle;
-
-    m_reticle_widget->GetScreenPos( x_reticle, y_reticle );
+    //int x_reticle, y_reticle;
+    //m_reticle_widget->GetScreenPos( x_reticle, y_reticle );
 
     
     // current camera infos
-
+/*
     dsstring camera_name;
 
     if( m_curr_camera )
@@ -255,7 +225,7 @@ void dsAppClient::OnRenderFrame( void )
     {
         renderer->DrawText( 255, 0, 0, 10, 350, "c1 = %d c2 = %d c3 = %d", c1, c2, c3 );
     }
-
+*/
 
 
     renderer->FlipScreen();
@@ -269,6 +239,8 @@ void dsAppClient::OnRenderFrame( void )
 
 bool dsAppClient::OnIdleAppInit( void )
 {
+    DrawSpace::Dynamics::Body::Parameters cube_params;
+
     World::m_scale = 1.0;
     DrawSpace::SphericalLOD::Body::BuildMeshe();
 
@@ -315,7 +287,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->GetRenderingQueue()->EnableTargetClearing( false );
     m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0 );
 
-    m_scenegraph.RegisterPass( m_texturepass );
+    //m_scenegraph.RegisterPass( m_texturepass );
+    m_scenenodegraph.RegisterPass( m_texturepass );
 
 
     //////////////////////////////////////////////////////////////
@@ -376,7 +349,14 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox->GetNodeFromPass( "texture_pass", Spacebox::RightQuad )->SetOrderNumber( 200 );
 
 
-    m_scenegraph.RegisterNode( m_spacebox );
+    //m_scenegraph.RegisterNode( m_spacebox );
+
+    m_spacebox_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Spacebox>, SceneNode<DrawSpace::Spacebox>( "spacebox" ) );
+    m_spacebox_node->SetContent( m_spacebox );
+
+    m_scenenodegraph.AddNode( m_spacebox_node );
+    m_scenenodegraph.RegisterNode( m_spacebox_node );
+
     
 
     //////////////////////////////////////////////////////////////
@@ -388,7 +368,7 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
 
-
+    /*
     m_chunk = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
     m_chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
@@ -422,7 +402,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterNode( m_chunk );
 
 
-    DrawSpace::Dynamics::Body::Parameters cube_params;
+    
     cube_params.mass = 50.0;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 ); //DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
@@ -430,10 +410,12 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, m_chunk, cube_params ) );
+    */
 
     ///////////////////////////////////////////////////////////////
 
 
+    /*
     m_building = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
     m_building->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
@@ -471,6 +453,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_scenegraph.RegisterNode( m_building );
 
+
   
     
     DrawSpace::Dynamics::Body::Parameters bld_params;
@@ -484,9 +467,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_building_collider->SetKinematic( bld_params );
     
+    */
 
     ///////////////////////////////////////////////////////////////
 
+/*
     m_socle = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
     m_socle->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
@@ -523,7 +508,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_socle->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
     m_scenegraph.RegisterNode( m_socle );
-
+    
   
     
     DrawSpace::Dynamics::Body::Parameters socle_params;
@@ -536,11 +521,11 @@ bool dsAppClient::OnIdleAppInit( void )
     m_socle_collider = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Collider, DrawSpace::Dynamics::Collider( m_socle ) );
 
     m_socle_collider->SetKinematic( socle_params );
-
+*/
 
     ///////////////////////////////////////////////////////////////
 
-
+    /*
     m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", 400.0 ) );
 
 
@@ -561,10 +546,11 @@ bool dsAppClient::OnIdleAppInit( void )
     m_centroid->SetOrbiter( m_planet->GetOrbiter() );
 
     m_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 270000000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.333, 25.0, 1.0, m_centroid ) );
-
+    */
 
     //////////////////////////////////////////////////////////////
 
+/*
     m_moon = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "moon", 300.0 ) );
 
 
@@ -586,7 +572,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_orbit2 = _DRAWSPACE_NEW_( Orbit, Orbit( 20000000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.002, 0.0, 1.0, m_centroid2 ) );
 
     m_centroid->RegisterSubOrbit( m_orbit2 );
-
+*/
 
 
     //////////////////////////////////////////////////////////////
@@ -622,7 +608,13 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_ship_drawable->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
-    m_scenegraph.RegisterNode( m_ship_drawable );
+    //m_scenegraph.RegisterNode( m_ship_drawable );
+
+    m_ship_drawable_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "rocket" ) );
+    m_ship_drawable_node->SetContent( m_ship_drawable );
+
+    m_scenenodegraph.RegisterNode( m_ship_drawable_node );
+
 
 
     cube_params.mass = SHIP_MASS;
@@ -631,102 +623,122 @@ bool dsAppClient::OnIdleAppInit( void )
     
     cube_params.initial_attitude.Translation( 265000000.0, 0.0, 0.0 );
 
-    m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, m_ship_drawable, cube_params ) );
+    m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, /*m_ship_drawable*/ NULL, cube_params ) );
 
+
+
+    m_ship_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::Rocket>, SceneNode<DrawSpace::Dynamics::Rocket>( "rocket_body" ) );
+    m_ship_node->SetContent( m_ship );
+
+    m_scenenodegraph.AddNode( m_ship_node );
+    m_scenenodegraph.RegisterNode( m_ship_node );
+
+    m_ship_drawable_node->LinkTo( m_ship_node );
 
     //////////////////////////////////////////////////////////////
 
 
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", NULL, "" ) );
-    m_scenegraph.RegisterNode( m_camera );
+    //m_scenegraph.RegisterNode( m_camera );
+    m_camera_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera" ) );
+    m_camera_node->SetContent( m_camera );
+    m_scenenodegraph.RegisterNode( m_camera_node );
+
+
+
+
     
-    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", m_ship, "ship" ) );
-    m_scenegraph.RegisterNode( m_camera2 );
+    //m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", m_ship, "ship" ) );
+    //m_scenegraph.RegisterNode( m_camera2 );
 
-    m_head_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::HeadMovement, DrawSpace::Core::HeadMovement );
+    //m_head_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::HeadMovement, DrawSpace::Core::HeadMovement );
 
-    m_head_mvt->Init( 1.0, 8000.0, Vector( 0.0, 25.0, 110.0, 1.0 ) );
-    m_head_mvt->SetRefBody( m_ship );
-
-
-    m_camera2->RegisterMovement( "headmvt", m_head_mvt );
+    //m_head_mvt->Init( 1.0, 8000.0, Vector( 0.0, 25.0, 110.0, 1.0 ) );
+    //m_head_mvt->SetRefBody( m_ship );
 
 
-
-    m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", m_ship, "ship" ) );
-
-    m_scenegraph.RegisterNode( m_camera3 );
+    //m_camera2->RegisterMovement( "headmvt", m_head_mvt );
 
 
-    m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera4", m_ship, "ship" ) );
-    m_scenegraph.RegisterNode( m_camera4 );
+
+    //m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", m_ship, "ship" ) );
+
+    //m_scenegraph.RegisterNode( m_camera3 );
 
 
-    m_circular_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
-    m_circular_mvt->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 385.0, 90.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
-
-    m_camera3->RegisterMovement( "circular_mvt", m_circular_mvt );
-
-    m_camera3->LockOnBody( "ship", m_ship );
-
-    m_camera4->RegisterMovement( "circular_mvt", m_circular_mvt );
-    m_camera4->LockOnBody( "cube", m_cube_body );
+    //m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera4", m_ship, "ship" ) );
+    //m_scenegraph.RegisterNode( m_camera4 );
 
 
-    m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera5", m_planet->GetOrbiter(), "planet0" ) );
+    //m_circular_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
+    //m_circular_mvt->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 385.0, 90.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
 
-    m_scenegraph.RegisterNode( m_camera5 );
+    //m_camera3->RegisterMovement( "circular_mvt", m_circular_mvt );
 
-    m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    m_longlat_mvt->Init( -21.0, 20.0, 400000.5, 0.0, 0.0 );
-    m_camera5->RegisterLongLatMovement( "longlatmvt", m_longlat_mvt );
+    //m_camera3->LockOnBody( "ship", m_ship );
 
-    m_circular_mvt2 = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
-    m_circular_mvt2->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 25.0, 0.9, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
-    m_camera5->RegisterMovement( "circular_mvt2", m_circular_mvt2 );
-    m_circular_mvt2->SetAngularSpeed( 25.0 );
+    
+    //m_camera4->RegisterMovement( "circular_mvt", m_circular_mvt );
+    //m_camera4->LockOnBody( "cube", m_cube_body );
     
 
 
-    m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera6", m_planet->GetOrbiter(), "planet0" ) );
+    //m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera5", m_planet->GetOrbiter(), "planet0" ) );
 
-    m_scenegraph.RegisterNode( m_camera6 );
+    //m_scenegraph.RegisterNode( m_camera5 );
 
-    m_spectator_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::SpectatorMovement, DrawSpace::Core::SpectatorMovement );
+    //m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    //m_longlat_mvt->Init( -21.0, 20.0, 400000.5, 0.0, 0.0 );
+    //m_camera5->RegisterLongLatMovement( "longlatmvt", m_longlat_mvt );
 
-    m_spectator_mvt->SetName( "spectator_camera" );
-
-    m_spectator_mvt->Init( 16.0, 8000, true );
-    m_spectator_mvt->SetRefBody( m_ship );
-
-    m_camera6->RegisterMovement( "spectator_mvt", m_spectator_mvt );
-    m_camera6->LockOnBody( "ship", m_ship );
-
-    m_camera6->LockOnBody( "ship", m_ship );
+    //m_circular_mvt2 = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
+    //m_circular_mvt2->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 25.0, 0.9, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
+    //m_camera5->RegisterMovement( "circular_mvt2", m_circular_mvt2 );
+    //m_circular_mvt2->SetAngularSpeed( 25.0 );
+    
 
 
+    //m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera6", m_planet->GetOrbiter(), "planet0" ) );
+
+    //m_scenegraph.RegisterNode( m_camera6 );
+
+    //m_spectator_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::SpectatorMovement, DrawSpace::Core::SpectatorMovement );
+
+    //m_spectator_mvt->SetName( "spectator_camera" );
+
+    //m_spectator_mvt->Init( 16.0, 8000, true );
+    //m_spectator_mvt->SetRefBody( m_ship );
+
+    //m_camera6->RegisterMovement( "spectator_mvt", m_spectator_mvt );
+    //m_camera6->LockOnBody( "ship", m_ship );
+
+    
 
 
-    m_camera7 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera7", m_cube_body, "cube_body" ) );
-    m_scenegraph.RegisterNode( m_camera7 );
+
+    
+    //m_camera7 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera7", m_cube_body, "cube_body" ) );
+    //m_scenegraph.RegisterNode( m_camera7 );
+    
 
 
+    
+    //m_camera8 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera8", m_building_collider, "building" ) );
+    //m_scenegraph.RegisterNode( m_camera8 );
 
-    m_camera8 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera8", m_building_collider, "building" ) );
-    m_scenegraph.RegisterNode( m_camera8 );
-
-    m_camera8->LockOnBody( "cube", m_cube_body );
+    //m_camera8->LockOnBody( "cube", m_cube_body );
+    
 
 
 
     ///////////////////////////////////////////////////////////////
 
 
-    m_reticle_widget = _DRAWSPACE_NEW_( ReticleWidget, ReticleWidget( "reticle_widget", (long)10, (long)10, &m_scenegraph, NULL ) );
+    //m_reticle_widget = _DRAWSPACE_NEW_( ReticleWidget, ReticleWidget( "reticle_widget", (long)10, (long)10, &m_scenegraph, NULL ) );
     
 
 
-
+    /*
     m_text_widget = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget", DRAWSPACE_GUI_WIDTH, DRAWSPACE_GUI_HEIGHT, m_font, true, m_reticle_widget ) );
 
 
@@ -773,13 +785,13 @@ bool dsAppClient::OnIdleAppInit( void )
     m_text_widget->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
 
     m_text_widget->RegisterToPass( m_finalpass );
+    */
 
 
 
 
 
-
-
+    /*
 
     m_text_widget_2 = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget_2", 1200, 360, m_font, false, m_text_widget ) );
     
@@ -813,6 +825,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_text_widget_2->RegisterToPass( m_finalpass );
 
+    */
 
 
 
@@ -826,10 +839,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
+    //m_reticle_widget->LockOnTransformNode( m_socle );
 
-    m_reticle_widget->LockOnTransformNode( m_socle );
-
-
+    /*
     DrawSpace::Gui::ReticleWidget::ClippingParams clp;
     clp.clipping_policy = DrawSpace::Gui::ReticleWidget::CLIPPING_HOLD;
     clp.xmin = -0.5;
@@ -843,6 +855,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_mouse_input.RegisterWidget( m_reticle_widget );
+    */
 
 
     ///////////////////////////////////////////////////////////////
@@ -855,8 +868,17 @@ bool dsAppClient::OnIdleAppInit( void )
     
     m_freemove.Init( DrawSpace::Utils::Vector( 265000000.0, 0.0, 50.0, 1.0 ) );
 
+    m_freemove_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::FreeMovement>, SceneNode<DrawSpace::Core::FreeMovement>( "free_node" ) );
+    m_freemove_node->SetContent( &m_freemove );
 
-    m_camera->RegisterMovement( "free_mvt", &m_freemove );
+    m_scenenodegraph.AddNode( m_freemove_node );
+    m_scenenodegraph.RegisterNode( m_freemove_node );
+    
+    m_camera_node->LinkTo( m_freemove_node );
+
+
+
+    //m_camera->RegisterMovement( "free_mvt", &m_freemove );
 
 
     m_mouse_circularmode = true;
@@ -865,82 +887,83 @@ bool dsAppClient::OnIdleAppInit( void )
     m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer ) );
 
     m_calendar->RegisterWorld( &m_world );
-    m_calendar->RegisterWorld( m_planet->GetWorld() );
-    m_calendar->RegisterWorld( m_moon->GetWorld() );
+    //m_calendar->RegisterWorld( m_planet->GetWorld() );
+    //m_calendar->RegisterWorld( m_moon->GetWorld() );
 
-    m_calendar->RegisterOrbit( m_orbit );
-    m_calendar->RegisterOrbit( m_orbit2 );
-
-
-    
-    m_scenegraph.SetCurrentCamera( "camera2" );
-    m_curr_camera = m_camera2;
+    //m_calendar->RegisterOrbit( m_orbit );
+    //m_calendar->RegisterOrbit( m_orbit2 );
 
 
     
-
-    m_longlat_mvt2 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    m_longlat_mvt2->Init( -21.0000, 20.000, 400014.5, 0.0, 0.0 );
-    m_longlat_mvt2->Compute( m_timer );
-    Matrix llres;
-    m_longlat_mvt2->GetResult( llres );
-
-    m_planet->RegisterIncludedInertBody( "simple_cube", m_cube_body, llres );
+    //m_scenegraph.SetCurrentCamera( "camera" );
+    m_scenenodegraph.SetCurrentCamera( "camera" );
+    m_curr_camera = m_camera;
 
 
-    m_longlat_mvt3 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    m_longlat_mvt3->Init( -21.0000, 20.0089, 400114.0, 80.0, 0.0 );
+    
 
-    m_building_collider->RegisterMovement( m_longlat_mvt3 );
+    //m_longlat_mvt2 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    //m_longlat_mvt2->Init( -21.0000, 20.000, 400014.5, 0.0, 0.0 );
+    //m_longlat_mvt2->Compute( m_timer );
+    //Matrix llres;
+    //m_longlat_mvt2->GetResult( llres );
 
-
-    m_planet->RegisterCollider( m_building_collider );
-
-
-
-
+    //m_planet->RegisterIncludedInertBody( "simple_cube", m_cube_body, llres );
 
 
-    m_longlat_mvt4 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    m_longlat_mvt4->Init( -21.0929, 20.0000, 400129.0, 40.0, 0.0 );
+    //m_longlat_mvt3 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    //m_longlat_mvt3->Init( -21.0000, 20.0089, 400114.0, 80.0, 0.0 );
 
-    m_socle_collider->RegisterMovement( m_longlat_mvt4 );
+    //m_building_collider->RegisterMovement( m_longlat_mvt3 );
 
 
-    m_planet->RegisterCollider( m_socle_collider );
+    //m_planet->RegisterCollider( m_building_collider );
 
 
 
 
 
-    m_planet->RegisterInertBody( "ship", m_ship );
-    m_planet->RegisterCameraPoint( m_camera2 );
-    m_planet->RegisterCameraPoint( m_camera3 );
-    m_planet->RegisterCameraPoint( m_camera4 );
-    m_planet->RegisterCameraPoint( m_camera5 );
-    m_planet->RegisterCameraPoint( m_camera );
 
-    m_planet->RegisterCameraPoint( m_camera6 );
-    m_planet->RegisterCameraPoint( m_camera7 );
-    m_planet->RegisterCameraPoint( m_camera8 );
+    //m_longlat_mvt4 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    //m_longlat_mvt4->Init( -21.0929, 20.0000, 400129.0, 40.0, 0.0 );
+
+    //m_socle_collider->RegisterMovement( m_longlat_mvt4 );
 
 
-    m_moon->RegisterInertBody( "ship", m_ship );
-    m_moon->RegisterCameraPoint( m_camera2 );
-    m_moon->RegisterCameraPoint( m_camera3 );
-    m_moon->RegisterCameraPoint( m_camera4 );
-    m_moon->RegisterCameraPoint( m_camera );
-    m_moon->RegisterCameraPoint( m_camera6 );
+    //m_planet->RegisterCollider( m_socle_collider );
+
+
+
+
+    
+    //m_planet->RegisterInertBody( "ship", m_ship );
+    //m_planet->RegisterCameraPoint( m_camera2 );
+    //m_planet->RegisterCameraPoint( m_camera3 );
+    //m_planet->RegisterCameraPoint( m_camera4 );
+    //m_planet->RegisterCameraPoint( m_camera5 );
+    //m_planet->RegisterCameraPoint( m_camera );
+
+    //m_planet->RegisterCameraPoint( m_camera6 );
+    //m_planet->RegisterCameraPoint( m_camera7 );
+    //m_planet->RegisterCameraPoint( m_camera8 );
+
+
+    //m_moon->RegisterInertBody( "ship", m_ship );
+    //m_moon->RegisterCameraPoint( m_camera2 );
+    //m_moon->RegisterCameraPoint( m_camera3 );
+    //m_moon->RegisterCameraPoint( m_camera4 );
+    //m_moon->RegisterCameraPoint( m_camera );
+    //m_moon->RegisterCameraPoint( m_camera6 );
     
 
 
-    m_scenegraph.RegisterCameraEvtHandler( m_planet->GetCameraEvtCb() );
-    m_scenegraph.RegisterCameraEvtHandler( m_moon->GetCameraEvtCb() );
+    //m_scenegraph.RegisterCameraEvtHandler( m_planet->GetCameraEvtCb() );
+    //m_scenegraph.RegisterCameraEvtHandler( m_moon->GetCameraEvtCb() );
 
     ///////////////////////////////////////////////////////////////
 
 
-    m_camera5->LockOnBody( "cube", m_cube_body );
+    //m_camera5->LockOnBody( "cube", m_cube_body );
 
 
 
@@ -1121,11 +1144,24 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F9:
 
-            if( m_curr_camera == m_camera2 )
+            if( m_curr_camera == m_camera )
             {
-                m_scenegraph.SetCurrentCamera( "camera3" );
+                //m_scenegraph.SetCurrentCamera( "camera2" );
+                m_curr_camera = m_camera2;
+            }
+
+            else if( m_curr_camera == m_camera2 )
+            {
+                //m_scenegraph.SetCurrentCamera( "camera3" );
                 m_curr_camera = m_camera3;
             }
+            else if( m_curr_camera == m_camera3 )
+            {
+                //m_scenegraph.SetCurrentCamera( "camera" );
+                m_curr_camera = m_camera;
+            }
+
+            /*
             else if( m_curr_camera == m_camera3 )
             {
                 m_scenegraph.SetCurrentCamera( "camera4" );
@@ -1159,12 +1195,7 @@ void dsAppClient::OnKeyPulse( long p_key )
                 m_scenegraph.SetCurrentCamera( "camera" );
                 m_curr_camera = m_camera;
             }
-
-            else if( m_curr_camera == m_camera )
-            {
-                m_scenegraph.SetCurrentCamera( "camera2" );
-                m_curr_camera = m_camera2;
-            }
+            */
 
 
             break;

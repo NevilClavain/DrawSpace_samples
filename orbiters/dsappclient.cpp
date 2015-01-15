@@ -128,8 +128,8 @@ void dsAppClient::OnRenderFrame( void )
     
 
 
-    m_cube_body->Update( m_timer );
-    m_cube_body_2->Update( m_timer );
+    //m_cube_body->Update( m_timer );
+    //m_cube_body_2->Update( m_timer );
 
 
     
@@ -668,7 +668,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, chunk, cube_params ) );
 
 
-    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>* m_cube_body_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::InertBody>, SceneNode<DrawSpace::Dynamics::InertBody>( "cube_body" ) );
+    m_cube_body_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::InertBody>, SceneNode<DrawSpace::Dynamics::InertBody>( "cube_body" ) );
     m_cube_body_node->SetContent( m_cube_body );
 
     m_scenenodegraph.AddNode( m_cube_body_node );
