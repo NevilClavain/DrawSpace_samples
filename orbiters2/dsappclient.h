@@ -85,15 +85,11 @@ protected:
     DrawSpace::Dynamics::Calendar*              m_calendar;
 
 
-    //MyPlanet*                                   m_planet;
-
     DrawSpace::Planetoid::Body*                 m_planet;
 
     DrawSpace::Dynamics::Orbit*                 m_orbit;
     DrawSpace::Dynamics::Centroid*              m_centroid;
 
-
-    //MyPlanet*                                   m_moon;
 
     DrawSpace::Planetoid::Body*                 m_moon;
 

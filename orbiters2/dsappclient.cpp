@@ -76,382 +76,6 @@ dsAppClient::~dsAppClient( void )
 
 #define SPEED     1.5
 
-void dsAppClient::compute_player_view_transform( void )
-{
-    Matrix cam_base_pos;
-    cam_base_pos.Translation( 0.0, 2.8, 11.4 );
-
-
-    /////////////////////////////////////////////////////
-
-    if( m_player_view_linear_acc[2] > 0.0 )
-    {
-        m_player_view_linear_speed_clamp_up[2] = 10.0;
-        m_player_view_linear_speed_clamp_down[2] = 0.0;
-
-        dsreal limit = ( m_player_view_linear_acc[2] / ( 8000.0 / SHIP_MASS ) );
-
-        if( m_player_view_pos[2] < limit )
-        {
-            m_player_view_linear_acc_2[2] = 5.0;
-        }
-        else
-        {
-            m_player_view_linear_acc_2[2] = -5.0;
-        }
-    }
-    else if( m_player_view_linear_acc[2] < 0.0 )
-    {
-        m_player_view_linear_speed_clamp_up[2] = 0.0;
-        m_player_view_linear_speed_clamp_down[2] = -10.0;
-
-        dsreal limit = ( m_player_view_linear_acc[2] / ( 8000.0 / SHIP_MASS ) );
-
-        if( m_player_view_pos[2] > limit )
-        {
-            m_player_view_linear_acc_2[2] = -5.0;
-        }
-        else
-        {
-            m_player_view_linear_acc_2[2] = 5.0;
-        }
-    }
-    else
-    {
-        if( m_player_view_pos[2] > 0.01 )
-        {
-            m_player_view_linear_speed_clamp_up[2] = 0.0;
-            m_player_view_linear_speed_clamp_down[2] = -10.0;
-
-            m_player_view_linear_acc_2[2] = -5.0;
-        }
-
-        else if( m_player_view_pos[2] < -0.01 )
-        {
-            m_player_view_linear_speed_clamp_up[2] = 10.0;
-            m_player_view_linear_speed_clamp_down[2] = 0.0;
-
-            m_player_view_linear_acc_2[2] = 5.0;
-        }
-        else
-        {
-            if( m_player_view_pos[2] > 0.0 )
-            {
-                m_player_view_linear_acc_2[2] = 5.0;
-
-                m_player_view_linear_speed_clamp_up[2] = 0.0;
-                m_player_view_linear_speed_clamp_down[2] = -10.0;
-            }
-            else if( m_player_view_pos[2] < 0.0 )
-            {
-                m_player_view_angular_acc_2[2] = -5.0;
-
-                m_player_view_linear_speed_clamp_up[2] = 10.0;
-                m_player_view_linear_speed_clamp_down[2] = 0.0;
-            }
-        }
-    }
-
-
-    /////////////////////////////////////////////////////
-
-
-    dsreal zpos = m_player_view_pos[2];
-    m_timer.TranslationSpeedInc( &zpos, m_player_view_linear_speed[2] );
-    m_player_view_pos[2] = zpos;
-
-
-    dsreal curr_speed = m_player_view_linear_speed[2];
-    m_timer.TranslationSpeedInc( &curr_speed, m_player_view_linear_acc_2[2] );
-    m_player_view_linear_speed[2] = curr_speed;   
-    m_player_view_linear_speed[2] = DrawSpace::Utils::Maths::Clamp( m_player_view_linear_speed_clamp_down[2], m_player_view_linear_speed_clamp_up[2], m_player_view_linear_speed[2] );
-
-
-
-    Matrix cam_delta_pos;
-    cam_delta_pos.Translation( m_player_view_pos );
-
-    /////////////////////////////////////////////////////
-
-    if( m_player_view_angular_acc[0] > 0.0 )
-    {
-        m_player_view_angular_speed_clamp_up[0] = 10.0;
-        m_player_view_angular_speed_clamp_down[0] = 0.0;
-
-        if( m_player_view_phi < 4 * m_player_view_angular_acc[0] )
-        {
-            m_player_view_angular_acc_2[0] = 5.0;
-        }
-        else
-        {
-            m_player_view_angular_acc_2[0] = -5.0;
-        }
-    }
-    else if( m_player_view_angular_acc[0] < 0.0 )
-    {
-        m_player_view_angular_speed_clamp_up[0] = 0.0;
-        m_player_view_angular_speed_clamp_down[0] = -10.0;
-
-        if( m_player_view_phi > 4 * m_player_view_angular_acc[0] )
-        {
-            m_player_view_angular_acc_2[0] = -5.0;
-        }
-        else
-        {
-            m_player_view_angular_acc_2[0] = 5.0;
-        }
-    }
-    else
-    {
-        if( m_player_view_phi > 0.3 )
-        {
-            m_player_view_angular_speed_clamp_up[0] = 0.0;
-            m_player_view_angular_speed_clamp_down[0] = -10.0;
-
-            m_player_view_angular_acc_2[0] = -5.0;
-        }
-
-        else if( m_player_view_phi < -0.3 )
-        {
-            m_player_view_angular_speed_clamp_up[0] = 10.0;
-            m_player_view_angular_speed_clamp_down[0] = 0.0;
-
-            m_player_view_angular_acc_2[1] = 5.0;
-        }
-
-        else
-        {
-            if( m_player_view_phi > 0.0 )
-            {
-                m_player_view_angular_acc_2[0] = 5.0;
-
-                m_player_view_angular_speed_clamp_up[0] = 0.0;
-                m_player_view_angular_speed_clamp_down[0] = -10.0;
-            }
-            else if( m_player_view_phi < 0.0 )
-            {
-                m_player_view_angular_acc_2[0] = -5.0;
-
-                m_player_view_angular_speed_clamp_up[0] = 10.0;
-                m_player_view_angular_speed_clamp_down[0] = 0.0;
-            }
-        }
-    }
-
-
-
-
-
-
-    if( m_player_view_angular_acc[1] > 0.0 )
-    {
-        m_player_view_angular_speed_clamp_up[1] = 10.0;
-        m_player_view_angular_speed_clamp_down[1] = 0.0;
-
-        if( m_player_view_theta < 4 * m_player_view_angular_acc[1] )
-        {
-            m_player_view_angular_acc_2[1] = 5.0;
-        }
-        else
-        {
-            m_player_view_angular_acc_2[1] = -5.0;
-        }
-    }
-    else if( m_player_view_angular_acc[1] < 0.0 )
-    {
-        m_player_view_angular_speed_clamp_up[1] = 0.0;
-        m_player_view_angular_speed_clamp_down[1] = -10.0;
-
-        if( m_player_view_theta > 4 * m_player_view_angular_acc[1] )
-        {
-            m_player_view_angular_acc_2[1] = -5.0;
-        }
-        else
-        {
-            m_player_view_angular_acc_2[1] = 5.0;
-        }
-    }
-    else
-    {
-        if( m_player_view_theta > 0.3 )
-        {
-            m_player_view_angular_speed_clamp_up[1] = 0.0;
-            m_player_view_angular_speed_clamp_down[1] = -10.0;
-
-            m_player_view_angular_acc_2[1] = -5.0;
-        }
-
-        else if( m_player_view_theta < -0.3 )
-        {
-            m_player_view_angular_speed_clamp_up[1] = 10.0;
-            m_player_view_angular_speed_clamp_down[1] = 0.0;
-
-            m_player_view_angular_acc_2[1] = 5.0;
-        }
-
-        else
-        {
-            if( m_player_view_theta > 0.0 )
-            {
-                m_player_view_angular_acc_2[1] = 5.0;
-
-                m_player_view_angular_speed_clamp_up[1] = 0.0;
-                m_player_view_angular_speed_clamp_down[1] = -10.0;
-            }
-            else if( m_player_view_theta < 0.0 )
-            {
-                m_player_view_angular_acc_2[1] = -5.0;
-
-                m_player_view_angular_speed_clamp_up[1] = 10.0;
-                m_player_view_angular_speed_clamp_down[1] = 0.0;
-            }            
-        }
-    }
-
-
-
-
-
-    if( m_player_view_angular_acc[2] > 0.0 )
-    {
-        m_player_view_angular_speed_clamp_up[2] = 10.0;
-        m_player_view_angular_speed_clamp_down[2] = 0.0;
-
-        if( m_player_view_rho < 3 * m_player_view_angular_acc[2] )
-        {
-            m_player_view_angular_acc_2[2] = 5.0;
-        }
-        else
-        {
-            m_player_view_angular_acc_2[2] = -5.0;
-        }
-    }
-    else if( m_player_view_angular_acc[2] < 0.0 )
-    {
-        m_player_view_angular_speed_clamp_up[2] = 0.0;
-        m_player_view_angular_speed_clamp_down[2] = -10.0;
-
-        if( m_player_view_rho > 3 * m_player_view_angular_acc[2] )
-        {          
-            m_player_view_angular_acc_2[2] = -5.0;
-        }
-        else
-        {
-            m_player_view_angular_acc_2[2] = 5.0;
-        }
-    }
-    else
-    {
-        if( m_player_view_rho > 0.3 )
-        {
-            m_player_view_angular_speed_clamp_up[2] = 0.0;
-            m_player_view_angular_speed_clamp_down[2] = -10.0;
-
-            m_player_view_angular_acc_2[2] = -5.0;
-        }
-
-        else if( m_player_view_rho < -0.3 )
-        {
-            m_player_view_angular_speed_clamp_up[2] = 10.0;
-            m_player_view_angular_speed_clamp_down[2] = 0.0;
-
-            m_player_view_angular_acc_2[2] = 5.0;
-        }
-
-        else
-        {
-            if( m_player_view_rho > 0.0 )
-            {
-                m_player_view_angular_acc_2[2] = 5.0;
-
-                m_player_view_angular_speed_clamp_up[2] = 0.0;
-                m_player_view_angular_speed_clamp_down[2] = -10.0;
-            }
-            else if( m_player_view_rho < 0.0 )
-            {
-                m_player_view_angular_acc_2[2] = -5.0;
-
-                m_player_view_angular_speed_clamp_up[2] = 10.0;
-                m_player_view_angular_speed_clamp_down[2] = 0.0;
-            }
-        }
-    }
-
-
-
-
-
-    dsreal phi = m_player_view_phi;
-    m_timer.TranslationSpeedInc( &phi, m_player_view_angular_speed[0] );
-    m_player_view_phi = phi;
-
-
-    dsreal rho = m_player_view_rho;
-    m_timer.TranslationSpeedInc( &rho, m_player_view_angular_speed[2] );
-    m_player_view_rho = rho;
-
-
-    dsreal theta = m_player_view_theta;
-    m_timer.TranslationSpeedInc( &theta, m_player_view_angular_speed[1] );
-    m_player_view_theta = theta;
-
-
-
-
-    curr_speed = m_player_view_angular_speed[0];
-    m_timer.TranslationSpeedInc( &curr_speed, m_player_view_angular_acc_2[0] );
-    m_player_view_angular_speed[0] = curr_speed;
-
-    
-    m_player_view_angular_speed[0] = DrawSpace::Utils::Maths::Clamp( m_player_view_angular_speed_clamp_down[0], m_player_view_angular_speed_clamp_up[0], m_player_view_angular_speed[0] );
-
-
-
-
-    curr_speed = m_player_view_angular_speed[1];
-    m_timer.TranslationSpeedInc( &curr_speed, m_player_view_angular_acc_2[1] );
-    m_player_view_angular_speed[1] = curr_speed;
-
-    
-    m_player_view_angular_speed[1] = DrawSpace::Utils::Maths::Clamp( m_player_view_angular_speed_clamp_down[1], m_player_view_angular_speed_clamp_up[1], m_player_view_angular_speed[1] );
-
-
-
-    
-    curr_speed = m_player_view_angular_speed[2];
-    m_timer.TranslationSpeedInc( &curr_speed, m_player_view_angular_acc_2[2] );
-    m_player_view_angular_speed[2] = curr_speed;
-
-    
-    m_player_view_angular_speed[2] = DrawSpace::Utils::Maths::Clamp( m_player_view_angular_speed_clamp_down[2], m_player_view_angular_speed_clamp_up[2], m_player_view_angular_speed[2] );
-
-
-
-
-    /////////////////////////////////////////////////////
-
-    Matrix rotx;
-    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0 ), DrawSpace::Utils::Maths::DegToRad( m_player_view_phi ) );
-
-    Matrix roty;
-    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0 ), DrawSpace::Utils::Maths::DegToRad( m_player_view_theta ) );
-
-    Matrix rotz;
-    rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), DrawSpace::Utils::Maths::DegToRad( m_player_view_rho ) );
-
-
-    Transformation tf;
-
-    tf.ClearAll();
-    tf.PushMatrix( cam_delta_pos );
-    tf.PushMatrix( cam_base_pos );
-    tf.PushMatrix( rotx );
-    tf.PushMatrix( roty );
-    tf.PushMatrix( rotz );
-    tf.BuildResult();
-    tf.GetResult( &m_player_view_transform );
-
-}
 
 void dsAppClient::OnRenderFrame( void )
 {
@@ -465,19 +89,7 @@ void dsAppClient::OnRenderFrame( void )
     sbtrans.Scale( 20.0, 20.0, 20.0 );
     m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
 
-
-    
-
-
-    //compute_player_view_transform();
-    //m_camera2->SetLocalTransform( m_player_view_transform );
-
-    /*
-    Matrix id;
-    id.Identity();
-    m_camera5->SetLocalTransform( id );
-    */
-    
+       
     Matrix origin;
     origin.Identity();
 
@@ -491,7 +103,6 @@ void dsAppClient::OnRenderFrame( void )
     m_cube_body->Update( m_timer );
 
     Matrix bld_pos;
-    //bld_pos.Translation( 265000000.0, 0.0, -200.0 );
     bld_pos.Identity();
 
 
@@ -570,9 +181,6 @@ void dsAppClient::OnRenderFrame( void )
 
     m_reticle_widget->GetScreenPos( x_reticle, y_reticle );
 
-    //renderer->DrawText( 0, 255, 0, x_reticle - 40, y_reticle - 40, "%.3f km", m_reticle_widget->GetLastDistance() / 1000.0 );
-
-
     
     // current camera infos
 
@@ -649,34 +257,6 @@ void dsAppClient::OnRenderFrame( void )
     }
 
 
-    //renderer->DrawText( 0, 255, 0, 10, 195, "planet01 : %d %d", m_planet->GetCollisionState(), m_planet->GetCollisionMesheBuildCount() );
-    //renderer->DrawText( 0, 255, 0, 10, 215, "moon : %d %d", m_moon->GetCollisionState(), m_moon->GetCollisionMesheBuildCount() );
-
-    /*
-    Vector tf, tt;
-    Vector tf2, tt2;
-
-    Matrix ship_trans;
-
-    m_ship->GetLastLocalWorldTrans( ship_trans );
-    ship_trans.ClearTranslation();
-    ship_trans.Inverse();
-
-    m_ship->GetTotalForce( tf );
-    m_ship->GetTotalTorque( tt );
-
-         
-    ship_trans.Transform( &tf, &tf2 );
-    ship_trans.Transform( &tt, &tt2 );
-        
-    m_player_view_linear_acc[2] = -tf2[2] / SHIP_MASS;
-
-    m_player_view_angular_acc[2] = -tt2[2];
-    m_player_view_angular_acc[1] = -tt2[1];
-    m_player_view_angular_acc[0] = -tt2[0];
-    */
-
-
 
     renderer->FlipScreen();
 
@@ -689,7 +269,6 @@ void dsAppClient::OnRenderFrame( void )
 
 bool dsAppClient::OnIdleAppInit( void )
 {
-    //World::m_scale = 0.5;
     World::m_scale = 1.0;
     DrawSpace::SphericalLOD::Body::BuildMeshe();
 
@@ -849,10 +428,6 @@ bool dsAppClient::OnIdleAppInit( void )
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 ); //DrawSpace::Utils::Vector( 0.5, 0.5, 0.5, 1.0 );
 
 
-    //cube_params.initial_attitude.Translation( 265000000.0, 0.0, -20.0 );
-
-    //cube_params.initial_attitude = llres;
-
 
     m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, m_chunk, cube_params ) );
 
@@ -966,8 +541,6 @@ bool dsAppClient::OnIdleAppInit( void )
     ///////////////////////////////////////////////////////////////
 
 
-    //m_planet = _DRAWSPACE_NEW_( MyPlanet, MyPlanet( "planet01", 400.0 ) );
-
     m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", 400.0 ) );
 
 
@@ -977,15 +550,6 @@ bool dsAppClient::OnIdleAppInit( void )
     {
         m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
         m_planet->GetDrawable()->SetNodeFromPassSpecificFx( "texture_pass", i, "main_fx" );
-
-        /*
-        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetVertexTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.bmp" ) ), 0 );
-        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetVertexTexture( 0 )->LoadFromFile();
-
-
-        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mapcolor.bmp" ) ), 0 );
-        m_planet->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetTexture( 0 )->LoadFromFile();
-        */
 
     }
     m_scenegraph.RegisterNode( m_planet->GetDrawable() );
@@ -1001,8 +565,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////
 
-    //m_moon = _DRAWSPACE_NEW_( MyPlanet, MyPlanet( "moon", 300.0 ) );
-
     m_moon = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "moon", 300.0 ) );
 
 
@@ -1012,14 +574,6 @@ bool dsAppClient::OnIdleAppInit( void )
     {
         m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
         m_moon->GetDrawable()->SetNodeFromPassSpecificFx( "texture_pass", i, "main_fx" );
-
-        /*
-        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetVertexTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.bmp" ) ), 0 );
-        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetVertexTexture( 0 )->LoadFromFile();
-
-        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mapcolor.bmp" ) ), 0 );
-        m_moon->GetDrawable()->GetNodeFromPass( "texture_pass", i )->GetTexture( 0 )->LoadFromFile();
-        */
 
     }
     m_scenegraph.RegisterNode( m_moon->GetDrawable() );
@@ -1071,7 +625,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenegraph.RegisterNode( m_ship_drawable );
 
 
-    //DrawSpace::Dynamics::Body::Parameters cube_params;
     cube_params.mass = SHIP_MASS;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285 / 2.0, 21.4704 / 2.0, 81.911 / 2.0, 1.0 );
@@ -1085,18 +638,12 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", NULL, "" ) );
-    //m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    //m_camera->SetName( "camera" );
     m_scenegraph.RegisterNode( m_camera );
     
     m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", m_ship, "ship" ) );
-    //m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    //m_camera2->SetName( "camera2" );
-    //m_camera2->SetRefBody( m_ship );
     m_scenegraph.RegisterNode( m_camera2 );
 
     m_head_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::HeadMovement, DrawSpace::Core::HeadMovement );
-    //m_head_mvt->Init( m_ship, 1.0, 8000.0, Vector( 0.0, 2.8, 11.4, 1.0 ) );
 
     m_head_mvt->Init( 1.0, 8000.0, Vector( 0.0, 25.0, 110.0, 1.0 ) );
     m_head_mvt->SetRefBody( m_ship );
@@ -1107,17 +654,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", m_ship, "ship" ) );
-    //m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    //m_camera3->SetName( "camera3" );
-    //m_camera3->SetRefBody( m_ship );
 
     m_scenegraph.RegisterNode( m_camera3 );
 
 
     m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera4", m_ship, "ship" ) );
-    //m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    //m_camera4->SetName( "camera4" );
-    //m_camera4->SetRefBody( m_ship );
     m_scenegraph.RegisterNode( m_camera4 );
 
 
@@ -1129,13 +670,10 @@ bool dsAppClient::OnIdleAppInit( void )
     m_camera3->LockOnBody( "ship", m_ship );
 
     m_camera4->RegisterMovement( "circular_mvt", m_circular_mvt );
-    m_camera4->LockOnBody( "cube", /*m_planet->GetOrbiter()*/ m_cube_body );
+    m_camera4->LockOnBody( "cube", m_cube_body );
 
 
     m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera5", m_planet->GetOrbiter(), "planet0" ) );
-    //m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    //m_camera5->SetName( "camera5" );
-    //m_camera5->SetRefBody( m_planet->GetOrbiter() );
 
     m_scenegraph.RegisterNode( m_camera5 );
 
@@ -1151,16 +689,13 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera6", m_planet->GetOrbiter(), "planet0" ) );
-    //m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    //m_camera6->SetName( "camera6" );
-    //m_camera6->SetRefBody( m_planet->GetOrbiter() );
 
     m_scenegraph.RegisterNode( m_camera6 );
 
     m_spectator_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::SpectatorMovement, DrawSpace::Core::SpectatorMovement );
 
     m_spectator_mvt->SetName( "spectator_camera" );
-    //m_spectator_mvt->Init( m_ship, 16.0, 8000, true );
+
     m_spectator_mvt->Init( 16.0, 8000, true );
     m_spectator_mvt->SetRefBody( m_ship );
 
@@ -1173,17 +708,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_camera7 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera7", m_cube_body, "cube_body" ) );
-    //m_camera7 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    //m_camera7->SetName( "camera7" );
-    //m_camera7->SetRefBody( m_cube_body );
     m_scenegraph.RegisterNode( m_camera7 );
 
 
 
     m_camera8 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera8", m_building_collider, "building" ) );
-    //m_camera8 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    //m_camera8->SetName( "camera8" );
-    //m_camera8->SetRefBody( m_building_collider );
     m_scenegraph.RegisterNode( m_camera8 );
 
     m_camera8->LockOnBody( "cube", m_cube_body );
@@ -1297,10 +826,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    //m_reticle_widget->LockOnBody( /*m_moon->GetOrbiter()*/ /*m_cube_body*/ m_building_collider );
 
-    m_reticle_widget->LockOnTransformNode( /*m_building*/ m_socle );
-    //m_reticle_widget->LockOnTransformNode( m_camera5 );
+    m_reticle_widget->LockOnTransformNode( m_socle );
 
 
     DrawSpace::Gui::ReticleWidget::ClippingParams clp;
@@ -1345,9 +872,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_calendar->RegisterOrbit( m_orbit2 );
 
 
-    m_scenegraph.SetCurrentCamera( "camera7" );
-
-    m_curr_camera = m_camera7;
+    
+    m_scenegraph.SetCurrentCamera( "camera2" );
+    m_curr_camera = m_camera2;
 
 
     
@@ -1413,16 +940,9 @@ bool dsAppClient::OnIdleAppInit( void )
     ///////////////////////////////////////////////////////////////
 
 
-
-    //m_camera5->LockOnBody( m_moon->GetOrbiter() );
-    //m_camera5->LockOnBody( m_ship );
     m_camera5->LockOnBody( "cube", m_cube_body );
 
 
-
-    /**/
-    //m_planet->GetDrawable()->SetCurrentPlanetBody( m_planet->GetPlanetBody() );
-    /**/
 
 
     //m_calendar->Startup( 162682566 );
@@ -1598,18 +1118,6 @@ void dsAppClient::OnKeyPulse( long p_key )
             m_calendar->SetTimeFactor( Calendar::SEC_1DAY_TIME );
             break;
 
-            /*
-        case VK_F8:
-            {
-
-                DrawSpace::SphericalLOD::Maps* maps = m_planet->GetDrawable()->GetBody()->GetFaceMapsFactory( DrawSpace::SphericalLOD::Patch::FrontPlanetFace );
-
-                dsreal alt = maps->GetAltFromLocalPoint( Vector( 0.499, 0.499, 0.0, 1.0 ) );
-
-            }
-
-            break;
-            */
 
         case VK_F9:
 
