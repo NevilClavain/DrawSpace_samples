@@ -525,10 +525,38 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ///////////////////////////////////////////////////////////////
 
-    /*
+    
     m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", 400.0 ) );
 
+    m_planet->RegisterPassSlot( "texture_pass" );
+    for( long i = 0; i < 6; i++ )
+    {
+        m_planet->GetNodeFromPass( "texture_pass", i )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+        m_planet->SetNodeFromPassSpecificFx( "texture_pass", i, "main_fx" );
 
+    }
+
+    m_planet_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Planetoid::Body>, SceneNode<DrawSpace::Planetoid::Body>( "planet01" ) );
+    m_planet_node->SetContent( m_planet );
+
+    m_scenenodegraph.RegisterNode( m_planet_node );
+
+    
+
+
+
+    m_planet_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 270000000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.333, 25.0, 1.0, /*m_centroid*/ NULL ) );
+    m_planet_orbit_node = _DRAWSPACE_NEW_( SceneNode<Orbit>, SceneNode<Orbit>( "planet01_orbit" ) );
+    m_planet_orbit_node->SetContent( m_planet_orbit );
+
+    m_scenenodegraph.AddNode( m_planet_orbit_node );
+    m_scenenodegraph.RegisterNode( m_planet_orbit_node );
+
+
+    m_planet_node->LinkTo( m_planet_orbit_node );
+
+
+    /*
     m_planet->GetDrawable()->RegisterPassSlot( "texture_pass" );
 
     for( long i = 0; i < 6; i++ )
@@ -537,11 +565,14 @@ bool dsAppClient::OnIdleAppInit( void )
         m_planet->GetDrawable()->SetNodeFromPassSpecificFx( "texture_pass", i, "main_fx" );
 
     }
-    m_scenegraph.RegisterNode( m_planet->GetDrawable() );
+    */
+    //m_scenegraph.RegisterNode( m_planet->GetDrawable() );
+
+
 
 
     
-
+    /*
     m_centroid = _DRAWSPACE_NEW_( Centroid, Centroid );
     m_centroid->SetOrbiter( m_planet->GetOrbiter() );
 
@@ -612,6 +643,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_ship_drawable_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "rocket" ) );
     m_ship_drawable_node->SetContent( m_ship_drawable );
+    m_ship_drawable_node->SetFlag( SCENENODE_FLAG_PLANETFRAGMENT_ALLOC | SCENENODE_FLAG_DLINKSCAN );
 
     m_scenenodegraph.RegisterNode( m_ship_drawable_node );
 
@@ -650,6 +682,7 @@ bool dsAppClient::OnIdleAppInit( void )
     //m_scenegraph.RegisterNode( m_camera2 );
     m_camera2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera2" ) );
     m_camera2_node->SetContent( m_camera2 );
+    m_camera2_node->SetFlag( SCENENODE_FLAG_PLANETFRAGMENT_ALLOC );
     m_scenenodegraph.RegisterNode( m_camera2_node );
 
 
@@ -682,6 +715,7 @@ bool dsAppClient::OnIdleAppInit( void )
     //m_scenegraph.RegisterNode( m_camera3 );
     m_camera3_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera3" ) );
     m_camera3_node->SetContent( m_camera3 );
+    m_camera3_node->SetFlag( SCENENODE_FLAG_PLANETFRAGMENT_ALLOC );
     m_scenenodegraph.RegisterNode( m_camera3_node );
 
 
@@ -995,6 +1029,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //m_scenegraph.RegisterCameraEvtHandler( m_planet->GetCameraEvtCb() );
     //m_scenegraph.RegisterCameraEvtHandler( m_moon->GetCameraEvtCb() );
+
+    m_scenenodegraph.RegisterCameraEvtHandler( m_planet->GetCameraEvtCb() );
+    m_scenenodegraph.RegisterNodesEvtHandler( m_planet->GetNodesEvtCb() );
 
     ///////////////////////////////////////////////////////////////
 

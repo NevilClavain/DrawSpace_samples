@@ -98,7 +98,17 @@ protected:
     DrawSpace::Dynamics::Calendar*              m_calendar;
 
 
-    //DrawSpace::Planetoid::Body*                 m_planet;
+    
+
+
+    DrawSpace::Dynamics::Orbit*                                         m_planet_orbit;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Orbit>*             m_planet_orbit_node;
+    
+    DrawSpace::Planetoid::Body*                                         m_planet;
+    DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>*             m_planet_node;
+
+
+
 
     //DrawSpace::Dynamics::Orbit*                 m_orbit;
     //DrawSpace::Dynamics::Centroid*              m_centroid;
