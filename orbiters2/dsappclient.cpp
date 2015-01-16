@@ -645,25 +645,61 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph.RegisterNode( m_camera_node );
 
 
-
-
     
-    //m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", m_ship, "ship" ) );
+    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", /*m_ship*/ NULL, /*"ship"*/ "" ) );
     //m_scenegraph.RegisterNode( m_camera2 );
+    m_camera2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera2" ) );
+    m_camera2_node->SetContent( m_camera2 );
+    m_scenenodegraph.RegisterNode( m_camera2_node );
 
-    //m_head_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::HeadMovement, DrawSpace::Core::HeadMovement );
 
-    //m_head_mvt->Init( 1.0, 8000.0, Vector( 0.0, 25.0, 110.0, 1.0 ) );
-    //m_head_mvt->SetRefBody( m_ship );
+
+
+
+
+    m_head_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::HeadMovement, DrawSpace::Core::HeadMovement );
+
+    m_head_mvt->Init( 1.0, 8000.0, Vector( 0.0, 25.0, 110.0, 1.0 ) );
+    m_head_mvt->SetRefBody( m_ship );
+
+    m_headmvt_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::HeadMovement>, SceneNode<DrawSpace::Core::HeadMovement>( "headmvt" ) );
+    m_headmvt_node->SetContent( m_head_mvt );
+    m_scenenodegraph.RegisterNode( m_headmvt_node );
+
+    m_camera2_node->LinkTo( m_headmvt_node );
+
+
+    m_headmvt_node->LinkTo( m_ship_node );
+
 
 
     //m_camera2->RegisterMovement( "headmvt", m_head_mvt );
 
 
 
-    //m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", m_ship, "ship" ) );
-
+    m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", m_ship, "ship" ) );
+    m_camera3->LockOnBody( "ship", m_ship );
     //m_scenegraph.RegisterNode( m_camera3 );
+    m_camera3_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera3" ) );
+    m_camera3_node->SetContent( m_camera3 );
+    m_scenenodegraph.RegisterNode( m_camera3_node );
+
+
+    m_circular_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
+    m_circular_mvt->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 385.0, 90.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
+
+    m_circmvt_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::CircularMovement>, SceneNode<DrawSpace::Core::CircularMovement>( "circmvt" ) );
+
+
+    m_circmvt_node->SetContent( m_circular_mvt );
+    m_scenenodegraph.RegisterNode( m_circmvt_node );
+
+    m_camera3_node->LinkTo( m_circmvt_node );
+
+
+    m_circmvt_node->LinkTo( m_ship_node );
+
+
 
 
     //m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera4", m_ship, "ship" ) );
@@ -896,8 +932,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     
     //m_scenegraph.SetCurrentCamera( "camera" );
-    m_scenenodegraph.SetCurrentCamera( "camera" );
-    m_curr_camera = m_camera;
+    m_scenenodegraph.SetCurrentCamera( "camera2" );
+    m_curr_camera = m_camera2;
 
 
     
@@ -1147,17 +1183,20 @@ void dsAppClient::OnKeyPulse( long p_key )
             if( m_curr_camera == m_camera )
             {
                 //m_scenegraph.SetCurrentCamera( "camera2" );
+                m_scenenodegraph.SetCurrentCamera( "camera2" );
                 m_curr_camera = m_camera2;
             }
 
             else if( m_curr_camera == m_camera2 )
             {
                 //m_scenegraph.SetCurrentCamera( "camera3" );
+                m_scenenodegraph.SetCurrentCamera( "camera3" );
                 m_curr_camera = m_camera3;
             }
             else if( m_curr_camera == m_camera3 )
             {
                 //m_scenegraph.SetCurrentCamera( "camera" );
+                m_scenenodegraph.SetCurrentCamera( "camera" );
                 m_curr_camera = m_camera;
             }
 

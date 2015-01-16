@@ -44,10 +44,16 @@ protected:
 
     
     DrawSpace::Dynamics::CameraPoint*           m_camera2;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera2_node;
+
     DrawSpace::Core::HeadMovement*              m_head_mvt;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::HeadMovement>*          m_headmvt_node;
 
     DrawSpace::Dynamics::CameraPoint*           m_camera3;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera3_node;
+
     DrawSpace::Core::CircularMovement*          m_circular_mvt;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::CircularMovement>*          m_circmvt_node;
 
     //DrawSpace::Dynamics::CameraPoint*           m_camera4;
 
