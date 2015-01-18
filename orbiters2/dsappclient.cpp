@@ -957,10 +957,11 @@ bool dsAppClient::OnIdleAppInit( void )
     m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer ) );
 
     m_calendar->RegisterWorld( &m_world );
-    //m_calendar->RegisterWorld( m_planet->GetWorld() );
+    m_calendar->RegisterWorld( m_planet->GetWorld() );
     //m_calendar->RegisterWorld( m_moon->GetWorld() );
 
-    //m_calendar->RegisterOrbit( m_orbit );
+    m_calendar->RegisterOrbit( m_planet_orbit );
+    m_calendar->RegisterOrbiter( m_planet );
     //m_calendar->RegisterOrbit( m_orbit2 );
 
 
