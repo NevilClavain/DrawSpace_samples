@@ -643,7 +643,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_ship_drawable_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "rocket" ) );
     m_ship_drawable_node->SetContent( m_ship_drawable );
-    m_ship_drawable_node->SetFlag( SCENENODE_FLAG_PLANETFRAGMENT_ALLOC | SCENENODE_FLAG_DLINKSCAN );
+    
 
     m_scenenodegraph.RegisterNode( m_ship_drawable_node );
 
@@ -656,9 +656,7 @@ bool dsAppClient::OnIdleAppInit( void )
     cube_params.initial_attitude.Translation( 265000000.0, 0.0, 0.0 );
 
     m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, /*m_ship_drawable*/ NULL, cube_params ) );
-
-
-
+   
     m_ship_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::Rocket>, SceneNode<DrawSpace::Dynamics::Rocket>( "rocket_body" ) );
     m_ship_node->SetContent( m_ship );
 
@@ -670,7 +668,7 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
 
-    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", NULL, "" ) );
+    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", NULL, "" ) );    
     //m_scenegraph.RegisterNode( m_camera );
     m_camera_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera" ) );
     m_camera_node->SetContent( m_camera );
@@ -679,10 +677,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
     
     m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", /*m_ship*/ NULL, /*"ship"*/ "" ) );
+    m_camera2->SetReferentBody( m_ship );
     //m_scenegraph.RegisterNode( m_camera2 );
     m_camera2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera2" ) );
     m_camera2_node->SetContent( m_camera2 );
-    m_camera2_node->SetFlag( SCENENODE_FLAG_PLANETFRAGMENT_ALLOC );
+
     m_scenenodegraph.RegisterNode( m_camera2_node );
 
 
@@ -712,10 +711,10 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", m_ship, "ship" ) );
     m_camera3->LockOnBody( "ship", m_ship );
+    m_camera3->SetReferentBody( m_ship );
     //m_scenegraph.RegisterNode( m_camera3 );
     m_camera3_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera3" ) );
     m_camera3_node->SetContent( m_camera3 );
-    m_camera3_node->SetFlag( SCENENODE_FLAG_PLANETFRAGMENT_ALLOC );
     m_scenenodegraph.RegisterNode( m_camera3_node );
 
 
