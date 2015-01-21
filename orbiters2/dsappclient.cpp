@@ -1030,8 +1030,9 @@ bool dsAppClient::OnIdleAppInit( void )
     //m_scenegraph.RegisterCameraEvtHandler( m_planet->GetCameraEvtCb() );
     //m_scenegraph.RegisterCameraEvtHandler( m_moon->GetCameraEvtCb() );
 
-    m_scenenodegraph.RegisterCameraEvtHandler( m_planet->GetCameraEvtCb() );
+    
     m_scenenodegraph.RegisterNodesEvtHandler( m_planet->GetNodesEvtCb() );
+    m_scenenodegraph.RegisterCameraEvtHandler( m_planet->GetCameraEvtCb() );
 
     ///////////////////////////////////////////////////////////////
 
