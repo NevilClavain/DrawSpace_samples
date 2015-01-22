@@ -525,6 +525,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ///////////////////////////////////////////////////////////////
 
+
+
+
     
     m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", 400.0 ) );
 
@@ -536,6 +539,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
     }
 
+    m_planet->SetOrbitDuration( 0.333 );
+    m_planet->SetRevolutionTiltAngle( 25.0 );
+    m_planet->SetRevolutionDuration( 1.0 );
+
+
     m_planet_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Planetoid::Body>, SceneNode<DrawSpace::Planetoid::Body>( "planet01" ) );
     m_planet_node->SetContent( m_planet );
 
@@ -545,7 +553,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_planet_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 270000000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.333, 25.0, 1.0, /*m_centroid*/ NULL ) );
+    m_planet_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 270000000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.333, 25.0, 1.0, NULL ) );
     m_planet_orbit_node = _DRAWSPACE_NEW_( SceneNode<Orbit>, SceneNode<Orbit>( "planet01_orbit" ) );
     m_planet_orbit_node->SetContent( m_planet_orbit );
 
@@ -554,6 +562,12 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_planet_node->LinkTo( m_planet_orbit_node );
+
+    
+
+
+
+
 
 
     /*
@@ -1026,13 +1040,8 @@ bool dsAppClient::OnIdleAppInit( void )
     //m_moon->RegisterCameraPoint( m_camera6 );
     
 
-
-    //m_scenegraph.RegisterCameraEvtHandler( m_planet->GetCameraEvtCb() );
-    //m_scenegraph.RegisterCameraEvtHandler( m_moon->GetCameraEvtCb() );
-
-    
-    m_scenenodegraph.RegisterNodesEvtHandler( m_planet->GetNodesEvtCb() );
-    m_scenenodegraph.RegisterCameraEvtHandler( m_planet->GetCameraEvtCb() );
+        
+    m_planet->RegisterScenegraphCallbacks( m_scenenodegraph );
 
     ///////////////////////////////////////////////////////////////
 
