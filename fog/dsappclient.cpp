@@ -463,11 +463,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_cube2_collider->SetKinematic( cube2_params );
     m_cube2_collider->AddToWorld( &m_world );
 
-    /*
-    Matrix local_pos;
-    local_pos.Translation( 0.0, -1.5, 0.0 );
-    m_cube2_collider->SetBaseTransform( local_pos );
-    */
 
     m_cube2_colider_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::Collider>, SceneNode<DrawSpace::Dynamics::Collider>( "cube2_body" ) );
     m_cube2_colider_node->SetContent( m_cube2_collider );

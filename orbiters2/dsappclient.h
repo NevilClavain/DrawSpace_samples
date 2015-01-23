@@ -73,10 +73,12 @@ protected:
 
     //DrawSpace::Core::LongLatMovement*           m_longlat_mvt2;
 
-    //DrawSpace::Core::LongLatMovement*           m_longlat_mvt3;
+    DrawSpace::Core::LongLatMovement*           m_longlat_mvt3;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*          m_longlatmvt3_node;
 
 
-    //DrawSpace::Core::LongLatMovement*           m_longlat_mvt4;
+    DrawSpace::Core::LongLatMovement*           m_longlat_mvt4;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*          m_longlatmvt4_node;
 
 
     DrawSpace::Dynamics::CameraPoint*           m_curr_camera;
@@ -134,20 +136,25 @@ protected:
     //DrawSpace::Chunk*                           m_chunk;
 
 
-    //DrawSpace::Chunk*                           m_building;
-    //DrawSpace::Dynamics::Collider*              m_building_collider;
+    DrawSpace::Chunk*                           m_building;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                    m_building_node;
+    
+    DrawSpace::Dynamics::Collider*              m_building_collider;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Collider>*                    m_building_collider_node;
 
-    //DrawSpace::Chunk*                           m_socle;
-    //DrawSpace::Dynamics::Collider*              m_socle_collider;
+    DrawSpace::Chunk*                           m_socle;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                    m_socle_node;
+    DrawSpace::Dynamics::Collider*              m_socle_collider;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Collider>*                    m_socle_collider_node;
 
 
 
     ///////////////////////////////////////////////////////////
 
 
-    //DrawSpace::Gui::ReticleWidget*              m_reticle_widget;
-    //DrawSpace::Gui::TextWidget*                 m_text_widget;
-    //DrawSpace::Gui::TextWidget*                 m_text_widget_2;
+    DrawSpace::Gui::ReticleWidget*              m_reticle_widget;
+    DrawSpace::Gui::TextWidget*                 m_text_widget;
+    DrawSpace::Gui::TextWidget*                 m_text_widget_2;
 
 
 

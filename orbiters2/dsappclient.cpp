@@ -98,15 +98,15 @@ void dsAppClient::OnRenderFrame( void )
     //////////////////////////////////////////////////////////////
 
     
-    //m_text_widget->SetVirtualTranslation( 100, 75 );
-    //m_text_widget_2->SetVirtualTranslation( -60, 160 );
+    m_text_widget->SetVirtualTranslation( 100, 75 );
+    m_text_widget_2->SetVirtualTranslation( -60, 160 );
 
-    //char distance[64];
-    //sprintf( distance, "%.3f km", m_reticle_widget->GetLastDistance() / 1000.0 );
+    char distance[64];
+    sprintf( distance, "%.3f km", m_reticle_widget->GetLastDistance() / 1000.0 );
 
-    //m_text_widget_2->SetText( -40, 0, 30, dsstring( distance ), DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
-    //m_reticle_widget->Transform();
-    //m_reticle_widget->Draw();
+    m_text_widget_2->SetText( -40, 0, 30, dsstring( distance ), DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
+    m_reticle_widget->Transform();
+    m_reticle_widget->Draw();
     
 
     //////////////////////////////////////////////////////////////
@@ -203,9 +203,10 @@ void dsAppClient::OnRenderFrame( void )
             renderer->DrawText( 0, 255, 0, 10, 270, "Altitude = %.2f m", cam_infos.altitud );
         }
     }
-
+*/
     renderer->DrawText( 0, 255, 0, 10, 300, "reticle distance = %f", m_reticle_widget->GetLastDistance() );
 
+    /*
     if( m_curr_camera == m_camera5 || m_curr_camera == m_camera4 )
     {
         renderer->DrawText( 0, 255, 0, 10, 320, "locked object distance = %f", m_curr_camera->GetLockedObjectDistance() );
@@ -415,7 +416,7 @@ bool dsAppClient::OnIdleAppInit( void )
     ///////////////////////////////////////////////////////////////
 
 
-    /*
+    
     m_building = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
     m_building->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
@@ -443,35 +444,51 @@ bool dsAppClient::OnIdleAppInit( void )
     m_building->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
     m_building->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "building3.bmp" ) ), 0 );
-
-
-
-
-
-
     m_building->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
-    m_scenegraph.RegisterNode( m_building );
+
+    m_building_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "building" ) );
+    m_building_node->SetContent( m_building );
 
 
+    m_scenenodegraph.RegisterNode( m_building_node );
   
     
     DrawSpace::Dynamics::Body::Parameters bld_params;
     bld_params.mass = 0.0;
     bld_params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
     bld_params.shape_descr.meshe = *( m_building->GetMeshe() );
-
-
    
-    m_building_collider = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Collider, DrawSpace::Dynamics::Collider( m_building ) );
+    m_building_collider = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Collider, DrawSpace::Dynamics::Collider( /*m_building*/ NULL ) );
 
     m_building_collider->SetKinematic( bld_params );
+
+
+
+    m_building_collider_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::Collider>, SceneNode<DrawSpace::Dynamics::Collider>( "building_collider" ) );
+    m_building_collider_node->SetContent( m_building_collider );
+
+    m_scenenodegraph.RegisterNode( m_building_collider_node );
+
+    m_building_node->LinkTo( m_building_collider_node );
+
+
+
+    m_longlat_mvt3 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    m_longlat_mvt3->Init( -21.0000, 20.0089, 400114.0, 80.0, 0.0 );
+
+    m_longlatmvt3_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LongLatMovement>, SceneNode<DrawSpace::Core::LongLatMovement>( "longlatmvt3_node" ) );
+    m_longlatmvt3_node->SetContent( m_longlat_mvt3 );
+
+    m_scenenodegraph.RegisterNode( m_longlatmvt3_node );
+
+    m_building_collider_node->LinkTo( m_longlatmvt3_node );
     
-    */
+    
 
     ///////////////////////////////////////////////////////////////
 
-/*
+
     m_socle = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
     m_socle->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
@@ -500,14 +517,15 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_socle->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "socle.bmp" ) ), 0 );
 
-
-
-
-
-
     m_socle->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
-    m_scenegraph.RegisterNode( m_socle );
+
+    m_socle_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "socle" ) );
+    m_socle_node->SetContent( m_socle );
+
+
+    m_scenenodegraph.RegisterNode( m_socle_node );
+
     
   
     
@@ -518,10 +536,33 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
    
-    m_socle_collider = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Collider, DrawSpace::Dynamics::Collider( m_socle ) );
+    m_socle_collider = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Collider, DrawSpace::Dynamics::Collider( /*m_socle*/ NULL ) );
 
     m_socle_collider->SetKinematic( socle_params );
-*/
+
+
+    m_socle_collider_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::Collider>, SceneNode<DrawSpace::Dynamics::Collider>( "socle_collider" ) );
+    m_socle_collider_node->SetContent( m_socle_collider );
+
+    m_scenenodegraph.RegisterNode( m_socle_collider_node );
+
+    m_socle_node->LinkTo( m_socle_collider_node );
+
+
+
+    m_longlat_mvt4 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    m_longlat_mvt4->Init( -21.0929, 20.0000, 400129.0, 40.0, 0.0 );
+
+
+
+    m_longlatmvt4_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LongLatMovement>, SceneNode<DrawSpace::Core::LongLatMovement>( "longlatmvt4_node" ) );
+    m_longlatmvt4_node->SetContent( m_longlat_mvt4 );
+
+    m_scenenodegraph.RegisterNode( m_longlatmvt4_node );
+
+    m_socle_collider_node->LinkTo( m_longlatmvt4_node );
+
+
 
     ///////////////////////////////////////////////////////////////
 
@@ -550,7 +591,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph.RegisterNode( m_planet_node );
 
     
-
+    m_longlatmvt3_node->LinkTo( m_planet_node );
+    m_longlatmvt4_node->LinkTo( m_planet_node );
 
 
     m_planet_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 270000000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.333, 25.0, 1.0, NULL ) );
@@ -566,7 +608,8 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
 
-
+    m_building_collider->SetReferentOrbiter( m_planet );
+    m_socle_collider->SetReferentOrbiter( m_planet );
 
 
 
@@ -817,11 +860,11 @@ bool dsAppClient::OnIdleAppInit( void )
     ///////////////////////////////////////////////////////////////
 
 
-    //m_reticle_widget = _DRAWSPACE_NEW_( ReticleWidget, ReticleWidget( "reticle_widget", (long)10, (long)10, &m_scenegraph, NULL ) );
+    m_reticle_widget = _DRAWSPACE_NEW_( ReticleWidget, ReticleWidget( "reticle_widget", (long)10, (long)10, /*&m_scenegraph,*/ &m_scenenodegraph, NULL ) );
     
 
 
-    /*
+    
     m_text_widget = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget", DRAWSPACE_GUI_WIDTH, DRAWSPACE_GUI_HEIGHT, m_font, true, m_reticle_widget ) );
 
 
@@ -868,13 +911,13 @@ bool dsAppClient::OnIdleAppInit( void )
     m_text_widget->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
 
     m_text_widget->RegisterToPass( m_finalpass );
-    */
+    
 
 
 
 
 
-    /*
+    
 
     m_text_widget_2 = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget_2", 1200, 360, m_font, false, m_text_widget ) );
     
@@ -908,7 +951,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_text_widget_2->RegisterToPass( m_finalpass );
 
-    */
+    
 
 
 
@@ -924,7 +967,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //m_reticle_widget->LockOnTransformNode( m_socle );
 
-    /*
+    m_reticle_widget->LockOnTransformNode( m_building );
+
+    
     DrawSpace::Gui::ReticleWidget::ClippingParams clp;
     clp.clipping_policy = DrawSpace::Gui::ReticleWidget::CLIPPING_HOLD;
     clp.xmin = -0.5;
@@ -938,7 +983,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_mouse_input.RegisterWidget( m_reticle_widget );
-    */
+    
 
 
     ///////////////////////////////////////////////////////////////
