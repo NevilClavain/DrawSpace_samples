@@ -766,7 +766,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", m_ship, "ship" ) );
+    m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", /*m_ship*/ NULL, /*"ship"*/ "" ) );
     m_camera3->LockOnBody( "ship", m_ship );
     m_camera3->SetReferentBody( m_ship );
     //m_scenegraph.RegisterNode( m_camera3 );
@@ -809,19 +809,50 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
 
-    //m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera5", m_planet->GetOrbiter(), "planet0" ) );
+    m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera5", NULL, "" ) );
+
+    m_camera5->SetReferentBody( m_planet );
+    m_camera5_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera5" ) );
+    m_camera5_node->SetContent( m_camera5 );
+
+    m_scenenodegraph.RegisterNode( m_camera5_node );
 
     //m_scenegraph.RegisterNode( m_camera5 );
 
-    //m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    //m_longlat_mvt->Init( -21.0, 20.0, 400000.5, 0.0, 0.0 );
+    m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    m_longlat_mvt->Init( -21.0, 20.0, 400000.5, 0.0, 0.0 );
     //m_camera5->RegisterLongLatMovement( "longlatmvt", m_longlat_mvt );
 
-    //m_circular_mvt2 = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
-    //m_circular_mvt2->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 25.0, 0.9, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
-    //m_camera5->RegisterMovement( "circular_mvt2", m_circular_mvt2 );
-    //m_circular_mvt2->SetAngularSpeed( 25.0 );
+
+
+    m_longlatmvt_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LongLatMovement>, SceneNode<DrawSpace::Core::LongLatMovement>( "longlatmvt_node" ) );
+    m_longlatmvt_node->SetContent( m_longlat_mvt );
+
+    m_scenenodegraph.RegisterNode( m_longlatmvt_node );
+
     
+
+
+
+
+
+
+    m_circular_mvt2 = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
+    m_circular_mvt2->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 25.0, 0.9, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
+    //m_camera5->RegisterMovement( "circular_mvt2", m_circular_mvt2 );
+    m_circular_mvt2->SetAngularSpeed( 25.0 );
+
+
+    m_circmvt2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::CircularMovement>, SceneNode<DrawSpace::Core::CircularMovement>( "circularmvt2_node" ) );
+    m_circmvt2_node->SetContent( m_circular_mvt2 );
+
+    m_scenenodegraph.RegisterNode( m_circmvt2_node );
+
+    
+    m_camera5_node->LinkTo( m_circmvt2_node );
+    m_circmvt2_node->LinkTo( m_longlatmvt_node );
+    m_longlatmvt_node->LinkTo( m_planet_node );
+
 
 
     //m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera6", m_planet->GetOrbiter(), "planet0" ) );
@@ -1288,9 +1319,15 @@ void dsAppClient::OnKeyPulse( long p_key )
             else if( m_curr_camera == m_camera3 )
             {
                 //m_scenegraph.SetCurrentCamera( "camera" );
+                m_scenenodegraph.SetCurrentCamera( "camera5" );
+                m_curr_camera = m_camera5;
+            }
+            else if( m_curr_camera == m_camera5 )
+            {
                 m_scenenodegraph.SetCurrentCamera( "camera" );
                 m_curr_camera = m_camera;
             }
+
 
             /*
             else if( m_curr_camera == m_camera3 )
