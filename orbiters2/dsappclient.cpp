@@ -60,10 +60,11 @@ void dsAppClient::OnRenderFrame( void )
     m_spacebox->SetLocalTransform( sbtrans );
 
        
-    Matrix origin;
-    origin.Identity();
+    Matrix cam5_roty;
 
-    //m_orbit->OrbitStep( origin );
+    cam5_roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0 ), Maths::DegToRad( 90.0 ) );
+    //m_camera5->SetLocalTransform( cam5_roty );
+
 
 
     //m_planet->ApplyGravity();
@@ -369,38 +370,45 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
 
-    /*
-    m_chunk = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
-
-    m_chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
-
-    m_chunk->RegisterPassSlot( "texture_pass" );
-    m_chunk->SetRenderer( renderer );
-
-    m_chunk->SetSceneName( "box" );
     
-    m_chunk->GetMeshe()->SetImporter( m_meshe_import );
+    m_cube = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
-    m_chunk->GetMeshe()->LoadFromFile( "object.ac", 0 );    
+    m_cube->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
-    m_chunk->GetNodeFromPass( "texture_pass" )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_cube->RegisterPassSlot( "texture_pass" );
+    m_cube->SetRenderer( renderer );
 
-    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-    m_chunk->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_cube->SetSceneName( "cube" );
+    
+    m_cube->GetMeshe()->SetImporter( m_meshe_import );
 
-    m_chunk->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "tex07.jpg" ) ), 0 );
+    m_cube->GetMeshe()->LoadFromFile( "object.ac", 0 );    
+
+    m_cube->GetNodeFromPass( "texture_pass" )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_cube->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_cube->GetNodeFromPass( "texture_pass" )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_cube->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_cube->GetNodeFromPass( "texture_pass" )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_cube->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_cube->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_cube->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_cube->GetNodeFromPass( "texture_pass" )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    m_cube->GetNodeFromPass( "texture_pass" )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "tex07.jpg" ) ), 0 );
 
 
 
-    m_chunk->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
+    m_cube->GetNodeFromPass( "texture_pass" )->GetTexture( 0 )->LoadFromFile();
 
-    m_scenegraph.RegisterNode( m_chunk );
+    //m_scenegraph.RegisterNode( m_chunk );
+
+    m_cube_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "cube_node" ) );
+    m_cube_node->SetContent( m_cube );
+
+
+    m_scenenodegraph.RegisterNode( m_cube_node );
+
 
 
     
@@ -410,8 +418,29 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, m_chunk, cube_params ) );
-    */
+    m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, /*m_chunk*/ NULL, cube_params ) );
+    
+    m_cube_body_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::InertBody>, SceneNode<DrawSpace::Dynamics::InertBody>( "cube_body_node" ) );
+
+    m_cube_body_node->SetContent( m_cube_body );
+
+    m_scenenodegraph.AddNode( m_cube_body_node );
+    m_scenenodegraph.RegisterNode( m_cube_body_node );
+
+    m_cube_node->LinkTo( m_cube_body_node );
+
+
+    m_longlat_mvt2 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    m_longlat_mvt2->Init( -21.0000, 20.000, 400014.5, 0.0, 0.0 );
+    m_longlat_mvt2->Compute( m_timer );
+    Matrix llres;
+    m_longlat_mvt2->GetResult( llres );
+
+
+    m_cube_body->SetDynamicLinkInitState( true );
+    m_cube_body->SetDynamicLinkInitialMatrix( llres );
+
+
 
     ///////////////////////////////////////////////////////////////
 
@@ -1055,10 +1084,12 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     
-    //m_scenegraph.SetCurrentCamera( "camera" );
-    m_scenenodegraph.SetCurrentCamera( "camera2" );
-    m_curr_camera = m_camera2;
+    
+    //m_scenenodegraph.SetCurrentCamera( "camera2" );
+    //m_curr_camera = m_camera2;
 
+    m_scenenodegraph.SetCurrentCamera( "camera5" );
+    m_curr_camera = m_camera5;
 
     
 
@@ -1122,7 +1153,7 @@ bool dsAppClient::OnIdleAppInit( void )
     ///////////////////////////////////////////////////////////////
 
 
-    //m_camera5->LockOnBody( "cube", m_cube_body );
+    m_camera5->LockOnBody( "cube", m_cube_body );
 
 
 

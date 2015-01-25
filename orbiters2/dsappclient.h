@@ -74,7 +74,7 @@ protected:
     //DrawSpace::Dynamics::CameraPoint*           m_camera8;
 
 
-    //DrawSpace::Core::LongLatMovement*           m_longlat_mvt2;
+    DrawSpace::Core::LongLatMovement*           m_longlat_mvt2;
 
     DrawSpace::Core::LongLatMovement*           m_longlat_mvt3;
     DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*          m_longlatmvt3_node;
@@ -135,8 +135,11 @@ protected:
     DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                    m_ship_drawable_node;
 
 
-    //DrawSpace::Dynamics::InertBody*             m_cube_body;
-    //DrawSpace::Chunk*                           m_chunk;
+    DrawSpace::Dynamics::InertBody*             m_cube_body;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>*             m_cube_body_node;
+    DrawSpace::Chunk*                           m_cube;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                    m_cube_node;
+
 
 
     DrawSpace::Chunk*                           m_building;
