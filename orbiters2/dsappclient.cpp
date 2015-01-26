@@ -59,12 +59,7 @@ void dsAppClient::OnRenderFrame( void )
     //m_scenegraph.SetNodeLocalTransformation( "spacebox", sbtrans );
     m_spacebox->SetLocalTransform( sbtrans );
 
-       
-    Matrix cam5_roty;
-
-    cam5_roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0 ), Maths::DegToRad( 90.0 ) );
-    //m_camera5->SetLocalTransform( cam5_roty );
-
+      
 
 
     //m_planet->ApplyGravity();
@@ -1154,6 +1149,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_camera5->LockOnBody( "cube", m_cube_body );
+    //m_camera5->LockOnTransformNode( "cube", m_cube );
 
 
 
