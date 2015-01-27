@@ -14,7 +14,6 @@ protected:
 
     static dsAppClient*                         m_instance;
 
-    //DrawSpace::Scenegraph                       m_scenegraph;
     DrawSpace::Core::SceneNodeGraph             m_scenenodegraph;
 
 
@@ -52,11 +51,12 @@ protected:
     DrawSpace::Dynamics::CameraPoint*           m_camera3;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera3_node;
 
+    DrawSpace::Dynamics::CameraPoint*           m_camera4;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera4_node;
+
+
     DrawSpace::Core::CircularMovement*          m_circular_mvt;
     DrawSpace::Core::SceneNode<DrawSpace::Core::CircularMovement>*          m_circmvt_node;
-
-    //DrawSpace::Dynamics::CameraPoint*           m_camera4;
-
 
     DrawSpace::Dynamics::CameraPoint*           m_camera5;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera5_node;
@@ -66,12 +66,19 @@ protected:
     DrawSpace::Core::SceneNode<DrawSpace::Core::CircularMovement>*          m_circmvt2_node;
 
 
-    //DrawSpace::Dynamics::CameraPoint*           m_camera6;
-    //DrawSpace::Core::SpectatorMovement*         m_spectator_mvt;
+    DrawSpace::Dynamics::CameraPoint*           m_camera6;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera6_node;
+
+    DrawSpace::Core::SpectatorMovement*         m_spectator_mvt;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::SpectatorMovement>*          m_spectmvt_node;
 
 
-    //DrawSpace::Dynamics::CameraPoint*           m_camera7;
-    //DrawSpace::Dynamics::CameraPoint*           m_camera8;
+    DrawSpace::Dynamics::CameraPoint*           m_camera7;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera7_node;
+
+    DrawSpace::Dynamics::CameraPoint*           m_camera8;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera8_node;
+
 
 
     DrawSpace::Core::LongLatMovement*           m_longlat_mvt2;
@@ -114,17 +121,13 @@ protected:
 
 
 
-
-    //DrawSpace::Dynamics::Orbit*                 m_orbit;
-    //DrawSpace::Dynamics::Centroid*              m_centroid;
-
-
-    //DrawSpace::Planetoid::Body*                 m_moon;
-
+    DrawSpace::Dynamics::Orbit*                                         m_moon_orbit;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Orbit>*             m_moon_orbit_node;
+    
+    DrawSpace::Planetoid::Body*                                         m_moon;
+    DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>*             m_moon_node;
 
 
-    //DrawSpace::Dynamics::Orbit*                 m_orbit2;
-    //DrawSpace::Dynamics::Centroid*              m_centroid2;
 
 
     DrawSpace::Dynamics::Rocket*                m_ship;
