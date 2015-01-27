@@ -53,11 +53,6 @@ void dsAppClient::OnRenderFrame( void )
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
 
-    
-    DrawSpace::Utils::Matrix sbtrans;
-    sbtrans.Scale( 20.0, 20.0, 20.0 );   
-    m_spacebox->SetLocalTransform( sbtrans );
-
       
 
     //Matrix cam7_pos;
@@ -319,8 +314,22 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Spacebox>, SceneNode<DrawSpace::Spacebox>( "spacebox" ) );
     m_spacebox_node->SetContent( m_spacebox );
 
-    m_scenenodegraph.AddNode( m_spacebox_node );
+    //m_scenenodegraph.AddNode( m_spacebox_node );
     m_scenenodegraph.RegisterNode( m_spacebox_node );
+
+
+
+    m_spacebox_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "spacebox_transfo" ) );
+    m_spacebox_transfo_node->SetContent( _DRAWSPACE_NEW_( DrawSpace::Core::Transformation, DrawSpace::Core::Transformation ) );
+
+    m_scenenodegraph.AddNode( m_spacebox_transfo_node );
+    m_scenenodegraph.RegisterNode( m_spacebox_transfo_node );
+
+    m_spacebox_node->LinkTo( m_spacebox_transfo_node );
+
+    Matrix sbscale;
+    sbscale.Scale( 20.0, 20.0, 20.0 );
+    m_spacebox_transfo_node->GetContent()->PushMatrix( sbscale );
 
     
 

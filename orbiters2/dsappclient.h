@@ -40,6 +40,9 @@ protected:
     DrawSpace::Spacebox*                        m_spacebox;
     DrawSpace::Core::SceneNode<DrawSpace::Spacebox>*                    m_spacebox_node;
 
+    
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_spacebox_transfo_node;
+
 
     
     DrawSpace::Dynamics::CameraPoint*           m_camera2;
