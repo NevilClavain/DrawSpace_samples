@@ -54,9 +54,9 @@ void dsAppClient::OnRenderFrame( void )
 
 
     
-    DrawSpace::Utils::Matrix sbtrans;
-    sbtrans.Scale( 20.0, 20.0, 20.0 );   
-    m_spacebox->SetLocalTransform( sbtrans );
+    //DrawSpace::Utils::Matrix sbtrans;
+    //sbtrans.Scale( 20.0, 20.0, 20.0 );   
+    //m_spacebox->SetLocalTransform( sbtrans );
 
       
 
@@ -319,8 +319,21 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Spacebox>, SceneNode<DrawSpace::Spacebox>( "spacebox" ) );
     m_spacebox_node->SetContent( m_spacebox );
 
-    m_scenenodegraph.AddNode( m_spacebox_node );
     m_scenenodegraph.RegisterNode( m_spacebox_node );
+
+
+    m_spacebox_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "spacebox_transfo" ) );
+    m_spacebox_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+    Matrix spacebox_scale;
+    spacebox_scale.Scale( 20.0, 20.0, 20.0 );
+    m_spacebox_transfo_node->GetContent()->PushMatrix( spacebox_scale );
+
+    m_scenenodegraph.AddNode( m_spacebox_transfo_node );
+    m_scenenodegraph.RegisterNode( m_spacebox_transfo_node );
+
+
+    m_spacebox_node->LinkTo( m_spacebox_transfo_node );
+
 
     
 
@@ -872,7 +885,18 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph.RegisterNode( m_camera7_node );
 
 
-    m_camera7_node->LinkTo( m_cube_body_node );
+
+    m_camera7_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "cam7_transfo" ) );
+    m_camera7_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+    Matrix cam7_pos;
+    cam7_pos.Translation( 0.0, 0.0, 4.0 );
+    m_camera7_transfo_node->GetContent()->PushMatrix( cam7_pos );
+
+    
+    m_scenenodegraph.RegisterNode( m_camera7_transfo_node );
+
+    m_camera7_transfo_node->LinkTo( m_cube_body_node );
+    m_camera7_node->LinkTo( m_camera7_transfo_node );
 
 
 
@@ -889,7 +913,21 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph.RegisterNode( m_camera8_node );
 
 
-    m_camera8_node->LinkTo( m_building_collider_node );
+    //m_camera8_node->LinkTo( m_building_collider_node );
+
+
+    m_camera8_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "cam8_transfo" ) );
+    m_camera8_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+    Matrix cam8_pos;
+    cam8_pos.Translation( 0.0, 130.0, 0.0 );
+    m_camera8_transfo_node->GetContent()->PushMatrix( cam8_pos );
+
+    
+    m_scenenodegraph.RegisterNode( m_camera8_transfo_node );
+
+    m_camera8_transfo_node->LinkTo( m_building_collider_node );
+    m_camera8_node->LinkTo( m_camera8_transfo_node );
+
     
 
 

@@ -40,6 +40,8 @@ protected:
     DrawSpace::Spacebox*                        m_spacebox;
     DrawSpace::Core::SceneNode<DrawSpace::Spacebox>*                    m_spacebox_node;
 
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_spacebox_transfo_node;
+
 
     
     DrawSpace::Dynamics::CameraPoint*           m_camera2;
@@ -76,8 +78,12 @@ protected:
     DrawSpace::Dynamics::CameraPoint*           m_camera7;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera7_node;
 
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_camera7_transfo_node;
+
     DrawSpace::Dynamics::CameraPoint*           m_camera8;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera8_node;
+
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_camera8_transfo_node;
 
 
 
