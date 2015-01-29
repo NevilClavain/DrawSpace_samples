@@ -1305,6 +1305,18 @@ void dsAppClient::OnKeyPulse( long p_key )
             break;
 
 
+        case VK_F8:
+            {
+                Matrix mat;   
+                mat.Translation( 265000000.0, 0.0, 0.0 );
+                m_ship->ForceInitialAttitude( mat );
+
+
+            }
+
+            break;
+
+
         case VK_F9:
 
             if( m_curr_camera == m_camera )
