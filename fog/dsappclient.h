@@ -84,6 +84,9 @@ protected:
 
     dsstring                                                            m_current_camera;
 
+
+    bool                                                                m_draw_cube2;
+
     dsAppClient( void );
 
 public:

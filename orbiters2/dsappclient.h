@@ -180,6 +180,9 @@ protected:
     WidgetEventHandler*                         m_mouseleftbuttondown_eventhandler;
 
 
+    bool                                        m_draw_spacebox;
+
+
     void on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget );
 
 

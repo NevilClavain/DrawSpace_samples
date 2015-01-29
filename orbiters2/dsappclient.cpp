@@ -27,7 +27,8 @@ m_mouselb( false ),
 m_mouserb( false ), 
 m_speed( 0.0 ), 
 m_speed_speed( 5.0 ),
-m_curr_camera( NULL )
+m_curr_camera( NULL ),
+m_draw_spacebox( true )
 {    
     _INIT_LOGGER( "orbiters2.conf" )  
     m_w_title = "orbiters 2 test";
@@ -1286,6 +1287,21 @@ void dsAppClient::OnKeyPulse( long p_key )
         case VK_F6:
 
             m_calendar->SetTimeFactor( Calendar::SEC_1DAY_TIME );
+            break;
+
+        case VK_F7:
+
+            if( m_draw_spacebox )
+            {
+                m_draw_spacebox = false;
+            }
+            else
+            {
+                m_draw_spacebox = true;
+            }
+
+            m_spacebox->SetDrawingState( "texture_pass", m_draw_spacebox );
+
             break;
 
 
