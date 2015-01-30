@@ -12,7 +12,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_draw_cube2( true )
 {    
     _INIT_LOGGER( "fog.conf" )  
     m_w_title = "fog test";
@@ -25,10 +25,6 @@ dsAppClient::~dsAppClient( void )
 
 void dsAppClient::OnRenderFrame( void )
 {
-    Matrix pos;
-    pos.Translation( 2.0, 2.0, 0.0 );
-
-    //m_cube2->SetLocalTransform( pos );
 
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -592,6 +588,22 @@ void dsAppClient::OnKeyPulse( long p_key )
 
             m_scenenodegraph.SetCurrentCamera( m_current_camera );
 
+            break;
+
+        case VK_F2:
+
+            if( m_draw_cube2 )
+            {
+                m_draw_cube2 = false;
+
+
+            }
+            else
+            {
+                m_draw_cube2 = true;
+            }
+
+            m_cube2->SetDrawingState( "texture_pass", m_draw_cube2 );
             break;
     }
 }

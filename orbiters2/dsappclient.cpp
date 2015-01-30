@@ -27,7 +27,8 @@ m_mouselb( false ),
 m_mouserb( false ), 
 m_speed( 0.0 ), 
 m_speed_speed( 5.0 ),
-m_curr_camera( NULL )
+m_curr_camera( NULL ),
+m_draw_spacebox( true )
 {    
     _INIT_LOGGER( "orbiters2.conf" )  
     m_w_title = "orbiters 2 test";
@@ -53,6 +54,14 @@ void dsAppClient::OnRenderFrame( void )
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
 
+<<<<<<< HEAD
+=======
+    
+    //DrawSpace::Utils::Matrix sbtrans;
+    //sbtrans.Scale( 20.0, 20.0, 20.0 );   
+    //m_spacebox->SetLocalTransform( sbtrans );
+
+>>>>>>> 81dcbfd19603ddbf43c266a955c1030ec3d89d99
       
 
     //Matrix cam7_pos;
@@ -314,6 +323,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Spacebox>, SceneNode<DrawSpace::Spacebox>( "spacebox" ) );
     m_spacebox_node->SetContent( m_spacebox );
 
+<<<<<<< HEAD
     //m_scenenodegraph.AddNode( m_spacebox_node );
     m_scenenodegraph.RegisterNode( m_spacebox_node );
 
@@ -321,15 +331,31 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_spacebox_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "spacebox_transfo" ) );
     m_spacebox_transfo_node->SetContent( _DRAWSPACE_NEW_( DrawSpace::Core::Transformation, DrawSpace::Core::Transformation ) );
+=======
+    m_scenenodegraph.RegisterNode( m_spacebox_node );
+
+
+    m_spacebox_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "spacebox_transfo" ) );
+    m_spacebox_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+    Matrix spacebox_scale;
+    spacebox_scale.Scale( 20.0, 20.0, 20.0 );
+    m_spacebox_transfo_node->GetContent()->PushMatrix( spacebox_scale );
+>>>>>>> 81dcbfd19603ddbf43c266a955c1030ec3d89d99
 
     m_scenenodegraph.AddNode( m_spacebox_transfo_node );
     m_scenenodegraph.RegisterNode( m_spacebox_transfo_node );
 
+<<<<<<< HEAD
     m_spacebox_node->LinkTo( m_spacebox_transfo_node );
 
     Matrix sbscale;
     sbscale.Scale( 20.0, 20.0, 20.0 );
     m_spacebox_transfo_node->GetContent()->PushMatrix( sbscale );
+=======
+
+    m_spacebox_node->LinkTo( m_spacebox_transfo_node );
+
+>>>>>>> 81dcbfd19603ddbf43c266a955c1030ec3d89d99
 
     
 
@@ -881,7 +907,18 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph.RegisterNode( m_camera7_node );
 
 
-    m_camera7_node->LinkTo( m_cube_body_node );
+
+    m_camera7_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "cam7_transfo" ) );
+    m_camera7_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+    Matrix cam7_pos;
+    cam7_pos.Translation( 0.0, 0.0, 4.0 );
+    m_camera7_transfo_node->GetContent()->PushMatrix( cam7_pos );
+
+    
+    m_scenenodegraph.RegisterNode( m_camera7_transfo_node );
+
+    m_camera7_transfo_node->LinkTo( m_cube_body_node );
+    m_camera7_node->LinkTo( m_camera7_transfo_node );
 
 
 
@@ -898,7 +935,21 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph.RegisterNode( m_camera8_node );
 
 
-    m_camera8_node->LinkTo( m_building_collider_node );
+    //m_camera8_node->LinkTo( m_building_collider_node );
+
+
+    m_camera8_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "cam8_transfo" ) );
+    m_camera8_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+    Matrix cam8_pos;
+    cam8_pos.Translation( 0.0, 130.0, 0.0 );
+    m_camera8_transfo_node->GetContent()->PushMatrix( cam8_pos );
+
+    
+    m_scenenodegraph.RegisterNode( m_camera8_transfo_node );
+
+    m_camera8_transfo_node->LinkTo( m_building_collider_node );
+    m_camera8_node->LinkTo( m_camera8_transfo_node );
+
     
 
 
@@ -1257,6 +1308,33 @@ void dsAppClient::OnKeyPulse( long p_key )
         case VK_F6:
 
             m_calendar->SetTimeFactor( Calendar::SEC_1DAY_TIME );
+            break;
+
+        case VK_F7:
+
+            if( m_draw_spacebox )
+            {
+                m_draw_spacebox = false;
+            }
+            else
+            {
+                m_draw_spacebox = true;
+            }
+
+            m_spacebox->SetDrawingState( "texture_pass", m_draw_spacebox );
+
+            break;
+
+
+        case VK_F8:
+            {
+                Matrix mat;   
+                mat.Translation( 265000000.0, 0.0, 0.0 );
+                m_ship->ForceInitialAttitude( mat );
+
+
+            }
+
             break;
 
 
