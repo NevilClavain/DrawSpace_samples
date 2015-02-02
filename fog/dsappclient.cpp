@@ -129,13 +129,6 @@ bool dsAppClient::OnIdleAppInit( void )
     ///////////////////////////////////////////////////////////////
 
 
-    m_scenenodegraph.RegisterPass( m_texturepass );
-    m_scenenodegraph.RegisterPass( m_fogintpass );
-
-
-    ///////////////////////////////////////////////////////////////
-
-
 
     m_chunk = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 

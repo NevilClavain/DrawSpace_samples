@@ -257,7 +257,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->GetRenderingQueue()->EnableTargetClearing( false );
     m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0 );
     
-    m_scenenodegraph.RegisterPass( m_texturepass );
 
 
     //////////////////////////////////////////////////////////////
