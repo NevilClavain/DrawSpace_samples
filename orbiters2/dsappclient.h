@@ -184,6 +184,26 @@ protected:
     bool                                        m_draw_spacebox;
 
 
+
+    //////////////////////////////////////////////////////////////
+
+    bool                                                                m_draw_hyperspace;
+
+
+    DrawSpace::Core::SceneNodeGraph                                     m_scenenodegraph_hyperspace;
+
+    DrawSpace::IntermediatePass*                                        m_texturepass_hyperspace;
+    DrawSpace::FinalPass*                                               m_finalpass_hyperspace;
+
+
+    DrawSpace::Chunk*                                                   m_cube1hp;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_cube1hp_node;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_cube1hp_transfo_node;
+
+
+
+
+
     void on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget );
 
 

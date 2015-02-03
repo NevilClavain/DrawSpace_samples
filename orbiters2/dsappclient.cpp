@@ -28,7 +28,8 @@ m_mouserb( false ),
 m_speed( 0.0 ), 
 m_speed_speed( 5.0 ),
 m_curr_camera( NULL ),
-m_draw_spacebox( true )
+m_draw_spacebox( true ),
+m_draw_hyperspace( false )
 {    
     _INIT_LOGGER( "orbiters2.conf" )  
     m_w_title = "orbiters 2 test";
@@ -72,49 +73,65 @@ void dsAppClient::OnRenderFrame( void )
     //m_camera8->SetLocalTransform( cam8_pos );
 
 
-    m_scenenodegraph.ComputeTransformations( m_timer );
-
-    //////////////////////////////////////////////////////////////
-
-    
-    m_text_widget->SetVirtualTranslation( 100, 75 );
-    m_text_widget_2->SetVirtualTranslation( -60, 160 );
-
-    char distance[64];
-    sprintf( distance, "%.3f km", m_reticle_widget->GetLastDistance() / 1000.0 );
-
-    m_text_widget_2->SetText( -40, 0, 30, dsstring( distance ), DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
-    m_reticle_widget->Transform();
-    m_reticle_widget->Draw();
     
 
     //////////////////////////////////////////////////////////////
 
+    if( m_draw_hyperspace )
+    {
+        m_scenenodegraph_hyperspace.ComputeTransformations( m_timer );
 
-   
+        m_texturepass_hyperspace->GetRenderingQueue()->Draw();
+        m_finalpass_hyperspace->GetRenderingQueue()->Draw();
+    }
+    else
+    {
 
-    m_texturepass->GetRenderingQueue()->Draw();
-
-    m_text_widget->Draw();
-
-    m_finalpass->GetRenderingQueue()->Draw();
-
-
-    long current_fps = m_timer.GetFPS();
-    renderer->DrawText( 0, 255, 0, 10, 35, "%d", current_fps );
-
-    dsstring date;
-    m_calendar->GetFormatedDate( date );    
-    renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
-
+        m_scenenodegraph.ComputeTransformations( m_timer );
     
+        m_text_widget->SetVirtualTranslation( 100, 75 );
+        m_text_widget_2->SetVirtualTranslation( -60, 160 );
+
+        char distance[64];
+        sprintf( distance, "%.3f km", m_reticle_widget->GetLastDistance() / 1000.0 );
+
+        m_text_widget_2->SetText( -40, 0, 30, dsstring( distance ), DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
+        m_reticle_widget->Transform();
+        m_reticle_widget->Draw();
+        
+
+        //////////////////////////////////////////////////////////////
 
 
-    dsreal speed = m_ship->GetLinearSpeedMagnitude();
+       
 
-    renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h ( %.1f m/s) - aspeed = %.1f", speed * 3.6, speed, m_ship->GetAngularSpeedMagnitude() );
+        m_texturepass->GetRenderingQueue()->Draw();
 
-    renderer->DrawText( 0, 255, 0, 10, 115, "contact = %d", m_ship->GetContactState() );
+        m_text_widget->Draw();
+
+        m_finalpass->GetRenderingQueue()->Draw();
+
+
+        long current_fps = m_timer.GetFPS();
+        renderer->DrawText( 0, 255, 0, 10, 35, "%d", current_fps );
+
+        dsstring date;
+        m_calendar->GetFormatedDate( date );    
+        renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
+
+        
+
+
+        dsreal speed = m_ship->GetLinearSpeedMagnitude();
+
+        renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h ( %.1f m/s) - aspeed = %.1f", speed * 3.6, speed, m_ship->GetAngularSpeedMagnitude() );
+
+        renderer->DrawText( 0, 255, 0, 10, 115, "contact = %d", m_ship->GetContactState() );
+
+        renderer->DrawText( 0, 255, 0, 10, 300, "reticle distance = %f", m_reticle_widget->GetLastDistance() );
+
+    }
+
 
 
     //int x_reticle, y_reticle;
@@ -173,7 +190,7 @@ void dsAppClient::OnRenderFrame( void )
         }
     }
 */
-    renderer->DrawText( 0, 255, 0, 10, 300, "reticle distance = %f", m_reticle_widget->GetLastDistance() );
+    //renderer->DrawText( 0, 255, 0, 10, 300, "reticle distance = %f", m_reticle_widget->GetLastDistance() );
 
     /*
     if( m_curr_camera == m_camera5 || m_curr_camera == m_camera4 )
@@ -273,6 +290,34 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
     m_finalpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
+
+
+
+    //////////////////////////////////////////////////////////////
+
+
+    m_texturepass_hyperspace = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass_hyperspace" ) );
+    m_texturepass_hyperspace->Initialize();
+
+    m_texturepass_hyperspace->GetRenderingQueue()->EnableDepthClearing( true );
+    m_texturepass_hyperspace->GetRenderingQueue()->EnableTargetClearing( true );
+    m_texturepass_hyperspace->GetRenderingQueue()->SetTargetClearingColor( 145, 90, 90 );
+
+
+
+    m_finalpass_hyperspace = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass_hyperspace" ) );
+    m_finalpass_hyperspace->Initialize();
+    m_finalpass_hyperspace->CreateViewportQuad();
+
+    m_finalpass_hyperspace->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) ) ;
+    m_finalpass_hyperspace->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_finalpass_hyperspace->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_finalpass_hyperspace->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_finalpass_hyperspace->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+    
+
+    m_finalpass_hyperspace->GetViewportQuad()->SetTexture( m_texturepass_hyperspace->GetTargetTexture(), 0 );
+
     
 
     //////////////////////////////////////////////////////////////
@@ -333,12 +378,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph.RegisterNode( m_spacebox_transfo_node );
     m_spacebox_node->LinkTo( m_spacebox_transfo_node );
 
-    Matrix sbscale;
-    sbscale.Scale( 20.0, 20.0, 20.0 );
-    m_spacebox_transfo_node->GetContent()->PushMatrix( sbscale );
-
-    
-
+   
     //////////////////////////////////////////////////////////////
 
 
@@ -1062,13 +1102,82 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
 
+
+
     ///////////////////////////////////////////////////////////////
+
+    m_cube1hp = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+
+    m_cube1hp->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
+    m_cube1hp->RegisterPassSlot( m_texturepass_hyperspace );
+    m_cube1hp->SetRenderer( renderer );
+
+    m_cube1hp->SetSceneName( "cube1hp" );
+    
+    m_cube1hp->GetMeshe()->SetImporter( m_meshe_import );
+
+    m_cube1hp->GetMeshe()->LoadFromFile( "object.ac", 0 );    
+
+    m_cube1hp->GetNodeFromPass( m_texturepass_hyperspace )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_cube1hp->GetNodeFromPass( m_texturepass_hyperspace )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_cube1hp->GetNodeFromPass( m_texturepass_hyperspace )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_cube1hp->GetNodeFromPass( m_texturepass_hyperspace )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_cube1hp->GetNodeFromPass( m_texturepass_hyperspace )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_cube1hp->GetNodeFromPass( m_texturepass_hyperspace )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_cube1hp->GetNodeFromPass( m_texturepass_hyperspace )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_cube1hp->GetNodeFromPass( m_texturepass_hyperspace )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_cube1hp->GetNodeFromPass( m_texturepass_hyperspace )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    m_cube1hp->GetNodeFromPass( m_texturepass_hyperspace )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "tex07.jpg" ) ), 0 );
+
+
+
+    m_cube1hp->GetNodeFromPass( m_texturepass_hyperspace )->GetTexture( 0 )->LoadFromFile();
+
+
+    m_cube1hp_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "cube1hp_node" ) );
+    m_cube1hp_node->SetContent( m_cube1hp );
+
+
+    m_scenenodegraph_hyperspace.RegisterNode( m_cube1hp_node );
+
+
+
+    m_cube1hp_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "cube1hp_transfo" ) );
+    m_cube1hp_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+    Matrix cube1hp_scale;
+    cube1hp_scale.Scale( 10.0, 10.0, 10.0 );
+
+    Matrix cube1hp_trans;
+    cube1hp_trans.Translation( 0.0, 0.0, -80.0 );
+
+    m_cube1hp_transfo_node->GetContent()->PushMatrix( cube1hp_trans );
+    m_cube1hp_transfo_node->GetContent()->PushMatrix( cube1hp_scale );
+
+    m_scenenodegraph_hyperspace.AddNode( m_cube1hp_transfo_node );
+    m_scenenodegraph_hyperspace.RegisterNode( m_cube1hp_transfo_node );
+    m_cube1hp_node->LinkTo( m_cube1hp_transfo_node );
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////
+
+
 
 
 
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
+
+    m_finalpass_hyperspace->GetRenderingQueue()->UpdateOutputQueue();
+    m_texturepass_hyperspace->GetRenderingQueue()->UpdateOutputQueue();
+
+
     
     m_freemove.Init( DrawSpace::Utils::Vector( 265000000.0, 0.0, 50.0, 1.0 ) );
 
@@ -1115,6 +1224,10 @@ bool dsAppClient::OnIdleAppInit( void )
     //m_camera5->LockOnTransformNode( "cube", m_cube );
 
 
+
+
+
+    ///////////////////////////////////////////////////////////////
 
 
     //m_calendar->Startup( 162682566 );
@@ -1292,16 +1405,17 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F7:
 
-            if( m_draw_spacebox )
+            
+            if( m_draw_hyperspace )
             {
-                m_draw_spacebox = false;
+                m_draw_hyperspace = false;
             }
             else
             {
-                m_draw_spacebox = true;
+                m_draw_hyperspace = true;
             }
-
-            m_spacebox->SetDrawingState( m_texturepass, m_draw_spacebox );
+            
+            //m_finalpass->GetViewportQuad()->SetDrawingState( false );
 
             break;
 
