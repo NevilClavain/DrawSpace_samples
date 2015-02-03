@@ -196,12 +196,12 @@ protected:
     DrawSpace::FinalPass*                                               m_finalpass_hyperspace;
 
 
-    DrawSpace::Chunk*                                                   m_cube1hp;
-    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_cube1hp_node;
-    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_cube1hp_transfo_node;
+    DrawSpace::Spacebox*                                                m_spacebox1hp;
+    DrawSpace::Core::SceneNode<DrawSpace::Spacebox>*                    m_spacebox1hp_node;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_spacebox1hp_transfo_node;
 
-
-
+    dsreal                                                              m_spacebox1hp_transz;
+    dsreal                                                              m_spacebox1hp_rotz;
 
 
     void on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget );
