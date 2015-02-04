@@ -35,8 +35,18 @@ m_draw_hyperspace( false )
     m_w_title = "orbiters 2 test";
     m_mouseleftbuttondown_eventhandler = _DRAWSPACE_NEW_( WidgetEventHandler, WidgetEventHandler( this, &dsAppClient::on_mouseleftbuttondown ) );
 
-    m_spacebox1hp_transz = -1000.0;
+    m_spacebox1hp_transz = -2000.0;
+    m_spacebox2hp_transz = -6000.0;
+
+    m_spacebox1bighp_transz = -6000.0;
+    m_spacebox2bighp_transz = -18000.0;
+
+
     m_spacebox1hp_rotz = 0.0;
+    m_spacebox2hp_rotz = 90.0;
+    m_spacebox1bighp_rotz = 33.0;
+    m_spacebox2bighp_rotz = 124.0;
+
 }
 
 dsAppClient::~dsAppClient( void )
@@ -88,10 +98,61 @@ void dsAppClient::OnRenderFrame( void )
         spacebox1hp_trans.Translation( 0.0, 0.0, m_spacebox1hp_transz );
         spacebox1hp_rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Maths::DegToRad( m_spacebox1hp_rotz ) );
 
-        m_spacebox1hp_transfo_node->GetContent()->ClearAll();
-        m_spacebox1hp_transfo_node->GetContent()->PushMatrix( spacebox1hp_trans );
-        m_spacebox1hp_transfo_node->GetContent()->PushMatrix( spacebox1hp_rotz );
-        m_spacebox1hp_transfo_node->GetContent()->PushMatrix( spacebox1hp_scale );
+        
+        m_spacebox1hp.transfo_node->GetContent()->ClearAll();
+        m_spacebox1hp.transfo_node->GetContent()->PushMatrix( spacebox1hp_trans );
+        m_spacebox1hp.transfo_node->GetContent()->PushMatrix( spacebox1hp_rotz );
+        m_spacebox1hp.transfo_node->GetContent()->PushMatrix( spacebox1hp_scale );
+        
+        
+
+
+
+        Matrix spacebox2hp_trans;
+        Matrix spacebox2hp_rotz;
+        spacebox2hp_trans.Translation( 0.0, 0.0, m_spacebox2hp_transz );
+        spacebox2hp_rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Maths::DegToRad( m_spacebox2hp_rotz ) );
+
+        
+        
+        m_spacebox2hp.transfo_node->GetContent()->ClearAll();
+        m_spacebox2hp.transfo_node->GetContent()->PushMatrix( spacebox2hp_trans );
+        m_spacebox2hp.transfo_node->GetContent()->PushMatrix( spacebox2hp_rotz );
+        m_spacebox2hp.transfo_node->GetContent()->PushMatrix( spacebox1hp_scale );
+        
+        
+        
+
+
+
+        
+        Matrix spacebox1bighp_scale;
+        Matrix spacebox1bighp_rotz;
+        Matrix spacebox1bighp_trans;
+
+        spacebox1bighp_scale.Scale( 600.0, 600.0, 12000.0 );
+        spacebox1bighp_rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Maths::DegToRad( m_spacebox1bighp_rotz ) );
+        spacebox1bighp_trans.Translation( 0.0, 0.0, m_spacebox1bighp_transz );
+
+        
+        m_spacebox1bighp.transfo_node->GetContent()->ClearAll();
+        m_spacebox1bighp.transfo_node->GetContent()->PushMatrix( spacebox1bighp_trans );
+        m_spacebox1bighp.transfo_node->GetContent()->PushMatrix( spacebox1bighp_rotz );
+        m_spacebox1bighp.transfo_node->GetContent()->PushMatrix( spacebox1bighp_scale );
+        
+        
+
+        Matrix spacebox2bighp_rotz;
+        Matrix spacebox2bighp_trans;
+        spacebox2bighp_trans.Translation( 0.0, 0.0, m_spacebox2bighp_transz );
+        spacebox2bighp_rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Maths::DegToRad( m_spacebox2bighp_rotz ) );
+        
+        m_spacebox2bighp.transfo_node->GetContent()->ClearAll();
+        m_spacebox2bighp.transfo_node->GetContent()->PushMatrix( spacebox2bighp_trans );
+        m_spacebox2bighp.transfo_node->GetContent()->PushMatrix( spacebox2bighp_rotz );
+        m_spacebox2bighp.transfo_node->GetContent()->PushMatrix( spacebox1bighp_scale );
+        
+
 
 
         m_scenenodegraph_hyperspace.ComputeTransformations( m_timer );
@@ -100,13 +161,43 @@ void dsAppClient::OnRenderFrame( void )
         m_finalpass_hyperspace->GetRenderingQueue()->Draw();
 
 
-        m_timer.AngleSpeedInc( &m_spacebox1hp_rotz, 90.0 );
-        m_timer.TranslationSpeedInc( &m_spacebox1hp_transz, 800.0 );
+        m_timer.AngleSpeedInc( &m_spacebox1hp_rotz, 30.0 );
+        m_timer.AngleSpeedInc( &m_spacebox2hp_rotz, 35.0 );
 
-        if( m_spacebox1hp_transz > 1900.0 )
+
+        m_timer.AngleSpeedInc( &m_spacebox1bighp_rotz, 45.0 );
+        m_timer.AngleSpeedInc( &m_spacebox2bighp_rotz, 50.0 );
+
+        m_timer.TranslationSpeedInc( &m_spacebox1hp_transz, 9000.0 );
+
+        if( m_spacebox1hp_transz > 4000.0 )
         {
-            m_spacebox1hp_transz = -1000.0;
+            m_spacebox1hp_transz = -4000.0;
         }
+
+        m_timer.TranslationSpeedInc( &m_spacebox2hp_transz, 9000.0 );
+
+        if( m_spacebox2hp_transz > 4000.0 )
+        {
+            m_spacebox2hp_transz = -4000.0;
+        }
+
+
+        m_timer.TranslationSpeedInc( &m_spacebox1bighp_transz, 9000.0 );
+
+        if( m_spacebox1bighp_transz > 12000.0 )
+        {
+            m_spacebox1bighp_transz = -12000.0;
+        }
+
+        m_timer.TranslationSpeedInc( &m_spacebox2bighp_transz, 9000.0 );
+
+        if( m_spacebox2bighp_transz > 12000.0 )
+        {
+            m_spacebox2bighp_transz = -12000.0;
+        }
+
+
     }
     else
     {
@@ -248,6 +339,157 @@ void dsAppClient::OnRenderFrame( void )
     m_freemove.SetSpeed( m_speed );
 }
 
+
+void dsAppClient::init_hpspacebox( const dsstring& p_scenename, Pass* p_pass, hp_spacebox* p_hpsb, long p_order )
+{
+    DrawSpace::Spacebox* spacebox;
+
+    spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
+    spacebox->RegisterPassSlot( m_texturepass_hyperspace );
+    
+    spacebox->SetSceneName( p_scenename );
+
+    for( long i = 0; i < 6; i++ )
+    {
+
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( false ) ) );
+
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->GetFx()->GetShader( 0 )->SetText(
+
+            "float4x4 matWorldViewProjection: register(c0);"
+
+            "struct VS_INPUT"
+            "{"
+               "float4 Position : POSITION0;"
+               "float4 TexCoord0: TEXCOORD0;"              
+            "};"
+
+            "struct VS_OUTPUT"
+            "{"
+               "float4 Position : POSITION0;"
+               "float4 TexCoord0: TEXCOORD0;"
+            "};"
+
+            "VS_OUTPUT vs_main( VS_INPUT Input )"
+            "{"
+               "VS_OUTPUT Output;"
+
+               "Output.Position = mul( Input.Position, matWorldViewProjection );"
+               "Output.TexCoord0 = Input.TexCoord0;"
+                  
+               "return( Output );"
+            "}"
+
+                );
+
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->GetFx()->GetShader( 1 )->SetText(
+
+        "float alpha: register(c0);"
+        "sampler2D Texture0;"
+        "struct PS_INTPUT"
+        "{"
+           "float4 Position : POSITION0;"
+           "float4 TexCoord0: TEXCOORD0;"
+        "};"
+        "float4 ps_main( PS_INTPUT input ) : COLOR0"
+        "{"
+           "float4 color = tex2D( Texture0, input.TexCoord0 );"
+
+           "float4 final_color;"
+
+           "final_color.r = color.r;"
+           "final_color.g = color.g;"
+           "final_color.b = color.b;"
+           "final_color.a = alpha;"
+
+           "return final_color;"
+
+        "}"
+                );
+
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add"  ) );
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always"  ) );
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, /*"invsrcalpha"*/ "one"  ) );
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha"  ) );
+
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->AddShaderParameter( 1, "alpha", 0 );
+        spacebox->GetNodeFromPass( m_texturepass_hyperspace, i )->SetShaderReal( "alpha", 1.0 );
+
+    }
+
+
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::FrontQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_front5.png" ) ), 0 );
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::FrontQuad )->GetTexture( 0 )->LoadFromFile();
+
+
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::RearQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_back6.png" ) ), 0 );
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::RearQuad )->GetTexture( 0 )->LoadFromFile();
+
+
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::TopQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_top3.png" ) ), 0 );
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::TopQuad )->GetTexture( 0 )->LoadFromFile();
+
+
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::BottomQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_bottom4.png" ) ), 0 );
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::BottomQuad )->GetTexture( 0 )->LoadFromFile();
+
+
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::LeftQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_left2.png" ) ), 0 );
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::LeftQuad )->GetTexture( 0 )->LoadFromFile();
+
+
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::RightQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_right1.png" ) ), 0 );
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::RightQuad )->GetTexture( 0 )->LoadFromFile();
+
+
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::FrontQuad )->SetOrderNumber( p_order );
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::RearQuad )->SetOrderNumber( p_order );
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::TopQuad )->SetOrderNumber( p_order );
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::BottomQuad )->SetOrderNumber( p_order );
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::LeftQuad )->SetOrderNumber( p_order );
+    spacebox->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::RightQuad )->SetOrderNumber( p_order );
+
+
+    spacebox->EnableTranslations( true );
+    spacebox->SetQuadDrawingState( m_texturepass_hyperspace, Spacebox::FrontQuad, false );
+    spacebox->SetQuadDrawingState( m_texturepass_hyperspace, Spacebox::RearQuad, false );
+    
+
+    SceneNode<DrawSpace::Spacebox>* node;
+
+    node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Spacebox>, SceneNode<DrawSpace::Spacebox>( p_scenename ) );
+    node->SetContent( spacebox );
+
+    m_scenenodegraph_hyperspace.RegisterNode( node );
+
+
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>* transfo_node;
+
+
+    transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( p_scenename + "_transfo" ) );
+    transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+
+    //m_scenenodegraph_hyperspace.AddNode( m_spacebox1hp_transfo_node );
+    m_scenenodegraph_hyperspace.RegisterNode( transfo_node );
+
+    node->LinkTo( transfo_node );
+
+
+    p_hpsb->node = node;
+    p_hpsb->transfo_node = transfo_node;
+}
+
 bool dsAppClient::OnIdleAppInit( void )
 {
     DrawSpace::Dynamics::Body::Parameters cube_params;
@@ -325,7 +567,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_texturepass_hyperspace->GetRenderingQueue()->EnableDepthClearing( true );
     m_texturepass_hyperspace->GetRenderingQueue()->EnableTargetClearing( true );
-    m_texturepass_hyperspace->GetRenderingQueue()->SetTargetClearingColor( 145, 90, 90 );
+    m_texturepass_hyperspace->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0 );
 
 
 
@@ -1130,69 +1372,20 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ///////////////////////////////////////////////////////////////
 
-
-    m_spacebox1hp = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
-    m_spacebox1hp->RegisterPassSlot( m_texturepass_hyperspace );
-    
-    m_spacebox1hp->SetSceneName( "spacebox1hp" );
+    init_hpspacebox( "spacebox1hp", m_texturepass_hyperspace, &m_spacebox1hp, 200 );
+    m_scenenodegraph_hyperspace.AddNode( m_spacebox1hp.transfo_node );
 
 
-    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox1hp, m_texturepass_hyperspace );
-
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::FrontQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_front5.png" ) ), 0 );
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::FrontQuad )->GetTexture( 0 )->LoadFromFile();
+    init_hpspacebox( "spacebox2hp", m_texturepass_hyperspace, &m_spacebox2hp, 200 );
+    m_scenenodegraph_hyperspace.AddNode( m_spacebox2hp.transfo_node );
 
 
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::RearQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_back6.png" ) ), 0 );
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::RearQuad )->GetTexture( 0 )->LoadFromFile();
+    init_hpspacebox( "spacebox1bighp", m_texturepass_hyperspace, &m_spacebox1bighp, 100 );
+    m_scenenodegraph_hyperspace.AddNode( m_spacebox1bighp.transfo_node );
 
 
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::TopQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_top3.png" ) ), 0 );
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::TopQuad )->GetTexture( 0 )->LoadFromFile();
-
-
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::BottomQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_bottom4.png" ) ), 0 );
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::BottomQuad )->GetTexture( 0 )->LoadFromFile();
-
-
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::LeftQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_left2.png" ) ), 0 );
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::LeftQuad )->GetTexture( 0 )->LoadFromFile();
-
-
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::RightQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_right1.png" ) ), 0 );
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::RightQuad )->GetTexture( 0 )->LoadFromFile();
-
-
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::FrontQuad )->SetOrderNumber( 200 );
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::RearQuad )->SetOrderNumber( 200 );
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::TopQuad )->SetOrderNumber( 200 );
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::BottomQuad )->SetOrderNumber( 200 );
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::LeftQuad )->SetOrderNumber( 200 );
-    m_spacebox1hp->GetNodeFromPass( m_texturepass_hyperspace, Spacebox::RightQuad )->SetOrderNumber( 200 );
-
-
-    m_spacebox1hp->EnableTranslations( true );
-    
-
-    m_spacebox1hp_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Spacebox>, SceneNode<DrawSpace::Spacebox>( "spacebox1hp" ) );
-    m_spacebox1hp_node->SetContent( m_spacebox1hp );
-
-    m_scenenodegraph_hyperspace.RegisterNode( m_spacebox1hp_node );
-
-
-    m_spacebox1hp_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "spacebox1hp_transfo" ) );
-    m_spacebox1hp_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
-    Matrix spacebox1hp_scale;
-    Matrix spacebox1hp_trans;
-    spacebox1hp_scale.Scale( 200.0, 200.0, 2000.0 );
-    spacebox1hp_trans.Translation( 0.0, 0.0, m_spacebox1hp_transz );
-    m_spacebox1hp_transfo_node->GetContent()->PushMatrix( spacebox1hp_trans );
-    m_spacebox1hp_transfo_node->GetContent()->PushMatrix( spacebox1hp_scale );
-
-    m_scenenodegraph_hyperspace.AddNode( m_spacebox1hp_transfo_node );
-    m_scenenodegraph_hyperspace.RegisterNode( m_spacebox1hp_transfo_node );
-    m_spacebox1hp_node->LinkTo( m_spacebox1hp_transfo_node );
-
+    init_hpspacebox( "spacebox2bighp", m_texturepass_hyperspace, &m_spacebox2bighp, 100 );
+    m_scenenodegraph_hyperspace.AddNode( m_spacebox2bighp.transfo_node );
 
 
     ///////////////////////////////////////////////////////////////

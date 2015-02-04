@@ -196,12 +196,32 @@ protected:
     DrawSpace::FinalPass*                                               m_finalpass_hyperspace;
 
 
-    DrawSpace::Spacebox*                                                m_spacebox1hp;
-    DrawSpace::Core::SceneNode<DrawSpace::Spacebox>*                    m_spacebox1hp_node;
-    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_spacebox1hp_transfo_node;
+    typedef struct
+    {
+
+        DrawSpace::Core::SceneNode<DrawSpace::Spacebox>*                    node;
+        DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        transfo_node;
+
+    } hp_spacebox; 
+
+
+
+    hp_spacebox                                                         m_spacebox1hp;
+    hp_spacebox                                                         m_spacebox2hp;
 
     dsreal                                                              m_spacebox1hp_transz;
     dsreal                                                              m_spacebox1hp_rotz;
+
+    dsreal                                                              m_spacebox2hp_transz;
+    dsreal                                                              m_spacebox2hp_rotz;
+
+    hp_spacebox                                                         m_spacebox1bighp;
+    dsreal                                                              m_spacebox1bighp_rotz;
+    dsreal                                                              m_spacebox1bighp_transz;
+
+    hp_spacebox                                                         m_spacebox2bighp;
+    dsreal                                                              m_spacebox2bighp_rotz;
+    dsreal                                                              m_spacebox2bighp_transz;
 
 
     void on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget );
@@ -209,7 +229,8 @@ protected:
 
     dsAppClient( void );
 
-    void compute_player_view_transform( void );
+    
+    void init_hpspacebox( const dsstring& p_scenename, DrawSpace::Pass* p_pass, hp_spacebox* p_hpsb, long p_order );
 
 public:
 
