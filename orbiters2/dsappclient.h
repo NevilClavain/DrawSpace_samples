@@ -224,6 +224,11 @@ protected:
     dsreal                                                              m_spacebox2bighp_transz;
 
 
+    dsreal                                                              m_hp_current_speed;
+    dsreal                                                              m_spacebox1hp_zscale;
+    dsreal                                                              m_spacebox2hp_zscale;
+
+
     void on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget );
 
 

@@ -20,6 +20,27 @@ _DECLARE_DS_LOGGER( logger, "AppClient" )
 #define SHIP_MASS 50.0
 
 
+#define HYPERSPACE_SCALE_Z             4000.0
+#define HYPERSPACE_SCALE_XY            200.0
+
+#define HYPERSPACE_LAYER2_SCALE_Z      8000.0
+#define HYPERSPACE_LAYER2_SCALE_XY     400.0
+
+#define HYPERSPACE_1_ROTZINIT           0.0
+#define HYPERSPACE_2_ROTZINIT           90.0
+
+#define HYPERSPACE_LAYER2_1_ROTZINIT    33.0
+#define HYPERSPACE_LAYER2_2_ROTZINIT    124.0
+
+#define HYPERSPACE_TRANSLATION_SPEED    7000.0
+
+#define HYPERSPACE_1_ROTZ_SPEED         30.0
+#define HYPERSPACE_2_ROTZ_SPEED         35.0
+
+#define HYPERSPACE_LAYER2_1_ROTZ_SPEED  45.0
+#define HYPERSPACE_LAYER2_2_ROTZ_SPEED  50.0
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 dsAppClient::dsAppClient( void ) : 
@@ -35,17 +56,17 @@ m_draw_hyperspace( false )
     m_w_title = "orbiters 2 test";
     m_mouseleftbuttondown_eventhandler = _DRAWSPACE_NEW_( WidgetEventHandler, WidgetEventHandler( this, &dsAppClient::on_mouseleftbuttondown ) );
 
-    m_spacebox1hp_transz = -2000.0;
-    m_spacebox2hp_transz = -6000.0;
+    m_spacebox1hp_transz = -HYPERSPACE_SCALE_Z * 0.5; //-2000.0;
+    m_spacebox2hp_transz = -HYPERSPACE_SCALE_Z * 1.5; //-6000.0;
 
-    m_spacebox1bighp_transz = -6000.0;
-    m_spacebox2bighp_transz = -18000.0;
+    m_spacebox1bighp_transz = -HYPERSPACE_LAYER2_SCALE_Z * 0.5;//-6000.0;
+    m_spacebox2bighp_transz = -HYPERSPACE_LAYER2_SCALE_Z * 1.5;//-18000.0;
 
 
-    m_spacebox1hp_rotz = 0.0;
-    m_spacebox2hp_rotz = 90.0;
-    m_spacebox1bighp_rotz = 33.0;
-    m_spacebox2bighp_rotz = 124.0;
+    m_spacebox1hp_rotz = HYPERSPACE_1_ROTZINIT;//0.0;
+    m_spacebox2hp_rotz = HYPERSPACE_2_ROTZINIT;//90.0;
+    m_spacebox1bighp_rotz = HYPERSPACE_LAYER2_1_ROTZINIT;//33.0;
+    m_spacebox2bighp_rotz = HYPERSPACE_LAYER2_2_ROTZINIT;//124.0;
 
 }
 
@@ -94,7 +115,7 @@ void dsAppClient::OnRenderFrame( void )
         Matrix spacebox1hp_scale;
         Matrix spacebox1hp_trans;
         Matrix spacebox1hp_rotz;
-        spacebox1hp_scale.Scale( 200.0, 200.0, 4000.0 );
+        spacebox1hp_scale.Scale( HYPERSPACE_SCALE_XY, HYPERSPACE_SCALE_XY, HYPERSPACE_SCALE_Z );
         spacebox1hp_trans.Translation( 0.0, 0.0, m_spacebox1hp_transz );
         spacebox1hp_rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Maths::DegToRad( m_spacebox1hp_rotz ) );
 
@@ -130,7 +151,7 @@ void dsAppClient::OnRenderFrame( void )
         Matrix spacebox1bighp_rotz;
         Matrix spacebox1bighp_trans;
 
-        spacebox1bighp_scale.Scale( 600.0, 600.0, 12000.0 );
+        spacebox1bighp_scale.Scale( HYPERSPACE_LAYER2_SCALE_XY, HYPERSPACE_LAYER2_SCALE_XY, HYPERSPACE_LAYER2_SCALE_Z );
         spacebox1bighp_rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Maths::DegToRad( m_spacebox1bighp_rotz ) );
         spacebox1bighp_trans.Translation( 0.0, 0.0, m_spacebox1bighp_transz );
 
@@ -161,40 +182,40 @@ void dsAppClient::OnRenderFrame( void )
         m_finalpass_hyperspace->GetRenderingQueue()->Draw();
 
 
-        m_timer.AngleSpeedInc( &m_spacebox1hp_rotz, 30.0 );
-        m_timer.AngleSpeedInc( &m_spacebox2hp_rotz, 35.0 );
+        m_timer.AngleSpeedInc( &m_spacebox1hp_rotz, HYPERSPACE_1_ROTZ_SPEED );
+        m_timer.AngleSpeedInc( &m_spacebox2hp_rotz, HYPERSPACE_2_ROTZ_SPEED );
 
 
-        m_timer.AngleSpeedInc( &m_spacebox1bighp_rotz, 45.0 );
-        m_timer.AngleSpeedInc( &m_spacebox2bighp_rotz, 50.0 );
+        m_timer.AngleSpeedInc( &m_spacebox1bighp_rotz, HYPERSPACE_LAYER2_1_ROTZ_SPEED );
+        m_timer.AngleSpeedInc( &m_spacebox2bighp_rotz, HYPERSPACE_LAYER2_2_ROTZ_SPEED );
 
-        m_timer.TranslationSpeedInc( &m_spacebox1hp_transz, 9000.0 );
+        m_timer.TranslationSpeedInc( &m_spacebox1hp_transz, m_hp_current_speed );
 
-        if( m_spacebox1hp_transz > 4000.0 )
+        if( m_spacebox1hp_transz > HYPERSPACE_SCALE_Z )
         {
-            m_spacebox1hp_transz = -4000.0;
+            m_spacebox1hp_transz = -HYPERSPACE_SCALE_Z;
         }
 
-        m_timer.TranslationSpeedInc( &m_spacebox2hp_transz, 9000.0 );
+        m_timer.TranslationSpeedInc( &m_spacebox2hp_transz, m_hp_current_speed );
 
-        if( m_spacebox2hp_transz > 4000.0 )
+        if( m_spacebox2hp_transz > HYPERSPACE_SCALE_Z )
         {
-            m_spacebox2hp_transz = -4000.0;
+            m_spacebox2hp_transz = -HYPERSPACE_SCALE_Z;
         }
 
 
-        m_timer.TranslationSpeedInc( &m_spacebox1bighp_transz, 9000.0 );
+        m_timer.TranslationSpeedInc( &m_spacebox1bighp_transz, m_hp_current_speed );
 
-        if( m_spacebox1bighp_transz > 12000.0 )
+        if( m_spacebox1bighp_transz > HYPERSPACE_LAYER2_SCALE_Z )
         {
-            m_spacebox1bighp_transz = -12000.0;
+            m_spacebox1bighp_transz = -HYPERSPACE_LAYER2_SCALE_Z;
         }
 
-        m_timer.TranslationSpeedInc( &m_spacebox2bighp_transz, 9000.0 );
+        m_timer.TranslationSpeedInc( &m_spacebox2bighp_transz, m_hp_current_speed );
 
-        if( m_spacebox2bighp_transz > 12000.0 )
+        if( m_spacebox2bighp_transz > HYPERSPACE_LAYER2_SCALE_Z )
         {
-            m_spacebox2bighp_transz = -12000.0;
+            m_spacebox2bighp_transz = -HYPERSPACE_LAYER2_SCALE_Z;
         }
 
 
@@ -1386,6 +1407,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
     init_hpspacebox( "spacebox2bighp", m_texturepass_hyperspace, &m_spacebox2bighp, 100 );
     m_scenenodegraph_hyperspace.AddNode( m_spacebox2bighp.transfo_node );
+
+
+    m_hp_current_speed = HYPERSPACE_TRANSLATION_SPEED;
 
 
     ///////////////////////////////////////////////////////////////
