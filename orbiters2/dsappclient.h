@@ -207,10 +207,12 @@ protected:
     bool                                                                m_draw_hyperspace;
 
 
+    /*
     DrawSpace::Core::SceneNodeGraph                                     m_scenenodegraph_hyperspace;
 
     DrawSpace::IntermediatePass*                                        m_texturepass_hyperspace;
     DrawSpace::FinalPass*                                               m_finalpass_hyperspace;
+    */
 
 
     typedef struct
