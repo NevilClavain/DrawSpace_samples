@@ -9,6 +9,23 @@ class dsAppClient : public DrawSpace::App
 {
 protected:
 
+
+    typedef enum
+    {
+        HP_NONE,
+        HP_ACCELERATE,
+        HP_IN,
+        HP_CRUISE,
+        HP_OUT,
+        HP_DECELERATE
+
+    } HyperSpace_state;
+
+
+    
+
+
+
     typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Gui::Widget*>   WidgetEventHandler;
 
 
@@ -224,9 +241,10 @@ protected:
     dsreal                                                              m_spacebox2bighp_transz;
 
 
-    dsreal                                                              m_hp_current_speed;
-    dsreal                                                              m_spacebox1hp_zscale;
-    dsreal                                                              m_spacebox2hp_zscale;
+    HyperSpace_state                                                    m_hp_state;
+    bool                                                                m_hp;
+    
+    dsreal                                                              m_hp_transition_transz;
 
 
     void on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget );
@@ -236,6 +254,8 @@ protected:
 
     
     void init_hpspacebox( const dsstring& p_scenename, DrawSpace::Pass* p_pass, hp_spacebox* p_hpsb, long p_order );
+
+    void manage_hp( void );
 
 public:
 

@@ -23,8 +23,8 @@ _DECLARE_DS_LOGGER( logger, "AppClient" )
 #define HYPERSPACE_SCALE_Z             4000.0
 #define HYPERSPACE_SCALE_XY            200.0
 
-#define HYPERSPACE_LAYER2_SCALE_Z      8000.0
-#define HYPERSPACE_LAYER2_SCALE_XY     400.0
+#define HYPERSPACE_LAYER2_SCALE_Z      12000.0
+#define HYPERSPACE_LAYER2_SCALE_XY     600.0
 
 #define HYPERSPACE_1_ROTZINIT           0.0
 #define HYPERSPACE_2_ROTZINIT           90.0
@@ -50,7 +50,9 @@ m_speed( 0.0 ),
 m_speed_speed( 5.0 ),
 m_curr_camera( NULL ),
 m_draw_spacebox( true ),
-m_draw_hyperspace( false )
+m_draw_hyperspace( false ),
+m_hp( false ),
+m_hp_state( HP_NONE )
 {    
     _INIT_LOGGER( "orbiters2.conf" )  
     m_w_title = "orbiters 2 test";
@@ -67,7 +69,8 @@ m_draw_hyperspace( false )
     m_spacebox2hp_rotz = HYPERSPACE_2_ROTZINIT;//90.0;
     m_spacebox1bighp_rotz = HYPERSPACE_LAYER2_1_ROTZINIT;//33.0;
     m_spacebox2bighp_rotz = HYPERSPACE_LAYER2_2_ROTZINIT;//124.0;
-
+    
+    m_hp_transition_transz = 0.0;
 }
 
 dsAppClient::~dsAppClient( void )
@@ -77,6 +80,79 @@ dsAppClient::~dsAppClient( void )
 
 
 #define SPEED     1.5
+
+
+
+void dsAppClient::manage_hp( void )
+{
+    switch( m_hp_state )
+    {
+        case HP_ACCELERATE:
+            {
+                dsreal speed = m_ship->GetLinearSpeedMagnitude() * 3.6;
+
+                if( speed < 50000000.0 )
+                {
+                    m_ship->ApplyFwdForce( 100000000.0 ); // acceleration de ouuuuf
+                }
+                else
+                {
+                    m_hp_state = HP_IN;
+                    m_hp_transition_transz = -50000.0;
+                }
+            }
+            break;
+
+        case HP_IN:
+            {
+                m_timer.TranslationSpeedInc( &m_hp_transition_transz, 10000.0 );
+
+                if( m_hp_transition_transz > 0.0 )
+                {
+                    m_hp_state = HP_CRUISE;
+                    m_ship->ZeroSpeed();
+                    m_hp_transition_transz = -50000.0;
+                }
+            }
+            break;
+
+        case HP_CRUISE:
+            break;
+
+
+        case HP_OUT:
+            {
+                m_timer.TranslationSpeedInc( &m_hp_transition_transz, 10000.0 );
+
+                if( m_hp_transition_transz > 0.0 )
+                {
+                    m_hp_state = HP_DECELERATE;
+                    m_ship->ForceLinearSpeed( Vector( 0.0, 0.0, -50000000.0, 1.0 ) );
+                    
+                    Matrix mat;   
+                    mat.Translation( 269000000.0, 0.0, 69000000.0 );
+                    m_ship->ForceInitialAttitude( mat );
+                }
+            }
+            break;
+
+        case HP_DECELERATE:
+            {
+                dsreal speed = m_ship->GetLinearSpeedMagnitude() * 3.6;
+
+                if( speed > 10000.0 )
+                {
+                    m_ship->ApplyRevForce( 1000000000.0 ); // deceleration de ouuuuf
+                }
+                else
+                {                    
+                    m_hp_state = HP_NONE;
+                }
+            }
+            break;
+    }
+
+}
 
 
 void dsAppClient::OnRenderFrame( void )
@@ -103,7 +179,7 @@ void dsAppClient::OnRenderFrame( void )
     //cam8_pos.Translation( 0.0, 130.0, 0.0 );
     //m_camera8->SetLocalTransform( cam8_pos );
 
-
+    manage_hp();
     
 
     //////////////////////////////////////////////////////////////
@@ -189,14 +265,14 @@ void dsAppClient::OnRenderFrame( void )
         m_timer.AngleSpeedInc( &m_spacebox1bighp_rotz, HYPERSPACE_LAYER2_1_ROTZ_SPEED );
         m_timer.AngleSpeedInc( &m_spacebox2bighp_rotz, HYPERSPACE_LAYER2_2_ROTZ_SPEED );
 
-        m_timer.TranslationSpeedInc( &m_spacebox1hp_transz, m_hp_current_speed );
+        m_timer.TranslationSpeedInc( &m_spacebox1hp_transz, HYPERSPACE_TRANSLATION_SPEED );
 
         if( m_spacebox1hp_transz > HYPERSPACE_SCALE_Z )
         {
             m_spacebox1hp_transz = -HYPERSPACE_SCALE_Z;
         }
 
-        m_timer.TranslationSpeedInc( &m_spacebox2hp_transz, m_hp_current_speed );
+        m_timer.TranslationSpeedInc( &m_spacebox2hp_transz, HYPERSPACE_TRANSLATION_SPEED );
 
         if( m_spacebox2hp_transz > HYPERSPACE_SCALE_Z )
         {
@@ -204,14 +280,14 @@ void dsAppClient::OnRenderFrame( void )
         }
 
 
-        m_timer.TranslationSpeedInc( &m_spacebox1bighp_transz, m_hp_current_speed );
+        m_timer.TranslationSpeedInc( &m_spacebox1bighp_transz, HYPERSPACE_TRANSLATION_SPEED );
 
         if( m_spacebox1bighp_transz > HYPERSPACE_LAYER2_SCALE_Z )
         {
             m_spacebox1bighp_transz = -HYPERSPACE_LAYER2_SCALE_Z;
         }
 
-        m_timer.TranslationSpeedInc( &m_spacebox2bighp_transz, m_hp_current_speed );
+        m_timer.TranslationSpeedInc( &m_spacebox2bighp_transz, HYPERSPACE_TRANSLATION_SPEED );
 
         if( m_spacebox2bighp_transz > HYPERSPACE_LAYER2_SCALE_Z )
         {
@@ -265,6 +341,7 @@ void dsAppClient::OnRenderFrame( void )
         renderer->DrawText( 0, 255, 0, 10, 115, "contact = %d", m_ship->GetContactState() );
 
         renderer->DrawText( 0, 255, 0, 10, 300, "reticle distance = %f", m_reticle_widget->GetLastDistance() );
+        renderer->DrawText( 0, 255, 0, 10, 330, "hp state = %d hp_transition_z = %f", m_hp_state, m_hp_transition_transz );
 
     }
 
@@ -1039,7 +1116,8 @@ bool dsAppClient::OnIdleAppInit( void )
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285 / 2.0, 21.4704 / 2.0, 81.911 / 2.0, 1.0 );
     
-    cube_params.initial_attitude.Translation( 265000000.0, 0.0, 0.0 );
+    //cube_params.initial_attitude.Translation( 265000000.0, 0.0, 0.0 );
+    cube_params.initial_attitude.Translation( 269000000.0, 0.0, 9000000.0 );
 
     m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, /*m_ship_drawable*/ NULL, cube_params ) );
    
@@ -1409,7 +1487,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph_hyperspace.AddNode( m_spacebox2bighp.transfo_node );
 
 
-    m_hp_current_speed = HYPERSPACE_TRANSLATION_SPEED;
+    
 
 
     ///////////////////////////////////////////////////////////////
@@ -1456,8 +1534,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     
    
-    m_scenenodegraph.SetCurrentCamera( "camera5" );
-    m_curr_camera = m_camera5;
+    m_scenenodegraph.SetCurrentCamera( "camera2" );
+    m_curr_camera = m_camera2;
 
        
 
@@ -1517,60 +1595,93 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case 'E':
 
-            m_ship->ApplyUpPitch( 50000.0 );
+            if( m_hp_state == HP_NONE )
+            {
+                m_ship->ApplyUpPitch( 50000.0 );
+            }
             break;
 
         case 'C':
 
-            m_ship->ApplyDownPitch( 50000.0 );
+            if( m_hp_state == HP_NONE )
+            {
+                m_ship->ApplyDownPitch( 50000.0 );
+            }
             break;
 
         case 'S':
 
-            m_ship->ApplyLeftYaw( 50000.0 );
+            if( m_hp_state == HP_NONE )
+            {
+                m_ship->ApplyLeftYaw( 50000.0 );
+            }
             break;
 
         case 'F':
 
-            m_ship->ApplyRightYaw( 50000.0 );
+            if( m_hp_state == HP_NONE )
+            {
+                m_ship->ApplyRightYaw( 50000.0 );
+            }
             break;
 
 
         case 'Z':
 
-            m_ship->ApplyLeftRoll( 50000.0 );
+            if( m_hp_state == HP_NONE )
+            {
+                m_ship->ApplyLeftRoll( 50000.0 );
+            }
             break;
 
         case 'R':
 
-            m_ship->ApplyRightRoll( 50000.0 );
+            if( m_hp_state == HP_NONE )
+            {
+                m_ship->ApplyRightRoll( 50000.0 );
+            }
             break;
 
         case 'T':
 
-            m_ship->ApplyFwdForce( 51000000.0 );
+            if( m_hp_state == HP_NONE )
+            {
+                m_ship->ApplyFwdForce( 51000000.0 );
+            }
             break;
 
 
 
         case VK_SPACE:
 
-            m_ship->ZeroSpeed();
+            if( m_hp_state == HP_NONE )
+            {
+                m_ship->ZeroSpeed();
+            }
             break;
 
         case VK_RETURN:
 
-            m_ship->ApplyFwdForce( 110000.0 );
+            if( m_hp_state == HP_NONE )
+            {
+                m_ship->ApplyFwdForce( 110000.0 );
+            }
             break;
 
         case VK_UP:
 
-            m_ship->ApplyFwdForce( -30000.0 );
+            if( m_hp_state == HP_NONE )
+            {
+                m_ship->ApplyFwdForce( -30000.0 );
+            }
             break;
 
         case VK_DOWN:
 
-            m_ship->ApplyDownForce( -10000.0 );
+            if( m_hp_state == HP_NONE )
+            {
+                m_ship->ApplyDownForce( -10000.0 );
+            }
             break;
 
 
@@ -1671,10 +1782,8 @@ void dsAppClient::OnKeyPulse( long p_key )
         case VK_F8:
             {
                 Matrix mat;   
-                mat.Translation( 265000000.0, 0.0, 0.0 );
+                mat.Translation( 269000000.0, 0.0, 9000000.0 );
                 m_ship->ForceInitialAttitude( mat );
-
-
             }
 
             break;
@@ -1723,6 +1832,25 @@ void dsAppClient::OnKeyPulse( long p_key )
                 m_scenenodegraph.SetCurrentCamera( "camera" );
                 m_curr_camera = m_camera;
             }
+            break;
+
+
+        case 'H':
+
+            if( !m_hp && m_hp_state == HP_NONE )
+            {
+                m_hp = true;
+                m_hp_state = HP_ACCELERATE;
+            }
+            else
+            {
+                if( m_hp_state == HP_CRUISE )
+                {
+                    m_hp = false;
+                    m_hp_state = HP_OUT;
+                }
+            }
+
             break;
 
     }
