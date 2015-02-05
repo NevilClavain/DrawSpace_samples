@@ -928,6 +928,74 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
 
+
+    m_hp_transition = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+
+    m_hp_transition->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
+    m_hp_transition->RegisterPassSlot( m_texturepass );
+    m_hp_transition->SetRenderer( renderer );
+
+    m_hp_transition->SetSceneName( "hptransition" );
+    
+    m_hp_transition->GetMeshe()->SetImporter( m_meshe_import );
+
+    m_hp_transition->GetMeshe()->LoadFromFile( "hptransition.ac", 0 );    
+
+    m_hp_transition->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    m_hp_transition->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "plasma1.jpg" ) ), 0 );
+
+
+
+    m_hp_transition->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+
+
+    m_hp_transition_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "hptransition" ) );
+    m_hp_transition_node->SetContent( m_hp_transition );
+
+
+    m_scenenodegraph.RegisterNode( m_hp_transition_node );
+
+
+    m_transition_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "hptransition_transfo" ) );
+    m_transition_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+
+        
+    m_scenenodegraph.AddNode( m_transition_transfo_node );
+    m_scenenodegraph.RegisterNode( m_transition_transfo_node );
+
+    m_hp_transition_node->LinkTo( m_transition_transfo_node );
+
+
+    Matrix hptranspos;
+    hptranspos.Translation( Vector( 269000000.0, 0.0, 8999500.0, 1.0 ) );
+    Matrix hptransscale;
+
+    hptransscale.Scale( 100.0, 100.0, 100.0 );
+
+    m_transition_transfo_node->GetContent()->PushMatrix( hptranspos );
+    m_transition_transfo_node->GetContent()->PushMatrix( hptransscale );
+
+
+
+
+
+
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
     
     m_cube = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
@@ -1623,8 +1691,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_reticle_widget->LockOnTransformNode( m_building );
+    //m_reticle_widget->LockOnTransformNode( m_building );
     //m_reticle_widget->LockOnBody( m_moon );
+    m_reticle_widget->LockOnTransformNode( m_hp_transition );
 
     
     DrawSpace::Gui::ReticleWidget::ClippingParams clp;

@@ -248,6 +248,11 @@ protected:
     
     dsreal                                                              m_hp_transition_transz;
 
+    DrawSpace::Chunk*                                                   m_hp_transition;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_hp_transition_node;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_transition_transfo_node;
+
+
 
     void on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget );
 
