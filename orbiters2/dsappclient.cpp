@@ -40,6 +40,12 @@ _DECLARE_DS_LOGGER( logger, "AppClient" )
 #define HYPERSPACE_LAYER2_1_ROTZ_SPEED  45.0
 #define HYPERSPACE_LAYER2_2_ROTZ_SPEED  50.0
 
+#define HYPERSPACE_TRANSITION_SPEED     70000.0
+
+#define HYPERSPACE_ACCELERATION_MAX_SPEED 50000000.0
+
+#define HYPERSPACE_TRANSITION_INIT_Z    -350000.0
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -91,27 +97,29 @@ void dsAppClient::manage_hp( void )
             {
                 dsreal speed = m_ship->GetLinearSpeedMagnitude() * 3.6;
 
-                if( speed < 50000000.0 )
+                if( speed < HYPERSPACE_ACCELERATION_MAX_SPEED )
                 {
-                    m_ship->ApplyFwdForce( 100000000.0 ); // acceleration de ouuuuf
+                    m_ship->ApplyFwdForce( 200000000.0 ); // acceleration de ouuuuf
                 }
                 else
                 {
                     m_hp_state = HP_IN;
-                    m_hp_transition_transz = -50000.0;
+                    m_hp_transition_transz = HYPERSPACE_TRANSITION_INIT_Z;
+                    m_hp_transition->SetDrawingState( m_texturepass, true );
                 }
             }
             break;
 
         case HP_IN:
             {
-                m_timer.TranslationSpeedInc( &m_hp_transition_transz, 10000.0 );
+                m_timer.TranslationSpeedInc( &m_hp_transition_transz, HYPERSPACE_TRANSITION_SPEED );
 
                 if( m_hp_transition_transz > 0.0 )
                 {
                     m_hp_state = HP_CRUISE;
                     m_ship->ZeroSpeed();
-                    m_hp_transition_transz = -50000.0;
+
+                    m_hp_transition_transz = HYPERSPACE_TRANSITION_INIT_Z;
 
                     ////////////////////////////
 
@@ -143,6 +151,8 @@ void dsAppClient::manage_hp( void )
 
                     m_spacebox->SetDrawingState( m_texturepass, false );
 
+                    m_hp_transition->SetDrawingState( m_texturepass, false );
+
                 }
             }
             break;
@@ -153,7 +163,7 @@ void dsAppClient::manage_hp( void )
 
         case HP_OUT:
             {
-                m_timer.TranslationSpeedInc( &m_hp_transition_transz, 10000.0 );
+                m_timer.TranslationSpeedInc( &m_hp_transition_transz, HYPERSPACE_TRANSITION_SPEED );
 
                 if( m_hp_transition_transz > 0.0 )
                 {
@@ -169,11 +179,13 @@ void dsAppClient::manage_hp( void )
                     ////////////////////////////
 
                     m_hp_state = HP_DECELERATE;
-                    m_ship->ForceLinearSpeed( Vector( 0.0, 0.0, -50000000.0, 1.0 ) );
+                    m_ship->ForceLinearSpeed( Vector( 0.0, 0.0, -HYPERSPACE_ACCELERATION_MAX_SPEED, 1.0 ) );
                     
                     Matrix mat;   
                     mat.Translation( 269000000.0, 0.0, 69000000.0 );
                     m_ship->ForceInitialAttitude( mat );
+
+                    m_hp_transition->SetDrawingState( m_texturepass, false );
                 }
             }
             break;
@@ -184,7 +196,7 @@ void dsAppClient::manage_hp( void )
 
                 if( speed > 10000000.0 )
                 {
-                    m_ship->ApplyRevForce( 1000000000.0 ); // deceleration de ouuuuf
+                    m_ship->ApplyRevForce( 1000000000.0 );
                 }
                 else if( speed > 200000.0 )
                 {
@@ -200,6 +212,19 @@ void dsAppClient::manage_hp( void )
                 }
             }
             break;
+    }
+
+    if( m_hp_state == HP_IN || m_hp_state == HP_OUT )
+    {
+        Matrix hptranspos;
+        hptranspos.Translation( Vector( 0.0, 0.0, m_hp_transition_transz, 1.0 ) );
+        Matrix hptransscale;
+
+        hptransscale.Scale( 1000.0, 1000.0, 1000.0 );
+
+        m_transition_transfo_node->GetContent()->ClearAll();
+        m_transition_transfo_node->GetContent()->PushMatrix( hptranspos );
+        m_transition_transfo_node->GetContent()->PushMatrix( hptransscale );
     }
 
 
@@ -270,15 +295,6 @@ void dsAppClient::manage_hp( void )
         
 
 
-
-        //m_scenenodegraph_hyperspace.ComputeTransformations( m_timer );
-
-        /*
-        m_texturepass_hyperspace->GetRenderingQueue()->Draw();
-        m_finalpass_hyperspace->GetRenderingQueue()->Draw();
-        */
-
-
         m_timer.AngleSpeedInc( &m_spacebox1hp_rotz, HYPERSPACE_1_ROTZ_SPEED );
         m_timer.AngleSpeedInc( &m_spacebox2hp_rotz, HYPERSPACE_2_ROTZ_SPEED );
 
@@ -327,189 +343,53 @@ void dsAppClient::OnRenderFrame( void )
 
 
 
-    
-    //DrawSpace::Utils::Matrix sbtrans;
-    //sbtrans.Scale( 20.0, 20.0, 20.0 );   
-    //m_spacebox->SetLocalTransform( sbtrans );
-
-      
-
-    //Matrix cam7_pos;
-    //cam7_pos.Translation( 0.0, 0.0, 4.0 );
-    //m_camera7->SetLocalTransform( cam7_pos );
-
-
-    //Matrix cam8_pos;
-    //cam8_pos.Translation( 0.0, 130.0, 0.0 );
-    //m_camera8->SetLocalTransform( cam8_pos );
-
     manage_hp();
+    
+
+
+    m_scenenodegraph.ComputeTransformations( m_timer );
+
+    m_text_widget->SetVirtualTranslation( 100, 75 );
+    m_text_widget_2->SetVirtualTranslation( -60, 160 );
+
+    char distance[64];
+    sprintf( distance, "%.3f km", m_reticle_widget->GetLastDistance() / 1000.0 );
+
+    m_text_widget_2->SetText( -40, 0, 30, dsstring( distance ), DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
+    m_reticle_widget->Transform();
+    m_reticle_widget->Draw();
     
 
     //////////////////////////////////////////////////////////////
 
-    /*
-    if( m_draw_hyperspace )
-    {
-        
 
-        Matrix spacebox1hp_scale;
-        Matrix spacebox1hp_trans;
-        Matrix spacebox1hp_rotz;
-        spacebox1hp_scale.Scale( HYPERSPACE_SCALE_XY, HYPERSPACE_SCALE_XY, HYPERSPACE_SCALE_Z );
-        spacebox1hp_trans.Translation( 0.0, 0.0, m_spacebox1hp_transz );
-        spacebox1hp_rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Maths::DegToRad( m_spacebox1hp_rotz ) );
+   
 
-        
-        m_spacebox1hp.transfo_node->GetContent()->ClearAll();
-        m_spacebox1hp.transfo_node->GetContent()->PushMatrix( spacebox1hp_trans );
-        m_spacebox1hp.transfo_node->GetContent()->PushMatrix( spacebox1hp_rotz );
-        m_spacebox1hp.transfo_node->GetContent()->PushMatrix( spacebox1hp_scale );
-        
-        
+    m_texturepass->GetRenderingQueue()->Draw();
+
+    m_text_widget->Draw();
+
+    m_finalpass->GetRenderingQueue()->Draw();
 
 
+    long current_fps = m_timer.GetFPS();
+    renderer->DrawText( 0, 255, 0, 10, 35, "%d", current_fps );
 
-        Matrix spacebox2hp_trans;
-        Matrix spacebox2hp_rotz;
-        spacebox2hp_trans.Translation( 0.0, 0.0, m_spacebox2hp_transz );
-        spacebox2hp_rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Maths::DegToRad( m_spacebox2hp_rotz ) );
+    dsstring date;
+    m_calendar->GetFormatedDate( date );    
+    renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
 
-        
-        
-        m_spacebox2hp.transfo_node->GetContent()->ClearAll();
-        m_spacebox2hp.transfo_node->GetContent()->PushMatrix( spacebox2hp_trans );
-        m_spacebox2hp.transfo_node->GetContent()->PushMatrix( spacebox2hp_rotz );
-        m_spacebox2hp.transfo_node->GetContent()->PushMatrix( spacebox1hp_scale );
-        
-        
-        
-
-
-
-        
-        Matrix spacebox1bighp_scale;
-        Matrix spacebox1bighp_rotz;
-        Matrix spacebox1bighp_trans;
-
-        spacebox1bighp_scale.Scale( HYPERSPACE_LAYER2_SCALE_XY, HYPERSPACE_LAYER2_SCALE_XY, HYPERSPACE_LAYER2_SCALE_Z );
-        spacebox1bighp_rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Maths::DegToRad( m_spacebox1bighp_rotz ) );
-        spacebox1bighp_trans.Translation( 0.0, 0.0, m_spacebox1bighp_transz );
-
-        
-        m_spacebox1bighp.transfo_node->GetContent()->ClearAll();
-        m_spacebox1bighp.transfo_node->GetContent()->PushMatrix( spacebox1bighp_trans );
-        m_spacebox1bighp.transfo_node->GetContent()->PushMatrix( spacebox1bighp_rotz );
-        m_spacebox1bighp.transfo_node->GetContent()->PushMatrix( spacebox1bighp_scale );
-        
-        
-
-        Matrix spacebox2bighp_rotz;
-        Matrix spacebox2bighp_trans;
-        spacebox2bighp_trans.Translation( 0.0, 0.0, m_spacebox2bighp_transz );
-        spacebox2bighp_rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Maths::DegToRad( m_spacebox2bighp_rotz ) );
-        
-        m_spacebox2bighp.transfo_node->GetContent()->ClearAll();
-        m_spacebox2bighp.transfo_node->GetContent()->PushMatrix( spacebox2bighp_trans );
-        m_spacebox2bighp.transfo_node->GetContent()->PushMatrix( spacebox2bighp_rotz );
-        m_spacebox2bighp.transfo_node->GetContent()->PushMatrix( spacebox1bighp_scale );
-        
-
-
-
-        m_scenenodegraph_hyperspace.ComputeTransformations( m_timer );
-
-        m_texturepass_hyperspace->GetRenderingQueue()->Draw();
-        m_finalpass_hyperspace->GetRenderingQueue()->Draw();
-
-
-        m_timer.AngleSpeedInc( &m_spacebox1hp_rotz, HYPERSPACE_1_ROTZ_SPEED );
-        m_timer.AngleSpeedInc( &m_spacebox2hp_rotz, HYPERSPACE_2_ROTZ_SPEED );
-
-
-        m_timer.AngleSpeedInc( &m_spacebox1bighp_rotz, HYPERSPACE_LAYER2_1_ROTZ_SPEED );
-        m_timer.AngleSpeedInc( &m_spacebox2bighp_rotz, HYPERSPACE_LAYER2_2_ROTZ_SPEED );
-
-        m_timer.TranslationSpeedInc( &m_spacebox1hp_transz, HYPERSPACE_TRANSLATION_SPEED );
-
-        if( m_spacebox1hp_transz > HYPERSPACE_SCALE_Z )
-        {
-            m_spacebox1hp_transz = -HYPERSPACE_SCALE_Z;
-        }
-
-        m_timer.TranslationSpeedInc( &m_spacebox2hp_transz, HYPERSPACE_TRANSLATION_SPEED );
-
-        if( m_spacebox2hp_transz > HYPERSPACE_SCALE_Z )
-        {
-            m_spacebox2hp_transz = -HYPERSPACE_SCALE_Z;
-        }
-
-
-        m_timer.TranslationSpeedInc( &m_spacebox1bighp_transz, HYPERSPACE_TRANSLATION_SPEED );
-
-        if( m_spacebox1bighp_transz > HYPERSPACE_LAYER2_SCALE_Z )
-        {
-            m_spacebox1bighp_transz = -HYPERSPACE_LAYER2_SCALE_Z;
-        }
-
-        m_timer.TranslationSpeedInc( &m_spacebox2bighp_transz, HYPERSPACE_TRANSLATION_SPEED );
-
-        if( m_spacebox2bighp_transz > HYPERSPACE_LAYER2_SCALE_Z )
-        {
-            m_spacebox2bighp_transz = -HYPERSPACE_LAYER2_SCALE_Z;
-        }
-
-
-    }
-    else
-    {
-    */
-
-        m_scenenodegraph.ComputeTransformations( m_timer );
     
-        m_text_widget->SetVirtualTranslation( 100, 75 );
-        m_text_widget_2->SetVirtualTranslation( -60, 160 );
-
-        char distance[64];
-        sprintf( distance, "%.3f km", m_reticle_widget->GetLastDistance() / 1000.0 );
-
-        m_text_widget_2->SetText( -40, 0, 30, dsstring( distance ), DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
-        m_reticle_widget->Transform();
-        m_reticle_widget->Draw();
-        
-
-        //////////////////////////////////////////////////////////////
 
 
-       
+    dsreal speed = m_ship->GetLinearSpeedMagnitude();
 
-        m_texturepass->GetRenderingQueue()->Draw();
+    renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h ( %.1f m/s) - aspeed = %.1f", speed * 3.6, speed, m_ship->GetAngularSpeedMagnitude() );
 
-        m_text_widget->Draw();
+    //renderer->DrawText( 0, 255, 0, 10, 115, "contact = %d", m_ship->GetContactState() );
 
-        m_finalpass->GetRenderingQueue()->Draw();
-
-
-        long current_fps = m_timer.GetFPS();
-        renderer->DrawText( 0, 255, 0, 10, 35, "%d", current_fps );
-
-        dsstring date;
-        m_calendar->GetFormatedDate( date );    
-        renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
-
-        
-
-
-        dsreal speed = m_ship->GetLinearSpeedMagnitude();
-
-        renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h ( %.1f m/s) - aspeed = %.1f", speed * 3.6, speed, m_ship->GetAngularSpeedMagnitude() );
-
-        renderer->DrawText( 0, 255, 0, 10, 115, "contact = %d", m_ship->GetContactState() );
-
-        renderer->DrawText( 0, 255, 0, 10, 300, "reticle distance = %f", m_reticle_widget->GetLastDistance() );
-        renderer->DrawText( 0, 255, 0, 10, 330, "hp state = %d hp_transition_z = %f", m_hp_state, m_hp_transition_transz );
-
-    //}
+    //renderer->DrawText( 0, 255, 0, 10, 300, "reticle distance = %f", m_reticle_widget->GetLastDistance() );
+    //renderer->DrawText( 0, 255, 0, 10, 330, "hp state = %d hp_transition_z = %f", m_hp_state, m_hp_transition_transz );
 
 
 
@@ -948,16 +828,35 @@ bool dsAppClient::OnIdleAppInit( void )
     m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
     m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
 
+    /*
     m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
     m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
     m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    */
+
+
+    
+    m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+
+    m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add"  ) );
+    m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always"  ) );
+    m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one"  ) );
+    m_hp_transition->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha"  ) );
+    
+
+
+    m_hp_transition->GetNodeFromPass( m_texturepass )->SetOrderNumber( 500 );
 
     m_hp_transition->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "plasma1.jpg" ) ), 0 );
 
 
 
     m_hp_transition->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+
+    m_hp_transition->IgnoreCamera( true );
+    m_hp_transition->SetDrawingState( m_texturepass, false );
 
 
     m_hp_transition_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "hptransition" ) );
@@ -977,6 +876,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_hp_transition_node->LinkTo( m_transition_transfo_node );
 
 
+    /*
     Matrix hptranspos;
     hptranspos.Translation( Vector( 269000000.0, 0.0, 8999500.0, 1.0 ) );
     Matrix hptransscale;
@@ -985,6 +885,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_transition_transfo_node->GetContent()->PushMatrix( hptranspos );
     m_transition_transfo_node->GetContent()->PushMatrix( hptransscale );
+    */
 
 
 
@@ -1691,9 +1592,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    //m_reticle_widget->LockOnTransformNode( m_building );
+    m_reticle_widget->LockOnTransformNode( m_building );
     //m_reticle_widget->LockOnBody( m_moon );
-    m_reticle_widget->LockOnTransformNode( m_hp_transition );
+    //m_reticle_widget->LockOnTransformNode( m_hp_transition );
 
     
     DrawSpace::Gui::ReticleWidget::ClippingParams clp;
@@ -1900,13 +1801,30 @@ void dsAppClient::OnKeyPress( long p_key )
             break;
 
 
+        case 'M':
+            if( m_hp_state == HP_NONE )
+            {
+                m_ship->ZeroASpeed();
+            }
+            break;
+
+
+        case 'L':
+            if( m_hp_state == HP_NONE )
+            {
+                m_ship->ZeroLSpeed();
+            }
+            break;
+
 
         case VK_SPACE:
 
+            /*
             if( m_hp_state == HP_NONE )
             {
                 m_ship->ZeroSpeed();
             }
+            */
             break;
 
         case VK_RETURN:
@@ -2097,6 +2015,7 @@ void dsAppClient::OnKeyPulse( long p_key )
                 {
                     m_hp = false;
                     m_hp_state = HP_OUT;
+                    m_hp_transition->SetDrawingState( m_texturepass, true );
                 }
             }
 
