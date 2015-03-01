@@ -1,4 +1,3 @@
-
 #include "dsappclient.h"
 
 using namespace DrawSpace;
