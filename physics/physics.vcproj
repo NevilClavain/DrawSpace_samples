@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				UseUnicodeResponseFiles="true"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\;.\..\..\DrawSpace\src;.\..\..\DrawSpace_thirdparts\log4cxx\include;&quot;.\..\..\DrawSpace_thirdparts\bullet-2.82\src&quot;"
+				AdditionalIncludeDirectories=".\;.\..\..\DrawSpace\src;&quot;.\..\..\DrawSpace_thirdparts\bullet-2.82\src&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;BT_USE_DOUBLE_PRECISION"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -62,10 +62,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="drawspace.lib log4cxx.lib BulletDynamics_vs2005_debug.lib BulletCollision_vs2005_debug.lib LinearMath_vs2005_debug.lib"
+				AdditionalDependencies="drawspace.lib BulletDynamics_vs2005_debug.lib BulletCollision_vs2005_debug.lib LinearMath_vs2005_debug.lib"
 				OutputFile="$(SolutionDir)\bin\$(ProjectName).exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=".\..\..\DrawSpace\libs;.\..\..\DrawSpace_thirdparts\log4cxx\lib\msvc\release;&quot;.\..\..\DrawSpace_thirdparts\bullet-2.82\lib&quot;"
+				AdditionalLibraryDirectories=".\..\..\DrawSpace\libs;&quot;.\..\..\DrawSpace_thirdparts\bullet-2.82\lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -100,7 +100,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="1"
+			CharacterSet="0"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -120,8 +120,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
-				RuntimeLibrary="2"
+				AdditionalIncludeDirectories=".\;.\..\..\DrawSpace\src;&quot;.\..\..\DrawSpace_thirdparts\bullet-2.82\src&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;BT_USE_DOUBLE_PRECISION"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -138,7 +139,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="drawspace_r.lib BulletDynamics_vs2005.lib BulletCollision_vs2005.lib LinearMath_vs2005.lib"
+				OutputFile="$(SolutionDir)\bin\$(ProjectName)_r.exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories=".\..\..\DrawSpace\libs;&quot;.\..\..\DrawSpace_thirdparts\bullet-2.82\lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

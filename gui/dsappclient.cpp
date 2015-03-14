@@ -170,7 +170,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->SetRenderer( renderer );
     m_chunk->SetSceneName( "cube" );
 
-    status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
+    status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe", "ac3dmeshe_plugin" );
     m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
     m_chunk->GetMeshe()->SetImporter( m_meshe_import );
     m_chunk->GetMeshe()->LoadFromFile( "object.ac", 0 );
@@ -201,7 +201,7 @@ bool dsAppClient::OnIdleAppInit( void )
     /////////////////////////////////////////////////////////////////
 
 
-    status = DrawSpace::Utils::LoadFontImportPlugin( "cbfgfont.dll", "cbfgfont_plugin" );
+    status = DrawSpace::Utils::LoadFontImportPlugin( "cbfgfont", "cbfgfont_plugin" );
     m_font_import = DrawSpace::Utils::InstanciateFontImportFromPlugin( "cbfgfont_plugin" );
     m_font = _DRAWSPACE_NEW_( Font, Font );
     m_font->SetImporter( m_font_import );
@@ -477,8 +477,8 @@ void dsAppClient::OnMouseMove( long p_xm, long p_ym, long p_dx, long p_dy )
     xmouse = m_xmouse;
     ymouse = m_ymouse;
 
-    m_timer.TranslationSpeedInc( &xmouse,  p_dx * 200 );
-    m_timer.TranslationSpeedInc( &ymouse,  p_dy * 200 );
+    m_timer.TranslationSpeedInc( &xmouse,  p_dx * 20 );
+    m_timer.TranslationSpeedInc( &ymouse,  p_dy * 20 );
 
     m_xmouse = (long)xmouse;
     m_ymouse = (long)ymouse;

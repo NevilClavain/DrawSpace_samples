@@ -655,7 +655,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     bool status;
 
-    status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe.dll", "ac3dmeshe_plugin" );
+    status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe", "ac3dmeshe_plugin" );
     if( !status )
     {
         _DSEXCEPTION( "Cannot load ac3dmeshe plugin !" )
@@ -667,7 +667,7 @@ bool dsAppClient::OnIdleAppInit( void )
     /////////////////////////////////////
 
 
-    status = DrawSpace::Utils::LoadFontImportPlugin( "cbfgfont.dll", "cbfgfont_plugin" );
+    status = DrawSpace::Utils::LoadFontImportPlugin( "cbfgfont", "cbfgfont_plugin" );
     m_font_import = DrawSpace::Utils::InstanciateFontImportFromPlugin( "cbfgfont_plugin" );
     m_font = _DRAWSPACE_NEW_( Font, Font );
     m_font->SetImporter( m_font_import );
