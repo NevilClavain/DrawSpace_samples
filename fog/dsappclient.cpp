@@ -13,7 +13,7 @@ _DECLARE_DS_LOGGER( logger, "AppClient" )
 
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_draw_cube2( true )
 {    
-    _INIT_LOGGER( "fog.conf" )  
+    _INIT_LOGGER( "logfog.conf" )  
     m_w_title = "fog test";
 }
 
