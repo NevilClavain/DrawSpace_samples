@@ -13,12 +13,12 @@ using namespace DrawSpace::Dynamics;
 
 dsAppClient* dsAppClient::m_instance = NULL;
 
-_DECLARE_DS_LOGGER( logger, "AppClient" )
+
 
 
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_box_count( 0 ), m_box_texture( 0 ), m_fpsmove( true ), m_zoom( 1.0 )
 {    
-    _INIT_LOGGER( "physics.conf" )  
+    _INIT_LOGGER( "logphysics.conf" )  
     m_w_title = "physics test";    
 }
 

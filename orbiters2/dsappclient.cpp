@@ -14,7 +14,7 @@ using namespace DrawSpace::Dynamics;
 dsAppClient* dsAppClient::m_instance = NULL;
 
 
-_DECLARE_DS_LOGGER( logger, "AppClient" )
+_DECLARE_DS_LOGGER( logger, "AppClient", DrawSpace::Logger::Configuration::GetInstance() )
 
 
 #define SHIP_MASS 50.0
@@ -60,7 +60,7 @@ m_draw_hyperspace( false ),
 m_hp( false ),
 m_hp_state( HP_NONE )
 {    
-    _INIT_LOGGER( "orbiters2.conf" )  
+    _INIT_LOGGER( "logorbiters2.conf" )  
     m_w_title = "orbiters 2 test";
     m_mouseleftbuttondown_eventhandler = _DRAWSPACE_NEW_( WidgetEventHandler, WidgetEventHandler( this, &dsAppClient::on_mouseleftbuttondown ) );
 

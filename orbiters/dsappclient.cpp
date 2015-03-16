@@ -12,12 +12,12 @@ using namespace DrawSpace::Dynamics;
 
 dsAppClient* dsAppClient::m_instance = NULL;
 
-_DECLARE_DS_LOGGER( logger, "AppClient" )
+
 
 
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 )
 {    
-    _INIT_LOGGER( "orbiters.conf" )  
+    _INIT_LOGGER( "logorbiters.conf" )  
     m_w_title = "orbiters test";
 
     m_nodesevent_cb = _DRAWSPACE_NEW_( NodesEventCallback, NodesEventCallback( this, &dsAppClient::on_nodes_event ) );

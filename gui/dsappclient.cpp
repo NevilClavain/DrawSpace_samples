@@ -7,7 +7,7 @@ using namespace DrawSpace::Gui;
 
 dsAppClient* dsAppClient::m_instance = NULL;
 
-_DECLARE_DS_LOGGER( logger, "AppClient" )
+
 
 
 dsAppClient::dsAppClient( void ) : 
@@ -19,7 +19,7 @@ m_xmouse( 0 ),
 m_ymouse( 0 ),
 m_widget_rot( 0.0 )
 {    
-    _INIT_LOGGER( "gui.conf" )  
+    _INIT_LOGGER( "loggui.conf" )  
     m_w_title = "gui test";
 
     m_mousein_eventhandler = _DRAWSPACE_NEW_( WidgetEventHandler, WidgetEventHandler( this, &dsAppClient::on_mousein ) );

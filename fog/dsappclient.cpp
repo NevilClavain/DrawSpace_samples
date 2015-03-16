@@ -8,7 +8,6 @@ using namespace DrawSpace::Gui;
 
 dsAppClient* dsAppClient::m_instance = NULL;
 
-_DECLARE_DS_LOGGER( logger, "AppClient" )
 
 
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_draw_cube2( true )
