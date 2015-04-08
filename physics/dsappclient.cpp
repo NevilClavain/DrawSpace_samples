@@ -256,8 +256,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->SetRenderer( renderer );
     m_ground->SetSceneName( "ground" );
 
-    status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe", "ac3dmeshe_plugin" );
-    m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
+    //status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe", "ac3dmeshe_plugin" );
+    //m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
+    m_meshe_import = new DrawSpace::Utils::AC3DMesheImport();
     m_ground->GetMeshe()->SetImporter( m_meshe_import );
 
     m_ground->GetMeshe()->LoadFromFile( "grid.ac", 0 );
@@ -337,8 +338,9 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
 
-    status = DrawSpace::Utils::LoadFontImportPlugin( "cbfgfont", "cbfgfont_plugin" );
-    m_font_import = DrawSpace::Utils::InstanciateFontImportFromPlugin( "cbfgfont_plugin" );
+    //status = DrawSpace::Utils::LoadFontImportPlugin( "cbfgfont", "cbfgfont_plugin" );
+    //m_font_import = DrawSpace::Utils::InstanciateFontImportFromPlugin( "cbfgfont_plugin" );
+    m_font_import = new DrawSpace::Utils::CBFGFontImport();
 
     m_font = _DRAWSPACE_NEW_( Font, Font );
 
