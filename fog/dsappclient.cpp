@@ -273,7 +273,7 @@ bool dsAppClient::OnIdleAppInit( void )
     ///////////////////////////////////////////////////////////////
 
 
-    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", NULL, "" ) );
+    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     m_camera_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera" ) );
     m_camera_node->SetContent( m_camera );
 
@@ -299,7 +299,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ////////// 2nd camera //////////////
 
-    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", NULL, "" ) );
+    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     m_camera2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera2" ) );
     m_camera2_node->SetContent( m_camera2 );
 
@@ -326,12 +326,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ////////// 3rd camera //////////////
 
-    m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", NULL, "" ) );
+    m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
 
-    Matrix cam3_pos;
-    cam3_pos.Translation( 0.0, 0.7, 6.0 );
-
-    m_camera3->SetLocalTransform( cam3_pos );
 
     m_camera3_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera3" ) );
     m_camera3_node->SetContent( m_camera3 );

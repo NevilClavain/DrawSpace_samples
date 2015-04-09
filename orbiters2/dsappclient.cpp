@@ -1280,7 +1280,7 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
 
-    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera", NULL, "" ) );    
+    m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     
     m_camera_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera" ) );
     m_camera_node->SetContent( m_camera );
@@ -1288,7 +1288,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     
-    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera2", /*m_ship*/ NULL, /*"ship"*/ "" ) );
+    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     m_camera2->SetReferentBody( m_ship );
     
     m_camera2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera2" ) );
@@ -1321,7 +1321,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera3", /*m_ship*/ NULL, /*"ship"*/ "" ) );
+    m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     m_camera3->LockOnBody( "ship", m_ship );
     m_camera3->SetReferentBody( m_ship );
     
@@ -1346,7 +1346,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera4", NULL, "" ) );
+    m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     m_camera4->LockOnBody( "cube", m_cube_body );
     m_camera4->SetReferentBody( m_ship );
 
@@ -1359,7 +1359,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera5", NULL, "" ) );
+    m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
 
     m_camera5->SetReferentBody( m_planet );
     m_camera5_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera5" ) );
@@ -1404,7 +1404,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera6", NULL, "" ) );
+    m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     m_camera6->SetReferentBody( m_planet );
     m_camera6->LockOnBody( "ship", m_ship );
 
@@ -1431,7 +1431,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_camera6_node->LinkTo( m_spectmvt_node );
 
-    m_camera7 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera7", NULL, "" ) );
+    m_camera7 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     m_camera7->SetReferentBody( m_cube_body );
     
     m_camera7_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera7" ) );
@@ -1456,7 +1456,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     
-    m_camera8 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint( "camera8", NULL , "" ) );
+    m_camera8 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     
 
     m_camera8->SetReferentBody( m_planet );
