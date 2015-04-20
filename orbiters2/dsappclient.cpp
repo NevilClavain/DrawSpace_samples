@@ -1322,7 +1322,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    m_camera3->LockOnBody( "ship", m_ship );
+    //m_camera3->LockOnBody( "ship", m_ship );
+    m_camera3->Lock( "ship", m_ship_node );
     m_camera3->SetReferentBody( m_ship );
     
     m_camera3_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera3" ) );
@@ -1347,7 +1348,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_camera4 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    m_camera4->LockOnBody( "cube", m_cube_body );
+    //m_camera4->LockOnBody( "cube", m_cube_body );
+    m_camera4->Lock( "cube", m_cube_body_node );
     m_camera4->SetReferentBody( m_ship );
 
     m_camera4_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera4" ) );
@@ -1406,7 +1408,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_camera6 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     m_camera6->SetReferentBody( m_planet );
-    m_camera6->LockOnBody( "ship", m_ship );
+    //m_camera6->LockOnBody( "ship", m_ship );
+    m_camera6->Lock( "ship", m_ship_node );
 
 
     m_camera6_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera6" ) );
@@ -1460,7 +1463,8 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
     m_camera8->SetReferentBody( m_planet );
-    m_camera8->LockOnBody( "cube", m_cube_body );
+    //m_camera8->LockOnBody( "cube", m_cube_body );
+    m_camera8->Lock( "cube", m_cube_body_node );
 
     m_camera8_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera8" ) );
     m_camera8_node->SetContent( m_camera8 );
@@ -1699,8 +1703,9 @@ bool dsAppClient::OnIdleAppInit( void )
     ///////////////////////////////////////////////////////////////
 
 
-    m_camera5->LockOnBody( "cube", m_cube_body );
+    //m_camera5->LockOnBody( "cube", m_cube_body );
     //m_camera5->LockOnTransformNode( "cube", m_cube );
+    m_camera5->Lock( "cube", m_cube_body_node );
 
 
 

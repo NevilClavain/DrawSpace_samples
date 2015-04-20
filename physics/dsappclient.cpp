@@ -428,7 +428,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_camera_2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    m_camera_2->LockOnTransformNode( "box", m_boxes[0].drawable );
+    //m_camera_2->LockOnTransformNode( "box", m_boxes[0].drawable );
+    m_camera_2->Lock( "box", m_boxes[0].drawable_node );
 
     
     m_camera2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera2" ) );

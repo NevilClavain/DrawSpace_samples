@@ -385,7 +385,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_camera2->LockOnBody( "cube_body", m_cube_body );
+    //m_camera2->LockOnBody( "cube_body", m_cube_body );
+    m_camera2->Lock( "cube_body", m_cube_body_node );
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////
