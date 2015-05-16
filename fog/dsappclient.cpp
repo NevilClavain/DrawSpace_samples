@@ -39,6 +39,7 @@ void dsAppClient::OnRenderFrame( void )
 
     renderer->DrawText( 255, 0, 0, 10, 20, "%d fps", m_timer.GetFPS() );
     renderer->DrawText( 255, 0, 0, 10, 40, "%s", m_current_camera.c_str() );
+    renderer->DrawText( 255, 0, 0, 10, 135, "%d", m_cube_body->IsActive() );
 
     renderer->FlipScreen();
 
@@ -356,6 +357,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, /*m_chunk*/ NULL, cube_params ) );
 
+    m_cube_body->Enable( false );
+
     m_cube_body_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::InertBody>, SceneNode<DrawSpace::Dynamics::InertBody>( "cube_body" ) );
     m_cube_body_node->SetContent( m_cube_body );
 
@@ -386,7 +389,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     //m_camera2->LockOnBody( "cube_body", m_cube_body );
-    m_camera2->Lock( "cube_body", m_cube_body_node );
+    m_camera2->Lock( m_cube_body_node );
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////
@@ -531,6 +534,18 @@ void dsAppClient::OnKeyPress( long p_key )
             else
             {
                 m_freemove.SetSpeed( -6.0 );
+            }
+            break;
+
+        case VK_F3:
+
+            if( m_cube_body->IsActive() )
+            {
+                m_cube_body->Enable( false );
+            }
+            else
+            {
+                m_cube_body->Enable( true );
             }
             break;
 

@@ -87,6 +87,7 @@ protected:
 
     bool                                                                m_draw_cube2;
 
+
     dsAppClient( void );
 
 public:
