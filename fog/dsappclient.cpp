@@ -39,7 +39,7 @@ void dsAppClient::OnRenderFrame( void )
 
     renderer->DrawText( 255, 0, 0, 10, 20, "%d fps", m_timer.GetFPS() );
     renderer->DrawText( 255, 0, 0, 10, 40, "%s", m_current_camera.c_str() );
-    renderer->DrawText( 255, 0, 0, 10, 135, "%d", m_cube_body->IsActive() );
+    renderer->DrawText( 255, 0, 0, 10, 135, "%d", m_cube_body->IsEnabled() );
 
     renderer->FlipScreen();
 
@@ -539,7 +539,7 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case VK_F3:
 
-            if( m_cube_body->IsActive() )
+            if( m_cube_body->IsEnabled() )
             {
                 m_cube_body->Enable( false );
             }
