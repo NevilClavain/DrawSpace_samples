@@ -41,10 +41,11 @@ void dsAppClient::OnRenderFrame( void )
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
-
+/*
     DrawSpace::Utils::Matrix sbtrans;
     sbtrans.Scale( 20.0, 20.0, 20.0 );
     m_spacebox->SetLocalTransform( sbtrans );
+*/
 
     m_scenenodegraph.ComputeTransformations( m_timer );
 
@@ -136,7 +137,7 @@ void dsAppClient::create_box( void )
     sprintf( namebody, "body_box_%d", m_box_count );
 
 
-    chunk->SetSceneName( name );
+
     
     chunk->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -254,7 +255,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
     m_ground->RegisterPassSlot( m_texturepass );
     m_ground->SetRenderer( renderer );
-    m_ground->SetSceneName( "ground" );
+
 
     //status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe", "ac3dmeshe_plugin" );
     //m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
@@ -293,7 +294,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
     m_spacebox->RegisterPassSlot( m_texturepass );
 
-    m_spacebox->SetSceneName( "spacebox" );
+
 
 
     DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, m_texturepass );
@@ -329,8 +330,20 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Spacebox>, SceneNode<DrawSpace::Spacebox>( "spacebox" ) );
     m_spacebox_node->SetContent( m_spacebox );
 
-    m_scenenodegraph.AddNode( m_spacebox_node );
+    //m_scenenodegraph.AddNode( m_spacebox_node );
     m_scenenodegraph.RegisterNode( m_spacebox_node );
+
+
+    m_spacebox_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "spacebox_transfo" ) );
+    m_spacebox_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+    Matrix spacebox_scale;
+    spacebox_scale.Scale( 20.0, 20.0, 20.0 );
+    m_spacebox_transfo_node->GetContent()->PushMatrix( spacebox_scale );
+
+    m_scenenodegraph.AddNode( m_spacebox_transfo_node );
+    m_scenenodegraph.RegisterNode( m_spacebox_transfo_node );
+    m_spacebox_node->LinkTo( m_spacebox_transfo_node );
+
     
 
 
@@ -429,7 +442,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_camera_2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     //m_camera_2->LockOnTransformNode( "box", m_boxes[0].drawable );
-    m_camera_2->Lock( "box", m_boxes[0].drawable_node );
+    m_camera_2->Lock( m_boxes[0].drawable_node );
 
     
     m_camera2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera2" ) );
