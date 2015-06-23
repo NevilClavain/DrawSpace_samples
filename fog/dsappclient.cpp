@@ -355,7 +355,7 @@ bool dsAppClient::OnIdleAppInit( void )
     cube_params.initial_attitude.Translation( 0.0, 10.5, 0.0 );
 
 
-    m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, /*m_chunk*/ NULL, cube_params ) );
+    m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, cube_params ) );
 
     m_cube_body->Enable( false );
 
@@ -377,7 +377,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ground_params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
 
-    m_ground_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, /*m_ground*/NULL, ground_params ) );
+    m_ground_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, ground_params ) );
     m_ground_body_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::InertBody>, SceneNode<DrawSpace::Dynamics::InertBody>( "ground_body" ) );
     m_ground_body_node->SetContent( m_ground_body );
 
