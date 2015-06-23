@@ -491,8 +491,6 @@ void dsAppClient::init_hpspacebox( const dsstring& p_scenename, Pass* p_pass, hp
     spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
     spacebox->RegisterPassSlot( m_texturepass );
     
-    spacebox->SetSceneName( p_scenename );
-
     for( long i = 0; i < 6; i++ )
     {
 
@@ -747,8 +745,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
     m_spacebox->RegisterPassSlot( m_texturepass );
     
-    m_spacebox->SetSceneName( "spacebox" );
-
 
     DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, m_texturepass );
 
@@ -818,8 +814,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_hp_transition->RegisterPassSlot( m_texturepass );
     m_hp_transition->SetRenderer( renderer );
-
-    m_hp_transition->SetSceneName( "hptransition" );
     
     m_hp_transition->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -907,8 +901,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_cube->RegisterPassSlot( m_texturepass );
     m_cube->SetRenderer( renderer );
-
-    m_cube->SetSceneName( "cube" );
     
     m_cube->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -982,8 +974,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_building->RegisterPassSlot( m_texturepass );
     m_building->SetRenderer( renderer );
-
-    m_building->SetSceneName( "building" );
     
     m_building->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -1055,7 +1045,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_socle->RegisterPassSlot( m_texturepass );
     m_socle->SetRenderer( renderer );
 
-    m_socle->SetSceneName( "socle" );
+
     
     m_socle->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -1227,7 +1217,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ship_drawable->RegisterPassSlot( m_texturepass );
     m_ship_drawable->SetRenderer( renderer );
 
-    m_ship_drawable->SetSceneName( "rocket" );
     
     m_ship_drawable->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -1598,8 +1587,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-
-    m_reticle_widget->LockOnTransformNode( m_building );
+    m_reticle_widget->Lock( m_building_node );
+    //m_reticle_widget->LockOnTransformNode( m_building );
     //m_reticle_widget->LockOnBody( m_moon );
     //m_reticle_widget->LockOnTransformNode( m_hp_transition );
 
