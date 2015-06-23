@@ -183,7 +183,7 @@ void dsAppClient::create_box( void )
     cube_params.initial_attitude.Translation( 0.0, 10.5, -25.0 );
 
 
-    DrawSpace::Dynamics::InertBody* cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, /*chunk*/NULL, cube_params ) );
+    DrawSpace::Dynamics::InertBody* cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, cube_params ) );
 
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>* cube_body_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::InertBody>, SceneNode<DrawSpace::Dynamics::InertBody>( namebody ) );
     cube_body_node->SetContent( cube_body );
@@ -492,7 +492,7 @@ bool dsAppClient::OnIdleAppInit( void )
     ground_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 100.0, 0.0, 100., 1.0 );
     ground_params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
 
-    m_ground_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, /*m_ground*/ NULL, ground_params ) );
+    m_ground_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, ground_params ) );
     m_ground_body_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::InertBody>, SceneNode<DrawSpace::Dynamics::InertBody>( "ground_body" ) );
     m_ground_body_node->SetContent( m_ground_body );
 

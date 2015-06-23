@@ -939,7 +939,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, /*m_chunk*/ NULL, cube_params ) );
+    m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, cube_params ) );
     
     m_cube_body_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::InertBody>, SceneNode<DrawSpace::Dynamics::InertBody>( "cube_body_node" ) );
 
@@ -1256,7 +1256,7 @@ bool dsAppClient::OnIdleAppInit( void )
     //cube_params.initial_attitude.Translation( 265000000.0, 0.0, 0.0 );
     cube_params.initial_attitude.Translation( 269000000.0, 0.0, 9000000.0 );
 
-    m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, /*m_ship_drawable*/ NULL, cube_params ) );
+    m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, cube_params ) );
    
     m_ship_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::Rocket>, SceneNode<DrawSpace::Dynamics::Rocket>( "rocket_body" ) );
     m_ship_node->SetContent( m_ship );
