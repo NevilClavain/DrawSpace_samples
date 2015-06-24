@@ -1008,7 +1008,7 @@ bool dsAppClient::OnIdleAppInit( void )
     bld_params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
     bld_params.shape_descr.meshe = *( m_building->GetMeshe() );
    
-    m_building_collider = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Collider, DrawSpace::Dynamics::Collider( /*m_building*/ NULL ) );
+    m_building_collider = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Collider, DrawSpace::Dynamics::Collider );
 
     m_building_collider->SetKinematic( bld_params );
 
@@ -1085,7 +1085,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
    
-    m_socle_collider = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Collider, DrawSpace::Dynamics::Collider( /*m_socle*/ NULL ) );
+    m_socle_collider = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Collider, DrawSpace::Dynamics::Collider );
 
     m_socle_collider->SetKinematic( socle_params );
 

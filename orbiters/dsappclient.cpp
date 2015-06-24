@@ -41,7 +41,6 @@ Chunk* dsAppClient::build_planet_chunk( char* p_name, char* p_texture )
 
     chunk->RegisterPassSlot( m_texturepass );
     chunk->SetRenderer( renderer );
-    chunk->SetSceneName( p_name );
 
     chunk->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -77,7 +76,6 @@ Chunk* dsAppClient::build_orbit_drawable( char* p_name, Orbit* p_orbit )
 
     chunk->RegisterPassSlot( m_texturepass );
     chunk->SetRenderer( renderer );
-    chunk->SetSceneName( p_name );
 
     Meshe* orb0_meshe = chunk->GetMeshe();
 
@@ -113,29 +111,9 @@ void dsAppClient::OnRenderFrame( void )
 {
     Matrix cam2_pos;
     cam2_pos.Translation( 0.0, 1.0, 0.0 );
-
-    
-
+   
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
-
-
-    
-    DrawSpace::Utils::Matrix sbtrans;
-    sbtrans.Scale( 20.0, 20.0, 20.0 );
-    
-    m_spacebox->SetLocalTransform( sbtrans );
-    
-
-
-    //m_cube_body->Update( m_timer );
-    //m_cube_body_2->Update( m_timer );
-
-
-    
-    
-    Matrix origin;
-    origin.Identity();
-
+           
     m_scenenodegraph.ComputeTransformations( m_timer );
 
 
@@ -227,9 +205,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
     m_spacebox->RegisterPassSlot( m_texturepass );
 
-    m_spacebox->SetSceneName( "spacebox" );
-
-
     DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, m_texturepass );
 
     m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::FrontQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_front5.png" ) ), 0 );
@@ -264,8 +239,18 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Spacebox>, SceneNode<DrawSpace::Spacebox>( "spacebox" ) );
     m_spacebox_node->SetContent( m_spacebox );
 
-    m_scenenodegraph.AddNode( m_spacebox_node );
     m_scenenodegraph.RegisterNode( m_spacebox_node );
+
+    m_spacebox_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "spacebox_transfo" ) );
+    m_spacebox_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+    Matrix spacebox_scale;
+    spacebox_scale.Scale( 20.0, 20.0, 20.0 );
+    m_spacebox_transfo_node->GetContent()->PushMatrix( spacebox_scale );
+
+    m_scenenodegraph.AddNode( m_spacebox_transfo_node );
+    m_scenenodegraph.RegisterNode( m_spacebox_transfo_node );
+    m_spacebox_node->LinkTo( m_spacebox_transfo_node );
+
 
     
 
@@ -306,7 +291,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph.RegisterNode( m_mars_chunk_node );
 
 
-    m_mars_orbiter = _DRAWSPACE_NEW_( Orbiter, Orbiter( &m_world, NULL ) );
+    m_mars_orbiter = _DRAWSPACE_NEW_( Orbiter, Orbiter( &m_world ) );
     m_mars_orbiter->SetOrbitDuration( 1.0 );
     m_mars_orbiter->SetRevolutionTiltAngle( 33.0 );
     m_mars_orbiter->SetRevolutionDuration( 1.0 );
@@ -370,7 +355,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_moon_orbiter = _DRAWSPACE_NEW_( Orbiter, Orbiter( &m_world, NULL ) );
+    m_moon_orbiter = _DRAWSPACE_NEW_( Orbiter, Orbiter( &m_world ) );
     m_moon_orbiter->SetOrbitDuration( 0.5 );
     m_moon_orbiter->SetRevolutionTiltAngle( 0.0 );
     m_moon_orbiter->SetRevolutionDuration( 0.3 );
@@ -458,7 +443,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph.RegisterNode( m_saturn1_chunk_node );
 
 
-    m_saturn1_orbiter = _DRAWSPACE_NEW_( Orbiter, Orbiter( &m_world, NULL ) );
+    m_saturn1_orbiter = _DRAWSPACE_NEW_( Orbiter, Orbiter( &m_world ) );
     m_saturn1_orbiter->SetOrbitDuration( 0.45 );
     m_saturn1_orbiter->SetRevolutionTiltAngle( 0.0 );
     m_saturn1_orbiter->SetRevolutionDuration( 0.0 );
@@ -525,7 +510,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph.RegisterNode( m_saturn2_chunk_node );
 
 
-    m_saturn2_orbiter = _DRAWSPACE_NEW_( Orbiter, Orbiter( &m_world, NULL ) );
+    m_saturn2_orbiter = _DRAWSPACE_NEW_( Orbiter, Orbiter( &m_world ) );
     m_saturn2_orbiter->SetOrbitDuration( 0.45 );
     m_saturn2_orbiter->SetRevolutionTiltAngle( 0.0 );
     m_saturn2_orbiter->SetRevolutionDuration( 0.0 );
@@ -614,8 +599,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     chunk->RegisterPassSlot( m_texturepass );
     chunk->SetRenderer( renderer );
-
-    chunk->SetSceneName( "box" );
     
     chunk->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -659,7 +642,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     cube_params.initial_attitude.Translation( 50.0, 0.0, -10.0 );
 
-    m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, chunk, cube_params ) );
+    m_cube_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, cube_params ) );
 
 
     m_cube_body_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::InertBody>, SceneNode<DrawSpace::Dynamics::InertBody>( "cube_body" ) );
@@ -683,8 +666,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     chunk->RegisterPassSlot( m_texturepass );
     chunk->SetRenderer( renderer );
-
-    chunk->SetSceneName( "box2" );
     
     chunk->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -725,7 +706,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     cube_params.initial_attitude.Translation( 5.0, 0.0, -100.0 );
 
-    m_cube_body_2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, chunk, cube_params ) );
+    m_cube_body_2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, cube_params ) );
 
 
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>* m_cube_body_2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::InertBody>, SceneNode<DrawSpace::Dynamics::InertBody>( "cube_body_2" ) );
