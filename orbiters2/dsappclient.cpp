@@ -691,7 +691,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_texturepass->GetRenderingQueue()->EnableDepthClearing( true );
     m_texturepass->GetRenderingQueue()->EnableTargetClearing( /*false*/ true );
-    m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0 );
+    m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 255 );
     
 
 

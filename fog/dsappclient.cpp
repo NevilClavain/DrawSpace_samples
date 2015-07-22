@@ -66,7 +66,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_texturepass->GetRenderingQueue()->EnableDepthClearing( true );
     m_texturepass->GetRenderingQueue()->EnableTargetClearing( true );
-    m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 145, 230, 230 );
+    m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 145, 230, 230, 255 );
 
     
 
@@ -79,7 +79,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_fogintpass->GetRenderingQueue()->EnableDepthClearing( true );
     m_fogintpass->GetRenderingQueue()->EnableTargetClearing( true );
-    m_fogintpass->GetRenderingQueue()->SetTargetClearingColor( 255, 0, 0 );
+    m_fogintpass->GetRenderingQueue()->SetTargetClearingColor( 255, 0, 0, 255 );
     
 
 
@@ -202,7 +202,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->GetNodeFromPass( m_fogintpass )->GetFx()->GetShader( 0 )->LoadFromFile();
     m_ground->GetNodeFromPass( m_fogintpass )->GetFx()->GetShader( 1 )->LoadFromFile();
 
-    m_ground->GetNodeFromPass( m_fogintpass )->AddShaderParameter( 0, "fog_intensity", 12 );
+    m_ground->GetNodeFromPass( m_fogintpass )->AddShaderParameter( 0, "fog_intensity", 20 );
     m_ground->GetNodeFromPass( m_fogintpass )->SetShaderReal( "fog_intensity", 0.08 );
 
     m_ground->GetNodeFromPass( m_fogintpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
