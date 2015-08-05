@@ -60,6 +60,13 @@ protected:
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::InertBody>*         m_ground_body_node;
 
 
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_impostor_transfo_node;
+
+    DrawSpace::Impostor*                                                m_impostor;
+    DrawSpace::Core::SceneNode<DrawSpace::Impostor>*                    m_impostor_node;
+
+
+
     int                                                                 m_box_count;
     int                                                                 m_box_texture;
 

@@ -41,11 +41,6 @@ void dsAppClient::OnRenderFrame( void )
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
-/*
-    DrawSpace::Utils::Matrix sbtrans;
-    sbtrans.Scale( 20.0, 20.0, 20.0 );
-    m_spacebox->SetLocalTransform( sbtrans );
-*/
 
     m_scenenodegraph.ComputeTransformations( m_timer );
 
@@ -90,6 +85,7 @@ void dsAppClient::OnRenderFrame( void )
     dsreal center_x, center_y;
     dsreal out_z;
 
+    
     m_boxes[0].inert_body->GetLastWorldTransformation( cube0_pos );
 
     cube0_pos_v[0] = cube0_pos( 3, 0 );
@@ -102,7 +98,7 @@ void dsAppClient::OnRenderFrame( void )
     m_image1->SetTranslation( center_x, center_y );
 
     renderer->DrawText( 0, 255, 0, 10, 105, "%f %f", center_x, center_y );
-
+    
 
     ///////////////////////////////////////////
 
@@ -226,7 +222,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->Initialize();
     m_texturepass->GetRenderingQueue()->EnableDepthClearing( true );
     m_texturepass->GetRenderingQueue()->EnableTargetClearing( true );
-    m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0 );
+    m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 0 );
 
 
 
@@ -257,8 +253,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->SetRenderer( renderer );
 
 
-    //status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe", "ac3dmeshe_plugin" );
-    //m_meshe_import = DrawSpace::Utils::InstanciateMesheImportFromPlugin( "ac3dmeshe_plugin" );
     m_meshe_import = new DrawSpace::Utils::AC3DMesheImport();
     m_ground->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -291,6 +285,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ////////////////////////////////////////////////////////////////
 
+       
     m_spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
     m_spacebox->RegisterPassSlot( m_texturepass );
 
@@ -330,7 +325,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Spacebox>, SceneNode<DrawSpace::Spacebox>( "spacebox" ) );
     m_spacebox_node->SetContent( m_spacebox );
 
-    //m_scenenodegraph.AddNode( m_spacebox_node );
+    
     m_scenenodegraph.RegisterNode( m_spacebox_node );
 
 
@@ -351,8 +346,6 @@ bool dsAppClient::OnIdleAppInit( void )
     //////////////////////////////////////////////////////////////
 
 
-    //status = DrawSpace::Utils::LoadFontImportPlugin( "cbfgfont", "cbfgfont_plugin" );
-    //m_font_import = DrawSpace::Utils::InstanciateFontImportFromPlugin( "cbfgfont_plugin" );
     m_font_import = new DrawSpace::Utils::CBFGFontImport();
 
     m_font = _DRAWSPACE_NEW_( Font, Font );
@@ -370,11 +363,11 @@ bool dsAppClient::OnIdleAppInit( void )
     m_fpstext_widget->GetImage()->SetOrderNumber( 20000 );
 
     m_fpstext_widget->RegisterToPass( m_finalpass );
-
+    
 
     //////////////////////////////////////////////////////////////
 
-
+    
     m_image1 = _DRAWSPACE_NEW_( Image, Image( (long)8, (long)8 ) );
 
     m_image1->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
@@ -395,7 +388,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_image1->GetTexture( 0 )->LoadFromFile();
 
     m_image1->SetOrderNumber( 20000 );
-
+    
 
 
     m_finalpass->GetRenderingQueue()->Add( m_image1 );
@@ -404,6 +397,56 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_world.Initialize();
     m_world.SetGravity( DrawSpace::Utils::Vector( 0.0, -9.81, 0.0, 0.0 ) );
+
+
+
+
+
+    m_impostor_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "impostor_transfo" ) );
+    m_impostor_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+    Matrix impostor_scale;
+    impostor_scale.Scale( 2.0, 2.0, 0.0 );
+
+    Matrix impostor_pos;
+    impostor_pos.Translation( 3.0, 3.4, -24.0 );
+
+    m_impostor_transfo_node->GetContent()->PushMatrix( impostor_pos );
+    m_impostor_transfo_node->GetContent()->PushMatrix( impostor_scale );
+
+    m_scenenodegraph.AddNode( m_impostor_transfo_node );
+    m_scenenodegraph.RegisterNode( m_impostor_transfo_node );
+    
+
+
+    m_impostor = _DRAWSPACE_NEW_( DrawSpace::Impostor, DrawSpace::Impostor );
+
+    m_impostor->RegisterPassSlot( m_texturepass );
+
+    m_impostor->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );    
+    m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+
+    m_impostor->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) ), 0 );
+    m_impostor->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+
+    m_impostor_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Impostor>, SceneNode<DrawSpace::Impostor>( "impostor0" ) );
+
+    m_impostor_node->SetContent( m_impostor );
+
+
+    m_scenenodegraph.RegisterNode( m_impostor_node );
+
+    m_impostor_node->LinkTo( m_impostor_transfo_node );
+
+
+
+
+
 
 
 
@@ -440,9 +483,13 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
+
+
     m_camera_2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    //m_camera_2->LockOnTransformNode( "box", m_boxes[0].drawable );
-    m_camera_2->Lock( m_boxes[0].drawable_node );
+    
+    //m_camera_2->Lock( m_boxes[0].drawable_node );
+
+    m_camera_2->Lock( m_impostor_node );
 
     
     m_camera2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera2" ) );
@@ -477,15 +524,16 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
+    
 
-
+    m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
 
 
     //////////////////////////////////////////////////////////////
 
-
+    
     DrawSpace::Dynamics::InertBody::Parameters ground_params;    
     ground_params.mass = 0.0;
     ground_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
@@ -500,7 +548,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph.RegisterNode( m_ground_body_node );
 
     m_ground_node->LinkTo( m_ground_body_node );
-
+    
 
     
 
