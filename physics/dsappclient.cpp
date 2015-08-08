@@ -404,14 +404,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_impostor_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "impostor_transfo" ) );
     m_impostor_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
-    Matrix impostor_scale;
-    impostor_scale.Scale( 2.0, 2.0, 0.0 );
 
     Matrix impostor_pos;
-    impostor_pos.Translation( 3.0, 3.4, -24.0 );
+    impostor_pos.Translation( -3.0, 1.4, -24.0 );
 
     m_impostor_transfo_node->GetContent()->PushMatrix( impostor_pos );
-    m_impostor_transfo_node->GetContent()->PushMatrix( impostor_scale );
 
     m_scenenodegraph.AddNode( m_impostor_transfo_node );
     m_scenenodegraph.RegisterNode( m_impostor_transfo_node );
@@ -423,13 +420,13 @@ bool dsAppClient::OnIdleAppInit( void )
     m_impostor->RegisterPassSlot( m_texturepass );
 
     m_impostor->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "screenimpostor.vsh", false ) ) );
+    m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "screenimpostor.psh", false ) ) );
     m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
     m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
 
-    m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );    
-    m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+//m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );    
+ //   m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
 
     m_impostor->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) ), 0 );
     m_impostor->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();

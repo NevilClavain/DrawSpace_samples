@@ -150,7 +150,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->GetNodeFromPass( m_fogintpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "fogintensity.psh", false ) ) );
     m_chunk->GetNodeFromPass( m_fogintpass )->GetFx()->GetShader( 0 )->LoadFromFile();
     m_chunk->GetNodeFromPass( m_fogintpass )->GetFx()->GetShader( 1 )->LoadFromFile();
-    m_chunk->GetNodeFromPass( m_fogintpass )->AddShaderParameter( 0, "fog_intensity", 12 );
+    m_chunk->GetNodeFromPass( m_fogintpass )->AddShaderParameter( 0, "fog_intensity", 24 );
     m_chunk->GetNodeFromPass( m_fogintpass )->SetShaderReal( "fog_intensity", 0.08 );
 
     m_chunk->GetNodeFromPass( m_fogintpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
