@@ -420,8 +420,12 @@ bool dsAppClient::OnIdleAppInit( void )
     Impostor::DisplayList idl;
     Impostor::DisplayListEntry idle;
 
+    for( long j = 0; j < 1; j++ )
     {
+        for( long i = 0; i < 2; i++ )
         {
+            idle.width_scale = 0.5;
+            idle.height_scale = 0.5;
 
             idle.u1 = 0.0;
             idle.v1 = 0.0;
@@ -432,6 +436,8 @@ bool dsAppClient::OnIdleAppInit( void )
             idle.u4 = 0.0;
             idle.v4 = 1.0;
 
+            idle.localpos[0] = i * 0.66;
+            idle.localpos[1] = j * 0.66;
             idle.localpos[2] = 0.0;
     
             idl.push_back( idle );
