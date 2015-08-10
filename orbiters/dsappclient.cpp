@@ -179,7 +179,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_texturepass->GetRenderingQueue()->EnableDepthClearing( true );
     m_texturepass->GetRenderingQueue()->EnableTargetClearing( true );
-    m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0 );
+    m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 0 );
 
 
     //////////////////////////////////////////////////////////////
@@ -355,6 +355,20 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
+
+    m_moon_transform_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "moon_scale" ) );
+    m_moon_transform_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+
+    Matrix moon_scale;
+    moon_scale.Scale( 4.0, 4.0, 4.0 );
+
+    m_moon_transform_node->GetContent()->PushMatrix( moon_scale );
+
+    m_scenenodegraph.RegisterNode( m_moon_transform_node );
+
+    
+
+
     m_moon_orbiter = _DRAWSPACE_NEW_( Orbiter, Orbiter( &m_world ) );
     m_moon_orbiter->SetOrbitDuration( 0.5 );
     m_moon_orbiter->SetRevolutionTiltAngle( 0.0 );
@@ -375,13 +389,16 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_scenenodegraph.RegisterNode( m_moon_orbiter_node );
 
-    m_moon_chunk_node->LinkTo( m_moon_orbiter_node );
+    //m_moon_chunk_node->LinkTo( m_moon_orbiter_node );
+
+    m_moon_transform_node->LinkTo( m_moon_orbiter_node );
+    m_moon_chunk_node->LinkTo( m_moon_transform_node );
 
 
     //////////////////////////////////////////////
 
 
-    m_moon_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 5.0, 0.45, 0.0, 10.0, 3.0, 0.0, 0.5, 0.0, 0.3, NULL ) );
+    m_moon_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 12.0, 0.45, 0.0, 10.0, 3.0, 0.0, 0.5, 0.0, 0.3, NULL ) );
     m_moon_orbit_node = _DRAWSPACE_NEW_( SceneNode<Orbit>, SceneNode<Orbit>( "moon_orbit" ) );
     m_moon_orbit_node->SetContent( m_moon_orbit );
 
@@ -406,6 +423,81 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_moon_orbit_chunk_node->LinkTo( m_mars_orbit_node );
+
+
+    //////////////////////////////////////////////
+
+
+    m_impostor2_ll_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>, DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>( "impostor2_ll" ) );
+
+    m_impostor2_ll_node->SetContent( new LongLatMovement() );
+
+    m_impostor2_ll_node->GetContent()->Init( 0.0, 0.0, 3.1, 0.0, 0.0 );
+
+    m_scenenodegraph.RegisterNode( m_impostor2_ll_node );
+
+    m_impostor2_ll_node->LinkTo( m_moon_orbiter_node );
+
+
+
+
+    Impostor::DisplayList idl;
+    Impostor::DisplayListEntry idle;
+
+    m_impostor2 = _DRAWSPACE_NEW_( DrawSpace::Impostor, DrawSpace::Impostor );
+
+
+    idl.clear();
+
+    idle.width_scale = 2.0;
+    idle.height_scale = 2.0;
+
+    idle.u1 = 0.0;
+    idle.v1 = 0.0;
+    idle.u2 = 1.0;
+    idle.v2 = 0.0;
+    idle.u3 = 1.0;
+    idle.v3 = 1.0;
+    idle.u4 = 0.0;
+    idle.v4 = 1.0;
+
+    idle.localpos[0] = 0.0;
+    idle.localpos[1] = 0.0;
+    idle.localpos[2] = 0.0;
+    
+    idl.push_back( idle );
+
+
+   
+    m_impostor2->Init( idl );
+
+    m_impostor2->RegisterPassSlot( m_texturepass );
+
+    m_impostor2->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.vsh", false ) ) );
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.psh", false ) ) );
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );    
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+
+    m_impostor2->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) ), 0 );
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+
+    
+
+    m_impostor2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Impostor>, SceneNode<DrawSpace::Impostor>( "impostor1" ) );
+
+    m_impostor2_node->SetContent( m_impostor2 );
+
+
+    m_scenenodegraph.RegisterNode( m_impostor2_node );
+
+    m_impostor2_node->LinkTo( m_impostor2_ll_node );
+
+
+
 
 
     //////////////////////////////////////////////

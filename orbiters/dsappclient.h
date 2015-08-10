@@ -101,9 +101,14 @@ protected:
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Orbiter>*           m_moon_orbiter_node;
     DrawSpace::Chunk*                                                   m_moon_chunk;
     DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_moon_chunk_node;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_moon_transform_node;
     DrawSpace::Chunk*                                                   m_moon_orbit_chunk;
     DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_moon_orbit_chunk_node;
 
+
+    DrawSpace::Impostor*                                                m_impostor2;
+    DrawSpace::Core::SceneNode<DrawSpace::Impostor>*                    m_impostor2_node;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*       m_impostor2_ll_node;
 
 
     DrawSpace::Dynamics::Orbit*                                         m_saturn_root_orbit;
