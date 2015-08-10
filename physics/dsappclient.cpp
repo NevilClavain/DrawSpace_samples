@@ -481,6 +481,96 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
+    m_impostor2_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "impostor2_transfo" ) );
+    m_impostor2_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+
+    Matrix impostor2_pos;
+    impostor2_pos.Translation( 6.0, 30.0, -16.0 );
+
+    Matrix impostor2_rot;
+    impostor2_rot.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Maths::DegToRad( 45 ) );
+
+
+    //m_impostor2_transfo_node->GetContent()->PushMatrix( impostor2_rot );
+    m_impostor2_transfo_node->GetContent()->PushMatrix( impostor2_pos );
+
+    m_scenenodegraph.AddNode( m_impostor2_transfo_node );
+    m_scenenodegraph.RegisterNode( m_impostor2_transfo_node );
+
+
+
+    m_impostor2_ll_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>, DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>( "impostor2_ll" ) );
+
+    m_impostor2_ll_node->SetContent( new LongLatMovement() );
+
+    m_impostor2_ll_node->GetContent()->Init( 0.0, -90.0, 12.0, 0.0, 0.0 );
+
+    m_scenenodegraph.RegisterNode( m_impostor2_ll_node );
+
+    m_impostor2_ll_node->LinkTo( m_impostor2_transfo_node );
+
+
+    m_impostor2 = _DRAWSPACE_NEW_( DrawSpace::Impostor, DrawSpace::Impostor );
+
+
+    idl.clear();
+
+    idle.width_scale = 2.0;
+    idle.height_scale = 2.0;
+
+    idle.u1 = 0.0;
+    idle.v1 = 0.0;
+    idle.u2 = 1.0;
+    idle.v2 = 0.0;
+    idle.u3 = 1.0;
+    idle.v3 = 1.0;
+    idle.u4 = 0.0;
+    idle.v4 = 1.0;
+
+    idle.localpos[0] = 0.0;
+    idle.localpos[1] = 0.0;
+    idle.localpos[2] = 0.0;
+    
+    idl.push_back( idle );
+
+
+    
+
+    m_impostor2->Init( idl );
+
+    m_impostor2->RegisterPassSlot( m_texturepass );
+
+    m_impostor2->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.vsh", false ) ) );
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.psh", false ) ) );
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );    
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+
+    m_impostor2->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) ), 0 );
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+
+    
+
+    m_impostor2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Impostor>, SceneNode<DrawSpace::Impostor>( "impostor1" ) );
+
+    m_impostor2_node->SetContent( m_impostor2 );
+
+
+    m_scenenodegraph.RegisterNode( m_impostor2_node );
+
+    m_impostor2_node->LinkTo( m_impostor2_ll_node );
+
+
+
+
+
+
+
+
+
     create_box();
 
     //////////////////////////////////////////////////////////////
@@ -520,7 +610,7 @@ bool dsAppClient::OnIdleAppInit( void )
     
     //m_camera_2->Lock( m_boxes[0].drawable_node );
 
-    m_camera_2->Lock( m_impostor_node );
+    m_camera_2->Lock( m_impostor2_node );
 
     
     m_camera2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera2" ) );

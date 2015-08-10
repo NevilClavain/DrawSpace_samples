@@ -66,6 +66,15 @@ protected:
     DrawSpace::Core::SceneNode<DrawSpace::Impostor>*                    m_impostor_node;
 
 
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_impostor2_transfo_node;
+
+    DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*       m_impostor2_ll_node;
+
+
+    DrawSpace::Impostor*                                                m_impostor2;
+    DrawSpace::Core::SceneNode<DrawSpace::Impostor>*                    m_impostor2_node;
+
+
 
     int                                                                 m_box_count;
     int                                                                 m_box_texture;
