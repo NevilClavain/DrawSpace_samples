@@ -499,23 +499,30 @@ bool dsAppClient::OnIdleAppInit( void )
 
     idl.clear();
 
-    idle.width_scale = 0.4;
-    idle.height_scale = 0.4;
+    for( long j = 0; j < 200; j++ )
+    {
+        for( long i = 0; i < 200; i++ )
+        {
+            idle.width_scale = 0.5;
+            idle.height_scale = 0.5;
 
-    idle.u1 = 0.0;
-    idle.v1 = 0.0;
-    idle.u2 = 1.0;
-    idle.v2 = 0.0;
-    idle.u3 = 1.0;
-    idle.v3 = 1.0;
-    idle.u4 = 0.0;
-    idle.v4 = 1.0;
+            idle.u1 = 0.0;
+            idle.v1 = 0.0;
+            idle.u2 = 1.0;
+            idle.v2 = 0.0;
+            idle.u3 = 1.0;
+            idle.v3 = 1.0;
+            idle.u4 = 0.0;
+            idle.v4 = 1.0;
 
-    idle.localpos[0] = 0.0;
-    idle.localpos[1] = 0.0;
-    idle.localpos[2] = 0.0;
+            idle.localpos[0] = i * 0.66;
+            idle.localpos[1] = j * 0.66;
+            idle.localpos[2] = 0.0;
     
-    idl.push_back( idle );
+            idl.push_back( idle );
+        }
+    }
+    
 
 
     
