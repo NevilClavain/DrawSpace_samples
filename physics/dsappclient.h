@@ -68,7 +68,7 @@ protected:
 
     DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_impostor2_transfo_node;
 
-    DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*       m_impostor2_ll_node;
+
 
 
     DrawSpace::Impostor*                                                m_impostor2;

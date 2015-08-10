@@ -485,13 +485,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_impostor2_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
 
     Matrix impostor2_pos;
-    impostor2_pos.Translation( 6.0, 30.0, -16.0 );
+    impostor2_pos.Translation( 6.0, 3.0, -16.0 );
 
-    Matrix impostor2_rot;
-    impostor2_rot.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Maths::DegToRad( 45 ) );
-
-
-    //m_impostor2_transfo_node->GetContent()->PushMatrix( impostor2_rot );
     m_impostor2_transfo_node->GetContent()->PushMatrix( impostor2_pos );
 
     m_scenenodegraph.AddNode( m_impostor2_transfo_node );
@@ -499,24 +494,13 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_impostor2_ll_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>, DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>( "impostor2_ll" ) );
-
-    m_impostor2_ll_node->SetContent( new LongLatMovement() );
-
-    m_impostor2_ll_node->GetContent()->Init( 0.0, -90.0, 12.0, 0.0, 0.0 );
-
-    m_scenenodegraph.RegisterNode( m_impostor2_ll_node );
-
-    m_impostor2_ll_node->LinkTo( m_impostor2_transfo_node );
-
-
     m_impostor2 = _DRAWSPACE_NEW_( DrawSpace::Impostor, DrawSpace::Impostor );
 
 
     idl.clear();
 
-    idle.width_scale = 2.0;
-    idle.height_scale = 2.0;
+    idle.width_scale = 0.4;
+    idle.height_scale = 0.4;
 
     idle.u1 = 0.0;
     idle.v1 = 0.0;
@@ -561,7 +545,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_scenenodegraph.RegisterNode( m_impostor2_node );
 
-    m_impostor2_node->LinkTo( m_impostor2_ll_node );
+    m_impostor2_node->LinkTo( m_impostor2_transfo_node );
 
 
 
