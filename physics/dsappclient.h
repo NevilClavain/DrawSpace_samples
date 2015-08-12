@@ -62,8 +62,8 @@ protected:
 
     DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_impostor_transfo_node;
 
-    DrawSpace::Impostor*                                                m_impostor;
-    DrawSpace::Core::SceneNode<DrawSpace::Impostor>*                    m_impostor_node;
+    DrawSpace::Chunk*                                                   m_impostor;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_impostor_node;
 
 
     DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_impostor2_transfo_node;
@@ -71,8 +71,8 @@ protected:
 
 
 
-    DrawSpace::Impostor*                                                m_impostor2;
-    DrawSpace::Core::SceneNode<DrawSpace::Impostor>*                    m_impostor2_node;
+    DrawSpace::Chunk*                                                   m_impostor2;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_impostor2_node;
 
 
 

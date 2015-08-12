@@ -106,8 +106,8 @@ protected:
     DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_moon_orbit_chunk_node;
 
 
-    DrawSpace::Impostor*                                                m_impostor2;
-    DrawSpace::Core::SceneNode<DrawSpace::Impostor>*                    m_impostor2_node;
+    DrawSpace::Chunk*                                                   m_impostor2;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_impostor2_node;
     DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*       m_impostor2_ll_node;
 
 

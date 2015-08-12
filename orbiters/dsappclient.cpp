@@ -40,7 +40,6 @@ Chunk* dsAppClient::build_planet_chunk( char* p_name, char* p_texture )
     chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
     chunk->RegisterPassSlot( m_texturepass );
-    chunk->SetRenderer( renderer );
 
     chunk->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -75,7 +74,6 @@ Chunk* dsAppClient::build_orbit_drawable( char* p_name, Orbit* p_orbit )
     chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
     chunk->RegisterPassSlot( m_texturepass );
-    chunk->SetRenderer( renderer );
 
     Meshe* orb0_meshe = chunk->GetMeshe();
 
@@ -441,10 +439,10 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    Impostor::DisplayList idl;
-    Impostor::DisplayListEntry idle;
+    Chunk::ImpostorsDisplayList idl;
+    Chunk::ImpostorsDisplayListEntry idle;
 
-    m_impostor2 = _DRAWSPACE_NEW_( DrawSpace::Impostor, DrawSpace::Impostor );
+    m_impostor2 = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
 
     idl.clear();
@@ -469,7 +467,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
    
-    m_impostor2->Init( idl );
+    m_impostor2->ImpostorsInit( idl );
 
     m_impostor2->RegisterPassSlot( m_texturepass );
 
@@ -487,7 +485,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     
 
-    m_impostor2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Impostor>, SceneNode<DrawSpace::Impostor>( "impostor1" ) );
+    m_impostor2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "impostor1" ) );
 
     m_impostor2_node->SetContent( m_impostor2 );
 
@@ -690,7 +688,6 @@ bool dsAppClient::OnIdleAppInit( void )
     chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
     chunk->RegisterPassSlot( m_texturepass );
-    chunk->SetRenderer( renderer );
     
     chunk->GetMeshe()->SetImporter( m_meshe_import );
 
@@ -757,7 +754,6 @@ bool dsAppClient::OnIdleAppInit( void )
     chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
     chunk->RegisterPassSlot( m_texturepass );
-    chunk->SetRenderer( renderer );
     
     chunk->GetMeshe()->SetImporter( m_meshe_import );
 

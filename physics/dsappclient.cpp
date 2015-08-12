@@ -124,7 +124,6 @@ void dsAppClient::create_box( void )
 
     chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
     chunk->RegisterPassSlot( m_texturepass );
-    chunk->SetRenderer( renderer );
 
     char name[32];
     sprintf( name, "box_%d", m_box_count );
@@ -250,7 +249,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_ground->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
     m_ground->RegisterPassSlot( m_texturepass );
-    m_ground->SetRenderer( renderer );
 
 
     m_meshe_import = new DrawSpace::Utils::AC3DMesheImport();
@@ -415,10 +413,10 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
 
-    m_impostor = _DRAWSPACE_NEW_( DrawSpace::Impostor, DrawSpace::Impostor );
+    m_impostor = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
-    Impostor::DisplayList idl;
-    Impostor::DisplayListEntry idle;
+    Chunk::ImpostorsDisplayList idl;
+    Chunk::ImpostorsDisplayListEntry idle;
 
     for( long j = 0; j < 1; j++ )
     {
@@ -447,7 +445,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     
 
-    m_impostor->Init( idl );
+    m_impostor->ImpostorsInit( idl );
 
     m_impostor->RegisterPassSlot( m_texturepass );
 
@@ -465,7 +463,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     
 
-    m_impostor_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Impostor>, SceneNode<DrawSpace::Impostor>( "impostor0" ) );
+    m_impostor_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "impostor0" ) );
 
     m_impostor_node->SetContent( m_impostor );
 
@@ -494,14 +492,14 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_impostor2 = _DRAWSPACE_NEW_( DrawSpace::Impostor, DrawSpace::Impostor );
+    m_impostor2 = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
 
     idl.clear();
 
-    for( long j = 0; j < 200; j++ )
+    for( long j = 0; j < 10; j++ )
     {
-        for( long i = 0; i < 200; i++ )
+        for( long i = 0; i < 10; i++ )
         {
             idle.width_scale = 0.5;
             idle.height_scale = 0.5;
@@ -527,7 +525,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     
 
-    m_impostor2->Init( idl );
+    m_impostor2->ImpostorsInit( idl );
 
     m_impostor2->RegisterPassSlot( m_texturepass );
 
@@ -537,15 +535,27 @@ bool dsAppClient::OnIdleAppInit( void )
     m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
     m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
 
-    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );    
-    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    //m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
 
-    m_impostor2->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) ), 0 );
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one" ) );
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
+
+
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+
+
+
+    m_impostor2->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "star_far.bmp" ) ), 0 );
     m_impostor2->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
 
     
+    m_impostor2->GetNodeFromPass( m_texturepass )->SetOrderNumber( 12000 );
 
-    m_impostor2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Impostor>, SceneNode<DrawSpace::Impostor>( "impostor1" ) );
+    m_impostor2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "impostor1" ) );
 
     m_impostor2_node->SetContent( m_impostor2 );
 
