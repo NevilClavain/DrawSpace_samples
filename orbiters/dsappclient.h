@@ -21,7 +21,14 @@ protected:
 
 
     DrawSpace::IntermediatePass*                                        m_texturepass;
+
+    DrawSpace::IntermediatePass*                                        m_fillpass;
+
+    DrawSpace::IntermediatePass*                                        m_zoompass;
+
     DrawSpace::FinalPass*                                               m_finalpass;
+
+    DrawSpace::FinalPass*                                               m_debugfinalpass;
 
 
     DrawSpace::Utils::TimeManager                                       m_timer;
@@ -37,6 +44,8 @@ protected:
     DrawSpace::Dynamics::CameraPoint*                                   m_camera;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera_node;
 
+    DrawSpace::Dynamics::CameraPoint*                                   m_camera2;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera2_node;
 
     
     DrawSpace::Core::FreeMovement                                       m_freemove;
@@ -106,6 +115,12 @@ protected:
     DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_moon_orbit_chunk_node;
 
 
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_impostor_transfo_node;
+    DrawSpace::Chunk*                                                   m_impostor;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_impostor_node;
+
+
+
     DrawSpace::Chunk*                                                   m_impostor2;
     DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_impostor2_node;
     DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*       m_impostor2_ll_node;
@@ -145,7 +160,7 @@ protected:
     
     NodesEventCallback*                                                 m_nodesevent_cb;
 
-    
+    bool                                                                m_switch;
 
 
     DrawSpace::Chunk*               build_planet_chunk( char* p_name, char* p_texture );
