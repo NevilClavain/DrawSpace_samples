@@ -160,12 +160,58 @@ void dsAppClient::OnRenderFrame( void )
     
     m_zoompass->GetRenderingQueue()->Draw();
 
+    m_countpass->GetRenderingQueue()->Draw();
+
+    m_foopass->GetRenderingQueue()->Draw();
+
     m_fpstext_widget->Draw();
 
     m_finalpass->GetRenderingQueue()->Draw();
 
     m_debugfinalpass->GetRenderingQueue()->Draw();
 
+
+    m_zoompass->GetTargetTexture()->CopyTextureContent();
+
+    unsigned char r1, g1, b1, a1;
+    unsigned char r2, g2, b2, a2;
+    unsigned char r3, g3, b3, a3;
+
+
+
+    unsigned char* color_ptr = (unsigned char*)m_texture_content;
+
+    r1 = *color_ptr; color_ptr++;
+    g1 = *color_ptr; color_ptr++;
+    b1 = *color_ptr; color_ptr++;
+    a1 = *color_ptr; color_ptr++;
+
+    color_ptr = (unsigned char*)m_texture_content;
+
+    color_ptr += ( ( 32 * 16 ) + 16 ) * 4;
+
+
+    r2 = *color_ptr; color_ptr++;
+    g2 = *color_ptr; color_ptr++;
+    b2 = *color_ptr; color_ptr++;
+    a2 = *color_ptr; color_ptr++;
+
+
+
+    color_ptr = (unsigned char*)m_texture_content;
+
+    color_ptr += ( ( 32 * 31 ) + 31 ) * 4;
+
+
+    r3 = *color_ptr; color_ptr++;
+    g3 = *color_ptr; color_ptr++;
+    b3 = *color_ptr; color_ptr++;
+    a3 = *color_ptr; color_ptr++;
+
+
+
+
+    _asm nop
 
 
     renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
@@ -216,6 +262,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
+
     m_zoompass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "zoom_pass" ) );
     m_zoompass->SetTargetDimsFromRenderer( false );
     m_zoompass->SetTargetDims( 32, 32 );
@@ -231,6 +278,54 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_zoompass->GetViewportQuad()->SetTexture( m_fillpass->GetTargetTexture(), 0 );
+
+
+    m_countpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "count_pass" ) );
+    m_countpass->SetTargetDimsFromRenderer( false );
+    m_countpass->SetTargetDims( 1, 1 );
+    m_countpass->SetRenderPurpose( Texture::RENDERPURPOSE_FLOAT );
+    m_countpass->Initialize();
+    m_countpass->CreateViewportQuad();
+    
+
+    m_countpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_countpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_countpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_countpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_countpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one" ) );
+    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "one" ) );
+
+    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "point" ) );    
+    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );    
+    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+
+
+
+    m_countpass->GetViewportQuad()->SetTexture( m_zoompass->GetTargetTexture(), 0 );
+
+    m_countpass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 0 );
+    m_countpass->GetRenderingQueue()->EnableTargetClearing( true );
+
+
+
+    m_foopass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "foo_pass" ) );
+    m_foopass->Initialize();
+    m_foopass->CreateViewportQuad();
+    
+
+    m_foopass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_foopass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "foo.vsh", false ) ) );
+    m_foopass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "foo.psh", false ) ) );
+    m_foopass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_foopass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+
+
+    m_foopass->GetViewportQuad()->SetTexture( m_countpass->GetTargetTexture(), 0 );
 
 
 
@@ -260,6 +355,7 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
     m_debugfinalpass->GetViewportQuad()->SetTexture( m_zoompass->GetTargetTexture(), 0 );
+    //m_debugfinalpass->GetViewportQuad()->SetTexture( m_foopass->GetTargetTexture(), 0 );
 
 
     //////////////////////////////////////////////////////////////
@@ -1045,6 +1141,13 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     m_fillpass->GetRenderingQueue()->UpdateOutputQueue();
     m_zoompass->GetRenderingQueue()->UpdateOutputQueue();
+    m_countpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_foopass->GetRenderingQueue()->UpdateOutputQueue();
+
+
+
+    status = m_zoompass->GetTargetTexture()->AllocTextureContent();
+    m_texture_content = m_zoompass->GetTargetTexture()->GetTextureContentPtr();
     
     m_debugfinalpass->GetViewportQuad()->SetDrawingState( false );
 

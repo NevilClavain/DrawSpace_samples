@@ -24,6 +24,10 @@ protected:
 
     DrawSpace::IntermediatePass*                                        m_fillpass;
 
+    DrawSpace::IntermediatePass*                                        m_countpass;
+
+    DrawSpace::IntermediatePass*                                        m_foopass;
+
     DrawSpace::IntermediatePass*                                        m_zoompass;
 
     DrawSpace::FinalPass*                                               m_finalpass;
@@ -161,6 +165,8 @@ protected:
     NodesEventCallback*                                                 m_nodesevent_cb;
 
     bool                                                                m_switch;
+
+    void*                                                               m_texture_content;
 
 
     DrawSpace::Chunk*               build_planet_chunk( char* p_name, char* p_texture );
