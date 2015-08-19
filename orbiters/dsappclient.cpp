@@ -15,7 +15,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_switch( false )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_switch( false ), m_occlusion_count( 0 )
 {    
     _INIT_LOGGER( "logorbiters.conf" )  
     m_w_title = "orbiters test";
@@ -160,10 +160,6 @@ void dsAppClient::OnRenderFrame( void )
     
     m_zoompass->GetRenderingQueue()->Draw();
 
-    m_countpass->GetRenderingQueue()->Draw();
-
-    m_foopass->GetRenderingQueue()->Draw();
-
     m_fpstext_widget->Draw();
 
     m_finalpass->GetRenderingQueue()->Draw();
@@ -181,6 +177,7 @@ void dsAppClient::OnRenderFrame( void )
 
     unsigned char* color_ptr = (unsigned char*)m_texture_content;
 
+    /*
     r1 = *color_ptr; color_ptr++;
     g1 = *color_ptr; color_ptr++;
     b1 = *color_ptr; color_ptr++;
@@ -207,11 +204,29 @@ void dsAppClient::OnRenderFrame( void )
     g3 = *color_ptr; color_ptr++;
     b3 = *color_ptr; color_ptr++;
     a3 = *color_ptr; color_ptr++;
+    */
+
+    m_occlusion_count = 0;
+    for( long i = 0; i < 1024; i++ )
+    {
+        if( *color_ptr == 255 )
+        {
+            m_occlusion_count++;
+        }
+
+        color_ptr += 4;
+    }
+
+    float scale = (float)m_occlusion_count / 1024.0;
+
+    m_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "globalscale", Vector( scale, 0.0, 0.0, 0.0 ) );
 
 
 
 
-    _asm nop
+    
+    
+
 
 
     renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
@@ -220,6 +235,7 @@ void dsAppClient::OnRenderFrame( void )
 
     renderer->DrawText( 0, 255, 0, 10, 95, "%d", m_calendar->GetSubSecCount() );
 
+    renderer->DrawText( 0, 255, 0, 10, 130, "occlusion_count = %d", m_occlusion_count );
 
     renderer->FlipScreen();
 
@@ -279,55 +295,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_zoompass->GetViewportQuad()->SetTexture( m_fillpass->GetTargetTexture(), 0 );
 
-
-    m_countpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "count_pass" ) );
-    m_countpass->SetTargetDimsFromRenderer( false );
-    m_countpass->SetTargetDims( 1, 1 );
-    m_countpass->SetRenderPurpose( Texture::RENDERPURPOSE_FLOAT );
-    m_countpass->Initialize();
-    m_countpass->CreateViewportQuad();
-    
-
-    m_countpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_countpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_countpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-    m_countpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_countpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
-
-    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
-    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
-    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
-    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one" ) );
-    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "one" ) );
-
-    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "point" ) );    
-    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );    
-    m_countpass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
-
-
-
-    m_countpass->GetViewportQuad()->SetTexture( m_zoompass->GetTargetTexture(), 0 );
-
-    m_countpass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 0 );
-    m_countpass->GetRenderingQueue()->EnableTargetClearing( true );
-
-
-
-    m_foopass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "foo_pass" ) );
-    m_foopass->Initialize();
-    m_foopass->CreateViewportQuad();
-    
-
-    m_foopass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_foopass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "foo.vsh", false ) ) );
-    m_foopass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "foo.psh", false ) ) );
-    m_foopass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_foopass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
-
-
-    m_foopass->GetViewportQuad()->SetTexture( m_countpass->GetTargetTexture(), 0 );
-
-
+    m_zoompass->GetViewportQuad()->AddShaderParameter( 0, "zoom_area", 24 );
+    m_zoompass->GetViewportQuad()->SetShaderRealVector( "zoom_area", Vector( 0.0025, 0.0, 0.0, 0.0 ) );
 
     //////////////////////////////////////////////////////////////
 
@@ -645,7 +614,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_impostor2->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) ), 0 );
     m_impostor2->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
-
 
 
     m_impostor2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "impostor1" ) );
@@ -1114,6 +1082,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_impostor->GetNodeFromPass( m_texturepass )->SetOrderNumber( 12000 );
 
+
+    m_impostor->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "globalscale", 24 );
+    m_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "globalscale", Vector( 1.0, 0.0, 0.0, 0.0 ) );
+
+
     m_impostor_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "impostor0" ) );
 
     m_impostor_node->SetContent( m_impostor );
@@ -1141,14 +1114,14 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     m_fillpass->GetRenderingQueue()->UpdateOutputQueue();
     m_zoompass->GetRenderingQueue()->UpdateOutputQueue();
-    m_countpass->GetRenderingQueue()->UpdateOutputQueue();
-    m_foopass->GetRenderingQueue()->UpdateOutputQueue();
 
 
 
     status = m_zoompass->GetTargetTexture()->AllocTextureContent();
     m_texture_content = m_zoompass->GetTargetTexture()->GetTextureContentPtr();
-    
+
+
+
     m_debugfinalpass->GetViewportQuad()->SetDrawingState( false );
 
     m_mouse_circularmode = true;
