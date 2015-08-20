@@ -219,7 +219,8 @@ void dsAppClient::OnRenderFrame( void )
 
     float scale = (float)m_occlusion_count / 1024.0;
 
-    m_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "globalscale", Vector( scale, 0.0, 0.0, 0.0 ) );
+    m_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "globalscale", Vector( scale, scale, 0.0, 0.0 ) );
+
 
 
 
@@ -1084,7 +1085,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_impostor->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "globalscale", 24 );
-    m_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "globalscale", Vector( 1.0, 0.0, 0.0, 0.0 ) );
+    m_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "globalscale", Vector( 1.0, 1.0, 0.0, 0.0 ) );
 
 
     m_impostor_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "impostor0" ) );
