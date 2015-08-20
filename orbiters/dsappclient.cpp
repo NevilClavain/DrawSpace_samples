@@ -616,6 +616,11 @@ bool dsAppClient::OnIdleAppInit( void )
     m_impostor2->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) ), 0 );
     m_impostor2->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
 
+    m_impostor2->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "flags", 0 );
+    m_impostor2->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags", Vector( 1.0, 0.0, 0.0, 0.0 ) );
+
+    m_impostor2->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "color", 1 );
+    m_impostor2->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 1.0 ) );
 
     m_impostor2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "impostor1" ) );
 
