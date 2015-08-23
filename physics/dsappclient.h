@@ -18,7 +18,16 @@ protected:
 
 
     DrawSpace::IntermediatePass*                                        m_texturepass;
+
+    DrawSpace::IntermediatePass*                                        m_texturepass2;
+
+    DrawSpace::IntermediatePass*                                        m_maskpass;
+
+    DrawSpace::IntermediatePass*                                        m_filterpass;
+
+
     DrawSpace::FinalPass*                                               m_finalpass;
+    DrawSpace::FinalPass*                                               m_finalpass2;
 
 
     DrawSpace::Utils::TimeManager                                       m_timer;

@@ -62,11 +62,15 @@ void dsAppClient::OnRenderFrame( void )
     m_fpstext_widget->Transform();
 
     m_texturepass->GetRenderingQueue()->Draw();
+    m_texturepass2->GetRenderingQueue()->Draw();
+    m_maskpass->GetRenderingQueue()->Draw();
+    m_filterpass->GetRenderingQueue()->Draw();
 
 
     m_fpstext_widget->Draw();
 
     m_finalpass->GetRenderingQueue()->Draw();
+    m_finalpass2->GetRenderingQueue()->Draw();
 
 
     dsstring date;
@@ -124,6 +128,7 @@ void dsAppClient::create_box( void )
 
     chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
     chunk->RegisterPassSlot( m_texturepass );
+    chunk->RegisterPassSlot( m_maskpass );
 
     char name[32];
     sprintf( name, "box_%d", m_box_count );
@@ -149,7 +154,23 @@ void dsAppClient::create_box( void )
     chunk->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     chunk->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
-    
+
+
+    chunk->GetNodeFromPass( m_maskpass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    chunk->GetNodeFromPass( m_maskpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "color.vsh", false ) ) );
+    chunk->GetNodeFromPass( m_maskpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "color.psh", false ) ) );
+    chunk->GetNodeFromPass( m_maskpass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    chunk->GetNodeFromPass( m_maskpass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    chunk->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );    
+    chunk->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+
+    chunk->GetNodeFromPass( m_maskpass )->AddShaderParameter( 1, "color", 0 );
+    chunk->GetNodeFromPass( m_maskpass )->SetShaderRealVector( "color", Vector( 0.0, 0.0, 0.0, 0.0 ) );
+
+
+
+
     if( 0 == m_box_texture )
     {
         chunk->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "shelby.jpg" ) ), 0 );
@@ -204,6 +225,7 @@ void dsAppClient::create_box( void )
 
 
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
+    m_maskpass->GetRenderingQueue()->UpdateOutputQueue();
 
     
 }
@@ -225,6 +247,41 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
+    m_texturepass2 = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass2" ) );
+
+    m_texturepass2->Initialize();
+    m_texturepass2->GetRenderingQueue()->EnableDepthClearing( true );
+    m_texturepass2->GetRenderingQueue()->EnableTargetClearing( true );
+    m_texturepass2->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 0 );
+
+
+    m_maskpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "mask_pass" ) );
+
+    m_maskpass->Initialize();
+    m_maskpass->GetRenderingQueue()->EnableDepthClearing( true );
+    m_maskpass->GetRenderingQueue()->EnableTargetClearing( true );
+    m_maskpass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 0 );
+
+
+
+    m_filterpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "filter_pass" ) );
+    m_filterpass->Initialize();
+    m_filterpass->CreateViewportQuad();
+    
+
+    m_filterpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_filterpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "impostors_filter.vsh", false ) ) );
+    m_filterpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "impostors_filter.psh", false ) ) );
+    m_filterpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_filterpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+
+
+    m_filterpass->GetViewportQuad()->SetTexture( m_maskpass->GetTargetTexture(), 0 );
+    m_filterpass->GetViewportQuad()->SetTexture( m_texturepass2->GetTargetTexture(), 1 );
+
+
+
+
     //////////////////////////////////////////////////////////////
 
     m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
@@ -238,7 +295,34 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
     m_finalpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
+
+
+
+    m_finalpass2 = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
+    m_finalpass2->Initialize();
+    m_finalpass2->CreateViewportQuad();
+    m_finalpass2->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_finalpass2->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_finalpass2->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+
     
+
+    m_finalpass2->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_finalpass2->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    m_finalpass2->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    m_finalpass2->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one" ) );
+    m_finalpass2->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
+
+
+    m_finalpass2->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_finalpass2->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+
+
+    
+    m_finalpass2->GetViewportQuad()->SetTexture( m_filterpass->GetTargetTexture(), 0 );
+
 
 
 
@@ -448,6 +532,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_impostor->ImpostorsInit( idl );
 
     m_impostor->RegisterPassSlot( m_texturepass );
+    m_impostor->RegisterPassSlot( m_maskpass );
 
     m_impostor->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "screenimpostor.vsh", false ) ) );
@@ -469,6 +554,30 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_impostor->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "color", 1 );
     m_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 1.0 ) );
+
+
+
+    m_impostor->GetNodeFromPass( m_maskpass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_impostor->GetNodeFromPass( m_maskpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "screenimpostor.vsh", false ) ) );
+    m_impostor->GetNodeFromPass( m_maskpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "screenimpostor.psh", false ) ) );
+    m_impostor->GetNodeFromPass( m_maskpass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_impostor->GetNodeFromPass( m_maskpass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_impostor->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );    
+    m_impostor->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+
+    m_impostor->GetNodeFromPass( m_maskpass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) ), 0 );
+    m_impostor->GetNodeFromPass( m_maskpass )->GetTexture( 0 )->LoadFromFile();
+
+    m_impostor->GetNodeFromPass( m_maskpass )->AddShaderParameter( 0, "globalscale", 24 );
+    m_impostor->GetNodeFromPass( m_maskpass )->SetShaderRealVector( "globalscale", Vector( 1.0, 1.0, 0.0, 0.0 ) );
+    
+    m_impostor->GetNodeFromPass( m_maskpass )->AddShaderParameter( 1, "flags", 0 );
+    m_impostor->GetNodeFromPass( m_maskpass )->SetShaderRealVector( "flags", Vector( 1.0, 0.0, 0.0, 0.0 ) );
+
+    m_impostor->GetNodeFromPass( m_maskpass )->AddShaderParameter( 1, "color", 1 );
+    m_impostor->GetNodeFromPass( m_maskpass )->SetShaderRealVector( "color", Vector( 0.0, 0.0, 0.0, 1.0 ) );
+
 
 
     m_impostor_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "impostor0" ) );
@@ -535,40 +644,68 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_impostor2->ImpostorsInit( idl );
 
-    m_impostor2->RegisterPassSlot( m_texturepass );
-
-    m_impostor2->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.vsh", false ) ) );
-    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.psh", false ) ) );
-    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
-
-    //m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-
-    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
-    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
-    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
-    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one" ) );
-    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
-
-
-    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-    m_impostor2->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
-
-
-
-    m_impostor2->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "star_far.bmp" ) ), 0 );
-    m_impostor2->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+    m_impostor2->RegisterPassSlot( m_texturepass2 );
+    m_impostor2->RegisterPassSlot( m_maskpass );
 
     
-    m_impostor2->GetNodeFromPass( m_texturepass )->SetOrderNumber( 12000 );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.vsh", false ) ) );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.psh", false ) ) );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one" ) );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
 
 
-    m_impostor2->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "flags", 0 );
-    m_impostor2->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags", Vector( 0.0, 0.0, 0.0, 0.0 ) );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
 
-    m_impostor2->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "color", 1 );
-    m_impostor2->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 1.0 ) );
+
+
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "star_far.bmp" ) ), 0 );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetTexture( 0 )->LoadFromFile();
+
+    
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetOrderNumber( 12000 );
+
+
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 1, "flags", 0 );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "flags", Vector( 0.0, 0.0, 0.0, 0.0 ) );
+
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 1, "color", 1 );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 1.0 ) );
+    
+
+
+    m_impostor2->GetNodeFromPass( m_maskpass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_impostor2->GetNodeFromPass( m_maskpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.vsh", false ) ) );
+    m_impostor2->GetNodeFromPass( m_maskpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.psh", false ) ) );
+    m_impostor2->GetNodeFromPass( m_maskpass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_impostor2->GetNodeFromPass( m_maskpass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_impostor2->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_impostor2->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    
+
+
+    m_impostor2->GetNodeFromPass( m_maskpass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "star_far.bmp" ) ), 0 );
+    m_impostor2->GetNodeFromPass( m_maskpass )->GetTexture( 0 )->LoadFromFile();
+
+    
+    m_impostor2->GetNodeFromPass( m_maskpass )->SetOrderNumber( 12000 );
+
+
+    m_impostor2->GetNodeFromPass( m_maskpass )->AddShaderParameter( 1, "flags", 0 );
+    m_impostor2->GetNodeFromPass( m_maskpass )->SetShaderRealVector( "flags", Vector( 1.0, 0.0, 0.0, 0.0 ) );
+
+    m_impostor2->GetNodeFromPass( m_maskpass )->AddShaderParameter( 1, "color", 1 );
+    m_impostor2->GetNodeFromPass( m_maskpass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 1.0 ) );
+
 
 
     m_impostor2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "impostor1" ) );
@@ -665,8 +802,12 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
+    m_texturepass2->GetRenderingQueue()->UpdateOutputQueue();
+    m_maskpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_filterpass->GetRenderingQueue()->UpdateOutputQueue();
     
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_finalpass2->GetRenderingQueue()->UpdateOutputQueue();
 
 
     //////////////////////////////////////////////////////////////
