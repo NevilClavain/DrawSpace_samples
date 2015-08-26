@@ -78,6 +78,10 @@ protected:
     DrawSpace::Chunk*                                                   m_impostor2;
     DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_impostor2_node;
 
+    DrawSpace::Spacebox*                                                m_spacebox;
+    DrawSpace::Core::SceneNode<DrawSpace::Spacebox>*                    m_spacebox_node;
+    
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_spacebox_transfo_node;
 
 
     int                                                                 m_box_count;
