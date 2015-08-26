@@ -21,9 +21,15 @@ protected:
 
 
     DrawSpace::IntermediatePass*                                        m_texturepass;
+    DrawSpace::IntermediatePass*                                        m_texturepass2;
+
+    DrawSpace::IntermediatePass*                                        m_maskpass;
+    DrawSpace::IntermediatePass*                                        m_filterpass;
+
 
 
     DrawSpace::FinalPass*                                               m_finalpass;
+    DrawSpace::FinalPass*                                               m_finalpass2;
 
 
     DrawSpace::Utils::TimeManager                                       m_timer;
@@ -43,10 +49,6 @@ protected:
     DrawSpace::Interface::MesheImport*                                  m_meshe_import;
 
     
-    DrawSpace::Spacebox*                                                m_spacebox;
-    DrawSpace::Core::SceneNode<DrawSpace::Spacebox>*                    m_spacebox_node;
-    
-    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_spacebox_transfo_node;
 
     dsreal                                                              m_speed;
     dsreal                                                              m_speed_speed;
@@ -59,6 +61,10 @@ protected:
 
 
 
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_impostor2_transfo_node;
+
+    DrawSpace::Chunk*                                                   m_impostor2;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_impostor2_node;
 
 
     DrawSpace::Dynamics::Calendar*                                      m_calendar;
