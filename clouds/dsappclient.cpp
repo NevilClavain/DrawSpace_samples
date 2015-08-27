@@ -275,6 +275,7 @@ bool dsAppClient::OnIdleAppInit( void )
     idl.clear();
 
 
+    /////////////////////////////////////////////////
 
     idle.width_scale = 1500.0;
     idle.height_scale = 1500.0;
@@ -397,6 +398,138 @@ bool dsAppClient::OnIdleAppInit( void )
     
     idl.push_back( idle );
 
+
+    /////////////////////////////////////////////////
+
+
+
+
+
+    /////////////////////////////////////////////////
+
+    idle.width_scale = 1500.0;
+    idle.height_scale = 1500.0;
+
+    idle.u1 = 0.5;
+    idle.v1 = 0.5;
+    idle.u2 = 0.75;
+    idle.v2 = 0.5;
+    idle.u3 = 0.75;
+    idle.v3 = 0.75;
+    idle.u4 = 0.5;
+    idle.v4 = 0.75;
+
+    idle.localpos[0] = 0.0;
+    idle.localpos[1] = 0.0;
+    idle.localpos[2] = -20000.0;
+    
+    idl.push_back( idle );
+
+
+
+    idle.width_scale = 1700.0;
+    idle.height_scale = 1700.0;
+
+    idle.u1 = 0.75;
+    idle.v1 = 0.75;
+    idle.u2 = 1.0;
+    idle.v2 = 0.75;
+    idle.u3 = 1.0;
+    idle.v3 = 1.0;
+    idle.u4 = 0.75;
+    idle.v4 = 1.0;
+
+    idle.localpos[0] = 950.0;
+    idle.localpos[1] = 90.0;
+    idle.localpos[2] = -20000.0;
+    
+    idl.push_back( idle );
+
+
+
+
+    idle.width_scale = 1400.0;
+    idle.height_scale = 1400.0;
+
+    idle.u1 = 0.25;
+    idle.v1 = 0.75;
+    idle.u2 = 0.5;
+    idle.v2 = 0.75;
+    idle.u3 = 0.5;
+    idle.v3 = 1.0;
+    idle.u4 = 0.25;
+    idle.v4 = 1.0;
+
+    idle.localpos[0] = 1750.0;
+    idle.localpos[1] = 190.0;
+    idle.localpos[2] = -20000.0 -700.0;
+    
+    idl.push_back( idle );
+
+
+
+
+
+    idle.width_scale = 1700.0;
+    idle.height_scale = 1700.0;
+
+    idle.u1 = 0.25;
+    idle.v1 = 0.75;
+    idle.u2 = 0.5;
+    idle.v2 = 0.75;
+    idle.u3 = 0.5;
+    idle.v3 = 1.0;
+    idle.u4 = 0.25;
+    idle.v4 = 1.0;
+
+    idle.localpos[0] = 1750.0;
+    idle.localpos[1] = 190.0;
+    idle.localpos[2] = -20000.0 + 700.0;
+    
+    idl.push_back( idle );
+
+
+
+
+    idle.width_scale = 1800.0;
+    idle.height_scale = 1800.0;
+
+    idle.u1 = 0.75;
+    idle.v1 = 0.0;
+    idle.u2 = 1.0;
+    idle.v2 = 0.0;
+    idle.u3 = 1.0;
+    idle.v3 = 0.25;
+    idle.u4 = 0.75;
+    idle.v4 = 0.25;
+
+    idle.localpos[0] = 250.0;
+    idle.localpos[1] = -60.0;
+    idle.localpos[2] = -20000.0;
+    
+    idl.push_back( idle );
+
+
+    idle.width_scale = 1800.0;
+    idle.height_scale = 1800.0;
+
+    idle.u1 = 0.75;
+    idle.v1 = 0.0;
+    idle.u2 = 1.0;
+    idle.v2 = 0.0;
+    idle.u3 = 1.0;
+    idle.v3 = 0.25;
+    idle.u4 = 0.75;
+    idle.v4 = 0.25;
+
+    idle.localpos[0] = 700.0;
+    idle.localpos[1] = -60.0;
+    idle.localpos[2] = -20000.0 + 300.0;
+    
+    idl.push_back( idle );
+
+
+    /////////////////////////////////////////////////
 
 
 
