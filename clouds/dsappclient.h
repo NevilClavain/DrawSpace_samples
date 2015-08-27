@@ -29,7 +29,7 @@ protected:
 
 
     DrawSpace::FinalPass*                                               m_finalpass;
-    DrawSpace::FinalPass*                                               m_finalpass2;
+    //DrawSpace::FinalPass*                                               m_finalpass2;
 
 
     DrawSpace::Utils::TimeManager                                       m_timer;

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8,00"
 	Name="clouds"
-	ProjectGUID="{9914B350-8E3A-4A2C-AA4B-6F677424C00F}"
+	ProjectGUID="{B9A7A650-24E1-4267-BB94-C31D0BBA2168}"
 	RootNamespace="orbiters"
 	Keyword="Win32Proj"
 	>

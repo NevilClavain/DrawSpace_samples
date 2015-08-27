@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "orbiters", "orbiters\orbite
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "orbiters2", "orbiters2\orbiters2.vcproj", "{FF6C5F7F-4108-4DE5-97DE-44564FD7A737}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "clouds", "clouds\clouds.vcproj", "{B9A7A650-24E1-4267-BB94-C31D0BBA2168}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -37,6 +39,10 @@ Global
 		{FF6C5F7F-4108-4DE5-97DE-44564FD7A737}.Debug|Win32.Build.0 = Debug|Win32
 		{FF6C5F7F-4108-4DE5-97DE-44564FD7A737}.Release|Win32.ActiveCfg = Release|Win32
 		{FF6C5F7F-4108-4DE5-97DE-44564FD7A737}.Release|Win32.Build.0 = Release|Win32
+		{B9A7A650-24E1-4267-BB94-C31D0BBA2168}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B9A7A650-24E1-4267-BB94-C31D0BBA2168}.Debug|Win32.Build.0 = Debug|Win32
+		{B9A7A650-24E1-4267-BB94-C31D0BBA2168}.Release|Win32.ActiveCfg = Release|Win32
+		{B9A7A650-24E1-4267-BB94-C31D0BBA2168}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

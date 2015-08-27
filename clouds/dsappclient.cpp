@@ -53,7 +53,7 @@ void dsAppClient::OnRenderFrame( void )
     m_filterpass->GetRenderingQueue()->Draw();
     
     m_finalpass->GetRenderingQueue()->Draw();
-    m_finalpass2->GetRenderingQueue()->Draw();
+    //m_finalpass2->GetRenderingQueue()->Draw();
 
     long current_fps = m_timer.GetFPS();
     renderer->DrawText( 0, 255, 0, 10, 35, "%d", current_fps );
@@ -92,7 +92,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass2->Initialize();
     m_texturepass2->GetRenderingQueue()->EnableDepthClearing( true );
     m_texturepass2->GetRenderingQueue()->EnableTargetClearing( true );
-    m_texturepass2->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 0 );
+    //m_texturepass2->GetRenderingQueue()->SetTargetClearingColor( 255, 255, 255, 255 );
+    //m_texturepass2->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 0 );
+    m_texturepass2->GetRenderingQueue()->SetTargetClearingColor( 145, 230, 230, 255 );
 
 
     m_maskpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "mask_pass" ) );
@@ -110,14 +112,17 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
     m_filterpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_filterpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "impostors_filter.vsh", false ) ) );
-    m_filterpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "impostors_filter.psh", false ) ) );
+    //m_filterpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "impostors_filter.vsh", false ) ) );
+    //m_filterpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "impostors_filter.psh", false ) ) );
+    m_filterpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "clouds_final.vsh", false ) ) );
+    m_filterpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "clouds_final.psh", false ) ) );
     m_filterpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
     m_filterpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
 
 
     m_filterpass->GetViewportQuad()->SetTexture( m_maskpass->GetTargetTexture(), 0 );
-    m_filterpass->GetViewportQuad()->SetTexture( m_texturepass2->GetTargetTexture(), 1 );
+    m_filterpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 1 );
+    m_filterpass->GetViewportQuad()->SetTexture( m_texturepass2->GetTargetTexture(), 2 );
 
 
 
@@ -133,18 +138,28 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    m_finalpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
+    m_finalpass->GetViewportQuad()->SetTexture( m_filterpass->GetTargetTexture(), 0 );
+
+    //m_finalpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
+    //m_finalpass->GetViewportQuad()->SetTexture( m_texturepass2->GetTargetTexture(), 0 );
+    
     
 
 
 
-
+    /*
     m_finalpass2 = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
     m_finalpass2->Initialize();
     m_finalpass2->CreateViewportQuad();
     m_finalpass2->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_finalpass2->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_finalpass2->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    
+    m_finalpass2->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "clouds_final.vsh", false ) ) );
+    m_finalpass2->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "clouds_final.psh", false ) ) );
+
+    //m_finalpass2->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    //m_finalpass2->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+
+
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
 
@@ -153,7 +168,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass2->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
     m_finalpass2->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
     m_finalpass2->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
-    m_finalpass2->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one" ) );
+    m_finalpass2->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );
     m_finalpass2->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
 
 
@@ -161,13 +176,15 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass2->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
 
 
-    m_finalpass2->GetViewportQuad()->SetTexture( m_filterpass->GetTargetTexture(), 0 );
+    //m_finalpass2->GetViewportQuad()->SetTexture( m_filterpass->GetTargetTexture(), 0 );
+    */
 
 
     m_ground = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
     m_ground->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
     m_ground->RegisterPassSlot( m_texturepass );
+    m_ground->RegisterPassSlot( m_texturepass2 );
     m_ground->RegisterPassSlot( m_maskpass );
 
 
@@ -192,6 +209,24 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_ground->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mapcolor.bmp" ) ), 0 );
     m_ground->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+
+
+
+    m_ground->GetNodeFromPass( m_texturepass2 )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_ground->GetNodeFromPass( m_texturepass2 )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_ground->GetNodeFromPass( m_texturepass2 )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_ground->GetNodeFromPass( m_texturepass2 )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_ground->GetNodeFromPass( m_texturepass2 )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    
+    m_ground->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_ground->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_ground->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_ground->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    
+
+    m_ground->GetNodeFromPass( m_texturepass2 )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mapcolor.bmp" ) ), 0 );
+    m_ground->GetNodeFromPass( m_texturepass2 )->GetTexture( 0 )->LoadFromFile();
 
 
 
@@ -239,35 +274,10 @@ bool dsAppClient::OnIdleAppInit( void )
 
     idl.clear();
 
-    /*
-    for( long j = 0; j < 1; j++ )
-    {
-        for( long i = 0; i < 10; i++ )
-        {
-            idle.width_scale = 0.5;
-            idle.height_scale = 0.5;
-
-            idle.u1 = 0.0;
-            idle.v1 = 0.0;
-            idle.u2 = 1.0;
-            idle.v2 = 0.0;
-            idle.u3 = 1.0;
-            idle.v3 = 1.0;
-            idle.u4 = 0.0;
-            idle.v4 = 1.0;
-
-            idle.localpos[0] = i * 0.33;
-            idle.localpos[1] = j * 0.33;
-            idle.localpos[2] = 0.0;
-    
-            idl.push_back( idle );
-        }
-    }
-    */
 
 
-    idle.width_scale = 1000.0;
-    idle.height_scale = 1000.0;
+    idle.width_scale = 1500.0;
+    idle.height_scale = 1500.0;
 
     idle.u1 = 0.5;
     idle.v1 = 0.5;
@@ -283,7 +293,112 @@ bool dsAppClient::OnIdleAppInit( void )
     idle.localpos[2] = 0.0;
     
     idl.push_back( idle );
+
+
+
+    idle.width_scale = 1700.0;
+    idle.height_scale = 1700.0;
+
+    idle.u1 = 0.75;
+    idle.v1 = 0.75;
+    idle.u2 = 1.0;
+    idle.v2 = 0.75;
+    idle.u3 = 1.0;
+    idle.v3 = 1.0;
+    idle.u4 = 0.75;
+    idle.v4 = 1.0;
+
+    idle.localpos[0] = 950.0;
+    idle.localpos[1] = 90.0;
+    idle.localpos[2] = 0.0;
     
+    idl.push_back( idle );
+
+
+
+
+    idle.width_scale = 1400.0;
+    idle.height_scale = 1400.0;
+
+    idle.u1 = 0.25;
+    idle.v1 = 0.75;
+    idle.u2 = 0.5;
+    idle.v2 = 0.75;
+    idle.u3 = 0.5;
+    idle.v3 = 1.0;
+    idle.u4 = 0.25;
+    idle.v4 = 1.0;
+
+    idle.localpos[0] = 1750.0;
+    idle.localpos[1] = 190.0;
+    idle.localpos[2] = -700.0;
+    
+    idl.push_back( idle );
+
+
+
+
+
+    idle.width_scale = 1700.0;
+    idle.height_scale = 1700.0;
+
+    idle.u1 = 0.25;
+    idle.v1 = 0.75;
+    idle.u2 = 0.5;
+    idle.v2 = 0.75;
+    idle.u3 = 0.5;
+    idle.v3 = 1.0;
+    idle.u4 = 0.25;
+    idle.v4 = 1.0;
+
+    idle.localpos[0] = 1750.0;
+    idle.localpos[1] = 190.0;
+    idle.localpos[2] = 700.0;
+    
+    idl.push_back( idle );
+
+
+
+
+    idle.width_scale = 1800.0;
+    idle.height_scale = 1800.0;
+
+    idle.u1 = 0.75;
+    idle.v1 = 0.0;
+    idle.u2 = 1.0;
+    idle.v2 = 0.0;
+    idle.u3 = 1.0;
+    idle.v3 = 0.25;
+    idle.u4 = 0.75;
+    idle.v4 = 0.25;
+
+    idle.localpos[0] = 250.0;
+    idle.localpos[1] = -60.0;
+    idle.localpos[2] = 0.0;
+    
+    idl.push_back( idle );
+
+
+    idle.width_scale = 1800.0;
+    idle.height_scale = 1800.0;
+
+    idle.u1 = 0.75;
+    idle.v1 = 0.0;
+    idle.u2 = 1.0;
+    idle.v2 = 0.0;
+    idle.u3 = 1.0;
+    idle.v3 = 0.25;
+    idle.u4 = 0.75;
+    idle.v4 = 0.25;
+
+    idle.localpos[0] = 700.0;
+    idle.localpos[1] = -60.0;
+    idle.localpos[2] = 300.0;
+    
+    idl.push_back( idle );
+
+
+
 
     m_impostor2->ImpostorsInit( idl );
 
@@ -301,11 +416,13 @@ bool dsAppClient::OnIdleAppInit( void )
     m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
     m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
     m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one" ) );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );
     m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    
 
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    
+
     m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
     m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
@@ -318,11 +435,19 @@ bool dsAppClient::OnIdleAppInit( void )
     m_impostor2->GetNodeFromPass( m_texturepass2 )->SetOrderNumber( 12000 );
 
 
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 0, "flags_v", 24 );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "flags_v", Vector( 0.5, 0.0, 0.0, 0.0 ) );
+
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 0, "clouds_dims", 25 );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "clouds_dims", Vector( 900, -500, 1.0, 0.66 ) );
+
+
+
     m_impostor2->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 1, "flags", 0 );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "flags", Vector( 0.0, 0.0, 0.0, 0.0 ) );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "flags", Vector( 0.5, 0.0, 0.0, 0.0 ) );
 
     m_impostor2->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 1, "color", 1 );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 1.0 ) );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "color", Vector( 0.99, 0.99, 0.99, 1.0 ) );
     
 
 
@@ -336,9 +461,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_impostor2->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     
 
-
-    m_impostor2->GetNodeFromPass( m_maskpass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "star_far.bmp" ) ), 0 );
-    m_impostor2->GetNodeFromPass( m_maskpass )->GetTexture( 0 )->LoadFromFile();
 
     
     m_impostor2->GetNodeFromPass( m_maskpass )->SetOrderNumber( 12000 );
@@ -425,7 +547,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_filterpass->GetRenderingQueue()->UpdateOutputQueue();
     
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
-    m_finalpass2->GetRenderingQueue()->UpdateOutputQueue();
+    //m_finalpass2->GetRenderingQueue()->UpdateOutputQueue();
 
 
 
