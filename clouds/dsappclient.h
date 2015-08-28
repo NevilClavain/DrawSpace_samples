@@ -14,6 +14,8 @@ protected:
 
     typedef DrawSpace::Core::CallBack2<dsAppClient, void, DrawSpace::Core::SceneNodeGraph::NodesEvent, DrawSpace::Core::BaseSceneNode*> NodesEventCallback;
 
+    typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Core::PropertyPool*>                                                RunnerMsgCb;
+
     static dsAppClient*                                                 m_instance;
 
     
@@ -72,9 +74,25 @@ protected:
     
     NodesEventCallback*                                                 m_nodesevent_cb;
 
+    DrawSpace::Chunk::ImpostorsDisplayList                              m_idl;
+
+    DrawSpace::Core::Mediator::MessageQueue*                            m_sort_msg;
+    DrawSpace::Core::Runner*                                            m_runner;
+    DrawSpace::Core::Task<DrawSpace::Core::Runner>*                     m_task;
+    RunnerMsgCb*                                                        m_runner_msg_cb;
+
+    bool                                                                m_update_clouds_meshes;
+    DrawSpace::Utils::Mutex                                             m_mutex;
+
+
    
 
-    void                            on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node );
+    void on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node );
+    void on_sort_request( DrawSpace::Core::PropertyPool* p_args );
+
+
+
+    void addcloud( dsreal p_xpos, dsreal p_zpos, DrawSpace::Chunk::ImpostorsDisplayList& p_idl );
 
     dsAppClient( void );
 

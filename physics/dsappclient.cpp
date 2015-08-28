@@ -498,6 +498,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_impostor = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+    m_impostor->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
     Chunk::ImpostorsDisplayList idl;
     Chunk::ImpostorsDisplayListEntry idle;
@@ -610,6 +611,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_impostor2 = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+    m_impostor2->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
 
     idl.clear();

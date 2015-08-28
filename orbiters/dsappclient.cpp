@@ -576,6 +576,7 @@ bool dsAppClient::OnIdleAppInit( void )
     Chunk::ImpostorsDisplayListEntry idle;
 
     m_impostor2 = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+    m_impostor2->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
 
     idl.clear();
@@ -617,7 +618,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_impostor2->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
 
     m_impostor2->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "flags", 0 );
-    m_impostor2->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags", Vector( 1.0, 0.0, 0.0, 0.0 ) );
+    m_impostor2->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags", Vector( 0.0, 0.0, 0.0, 0.0 ) );
 
     m_impostor2->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "color", 1 );
     m_impostor2->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 1.0 ) );
@@ -1042,6 +1043,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_impostor = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+    m_impostor->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
 
     idle.width_scale = 60.0;
