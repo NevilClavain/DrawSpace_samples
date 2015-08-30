@@ -395,11 +395,11 @@ bool dsAppClient::OnIdleAppInit( void )
     dsreal cloudspos_x = 0.0;
     dsreal cloudspos_z = 0.0;
 
-    for( long i = 0; i < 10; i++ )
+    for( long i = 0; i < 20; i++ )
     {
         cloudspos_z = 0.0;
 
-        for( long j = 0; j < 5; j++ )
+        for( long j = 0; j < 20; j++ )
         {
             addcloud( cloudspos_x, cloudspos_z, m_idl );            
 
