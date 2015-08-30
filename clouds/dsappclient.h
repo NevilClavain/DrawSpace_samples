@@ -16,6 +16,8 @@ protected:
 
     typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Core::PropertyPool*>                                                RunnerMsgCb;
 
+    typedef DrawSpace::Core::CallBack2<dsAppClient, void, DrawSpace::Core::SceneNodeGraph::CameraEvent, DrawSpace::Core::BaseSceneNode*> CameraEventCb;
+
     static dsAppClient*                                                 m_instance;
 
     
@@ -47,6 +49,11 @@ protected:
     DrawSpace::Core::FreeMovement                                       m_freemove;
     DrawSpace::Core::SceneNode<DrawSpace::Core::FreeMovement>*          m_freemove_node;
 
+
+    DrawSpace::Dynamics::CameraPoint*                                   m_camera2;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera2_node;
+
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_camera2_transfo_node;
     
     DrawSpace::Interface::MesheImport*                                  m_meshe_import;
 
@@ -85,14 +92,21 @@ protected:
     DrawSpace::Utils::Mutex                                             m_mutex;
 
 
+    CameraEventCb*                                                      m_cameraevent_cb;
+
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_current_camera;
    
 
     void on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node );
     void on_sort_request( DrawSpace::Core::PropertyPool* p_args );
 
+    void on_camera_event( DrawSpace::Core::SceneNodeGraph::CameraEvent p_event, DrawSpace::Core::BaseSceneNode* p_node );
 
 
-    void addcloud( dsreal p_xpos, dsreal p_zpos, DrawSpace::Chunk::ImpostorsDisplayList& p_idl );
+
+    void clouds_addcloud( dsreal p_xpos, dsreal p_zpos, DrawSpace::Chunk::ImpostorsDisplayList& p_idl );
+    void clouds_execsortz( void );
+
 
     dsAppClient( void );
 

@@ -15,12 +15,14 @@ dsAppClient* dsAppClient::m_instance = NULL;
 
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_current_camera( NULL )
 {    
     _INIT_LOGGER( "logclouds.conf" )  
     m_w_title = "clouds test";
 
     m_nodesevent_cb = _DRAWSPACE_NEW_( NodesEventCallback, NodesEventCallback( this, &dsAppClient::on_nodes_event ) );
+
+    
 
     m_update_clouds_meshes = false;
 }
@@ -32,6 +34,9 @@ dsAppClient::~dsAppClient( void )
 
 void dsAppClient::on_sort_request( DrawSpace::Core::PropertyPool* p_args )
 {
+
+    clouds_execsortz();
+
     Chunk::ImpostorsDisplayListEntry idle_1, idle_2;
 
     idle_1 = m_idl[1];
@@ -54,6 +59,26 @@ void dsAppClient::on_sort_request( DrawSpace::Core::PropertyPool* p_args )
 void dsAppClient::on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node )
 {
 
+
+}
+
+void dsAppClient::on_camera_event( DrawSpace::Core::SceneNodeGraph::CameraEvent p_event, DrawSpace::Core::BaseSceneNode* p_node )
+{
+    if( DrawSpace::Core::SceneNodeGraph::ACTIVE == p_event )
+    {
+        DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* prec_camera = m_current_camera;        
+        m_current_camera = static_cast< DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* >( p_node );
+
+        if( prec_camera != m_current_camera )
+        {
+            PropertyPool props;
+            m_sort_msg->PushMessage( props );    
+        }
+    }
+}
+
+void dsAppClient::clouds_execsortz( void )
+{
 
 }
 
@@ -101,7 +126,7 @@ void dsAppClient::OnRenderFrame( void )
 }
 
 
-void dsAppClient::addcloud( dsreal p_xpos, dsreal p_zpos, Chunk::ImpostorsDisplayList& p_idl )
+void dsAppClient::clouds_addcloud( dsreal p_xpos, dsreal p_zpos, Chunk::ImpostorsDisplayList& p_idl )
 {
     Chunk::ImpostorsDisplayListEntry idle;
 
@@ -401,7 +426,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
         for( long j = 0; j < 20; j++ )
         {
-            addcloud( cloudspos_x, cloudspos_z, m_idl );            
+            clouds_addcloud( cloudspos_x, cloudspos_z, m_idl );            
 
             cloudspos_z -= 5500.0;
         }
@@ -519,6 +544,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_scenenodegraph.RegisterNodesEvtHandler( m_nodesevent_cb );
+
+    
   
 
     m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer ) );
@@ -585,8 +612,10 @@ bool dsAppClient::OnIdleAppInit( void )
     m_task = _DRAWSPACE_NEW_( Task<Runner>, Task<Runner> );
     m_task->Startup( m_runner );
 
+    
+    m_cameraevent_cb = _DRAWSPACE_NEW_( CameraEventCb, CameraEventCb( this, &dsAppClient::on_camera_event ) );
 
-
+    m_scenenodegraph.RegisterCameraEvtHandler( m_cameraevent_cb );
         
     return true;
 }
@@ -673,7 +702,7 @@ void dsAppClient::OnKeyPulse( long p_key )
         case VK_F2:
             {              
                 PropertyPool props;
-                m_sort_msg->PushMessage( props );                
+                m_sort_msg->PushMessage( props ); 
             }        
             break;
 
