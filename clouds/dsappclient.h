@@ -94,7 +94,15 @@ protected:
 
     CameraEventCb*                                                      m_cameraevent_cb;
 
+    int                                                                 m_selected_camera;
+
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_current_camera;
+
+    bool                                                                m_previous_camera_pos_avail;
+    DrawSpace::Utils::Vector                                            m_previous_camera_pos;
+
+
+    int                                                                 m_recompute_count;
    
 
     void on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node );

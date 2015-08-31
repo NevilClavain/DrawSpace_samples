@@ -15,7 +15,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_current_camera( NULL )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_current_camera( NULL ), m_selected_camera( 0 ), m_recompute_count( 0 )
 {    
     _INIT_LOGGER( "logclouds.conf" )  
     m_w_title = "clouds test";
@@ -72,7 +72,10 @@ void dsAppClient::on_camera_event( DrawSpace::Core::SceneNodeGraph::CameraEvent 
         if( prec_camera != m_current_camera )
         {
             PropertyPool props;
-            m_sort_msg->PushMessage( props );    
+            m_sort_msg->PushMessage( props );
+            m_recompute_count++;
+
+            m_previous_camera_pos_avail = false;
         }
     }
 }
@@ -113,6 +116,7 @@ void dsAppClient::OnRenderFrame( void )
 
     long current_fps = m_timer.GetFPS();
     renderer->DrawText( 0, 255, 0, 10, 35, "%d", current_fps );
+    renderer->DrawText( 0, 255, 0, 10, 55, "%d", m_recompute_count );
 
 
     renderer->FlipScreen();
@@ -122,6 +126,48 @@ void dsAppClient::OnRenderFrame( void )
     m_calendar->Run();
 
     m_freemove.SetSpeed( m_speed );
+
+
+
+    if( m_current_camera )
+    {
+        Matrix Mat;
+
+        m_current_camera->GetFinalTransform( Mat );
+
+        Vector current_camera_pos;
+
+        current_camera_pos[0] = Mat( 3, 0 );
+        current_camera_pos[1] = Mat( 3, 1 );
+        current_camera_pos[2] = Mat( 3, 2 );
+        current_camera_pos[3] = 1.0;
+
+
+        if( m_previous_camera_pos_avail )
+        {
+            Vector delta_cam_pos;
+
+            delta_cam_pos[0] = current_camera_pos[0] - m_previous_camera_pos[0];
+            delta_cam_pos[0] = current_camera_pos[1] - m_previous_camera_pos[1];
+            delta_cam_pos[0] = current_camera_pos[2] - m_previous_camera_pos[2];
+            delta_cam_pos[3] = 1.0;
+
+            if( delta_cam_pos.Length() > 300.0 )
+            {
+                PropertyPool props;
+                m_sort_msg->PushMessage( props );
+                m_recompute_count++;
+
+                m_previous_camera_pos = current_camera_pos;
+            }
+
+        }
+        else
+        {
+            m_previous_camera_pos = current_camera_pos;
+            m_previous_camera_pos_avail = true;
+        }
+    }
        
 }
 
@@ -578,6 +624,38 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
+    m_camera2 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
+
+    
+    m_camera2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera2" ) );
+    m_camera2_node->SetContent( m_camera2 );
+    m_scenenodegraph.RegisterNode( m_camera2_node );
+
+
+
+    m_camera2_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "camera2_transfo" ) );
+    m_camera2_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+
+    Matrix cam2_pos;
+    cam2_pos.Translation( 20000.0, 9000.0, -60000.0 );
+
+    m_camera2_transfo_node->GetContent()->PushMatrix( cam2_pos );
+
+    m_scenenodegraph.AddNode( m_camera2_transfo_node );
+    m_scenenodegraph.RegisterNode( m_camera2_transfo_node );
+
+
+
+
+
+
+    m_camera2_node->LinkTo( m_camera2_transfo_node );
+
+
+    m_camera2->Lock( m_impostor2_node );
+
+
+
 
 
     m_scenenodegraph.SetCurrentCamera( "camera" );
@@ -611,6 +689,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_task = _DRAWSPACE_NEW_( Task<Runner>, Task<Runner> );
     m_task->Startup( m_runner );
+
+    m_previous_camera_pos_avail = false;
 
     
     m_cameraevent_cb = _DRAWSPACE_NEW_( CameraEventCb, CameraEventCb( this, &dsAppClient::on_camera_event ) );
@@ -708,6 +788,16 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F3:
 
+            if( 0 == m_selected_camera )
+            {
+                m_scenenodegraph.SetCurrentCamera( "camera2" );
+                m_selected_camera = 1;
+            }
+            else
+            {
+                m_scenenodegraph.SetCurrentCamera( "camera" );
+                m_selected_camera = 0;
+            }
             break;
 
         case VK_F4:
