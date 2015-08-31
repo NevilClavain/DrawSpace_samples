@@ -18,6 +18,17 @@ protected:
 
     typedef DrawSpace::Core::CallBack2<dsAppClient, void, DrawSpace::Core::SceneNodeGraph::CameraEvent, DrawSpace::Core::BaseSceneNode*> CameraEventCb;
 
+
+    typedef struct
+    {
+        DrawSpace::Chunk::ImpostorsDisplayList  idl;
+
+        DrawSpace::Utils::Vector                pos;
+        DrawSpace::Utils::Vector                transformed_pos;  // pour le z-sort
+
+    } Cloud;
+
+
     static dsAppClient*                                                 m_instance;
 
     
@@ -83,6 +94,8 @@ protected:
 
     DrawSpace::Chunk::ImpostorsDisplayList                              m_idl;
 
+    std::vector<Cloud>                                                  m_clouds;
+
     DrawSpace::Core::Mediator::MessageQueue*                            m_sort_msg;
     DrawSpace::Core::Runner*                                            m_runner;
     DrawSpace::Core::Task<DrawSpace::Core::Runner>*                     m_task;
@@ -103,6 +116,8 @@ protected:
 
 
     int                                                                 m_recompute_count;
+
+    bool                                                                m_ready;
    
 
     void on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node );
@@ -113,7 +128,11 @@ protected:
 
 
     void clouds_addcloud( dsreal p_xpos, dsreal p_zpos, DrawSpace::Chunk::ImpostorsDisplayList& p_idl );
-    void clouds_execsortz( void );
+    void clouds_execsortz( const DrawSpace::Utils::Matrix& p_globalmat );
+
+    void clouds_impostors_init( void );
+
+    static bool clouds_nodes_comp( Cloud p_n1, Cloud p_n2 );
 
 
     dsAppClient( void );

@@ -1,5 +1,5 @@
 #include "dsappclient.h"
-
+#include <algorithm>
 
 
 using namespace DrawSpace;
@@ -15,7 +15,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_current_camera( NULL ), m_selected_camera( 0 ), m_recompute_count( 0 )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_current_camera( NULL ), m_selected_camera( 0 ), m_recompute_count( 0 ), m_ready( false )
 {    
     _INIT_LOGGER( "logclouds.conf" )  
     m_w_title = "clouds test";
@@ -35,17 +35,24 @@ dsAppClient::~dsAppClient( void )
 void dsAppClient::on_sort_request( DrawSpace::Core::PropertyPool* p_args )
 {
 
-    clouds_execsortz();
+    Matrix global_mat;
+    global_mat = p_args->GetPropValue<Matrix>( "globalmat" );
 
+    clouds_execsortz( global_mat );
+
+    /*
     Chunk::ImpostorsDisplayListEntry idle_1, idle_2;
-
     idle_1 = m_idl[1];
     idle_2 = m_idl[2];
 
     m_idl[1] = idle_2;
     m_idl[2] = idle_1;
+    */
+    //m_impostor2->ImpostorsInit( m_idl );
 
-    m_impostor2->ImpostorsInit( m_idl );
+
+
+    clouds_impostors_init();
 
 
     m_mutex.WaitInfinite();
@@ -69,9 +76,22 @@ void dsAppClient::on_camera_event( DrawSpace::Core::SceneNodeGraph::CameraEvent 
         DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* prec_camera = m_current_camera;        
         m_current_camera = static_cast< DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* >( p_node );
 
-        if( prec_camera != m_current_camera )
+        if( prec_camera != m_current_camera && m_ready )
         {
+
+            Matrix CamMat;
+
+            m_current_camera->GetFinalTransform( CamMat );
+
+            Matrix ImpostorMat;
+
+            m_impostor2_node->GetFinalTransform( ImpostorMat );
+
+            Matrix res = ImpostorMat * CamMat;
             PropertyPool props;
+
+            props.AddPropValue<Matrix>( "globalmat", res );
+
             m_sort_msg->PushMessage( props );
             m_recompute_count++;
 
@@ -80,9 +100,20 @@ void dsAppClient::on_camera_event( DrawSpace::Core::SceneNodeGraph::CameraEvent 
     }
 }
 
-void dsAppClient::clouds_execsortz( void )
-{
 
+void dsAppClient::clouds_impostors_init( void )
+{
+    m_idl.clear();
+
+    for( size_t i = 0; i < m_clouds.size(); i++ )
+    {
+        for( size_t j = 0; j < m_clouds[i].idl.size(); j++ )
+        {
+            m_idl.push_back( m_clouds[i].idl[j] );
+        }
+    }
+
+    m_impostor2->ImpostorsInit( m_idl );
 }
 
 void dsAppClient::OnRenderFrame( void )
@@ -115,8 +146,8 @@ void dsAppClient::OnRenderFrame( void )
     //m_finalpass2->GetRenderingQueue()->Draw();
 
     long current_fps = m_timer.GetFPS();
-    renderer->DrawText( 0, 255, 0, 10, 35, "%d", current_fps );
-    renderer->DrawText( 0, 255, 0, 10, 55, "%d", m_recompute_count );
+    renderer->DrawText( 0, 0, 0, 10, 35, "%d", current_fps );
+    renderer->DrawText( 0, 0, 0, 10, 55, "%d", m_recompute_count );
 
 
     renderer->FlipScreen();
@@ -127,19 +158,20 @@ void dsAppClient::OnRenderFrame( void )
 
     m_freemove.SetSpeed( m_speed );
 
+    m_ready = true;
 
 
     if( m_current_camera )
     {
-        Matrix Mat;
+        Matrix CamMat;
 
-        m_current_camera->GetFinalTransform( Mat );
+        m_current_camera->GetFinalTransform( CamMat );
 
         Vector current_camera_pos;
 
-        current_camera_pos[0] = Mat( 3, 0 );
-        current_camera_pos[1] = Mat( 3, 1 );
-        current_camera_pos[2] = Mat( 3, 2 );
+        current_camera_pos[0] = CamMat( 3, 0 );
+        current_camera_pos[1] = CamMat( 3, 1 );
+        current_camera_pos[2] = CamMat( 3, 2 );
         current_camera_pos[3] = 1.0;
 
 
@@ -152,9 +184,19 @@ void dsAppClient::OnRenderFrame( void )
             delta_cam_pos[0] = current_camera_pos[2] - m_previous_camera_pos[2];
             delta_cam_pos[3] = 1.0;
 
-            if( delta_cam_pos.Length() > 300.0 )
+            if( delta_cam_pos.Length() > 1000.0 )
             {
+
+                // get clouds node global transform
+                Matrix ImpostorMat;
+
+                m_impostor2_node->GetFinalTransform( ImpostorMat );
+
+                Matrix res = ImpostorMat * CamMat;
                 PropertyPool props;
+
+                props.AddPropValue<Matrix>( "globalmat", res );
+
                 m_sort_msg->PushMessage( props );
                 m_recompute_count++;
 
@@ -175,6 +217,7 @@ void dsAppClient::OnRenderFrame( void )
 void dsAppClient::clouds_addcloud( dsreal p_xpos, dsreal p_zpos, Chunk::ImpostorsDisplayList& p_idl )
 {
     Chunk::ImpostorsDisplayListEntry idle;
+    Chunk::ImpostorsDisplayList idl;
 
 
     idle.width_scale = 1500.0;
@@ -193,7 +236,7 @@ void dsAppClient::clouds_addcloud( dsreal p_xpos, dsreal p_zpos, Chunk::Impostor
     idle.localpos[1] = 0.0;
     idle.localpos[2] = p_zpos;
     
-    p_idl.push_back( idle );
+    idl.push_back( idle );
 
 
 
@@ -213,7 +256,7 @@ void dsAppClient::clouds_addcloud( dsreal p_xpos, dsreal p_zpos, Chunk::Impostor
     idle.localpos[1] = 90.0;
     idle.localpos[2] = p_zpos;
     
-    p_idl.push_back( idle );
+    idl.push_back( idle );
 
 
 
@@ -234,7 +277,7 @@ void dsAppClient::clouds_addcloud( dsreal p_xpos, dsreal p_zpos, Chunk::Impostor
     idle.localpos[1] = 190.0;
     idle.localpos[2] = p_zpos - 700.0;
     
-    p_idl.push_back( idle );
+    idl.push_back( idle );
 
 
 
@@ -256,7 +299,7 @@ void dsAppClient::clouds_addcloud( dsreal p_xpos, dsreal p_zpos, Chunk::Impostor
     idle.localpos[1] = 190.0;
     idle.localpos[2] = p_zpos + 700.0;
     
-    p_idl.push_back( idle );
+    idl.push_back( idle );
 
 
 
@@ -277,7 +320,7 @@ void dsAppClient::clouds_addcloud( dsreal p_xpos, dsreal p_zpos, Chunk::Impostor
     idle.localpos[1] = -60.0;
     idle.localpos[2] = p_zpos;
     
-    p_idl.push_back( idle );
+    idl.push_back( idle );
 
 
     idle.width_scale = 1800.0;
@@ -296,8 +339,49 @@ void dsAppClient::clouds_addcloud( dsreal p_xpos, dsreal p_zpos, Chunk::Impostor
     idle.localpos[1] = -60.0;
     idle.localpos[2] = p_zpos;
     
-    p_idl.push_back( idle );
+    idl.push_back( idle );
+
+    Cloud cloud;
+
+    cloud.idl = idl;
+    cloud.pos[0] = p_xpos;
+    cloud.pos[1] = 0.0;
+    cloud.pos[2] = p_zpos;
+    cloud.pos[3] = 1.0;
+
+    m_clouds.push_back( cloud );
 }
+
+
+void dsAppClient::clouds_execsortz( const Matrix& p_globalmat )
+{
+    // compute all camera-space z-depth
+
+    for( size_t i = 0; i < m_clouds.size(); i++ )
+    {
+        Matrix local_trans;
+        local_trans.Translation( m_clouds[i].pos );
+
+        Matrix final = local_trans * p_globalmat;
+
+        Vector point( 0.0, 0.0, 0.0, 1.0 );
+        Vector t_point;
+        
+        final.Transform( &point, &t_point );
+
+        m_clouds[i].transformed_pos = t_point;
+
+    }
+
+    std::sort( m_clouds.begin(), m_clouds.end(), dsAppClient::clouds_nodes_comp );
+}
+
+
+bool dsAppClient::clouds_nodes_comp( Cloud p_n1, Cloud p_n2 )
+{
+    return ( p_n1.transformed_pos[2] > p_n2.transformed_pos[2] );
+}
+
 
 
 
@@ -466,11 +550,11 @@ bool dsAppClient::OnIdleAppInit( void )
     dsreal cloudspos_x = 0.0;
     dsreal cloudspos_z = 0.0;
 
-    for( long i = 0; i < 20; i++ )
+    for( long i = 0; i < 4; i++ )
     {
         cloudspos_z = 0.0;
 
-        for( long j = 0; j < 20; j++ )
+        for( long j = 0; j < 4; j++ )
         {
             clouds_addcloud( cloudspos_x, cloudspos_z, m_idl );            
 
@@ -484,7 +568,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_impostor2->ImpostorsInit( m_idl );
+    
+    clouds_impostors_init();
 
     m_impostor2->RegisterPassSlot( m_texturepass2 );
     m_impostor2->RegisterPassSlot( m_maskpass );
@@ -781,8 +866,6 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F2:
             {              
-                PropertyPool props;
-                m_sort_msg->PushMessage( props ); 
             }        
             break;
 
