@@ -24,7 +24,7 @@ protected:
         DrawSpace::Chunk::ImpostorsDisplayList  idl;
 
         DrawSpace::Utils::Vector                pos;
-        DrawSpace::Utils::Vector                transformed_pos;  // pour le z-sort
+        dsreal                                  dist_to_cam;  // pour le z-sort
 
     } Cloud;
 
@@ -118,6 +118,12 @@ protected:
     int                                                                 m_recompute_count;
 
     bool                                                                m_ready;
+
+    bool                                                                m_sort_running;
+
+    bool                                                                m_sort_running_copy;
+
+    DrawSpace::Utils::Mutex                                             m_sort_run_mutex;
    
 
     void on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node );
@@ -128,7 +134,7 @@ protected:
 
 
     void clouds_addcloud( dsreal p_xpos, dsreal p_zpos, DrawSpace::Chunk::ImpostorsDisplayList& p_idl );
-    void clouds_execsortz( const DrawSpace::Utils::Matrix& p_globalmat );
+    void clouds_execsortz( const DrawSpace::Utils::Matrix& p_impostor_mat, const DrawSpace::Utils::Matrix& p_cam_mat );
 
     void clouds_impostors_init( void );
 
