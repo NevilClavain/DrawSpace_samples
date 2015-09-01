@@ -94,7 +94,8 @@ protected:
 
     DrawSpace::Chunk::ImpostorsDisplayList                              m_idl;
 
-    std::vector<Cloud>                                                  m_clouds;
+    //std::vector<Cloud>                                                  m_clouds;
+    std::vector<Cloud*>                                                 m_clouds;
 
     DrawSpace::Core::Mediator::MessageQueue*                            m_sort_msg;
     DrawSpace::Core::Runner*                                            m_runner;
@@ -138,7 +139,8 @@ protected:
 
     void clouds_impostors_init( void );
 
-    static bool clouds_nodes_comp( Cloud p_n1, Cloud p_n2 );
+    //static bool clouds_nodes_comp( Cloud p_n1, Cloud p_n2 );
+    static bool clouds_nodes_comp( Cloud* p_n1, Cloud* p_n2 );
 
 
     dsAppClient( void );

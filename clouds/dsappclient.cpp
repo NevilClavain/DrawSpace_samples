@@ -102,9 +102,11 @@ void dsAppClient::clouds_impostors_init( void )
 
     for( size_t i = 0; i < m_clouds.size(); i++ )
     {
-        for( size_t j = 0; j < m_clouds[i].idl.size(); j++ )
+        //for( size_t j = 0; j < m_clouds[i].idl.size(); j++ )
+        for( size_t j = 0; j < m_clouds[i]->idl.size(); j++ )
         {
-            m_idl.push_back( m_clouds[i].idl[j] );
+            //m_idl.push_back( m_clouds[i].idl[j] );
+            m_idl.push_back( m_clouds[i]->idl[j] );
         }
     }
 
@@ -187,7 +189,7 @@ void dsAppClient::OnRenderFrame( void )
             delta_cam_pos[0] = current_camera_pos[2] - m_previous_camera_pos[2];
             delta_cam_pos[3] = 1.0;
 
-            if( delta_cam_pos.Length() > 1000.0 )
+            if( delta_cam_pos.Length() > 500.0 )
             {
 
                 m_sort_running_copy = true;
@@ -355,6 +357,7 @@ void dsAppClient::clouds_addcloud( dsreal p_xpos, dsreal p_zpos, Chunk::Impostor
     
     idl.push_back( idle );
 
+    /*
     Cloud cloud;
 
     cloud.idl = idl;
@@ -364,6 +367,18 @@ void dsAppClient::clouds_addcloud( dsreal p_xpos, dsreal p_zpos, Chunk::Impostor
     cloud.pos[3] = 1.0;
 
     m_clouds.push_back( cloud );
+    */
+
+    Cloud* cloud = new Cloud;
+
+    cloud->idl = idl;
+    cloud->pos[0] = p_xpos;
+    cloud->pos[1] = 0.0;
+    cloud->pos[2] = p_zpos;
+    cloud->pos[3] = 1.0;
+
+    m_clouds.push_back( cloud );
+
 }
 
 
@@ -374,7 +389,8 @@ void dsAppClient::clouds_execsortz( const DrawSpace::Utils::Matrix& p_impostor_m
     for( size_t i = 0; i < m_clouds.size(); i++ )
     {
         Matrix local_trans;
-        local_trans.Translation( m_clouds[i].pos );
+        //local_trans.Translation( m_clouds[i].pos );
+        local_trans.Translation( m_clouds[i]->pos );
 
         Matrix final = local_trans * p_impostor_mat;
 
@@ -396,16 +412,19 @@ void dsAppClient::clouds_execsortz( const DrawSpace::Utils::Matrix& p_impostor_m
         dist_imp[2] = t_point_imp[2] - t_point_cam[2];
         dist_imp[3] = 1.0;
 
-        m_clouds[i].dist_to_cam = dist_imp.Length();       
+        //m_clouds[i].dist_to_cam = dist_imp.Length();
+        m_clouds[i]->dist_to_cam = dist_imp.Length();
     }
 
     std::sort( m_clouds.begin(), m_clouds.end(), dsAppClient::clouds_nodes_comp );
 }
 
 
-bool dsAppClient::clouds_nodes_comp( Cloud p_n1, Cloud p_n2 )
+//bool dsAppClient::clouds_nodes_comp( Cloud p_n1, Cloud p_n2 )
+bool dsAppClient::clouds_nodes_comp( Cloud* p_n1, Cloud* p_n2 )
 {
-    return ( p_n1.dist_to_cam > p_n2.dist_to_cam );
+    //return ( p_n1.dist_to_cam > p_n2.dist_to_cam );
+    return ( p_n1->dist_to_cam > p_n2->dist_to_cam );
 }
 
 
@@ -576,11 +595,11 @@ bool dsAppClient::OnIdleAppInit( void )
     dsreal cloudspos_x = 0.0;
     dsreal cloudspos_z = 0.0;
 
-    for( long i = 0; i < 10; i++ )
+    for( long i = 0; i < 20; i++ )
     {
         cloudspos_z = 0.0;
 
-        for( long j = 0; j < 10; j++ )
+        for( long j = 0; j < 20; j++ )
         {
             clouds_addcloud( cloudspos_x, cloudspos_z, m_idl );            
 
