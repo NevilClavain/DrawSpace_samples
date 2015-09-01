@@ -103,6 +103,11 @@ protected:
     RunnerMsgCb*                                                        m_runner_msg_cb;
 
     bool                                                                m_update_clouds_meshes;
+
+    bool                                                                m_clouds_sort_request;
+
+    bool                                                                m_ready;
+
     DrawSpace::Utils::Mutex                                             m_mutex;
 
 
@@ -118,7 +123,7 @@ protected:
 
     int                                                                 m_recompute_count;
 
-    bool                                                                m_ready;
+    
 
     bool                                                                m_sort_running;
 

@@ -69,6 +69,7 @@ void dsAppClient::on_camera_event( DrawSpace::Core::SceneNodeGraph::CameraEvent 
         DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* prec_camera = m_current_camera;        
         m_current_camera = static_cast< DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* >( p_node );
 
+        /*
         if( prec_camera != m_current_camera && m_ready )
         {
 
@@ -91,6 +92,12 @@ void dsAppClient::on_camera_event( DrawSpace::Core::SceneNodeGraph::CameraEvent 
             m_recompute_count++;
 
             m_previous_camera_pos_avail = false;
+        }
+        */
+
+        if( prec_camera != m_current_camera )
+        {
+            m_clouds_sort_request = true;
         }
     }
 }
@@ -168,9 +175,7 @@ void dsAppClient::OnRenderFrame( void )
         Matrix CamMat;
         
         m_current_camera->GetFinalTransform( CamMat );
-
-        
-
+       
 
         Vector current_camera_pos;
 
@@ -192,31 +197,12 @@ void dsAppClient::OnRenderFrame( void )
             if( delta_cam_pos.Length() > 500.0 )
             {
 
-                m_sort_running_copy = true;
-                if( m_sort_run_mutex.Wait( 0 ) )
-                {
-                    m_sort_running_copy = m_sort_running;                     
-                }
-                m_sort_run_mutex.Release();
+                m_clouds_sort_request = true;
 
-                if( !m_sort_running_copy )
-                {
-                    // get clouds node global transform
-                    Matrix ImpostorMat;
+                /*
+                */
 
-                    m_impostor2_node->GetFinalTransform( ImpostorMat );
-
-                    PropertyPool props;
-
-                    props.AddPropValue<Matrix>( "ImpostorMat", ImpostorMat );
-                    props.AddPropValue<Matrix>( "CamMat", CamMat );
-
-                    m_sort_msg->PushMessage( props );
-                    m_recompute_count++;
-
-                    m_previous_camera_pos = current_camera_pos;
-                }
-                
+                m_previous_camera_pos = current_camera_pos;
             }
 
         }
@@ -225,6 +211,42 @@ void dsAppClient::OnRenderFrame( void )
             m_previous_camera_pos = current_camera_pos;
             m_previous_camera_pos_avail = true;
         }
+    }
+
+
+    if( m_clouds_sort_request )
+    {
+        m_sort_running_copy = true;
+        if( m_sort_run_mutex.Wait( 0 ) )
+        {
+            m_sort_running_copy = m_sort_running;                     
+        }
+        m_sort_run_mutex.Release();
+
+        if( !m_sort_running_copy )
+        {
+            // get clouds node global transform
+            Matrix ImpostorMat;
+            m_impostor2_node->GetFinalTransform( ImpostorMat );
+
+            Matrix CamMat;
+            m_current_camera->GetFinalTransform( CamMat );
+
+
+
+            PropertyPool props;
+
+            props.AddPropValue<Matrix>( "ImpostorMat", ImpostorMat );
+            props.AddPropValue<Matrix>( "CamMat", CamMat );
+
+            m_sort_msg->PushMessage( props );
+            m_recompute_count++;
+
+            
+        }
+
+
+        m_clouds_sort_request = false;
     }
        
 }
