@@ -15,7 +15,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_current_camera( NULL ), m_selected_camera( 0 ), m_recompute_count( 0 ), m_ready( false ), m_sort_running_copy( false )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_current_camera( NULL ), m_selected_camera( 0 ), m_recompute_count( 0 ), m_ready( false )
 {    
     _INIT_LOGGER( "logclouds.conf" )  
     m_w_title = "clouds test";
@@ -153,12 +153,6 @@ void dsAppClient::OnRenderFrame( void )
     renderer->DrawText( 0, 0, 0, 10, 35, "%d", current_fps );
     renderer->DrawText( 0, 0, 0, 10, 55, "%d", m_recompute_count );
 
-    if( m_sort_running_copy )
-    {
-        renderer->DrawText( 0, 0, 0, 10, 85, "sorting..." );
-    }
-
-
     renderer->FlipScreen();
 
 
@@ -213,17 +207,17 @@ void dsAppClient::OnRenderFrame( void )
         }
     }
 
+    bool busy = true;
+    if( m_sort_run_mutex.Wait( 0 ) )
+    {
+        busy = m_sort_running;
+    }
+    m_sort_run_mutex.Release();
+
 
     if( m_clouds_sort_request )
     {
-        m_sort_running_copy = true;
-        if( m_sort_run_mutex.Wait( 0 ) )
-        {
-            m_sort_running_copy = m_sort_running;                     
-        }
-        m_sort_run_mutex.Release();
-
-        if( !m_sort_running_copy )
+        if( !busy )
         {
             // get clouds node global transform
             Matrix ImpostorMat;

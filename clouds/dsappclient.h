@@ -126,9 +126,7 @@ protected:
     
 
     bool                                                                m_sort_running;
-
-    bool                                                                m_sort_running_copy;
-
+    
     DrawSpace::Utils::Mutex                                             m_sort_run_mutex;
    
 
