@@ -1,6 +1,7 @@
 #include "dsappclient.h"
 #include <algorithm>
 
+//#include <random>
 
 using namespace DrawSpace;
 using namespace DrawSpace::Interface;
@@ -22,9 +23,11 @@ dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_spe
 
     m_nodesevent_cb = _DRAWSPACE_NEW_( NodesEventCallback, NodesEventCallback( this, &dsAppClient::on_nodes_event ) );
 
-    
+    m_procedural_cb = _DRAWSPACE_NEW_( ProceduralCb, ProceduralCb( this, &dsAppClient::on_procedural ) );
+    m_procedural_source.RegisterHandler( m_procedural_cb );
 
     m_update_clouds_meshes = false;
+
 }
 
 dsAppClient::~dsAppClient( void )
@@ -69,32 +72,6 @@ void dsAppClient::on_camera_event( DrawSpace::Core::SceneNodeGraph::CameraEvent 
         DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* prec_camera = m_current_camera;        
         m_current_camera = static_cast< DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* >( p_node );
 
-        /*
-        if( prec_camera != m_current_camera && m_ready )
-        {
-
-            Matrix CamMat;
-
-            m_current_camera->GetFinalTransform( CamMat );
-
-            Matrix ImpostorMat;
-
-            m_impostor2_node->GetFinalTransform( ImpostorMat );
-
-            
-            PropertyPool props;
-
-            props.AddPropValue<Matrix>( "ImpostorMat", ImpostorMat );
-            props.AddPropValue<Matrix>( "CamMat", CamMat );
-
-
-            m_sort_msg->PushMessage( props );
-            m_recompute_count++;
-
-            m_previous_camera_pos_avail = false;
-        }
-        */
-
         if( prec_camera != m_current_camera )
         {
             m_clouds_sort_request = true;
@@ -109,10 +86,8 @@ void dsAppClient::clouds_impostors_init( void )
 
     for( size_t i = 0; i < m_clouds.size(); i++ )
     {
-        //for( size_t j = 0; j < m_clouds[i].idl.size(); j++ )
         for( size_t j = 0; j < m_clouds[i]->idl.size(); j++ )
-        {
-            //m_idl.push_back( m_clouds[i].idl[j] );
+        {     
             m_idl.push_back( m_clouds[i]->idl[j] );
         }
     }
@@ -146,8 +121,7 @@ void dsAppClient::OnRenderFrame( void )
     m_maskpass->GetRenderingQueue()->Draw();
     m_filterpass->GetRenderingQueue()->Draw();
     
-    m_finalpass->GetRenderingQueue()->Draw();
-    //m_finalpass2->GetRenderingQueue()->Draw();
+    m_finalpass->GetRenderingQueue()->Draw();    
 
     long current_fps = m_timer.GetFPS();
     renderer->DrawText( 0, 0, 0, 10, 35, "%d", current_fps );
@@ -373,18 +347,6 @@ void dsAppClient::clouds_addcloud( dsreal p_xpos, dsreal p_zpos, Chunk::Impostor
     
     idl.push_back( idle );
 
-    /*
-    Cloud cloud;
-
-    cloud.idl = idl;
-    cloud.pos[0] = p_xpos;
-    cloud.pos[1] = 0.0;
-    cloud.pos[2] = p_zpos;
-    cloud.pos[3] = 1.0;
-
-    m_clouds.push_back( cloud );
-    */
-
     Cloud* cloud = new Cloud;
 
     cloud->idl = idl;
@@ -405,7 +367,7 @@ void dsAppClient::clouds_execsortz( const DrawSpace::Utils::Matrix& p_impostor_m
     for( size_t i = 0; i < m_clouds.size(); i++ )
     {
         Matrix local_trans;
-        //local_trans.Translation( m_clouds[i].pos );
+
         local_trans.Translation( m_clouds[i]->pos );
 
         Matrix final = local_trans * p_impostor_mat;
@@ -428,7 +390,6 @@ void dsAppClient::clouds_execsortz( const DrawSpace::Utils::Matrix& p_impostor_m
         dist_imp[2] = t_point_imp[2] - t_point_cam[2];
         dist_imp[3] = 1.0;
 
-        //m_clouds[i].dist_to_cam = dist_imp.Length();
         m_clouds[i]->dist_to_cam = dist_imp.Length();
     }
 
@@ -436,10 +397,8 @@ void dsAppClient::clouds_execsortz( const DrawSpace::Utils::Matrix& p_impostor_m
 }
 
 
-//bool dsAppClient::clouds_nodes_comp( Cloud p_n1, Cloud p_n2 )
 bool dsAppClient::clouds_nodes_comp( Cloud* p_n1, Cloud* p_n2 )
 {
-    //return ( p_n1.dist_to_cam > p_n2.dist_to_cam );
     return ( p_n1->dist_to_cam > p_n2->dist_to_cam );
 }
 
@@ -448,6 +407,29 @@ bool dsAppClient::clouds_nodes_comp( Cloud* p_n1, Cloud* p_n2 )
 
 bool dsAppClient::OnIdleAppInit( void )
 {
+    /*
+    std::default_random_engine generator;
+    std::uniform_int_distribution<int> distribution(0,100);
+
+    std::default_random_engine generator2;
+    std::uniform_int_distribution<int> distribution2(0,100);
+
+    generator.seed( 4554 );
+    generator2.seed( 667 );
+
+    int number;
+    int number2;
+
+    number = distribution(generator);
+    //number2 = distribution2(generator2);
+    number = distribution(generator);
+    //number2 = distribution2(generator2);
+    number = distribution(generator);
+    //number2 = distribution2(generator2);
+    number = distribution(generator);
+    //number2 = distribution2(generator2);
+    number = distribution(generator);
+    */
 
     /////////////////////////////////////
            
@@ -842,6 +824,19 @@ bool dsAppClient::OnIdleAppInit( void )
     m_cameraevent_cb = _DRAWSPACE_NEW_( CameraEventCb, CameraEventCb( this, &dsAppClient::on_camera_event ) );
 
     m_scenenodegraph.RegisterCameraEvtHandler( m_cameraevent_cb );
+
+
+    DrawSpace::Procedural::Publisher* m_pub = new DrawSpace::Procedural::Publisher;
+    DrawSpace::Procedural::Integer* m_int = new DrawSpace::Procedural::Integer();
+    m_int->SetValue( 666 );
+
+    m_pub->SetChild( m_int );
+
+    
+    m_procedural_source.SetRules( m_pub );
+
+    m_procedural_source.Run();
+
         
     return true;
 }
@@ -999,6 +994,11 @@ void dsAppClient::OnMouseRightButtonUp( long p_xm, long p_ym )
 }
 
 void dsAppClient::OnAppEvent( WPARAM p_wParam, LPARAM p_lParam )
+{
+
+}
+
+void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
 {
 
 }

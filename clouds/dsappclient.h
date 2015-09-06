@@ -19,6 +19,8 @@ protected:
     typedef DrawSpace::Core::CallBack2<dsAppClient, void, DrawSpace::Core::SceneNodeGraph::CameraEvent, DrawSpace::Core::BaseSceneNode*> CameraEventCb;
 
 
+    typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Procedural::Atomic*>                                                 ProceduralCb;
+
     typedef struct
     {
         DrawSpace::Chunk::ImpostorsDisplayList  idl;
@@ -128,6 +130,11 @@ protected:
     bool                                                                m_sort_running;
     
     DrawSpace::Utils::Mutex                                             m_sort_run_mutex;
+
+
+    ProceduralCb*                                                       m_procedural_cb;
+
+    DrawSpace::Procedural::Source                                       m_procedural_source;
    
 
     void on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node );
@@ -135,6 +142,7 @@ protected:
 
     void on_camera_event( DrawSpace::Core::SceneNodeGraph::CameraEvent p_event, DrawSpace::Core::BaseSceneNode* p_node );
 
+    void on_procedural( DrawSpace::Procedural::Atomic* p_atom );
 
 
     void clouds_addcloud( dsreal p_xpos, dsreal p_zpos, DrawSpace::Chunk::ImpostorsDisplayList& p_idl );
