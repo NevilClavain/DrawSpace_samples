@@ -830,7 +830,9 @@ bool dsAppClient::OnIdleAppInit( void )
     DrawSpace::Procedural::Integer* m_int = new DrawSpace::Procedural::Integer();
     m_int->SetValue( 666 );
 
-    m_pub->SetChild( m_int );
+    DrawSpace::Procedural::UniformDistributionRandom* m_rand = new DrawSpace::Procedural::UniformDistributionRandom( 89554, 0, 20 );
+
+    m_pub->SetChild( m_rand );
 
     
     m_procedural_source.SetRules( m_pub );
@@ -1000,5 +1002,4 @@ void dsAppClient::OnAppEvent( WPARAM p_wParam, LPARAM p_lParam )
 
 void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
 {
-
 }
