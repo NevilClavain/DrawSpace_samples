@@ -134,7 +134,7 @@ protected:
 
     ProceduralCb*                                                       m_procedural_cb;
 
-    DrawSpace::Procedural::Source                                       m_procedural_source;
+    
    
 
     void on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node );

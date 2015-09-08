@@ -24,8 +24,7 @@ dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_spe
     m_nodesevent_cb = _DRAWSPACE_NEW_( NodesEventCallback, NodesEventCallback( this, &dsAppClient::on_nodes_event ) );
 
     m_procedural_cb = _DRAWSPACE_NEW_( ProceduralCb, ProceduralCb( this, &dsAppClient::on_procedural ) );
-    m_procedural_source.RegisterHandler( m_procedural_cb );
-
+    
     m_update_clouds_meshes = false;
 
 }
@@ -826,21 +825,43 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph.RegisterCameraEvtHandler( m_cameraevent_cb );
 
 
-    DrawSpace::Procedural::Publisher* m_pub = new DrawSpace::Procedural::Publisher;
-    DrawSpace::Procedural::Integer* m_int = new DrawSpace::Procedural::Integer();
-    m_int->SetValue( 666 );
+    DrawSpace::Procedural::Publisher* pub = new DrawSpace::Procedural::Publisher;
+    DrawSpace::Procedural::Integer* pint = new DrawSpace::Procedural::Integer();
+    pint->SetValue( 10 );
 
-    DrawSpace::Procedural::UniformDistributionRandom* m_rand = new DrawSpace::Procedural::UniformDistributionRandom( 89554, 0, 20 );
+    DrawSpace::Procedural::Real* preal = new DrawSpace::Procedural::Real();
+    preal->SetValue( 3.14 );
 
-    m_pub->SetChild( m_rand );
+    /*
+    DrawSpace::Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, DrawSpace::Procedural::Integer>* rand = 
+        new DrawSpace::Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, DrawSpace::Procedural::Integer>( new std::uniform_int_distribution<int>( 0, 20 ), 89555);
+      */  
 
+    /*
+    DrawSpace::Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<double>, DrawSpace::Procedural::Real>* rand = 
+        new DrawSpace::Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<double>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<double>( -1000.0, 1000.0 ), 133433 );
+      */  
     
-    m_procedural_source.SetRules( m_pub );
+    DrawSpace::Procedural::RandomDistribution<int, std::geometric_distribution<int>, DrawSpace::Procedural::Integer>* rand = 
+        new DrawSpace::Procedural::RandomDistribution<int, std::geometric_distribution<int>, DrawSpace::Procedural::Integer>( new std::geometric_distribution<int>( 0.3 ), 2887 );
+        
 
-    m_procedural_source.Run();
+    DrawSpace::Procedural::Repeat* repeat = new DrawSpace::Procedural::Repeat;
 
+    pub->SetChild( rand );
+    pub->RegisterHandler( m_procedural_cb );
+
+    repeat->SetChild( pub );
+    repeat->SetNbLoops( pint );
+
+
+    repeat->Apply();
         
     return true;
+}
+
+void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
+{
 }
 
 void dsAppClient::OnAppInit( void )
@@ -998,8 +1019,4 @@ void dsAppClient::OnMouseRightButtonUp( long p_xm, long p_ym )
 void dsAppClient::OnAppEvent( WPARAM p_wParam, LPARAM p_lParam )
 {
 
-}
-
-void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
-{
 }
