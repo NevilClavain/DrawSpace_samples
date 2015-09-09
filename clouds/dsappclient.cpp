@@ -832,19 +832,18 @@ bool dsAppClient::OnIdleAppInit( void )
     DrawSpace::Procedural::Real* preal = new DrawSpace::Procedural::Real();
     preal->SetValue( 3.14 );
 
-    /*
-    DrawSpace::Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, DrawSpace::Procedural::Integer>* rand = 
-        new DrawSpace::Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, DrawSpace::Procedural::Integer>( new std::uniform_int_distribution<int>( 0, 20 ), 89555);
-      */  
 
-    /*
+    DrawSpace::Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, DrawSpace::Procedural::Integer>* rand_nbloop = 
+        new DrawSpace::Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, DrawSpace::Procedural::Integer>( new std::uniform_int_distribution<int>( 1, 20 ), 78 );
+
+    
     DrawSpace::Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<double>, DrawSpace::Procedural::Real>* rand = 
         new DrawSpace::Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<double>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<double>( -1000.0, 1000.0 ), 133433 );
-      */  
-    
+        
+    /*
     DrawSpace::Procedural::RandomDistribution<int, std::geometric_distribution<int>, DrawSpace::Procedural::Integer>* rand = 
         new DrawSpace::Procedural::RandomDistribution<int, std::geometric_distribution<int>, DrawSpace::Procedural::Integer>( new std::geometric_distribution<int>( 0.3 ), 2887 );
-        
+      */  
 
     DrawSpace::Procedural::Repeat* repeat = new DrawSpace::Procedural::Repeat;
 
@@ -852,7 +851,8 @@ bool dsAppClient::OnIdleAppInit( void )
     pub->RegisterHandler( m_procedural_cb );
 
     repeat->SetChild( pub );
-    repeat->SetNbLoops( pint );
+    //repeat->SetNbLoops( pint );
+    repeat->SetNbLoops( rand_nbloop );
 
 
     repeat->Apply();
