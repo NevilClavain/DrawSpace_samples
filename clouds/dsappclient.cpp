@@ -826,15 +826,18 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     DrawSpace::Procedural::Publisher* pub = new DrawSpace::Procedural::Publisher;
+    DrawSpace::Procedural::Publisher* pub2 = new DrawSpace::Procedural::Publisher;
     DrawSpace::Procedural::Integer* pint = new DrawSpace::Procedural::Integer();
     pint->SetValue( 10 );
 
     DrawSpace::Procedural::Real* preal = new DrawSpace::Procedural::Real();
     preal->SetValue( 3.14 );
 
+    DrawSpace::Procedural::String* pstring = new DrawSpace::Procedural::String();
+    pstring->SetValue( "hello !" );
 
     DrawSpace::Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, DrawSpace::Procedural::Integer>* rand_nbloop = 
-        new DrawSpace::Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, DrawSpace::Procedural::Integer>( new std::uniform_int_distribution<int>( 1, 20 ), 78 );
+        new DrawSpace::Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, DrawSpace::Procedural::Integer>( new std::uniform_int_distribution<int>( 1, 10 ), 78 );
 
     
     DrawSpace::Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<double>, DrawSpace::Procedural::Real>* rand = 
@@ -847,15 +850,25 @@ bool dsAppClient::OnIdleAppInit( void )
 
     DrawSpace::Procedural::Repeat* repeat = new DrawSpace::Procedural::Repeat;
 
+    DrawSpace::Procedural::Batch* batch = new DrawSpace::Procedural::Batch;
+
+
+
     pub->SetChild( rand );
     pub->RegisterHandler( m_procedural_cb );
+
+    pub2->SetChild( pstring );
+    pub2->RegisterHandler( m_procedural_cb );
+
 
     repeat->SetChild( pub );
     //repeat->SetNbLoops( pint );
     repeat->SetNbLoops( rand_nbloop );
 
+    batch->AddChild( pub2 );
+    batch->AddChild( repeat );
 
-    repeat->Apply();
+    batch->Apply();
         
     return true;
 }
