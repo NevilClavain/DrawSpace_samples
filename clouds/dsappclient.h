@@ -96,6 +96,8 @@ protected:
 
     DrawSpace::Chunk::ImpostorsDisplayList                              m_idl;
 
+    Cloud*                                                              m_new_cloud;
+    
     //std::vector<Cloud>                                                  m_clouds;
     std::vector<Cloud*>                                                 m_clouds;
 
