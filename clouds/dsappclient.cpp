@@ -50,8 +50,8 @@ void dsAppClient::on_sort_request( DrawSpace::Core::PropertyPool* p_args )
     
 
     m_mutex.WaitInfinite();
-
-    m_update_clouds_meshes = true;
+m_update_clouds_meshes
+     = true;
 
     m_mutex.Release();
 
@@ -824,7 +824,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_impostor2->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 0, "clouds_dims", 25 );
     //m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "clouds_dims", Vector( 900, -500, 1.0, 0.66 ) );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "clouds_dims", Vector( 400, -200, 1.0, 0.66 ) );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "clouds_dims", Vector( 400, -200, 1.0, 0.76 ) );
 
 
 
