@@ -591,10 +591,10 @@ bool dsAppClient::OnIdleAppInit( void )
     //// declare cloud
 
     Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_cloudposx = 
-        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>( new std::uniform_real_distribution<dsreal>( -10000.0, 10000.0 ), 76654 );
+        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>( new std::uniform_real_distribution<dsreal>( -30000.0, 30000.0 ), 76654 );
 
     Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_cloudposz = 
-        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<dsreal>( -10000.0, 10000.0 ), 288775 );
+        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<dsreal>( -30000.0, 30000.0 ), 288775 );
 
 
     Procedural::Array* declare_cloud_array = new Procedural::Array;
@@ -613,6 +613,16 @@ bool dsAppClient::OnIdleAppInit( void )
     ////
 
     //// add cloud impostor
+
+    Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posx = 
+        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>( new std::uniform_real_distribution<dsreal>( -600.0, 600.0 ), 133212 );
+
+    Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posy = 
+        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<dsreal>( -100.0, 100.0 ), 8766 );
+
+    Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posz = 
+        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<dsreal>( -600.0, 600.0 ), 73322 );
+
 
     Procedural::Vector* uvcloud_main0 = new Procedural::Vector;
     uvcloud_main0->SetValue( Utils::Vector( 0.5, 0.5, 0.75, 0.75 ) );
@@ -650,7 +660,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostorscale = 
-        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>( new std::uniform_real_distribution<dsreal>( 500.0, 2000.0 ), 996 );
+        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>( new std::uniform_real_distribution<dsreal>( 200.0, 800.0 ), 996 );
 
 
 
@@ -664,18 +674,23 @@ bool dsAppClient::OnIdleAppInit( void )
     pub_add_impostor->SetChild( add_impostor_array );
     pub_add_impostor->RegisterHandler( m_procedural_cb );
 
+        
 
-    DrawSpace::Procedural::Vector* impostor_scale = new DrawSpace::Procedural::Vector;
-    DrawSpace::Procedural::Vector* impostor_pos = new DrawSpace::Procedural::Vector;
-    
-    impostor_scale->SetValue( Utils::Vector( 1500.0, 1500.0, 0.0, 0.0 ) );
-    impostor_pos->SetValue( Utils::Vector( 0.0, 0.0, 0.0, 0.0 ) );
-    
-
-    add_impostor_array->AddValue( add_impostor_string );
-    add_impostor_array->AddValue( impostor_pos );    
+    add_impostor_array->AddValue( add_impostor_string );        
     add_impostor_array->AddValue( uvcloud_main_index );
     add_impostor_array->AddValue( rand_impostorscale );
+    add_impostor_array->AddValue( rand_impostor_posx );
+    add_impostor_array->AddValue( rand_impostor_posy );
+    add_impostor_array->AddValue( rand_impostor_posz );
+
+
+    Procedural::Repeat* cloud_loop = new Procedural::Repeat;
+
+    Procedural::Integer* nb_impostors = new Procedural::Integer;
+    nb_impostors->SetValue( 15 );
+    cloud_loop->SetChild( pub_add_impostor );
+    cloud_loop->SetNbLoops( nb_impostors );
+
 
     ////
 
@@ -696,41 +711,18 @@ bool dsAppClient::OnIdleAppInit( void )
     //// root
     Procedural::Batch* main_task = new Procedural::Batch;
     main_task->AddChild( pub_declare_cloud );
-    main_task->AddChild( pub_add_impostor );
+    //main_task->AddChild( pub_add_impostor );
+    main_task->AddChild( cloud_loop );
     main_task->AddChild( pub_push_cloud );
 
     Procedural::Integer* nb_clouds = new Procedural::Integer;
-    nb_clouds->SetValue( 30 );
+    nb_clouds->SetValue( 50 );
 
     Procedural::Repeat* main_loop = new Procedural::Repeat;
     main_loop->SetChild( main_task );
     main_loop->SetNbLoops( nb_clouds );
 
     main_loop->Apply();
-
-
-    /*
-    DrawSpace::Procedural::Array* cloud_impostor = new DrawSpace::Procedural::Array;
-
-    DrawSpace::Procedural::Vector* impostor_scale = new DrawSpace::Procedural::Vector;
-    DrawSpace::Procedural::Vector* impostor_pos = new DrawSpace::Procedural::Vector;
-    DrawSpace::Procedural::Vector* impostor_uv = new DrawSpace::Procedural::Vector;
-
-    impostor_scale->SetValue( Utils::Vector( 1500.0, 1500.0, 0.0, 0.0 ) );
-    impostor_pos->SetValue( Utils::Vector( 0.0, 0.0, 0.0, 0.0 ) );
-    impostor_uv->SetValue( Utils::Vector( 0.5, 0.5, 0.75, 0.75 ) );
-
-    cloud_impostor->AddValue( impostor_scale );
-    cloud_impostor->AddValue( impostor_pos );
-    cloud_impostor->AddValue( impostor_uv );
-
-    DrawSpace::Procedural::Publisher* pub = new DrawSpace::Procedural::Publisher;
-
-    pub->SetChild( cloud_impostor );
-    pub->RegisterHandler( m_procedural_cb );
-
-    pub->Apply();
-    */
 
 
     /*
@@ -797,7 +789,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "flags_v", Vector( 0.5, 0.0, 0.0, 0.0 ) );
 
     m_impostor2->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 0, "clouds_dims", 25 );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "clouds_dims", Vector( 900, -500, 1.0, 0.66 ) );
+    //m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "clouds_dims", Vector( 900, -500, 1.0, 0.66 ) );
+    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "clouds_dims", Vector( 450, -30, 1.0, 0.66 ) );
 
 
 
@@ -969,55 +962,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_scenenodegraph.RegisterCameraEvtHandler( m_cameraevent_cb );
 
-
-
-
-    /*
-    DrawSpace::Procedural::Publisher* pub = new DrawSpace::Procedural::Publisher;
-    DrawSpace::Procedural::Publisher* pub2 = new DrawSpace::Procedural::Publisher;
-    DrawSpace::Procedural::Integer* pint = new DrawSpace::Procedural::Integer();
-    pint->SetValue( 10 );
-
-    DrawSpace::Procedural::Real* preal = new DrawSpace::Procedural::Real();
-    preal->SetValue( 3.14 );
-
-    DrawSpace::Procedural::String* pstring = new DrawSpace::Procedural::String();
-    pstring->SetValue( "hello !" );
-
-    DrawSpace::Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, DrawSpace::Procedural::Integer>* rand_nbloop = 
-        new DrawSpace::Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, DrawSpace::Procedural::Integer>( new std::uniform_int_distribution<int>( 1, 10 ), 78 );
-
-    
-    DrawSpace::Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<double>, DrawSpace::Procedural::Real>* rand = 
-        new DrawSpace::Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<double>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<double>( -1000.0, 1000.0 ), 133433 );
-        
-    
-    //DrawSpace::Procedural::RandomDistribution<int, std::geometric_distribution<int>, DrawSpace::Procedural::Integer>* rand = 
-     //   new DrawSpace::Procedural::RandomDistribution<int, std::geometric_distribution<int>, DrawSpace::Procedural::Integer>( new std::geometric_distribution<int>( 0.3 ), 2887 );
-        
-
-    DrawSpace::Procedural::Repeat* repeat = new DrawSpace::Procedural::Repeat;
-
-    DrawSpace::Procedural::Batch* batch = new DrawSpace::Procedural::Batch;
-
-
-
-    pub->SetChild( rand );
-    pub->RegisterHandler( m_procedural_cb );
-
-    pub2->SetChild( pstring );
-    pub2->RegisterHandler( m_procedural_cb );
-
-
-    repeat->SetChild( pub );
-    repeat->SetNbLoops( rand_nbloop );
-
-    batch->AddChild( pub2 );
-    batch->AddChild( repeat );
-
-    batch->Apply();
-
-    */
         
     return true;
 }
@@ -1053,18 +997,31 @@ void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
         Chunk::ImpostorsDisplayListEntry idle;
 
         
-        Procedural::Vector* impostor_pos = static_cast<Procedural::Vector*>( message->GetValueAt( 1 ) );        
-        Procedural::Index* impostor_uvindex = static_cast<Procedural::Index*>( message->GetValueAt( 2 ) );
+        Procedural::Index* impostor_uvindex = static_cast<Procedural::Index*>( message->GetValueAt( 1 ) );
         Procedural::Vector* impostor_uv = static_cast<Procedural::Vector*>( impostor_uvindex->GetResultValue() );
 
         Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostorscale = 
+            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 2 ) );
+
+        Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posx = 
             static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 3 ) );
+
+        Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posy = 
+            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 4 ) );
+
+        Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posz = 
+            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 5 ) );
+
+
 
         Procedural::Real* impostor_scale = static_cast<Procedural::Real*>( rand_impostorscale->GetResultValue() );
 
         idle.width_scale = impostor_scale->GetValue();
         idle.height_scale = impostor_scale->GetValue();
 
+        Procedural::Real* posx = static_cast<Procedural::Real*>( rand_impostor_posx->GetResultValue() );
+        Procedural::Real* posy = static_cast<Procedural::Real*>( rand_impostor_posy->GetResultValue() );
+        Procedural::Real* posz = static_cast<Procedural::Real*>( rand_impostor_posz->GetResultValue() );
 
         
         idle.u1 = impostor_uv->GetValue()[0];
@@ -1077,9 +1034,9 @@ void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
         idle.v4 = impostor_uv->GetValue()[3];
         
 
-        idle.localpos[0] = m_new_cloud->pos[0];
-        idle.localpos[1] = m_new_cloud->pos[1];
-        idle.localpos[2] = m_new_cloud->pos[2];
+        idle.localpos[0] = m_new_cloud->pos[0] + posx->GetValue();
+        idle.localpos[1] = m_new_cloud->pos[1] + posy->GetValue();
+        idle.localpos[2] = m_new_cloud->pos[2] + posz->GetValue();
     
         m_new_cloud->idl.push_back( idle );
     
@@ -1089,49 +1046,6 @@ void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
         m_clouds.push_back( m_new_cloud );
     }
 
-
-    /*
-    DrawSpace::Procedural::Array* impostor = static_cast<DrawSpace::Procedural::Array*>( p_atom );
-
-    DrawSpace::Procedural::Vector* impostor_scale = static_cast<DrawSpace::Procedural::Vector*>( impostor->GetValueAt( 0 ) );
-    DrawSpace::Procedural::Vector* impostor_pos = static_cast<DrawSpace::Procedural::Vector*>( impostor->GetValueAt( 1 ) );
-    DrawSpace::Procedural::Vector* impostor_uv = static_cast<DrawSpace::Procedural::Vector*>( impostor->GetValueAt( 2 ) );
-
-    Chunk::ImpostorsDisplayListEntry idle;
-    Chunk::ImpostorsDisplayList idl;
-
-    idle.width_scale = impostor_scale->GetValue()[0];
-    idle.height_scale = impostor_scale->GetValue()[1];
-
-    idle.u1 = impostor_uv->GetValue()[0];
-    idle.v1 = impostor_uv->GetValue()[1];
-    idle.u2 = impostor_uv->GetValue()[2];
-    idle.v2 = impostor_uv->GetValue()[1];
-    idle.u3 = impostor_uv->GetValue()[2];
-    idle.v3 = impostor_uv->GetValue()[3];
-    idle.u4 = impostor_uv->GetValue()[0];
-    idle.v4 = impostor_uv->GetValue()[3];
-
-    idle.localpos[0] = impostor_pos->GetValue()[0];
-    idle.localpos[1] = impostor_pos->GetValue()[1];
-    idle.localpos[2] = impostor_pos->GetValue()[2];
-    
-    idl.push_back( idle );
-
-
-
-
-
-    Cloud* cloud = new Cloud;
-
-    cloud->idl = idl;
-    cloud->pos[0] = 0.0;
-    cloud->pos[1] = 0.0;
-    cloud->pos[2] = 0.0;
-    cloud->pos[3] = 1.0;
-
-    m_clouds.push_back( cloud );
-    */
 }
 
 void dsAppClient::OnAppInit( void )
