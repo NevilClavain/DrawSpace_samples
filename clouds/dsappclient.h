@@ -106,6 +106,9 @@ protected:
     DrawSpace::Core::Task<DrawSpace::Core::Runner>*                     m_task;
     RunnerMsgCb*                                                        m_runner_msg_cb;
 
+    DrawSpace::Utils::Mutex                                             m_runner_state_mutex;
+    int                                                                 m_runner_state;
+
     bool                                                                m_update_clouds_meshes;
 
     bool                                                                m_clouds_sort_request;

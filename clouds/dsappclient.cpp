@@ -16,7 +16,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_current_camera( NULL ), m_selected_camera( 0 ), m_recompute_count( 0 ), m_ready( false )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_current_camera( NULL ), m_selected_camera( 0 ), m_recompute_count( 0 ), m_ready( false ), m_runner_state( 0 )
 {    
     _INIT_LOGGER( "logclouds.conf" )  
     m_w_title = "clouds test";
@@ -45,17 +45,23 @@ void dsAppClient::on_sort_request( DrawSpace::Core::PropertyPool* p_args )
 
     clouds_execsortz( ImpostorMat, CamMat );
 
+
     clouds_impostors_init();
 
     
 
     m_mutex.WaitInfinite();
-m_update_clouds_meshes
-     = true;
+
+    m_update_clouds_meshes = true;
 
     m_mutex.Release();
 
     m_sort_run_mutex.Release();
+
+    m_runner_state_mutex.WaitInfinite();
+    m_runner_state = 0;
+    m_runner_state_mutex.Release();
+
 }
 
 void dsAppClient::on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node )
@@ -83,6 +89,10 @@ void dsAppClient::clouds_impostors_init( void )
 {
     m_idl.clear();
 
+    m_runner_state_mutex.WaitInfinite();
+    m_runner_state = 3;
+    m_runner_state_mutex.Release();
+
     for( size_t i = 0; i < m_clouds.size(); i++ )
     {
         for( size_t j = 0; j < m_clouds[i]->idl.size(); j++ )
@@ -90,6 +100,11 @@ void dsAppClient::clouds_impostors_init( void )
             m_idl.push_back( m_clouds[i]->idl[j] );
         }
     }
+
+    m_runner_state_mutex.WaitInfinite();
+    m_runner_state = 4;
+    m_runner_state_mutex.Release();
+
 
     m_impostor2->ImpostorsInit( m_idl );
 }
@@ -124,7 +139,35 @@ void dsAppClient::OnRenderFrame( void )
 
     long current_fps = m_timer.GetFPS();
     renderer->DrawText( 0, 0, 0, 10, 35, "%d", current_fps );
-    renderer->DrawText( 0, 0, 0, 10, 55, "%d", m_recompute_count );
+    //renderer->DrawText( 0, 0, 0, 10, 55, "%d", m_recompute_count );
+
+    int runner_state = -1;
+
+    if( m_runner_state_mutex.Wait( 0 ) )
+    {
+        runner_state = m_runner_state;
+        m_runner_state_mutex.Release();
+    }
+
+    switch( runner_state )
+    {
+
+        case 1:
+            renderer->DrawText( 0, 0, 0, 10, 75, "computing clouds pos..." );
+            break;
+
+        case 2:
+            renderer->DrawText( 0, 0, 0, 10, 75, "sorting..." );
+            break;
+
+        case 3:
+            renderer->DrawText( 0, 0, 0, 10, 75, "clouds transfert..." );
+            break;
+
+        case 4:
+            renderer->DrawText( 0, 0, 0, 10, 75, "impostors initialization..." );
+            break;
+    }
 
     renderer->FlipScreen();
 
@@ -363,6 +406,10 @@ void dsAppClient::clouds_execsortz( const DrawSpace::Utils::Matrix& p_impostor_m
 {
     // compute all camera-space z-depth
 
+    m_runner_state_mutex.WaitInfinite();
+    m_runner_state = 1;
+    m_runner_state_mutex.Release();
+
     for( size_t i = 0; i < m_clouds.size(); i++ )
     {
         Matrix local_trans;
@@ -391,6 +438,10 @@ void dsAppClient::clouds_execsortz( const DrawSpace::Utils::Matrix& p_impostor_m
 
         m_clouds[i]->dist_to_cam = dist_imp.Length();
     }
+
+    m_runner_state_mutex.WaitInfinite();
+    m_runner_state = 2;
+    m_runner_state_mutex.Release();
 
     std::sort( m_clouds.begin(), m_clouds.end(), dsAppClient::clouds_nodes_comp );
 }
