@@ -598,7 +598,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
    
-    m_impostor2->ImpostorsInit( idl );
+    m_impostor2->SetImpostorsDisplayList( idl );
+    m_impostor2->ImpostorsInit();
 
     m_impostor2->RegisterPassSlot( m_texturepass );
 
@@ -1063,8 +1064,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     
-
-    m_impostor->ImpostorsInit( idl );
+    m_impostor->SetImpostorsDisplayList( idl );
+    m_impostor->ImpostorsInit();
 
     m_impostor->RegisterPassSlot( m_texturepass );
 

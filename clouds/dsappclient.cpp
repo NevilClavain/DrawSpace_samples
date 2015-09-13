@@ -101,13 +101,8 @@ void dsAppClient::clouds_impostors_init( void )
         }
     }
 
-    /*
-    m_runner_state_mutex.WaitInfinite();
-    m_runner_state = 4;
-    m_runner_state_mutex.Release();
+    m_impostor2->SetImpostorsDisplayList( m_idl );
 
-    m_impostor2->ImpostorsInit( m_idl );
-    */
 }
 
 void dsAppClient::OnRenderFrame( void )
@@ -124,9 +119,8 @@ void dsAppClient::OnRenderFrame( void )
     m_mutex.WaitInfinite();
     if( m_update_clouds_meshes )
     {
-        //m_impostor2->GetMeshe()->UpdateVertices();
+        m_impostor2->ImpostorsUpdate();
 
-        renderer->UpdateMesheVerticesFromImpostors( m_idl, m_impostor2->GetMeshe()->GetRenderData() );
         m_update_clouds_meshes = false;
     }
     m_mutex.Release();
@@ -144,33 +138,7 @@ void dsAppClient::OnRenderFrame( void )
     renderer->DrawText( 0, 0, 0, 10, 35, "%d", current_fps );
     //renderer->DrawText( 0, 0, 0, 10, 55, "%d", m_recompute_count );
 
-    int runner_state = -1;
 
-    if( m_runner_state_mutex.Wait( 0 ) )
-    {
-        runner_state = m_runner_state;
-        m_runner_state_mutex.Release();
-    }
-
-    switch( runner_state )
-    {
-
-        case 1:
-            renderer->DrawText( 0, 0, 0, 10, 75, "computing clouds pos..." );
-            break;
-
-        case 2:
-            renderer->DrawText( 0, 0, 0, 10, 75, "sorting..." );
-            break;
-
-        case 3:
-            renderer->DrawText( 0, 0, 0, 10, 75, "clouds transfert..." );
-            break;
-
-        case 4:
-            renderer->DrawText( 0, 0, 0, 10, 75, "impostors initialization..." );
-            break;
-    }
 
     renderer->FlipScreen();
 
@@ -804,7 +772,7 @@ bool dsAppClient::OnIdleAppInit( void )
     main_task->AddChild( pub_push_cloud );
 
     Procedural::Integer* nb_clouds = new Procedural::Integer;
-    nb_clouds->SetValue( 300 );
+    nb_clouds->SetValue( 220 );
 
     Procedural::Repeat* main_loop = new Procedural::Repeat;
     main_loop->SetChild( main_task );
@@ -848,7 +816,8 @@ bool dsAppClient::OnIdleAppInit( void )
         }
     }
 
-    m_impostor2->ImpostorsInit( m_idl );
+    m_impostor2->SetImpostorsDisplayList( m_idl );
+    m_impostor2->ImpostorsInit();
 
 
 
