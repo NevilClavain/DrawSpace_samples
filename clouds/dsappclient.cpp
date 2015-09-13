@@ -101,12 +101,13 @@ void dsAppClient::clouds_impostors_init( void )
         }
     }
 
+    /*
     m_runner_state_mutex.WaitInfinite();
     m_runner_state = 4;
     m_runner_state_mutex.Release();
 
-
     m_impostor2->ImpostorsInit( m_idl );
+    */
 }
 
 void dsAppClient::OnRenderFrame( void )
@@ -123,7 +124,9 @@ void dsAppClient::OnRenderFrame( void )
     m_mutex.WaitInfinite();
     if( m_update_clouds_meshes )
     {
-        m_impostor2->GetMeshe()->UpdateVertices();
+        //m_impostor2->GetMeshe()->UpdateVertices();
+
+        renderer->UpdateMesheVerticesFromImpostors( m_idl, m_impostor2->GetMeshe()->GetRenderData() );
         m_update_clouds_meshes = false;
     }
     m_mutex.Release();
@@ -262,10 +265,10 @@ void dsAppClient::OnRenderFrame( void )
 }
 
 
-void dsAppClient::clouds_addcloud( dsreal p_xpos, dsreal p_zpos, Chunk::ImpostorsDisplayList& p_idl )
+void dsAppClient::clouds_addcloud( dsreal p_xpos, dsreal p_zpos, ImpostorsDisplayList& p_idl )
 {
-    Chunk::ImpostorsDisplayListEntry idle;
-    Chunk::ImpostorsDisplayList idl;
+    ImpostorsDisplayListEntry idle;
+    ImpostorsDisplayList idl;
 
 
     idle.width_scale = 1500.0;
@@ -801,7 +804,7 @@ bool dsAppClient::OnIdleAppInit( void )
     main_task->AddChild( pub_push_cloud );
 
     Procedural::Integer* nb_clouds = new Procedural::Integer;
-    nb_clouds->SetValue( 200 );
+    nb_clouds->SetValue( 300 );
 
     Procedural::Repeat* main_loop = new Procedural::Repeat;
     main_loop->SetChild( main_task );
@@ -833,7 +836,21 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     
-    clouds_impostors_init();
+    //clouds_impostors_init();
+
+    m_idl.clear();
+
+    for( size_t i = 0; i < m_clouds.size(); i++ )
+    {
+        for( size_t j = 0; j < m_clouds[i]->idl.size(); j++ )
+        {     
+            m_idl.push_back( m_clouds[i]->idl[j] );
+        }
+    }
+
+    m_impostor2->ImpostorsInit( m_idl );
+
+
 
     m_impostor2->RegisterPassSlot( m_texturepass2 );
     m_impostor2->RegisterPassSlot( m_maskpass );
@@ -1029,6 +1046,10 @@ bool dsAppClient::OnIdleAppInit( void )
     m_calendar->Startup( 0 );
 
 
+
+
+
+
     m_runner_msg_cb = _DRAWSPACE_NEW_( RunnerMsgCb, RunnerMsgCb( this, &dsAppClient::on_sort_request ) );
 
     m_runner = _DRAWSPACE_NEW_( Runner, Runner );
@@ -1079,7 +1100,7 @@ void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
     }
     else if( "add_bottom_impostor" == opcode->GetValue() )
     {
-        Chunk::ImpostorsDisplayListEntry idle;
+        ImpostorsDisplayListEntry idle;
 
         Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posx = 
             static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 1 ) );
@@ -1115,7 +1136,7 @@ void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
     }
     else if( "add_impostor" == opcode->GetValue() )
     {
-        Chunk::ImpostorsDisplayListEntry idle;
+        ImpostorsDisplayListEntry idle;
 
         
         Procedural::Index* impostor_uvindex = static_cast<Procedural::Index*>( message->GetValueAt( 1 ) );

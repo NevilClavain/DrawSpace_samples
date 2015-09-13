@@ -23,7 +23,7 @@ protected:
 
     typedef struct
     {
-        DrawSpace::Chunk::ImpostorsDisplayList  idl;
+        DrawSpace::ImpostorsDisplayList         idl;
 
         DrawSpace::Utils::Vector                pos;
         dsreal                                  dist_to_cam;  // pour le z-sort
@@ -94,7 +94,7 @@ protected:
     
     NodesEventCallback*                                                 m_nodesevent_cb;
 
-    DrawSpace::Chunk::ImpostorsDisplayList                              m_idl;
+    DrawSpace::ImpostorsDisplayList                                     m_idl;
 
     Cloud*                                                              m_new_cloud;
     
@@ -150,7 +150,7 @@ protected:
     void on_procedural( DrawSpace::Procedural::Atomic* p_atom );
 
 
-    void clouds_addcloud( dsreal p_xpos, dsreal p_zpos, DrawSpace::Chunk::ImpostorsDisplayList& p_idl );
+    void clouds_addcloud( dsreal p_xpos, dsreal p_zpos, DrawSpace::ImpostorsDisplayList& p_idl );
     void clouds_execsortz( const DrawSpace::Utils::Matrix& p_impostor_mat, const DrawSpace::Utils::Matrix& p_cam_mat );
 
     void clouds_impostors_init( void );

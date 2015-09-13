@@ -169,9 +169,6 @@ void dsAppClient::OnRenderFrame( void )
 
     m_zoompass->GetTargetTexture()->CopyTextureContent();
 
-    unsigned char r1, g1, b1, a1;
-    unsigned char r2, g2, b2, a2;
-    unsigned char r3, g3, b3, a3;
 
 
 
@@ -572,8 +569,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    Chunk::ImpostorsDisplayList idl;
-    Chunk::ImpostorsDisplayListEntry idle;
+    ImpostorsDisplayList idl;
+    ImpostorsDisplayListEntry idle;
 
     m_impostor2 = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
     m_impostor2->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
