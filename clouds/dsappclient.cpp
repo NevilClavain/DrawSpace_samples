@@ -671,12 +671,30 @@ bool dsAppClient::OnIdleAppInit( void )
     add_bottom_impostor_array->AddValue( bottom_scale );
 
 
-    Procedural::Repeat* cloud_bottom_loop = new Procedural::Repeat;
+    
 
+    Procedural::Array* nb_bottom_impostors_array = new Procedural::Array;
     Procedural::Integer* nb_bottom_impostors = new Procedural::Integer;
     nb_bottom_impostors->SetValue( 40 );
+
+    Procedural::Integer* no_bottom_impostors = new Procedural::Integer;
+    no_bottom_impostors->SetValue( 0 );
+
+    nb_bottom_impostors_array->AddValue( no_bottom_impostors );
+    nb_bottom_impostors_array->AddValue( nb_bottom_impostors );
+    
+    Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, Procedural::Integer>* rand_nb_bottom_impostors = 
+    new Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, Procedural::Integer>( new std::uniform_int_distribution<int>( 0, 1 ), 91123 );
+
+    Procedural::Index* nb_bottom_impostors_index = new Procedural::Index;
+
+    nb_bottom_impostors_index->SetArray( nb_bottom_impostors_array );
+    nb_bottom_impostors_index->SetIndex( rand_nb_bottom_impostors );
+
+    
+    Procedural::Repeat* cloud_bottom_loop = new Procedural::Repeat;
     cloud_bottom_loop->SetChild( pub_add_bottom_impostor );
-    cloud_bottom_loop->SetNbLoops( nb_bottom_impostors );
+    cloud_bottom_loop->SetNbLoops( nb_bottom_impostors_index );
 
 
 
