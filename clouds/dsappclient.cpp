@@ -795,8 +795,6 @@ bool dsAppClient::OnIdleAppInit( void )
         new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>( new std::uniform_real_distribution<dsreal>( 200.0, 800.0 ), 996 );
 
 
-
-
     Procedural::Array* add_impostor_array = new Procedural::Array;
 
     Procedural::String* add_impostor_string = new Procedural::String;
@@ -826,6 +824,90 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ////
 
+
+
+    //// add fragment cloud impostors
+
+    Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_frag_impostor_posx = 
+        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>( new std::uniform_real_distribution<dsreal>( -2600.0, 2600.0 ), 7553 );
+
+    Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_frag_impostor_posy = 
+        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<dsreal>( -60.0, 60.0 ), 10998 );
+
+    Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_frag_impostor_posz = 
+        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<dsreal>( -2600.0, 2600.0 ), 17800 );
+
+
+    Procedural::Vector* uvcloud_frag0 = new Procedural::Vector;
+    uvcloud_frag0->SetValue( Utils::Vector( 0.0, 0.25, 0.25, 0.5 ) );
+
+    Procedural::Vector* uvcloud_frag1 = new Procedural::Vector;
+    uvcloud_frag1->SetValue( Utils::Vector( 0.25, 0.25, 0.5, 0.5 ) );
+
+    Procedural::Vector* uvcloud_frag2 = new Procedural::Vector;
+    uvcloud_frag2->SetValue( Utils::Vector( 0.5, 0.25, 0.75, 0.5 ) );
+
+    Procedural::Vector* uvcloud_frag3 = new Procedural::Vector;
+    uvcloud_frag3->SetValue( Utils::Vector( 0.75, 0.25, 1.0, 0.5 ) );
+
+    Procedural::Vector* uvcloud_frag4 = new Procedural::Vector;
+    uvcloud_frag4->SetValue( Utils::Vector( 0.0, 0.5, 0.25, 0.75 ) );
+
+    Procedural::Vector* uvcloud_frag5 = new Procedural::Vector;
+    uvcloud_frag5->SetValue( Utils::Vector( 0.25, 0.5, 0.5, 0.75 ) );
+
+
+    Procedural::Array* uvcloud_frag = new Procedural::Array;
+    uvcloud_frag->AddValue( uvcloud_frag0 );
+    uvcloud_frag->AddValue( uvcloud_frag1 );
+    uvcloud_frag->AddValue( uvcloud_frag2 );
+    uvcloud_frag->AddValue( uvcloud_frag3 );
+    uvcloud_frag->AddValue( uvcloud_frag4 );
+    uvcloud_frag->AddValue( uvcloud_frag5 );
+
+    Procedural::Index* uvcloud_frag_index = new Procedural::Index;
+    uvcloud_frag_index->SetArray( uvcloud_frag );
+
+    Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, Procedural::Integer>* rand_cloudfrag_uv = 
+        new Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, Procedural::Integer>( new std::uniform_int_distribution<int>( 0, 5 ), 64099 );
+
+    uvcloud_frag_index->SetIndex( rand_cloudfrag_uv );
+
+
+    Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_fragimpostorscale = 
+        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>( new std::uniform_real_distribution<dsreal>( 100.0, 500.0 ), 18776 );
+
+
+
+    Procedural::Array* add_fragimpostor_array = new Procedural::Array;
+
+
+    DrawSpace::Procedural::Publisher* pub_add_fragimpostor = new DrawSpace::Procedural::Publisher;
+    pub_add_fragimpostor->SetChild( add_fragimpostor_array );
+    pub_add_fragimpostor->RegisterHandler( m_procedural_cb );
+
+        
+
+    add_fragimpostor_array->AddValue( add_impostor_string );        
+    add_fragimpostor_array->AddValue( uvcloud_frag_index );
+    add_fragimpostor_array->AddValue( rand_fragimpostorscale );
+    add_fragimpostor_array->AddValue( rand_frag_impostor_posx );
+    add_fragimpostor_array->AddValue( rand_frag_impostor_posy );
+    add_fragimpostor_array->AddValue( rand_frag_impostor_posz );
+
+
+    Procedural::Repeat* cloud_frag_loop = new Procedural::Repeat;
+
+    Procedural::Integer* nb_frag_impostors = new Procedural::Integer;
+    nb_frag_impostors->SetValue( 20 );
+    cloud_frag_loop->SetChild( pub_add_fragimpostor );
+    cloud_frag_loop->SetNbLoops( nb_frag_impostors );
+
+
+    ////
+
+
+
     //// push cloud
     Procedural::Array* push_cloud_array = new Procedural::Array;
 
@@ -845,7 +927,8 @@ bool dsAppClient::OnIdleAppInit( void )
     main_task->AddChild( pub_declare_cloud );
     main_task->AddChild( cloud_core_loop );
     main_task->AddChild( cloud_bottom_loop );
-    main_task->AddChild( cloud_loop );    
+    main_task->AddChild( cloud_loop );
+    main_task->AddChild( cloud_frag_loop );
     main_task->AddChild( pub_push_cloud );
 
     Procedural::Integer* nb_clouds = new Procedural::Integer;
