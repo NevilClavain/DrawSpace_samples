@@ -428,30 +428,6 @@ bool dsAppClient::clouds_nodes_comp( Cloud* p_n1, Cloud* p_n2 )
 
 bool dsAppClient::OnIdleAppInit( void )
 {
-    /*
-    std::default_random_engine generator;
-    std::uniform_int_distribution<int> distribution(0,100);
-
-    std::default_random_engine generator2;
-    std::uniform_int_distribution<int> distribution2(0,100);
-
-    generator.seed( 4554 );
-    generator2.seed( 667 );
-
-    int number;
-    int number2;
-
-    number = distribution(generator);
-    //number2 = distribution2(generator2);
-    number = distribution(generator);
-    //number2 = distribution2(generator2);
-    number = distribution(generator);
-    //number2 = distribution2(generator2);
-    number = distribution(generator);
-    //number2 = distribution2(generator2);
-    number = distribution(generator);
-    */
-
     /////////////////////////////////////
            
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -613,10 +589,10 @@ bool dsAppClient::OnIdleAppInit( void )
     //// declare cloud
 
     Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_cloudposx = 
-        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>( new std::uniform_real_distribution<dsreal>( -60000.0, 60000.0 ), 76654 );
+        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>( new std::uniform_real_distribution<dsreal>( -60000.0, 60000.0 ), 222 );
 
     Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_cloudposz = 
-        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<dsreal>( -60000.0, 60000.0 ), 288775 );
+        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<dsreal>( -60000.0, 60000.0 ), 53432 );
 
 
     Procedural::Array* declare_cloud_array = new Procedural::Array;
@@ -634,12 +610,82 @@ bool dsAppClient::OnIdleAppInit( void )
     pub_declare_cloud->RegisterHandler( m_procedural_cb );
     ////
 
-    //// add bottom cloud impostor
+    //// add core cloud impostors
+
+
+    Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_core_impostor_posx = 
+        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>( new std::uniform_real_distribution<dsreal>( -600.0, 600.0 ), 9915 );
+
+    Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_core_impostor_posz = 
+        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<dsreal>( -600.0, 600.0 ), 40090 );
+
+    Procedural::Vector* uvcloud_core0 = new Procedural::Vector;
+    uvcloud_core0->SetValue( Utils::Vector( 0.0, 0.0, 0.25, 0.25 ) );
+
+    Procedural::Vector* uvcloud_core1 = new Procedural::Vector;
+    uvcloud_core1->SetValue( Utils::Vector( 0.25, 0.0, 0.5, 0.25 ) );
+
+    Procedural::Vector* uvcloud_core2 = new Procedural::Vector;
+    uvcloud_core2->SetValue( Utils::Vector( 0.5, 0.0, 0.75, 0.25 ) );
+
+
+    Procedural::Array* uvcloud_core = new Procedural::Array;
+    uvcloud_core->AddValue( uvcloud_core0 );
+    uvcloud_core->AddValue( uvcloud_core1 );
+    uvcloud_core->AddValue( uvcloud_core2 );
+
+
+    Procedural::Index* uvcloud_core_index = new Procedural::Index;
+    uvcloud_core_index->SetArray( uvcloud_core );
+
+    Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, Procedural::Integer>* rand_cloudcore_uv = 
+        new Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, Procedural::Integer>( new std::uniform_int_distribution<int>( 0, 2 ), 27764 );
+
+    uvcloud_core_index->SetIndex( rand_cloudcore_uv );
+
+
+
+    Procedural::Real* core_scale = new Procedural::Real;
+    core_scale->SetValue( 600.0 );
+
+
+    Procedural::Array* add_core_impostor_array = new Procedural::Array;
+
+    Procedural::String* add_core_impostor_string = new Procedural::String;
+    add_core_impostor_string->SetValue( "add_core_impostor" );
+
+    DrawSpace::Procedural::Publisher* pub_add_core_impostor = new DrawSpace::Procedural::Publisher;
+    pub_add_core_impostor->SetChild( add_core_impostor_array );
+    pub_add_core_impostor->RegisterHandler( m_procedural_cb );
+
+        
+
+    add_core_impostor_array->AddValue( add_core_impostor_string );        
+    add_core_impostor_array->AddValue( rand_core_impostor_posx );    
+    add_core_impostor_array->AddValue( rand_core_impostor_posz );
+    add_core_impostor_array->AddValue( uvcloud_core_index );
+    add_core_impostor_array->AddValue( core_scale );
+
+
+    Procedural::Integer* nb_core_impostors = new Procedural::Integer;
+    nb_core_impostors->SetValue( 20 );
+    
+
+    
+    Procedural::Repeat* cloud_core_loop = new Procedural::Repeat;
+    cloud_core_loop->SetChild( pub_add_core_impostor );
+    cloud_core_loop->SetNbLoops( nb_core_impostors );
+
+
+
+    ////
+
+    //// add bottom cloud impostors
 
     Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_bottom_impostor_posx = 
         new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>( new std::uniform_real_distribution<dsreal>( -800.0, 800.0 ), 855453 );
 
-    Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_bottomimpostor_posz = 
+    Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_bottom_impostor_posz = 
         new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<dsreal>( -800.0, 800.0 ), 237 );
 
     Procedural::Vector* uv_bottom = new Procedural::Vector;
@@ -666,7 +712,7 @@ bool dsAppClient::OnIdleAppInit( void )
     add_bottom_impostor_array->AddValue( add_bottom_impostor_string );        
     add_bottom_impostor_array->AddValue( rand_bottom_impostor_posx );
     add_bottom_impostor_array->AddValue( y_pos );
-    add_bottom_impostor_array->AddValue( rand_bottomimpostor_posz );
+    add_bottom_impostor_array->AddValue( rand_bottom_impostor_posz );
     add_bottom_impostor_array->AddValue( uv_bottom );
     add_bottom_impostor_array->AddValue( bottom_scale );
 
@@ -698,7 +744,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    //// add cloud impostor
+    //// add cloud impostors
 
     Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posx = 
         new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>( new std::uniform_real_distribution<dsreal>( -600.0, 600.0 ), 133212 );
@@ -797,12 +843,13 @@ bool dsAppClient::OnIdleAppInit( void )
     //// root
     Procedural::Batch* main_task = new Procedural::Batch;
     main_task->AddChild( pub_declare_cloud );
+    main_task->AddChild( cloud_core_loop );
     main_task->AddChild( cloud_bottom_loop );
     main_task->AddChild( cloud_loop );    
     main_task->AddChild( pub_push_cloud );
 
     Procedural::Integer* nb_clouds = new Procedural::Integer;
-    nb_clouds->SetValue( 220 );
+    nb_clouds->SetValue( 320 );
 
     Procedural::Repeat* main_loop = new Procedural::Repeat;
     main_loop->SetChild( main_task );
@@ -1071,6 +1118,49 @@ void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
         m_new_cloud->pos[1] = 0.0;
         m_new_cloud->pos[2] = posz->GetValue();
         m_new_cloud->pos[3] = 1.0;
+
+    }
+    else if( "add_core_impostor" == opcode->GetValue() )
+    {
+        ImpostorsDisplayListEntry idle;
+
+        Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posx = 
+            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 1 ) );
+
+        Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posz = 
+            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 2 ) );
+
+        //Procedural::Vector* impostor_uv = static_cast<Procedural::Vector*>( message->GetValueAt( 3 ) );
+
+        Procedural::Index* impostor_uvindex = static_cast<Procedural::Index*>( message->GetValueAt( 3 ) );
+        Procedural::Vector* impostor_uv = static_cast<Procedural::Vector*>( impostor_uvindex->GetResultValue() );
+
+
+        Procedural::Real* posx = static_cast<Procedural::Real*>( rand_impostor_posx->GetResultValue() );
+        Procedural::Real* posz = static_cast<Procedural::Real*>( rand_impostor_posz->GetResultValue() );
+        
+
+        Procedural::Real* scale = static_cast<Procedural::Real*>( message->GetValueAt( 4 ) );
+
+        idle.width_scale = scale->GetValue();
+        idle.height_scale = scale->GetValue();
+
+        idle.u1 = impostor_uv->GetValue()[0];
+        idle.v1 = impostor_uv->GetValue()[1];
+        idle.u2 = impostor_uv->GetValue()[2];
+        idle.v2 = impostor_uv->GetValue()[1];
+        idle.u3 = impostor_uv->GetValue()[2];
+        idle.v3 = impostor_uv->GetValue()[3];
+        idle.u4 = impostor_uv->GetValue()[0];
+        idle.v4 = impostor_uv->GetValue()[3];
+
+
+        idle.localpos[0] = m_new_cloud->pos[0] + posx->GetValue();
+        idle.localpos[1] = m_new_cloud->pos[1];
+        idle.localpos[2] = m_new_cloud->pos[2] + posz->GetValue();
+    
+        m_new_cloud->idl.push_back( idle );
+
 
     }
     else if( "add_bottom_impostor" == opcode->GetValue() )
