@@ -175,7 +175,7 @@ void dsAppClient::OnRenderFrame( void )
             delta_cam_pos[0] = current_camera_pos[2] - m_previous_camera_pos[2];
             delta_cam_pos[3] = 1.0;
 
-            if( delta_cam_pos.Length() > 1000.0 )
+            if( delta_cam_pos.Length() > 4000.0 )
             {
 
                 m_clouds_sort_request = true;
@@ -819,7 +819,7 @@ bool dsAppClient::OnIdleAppInit( void )
     Procedural::Repeat* cloud_loop = new Procedural::Repeat;
 
     Procedural::Integer* nb_impostors = new Procedural::Integer;
-    nb_impostors->SetValue( 15 );
+    nb_impostors->SetValue( 7 );
     cloud_loop->SetChild( pub_add_impostor );
     cloud_loop->SetNbLoops( nb_impostors );
 
