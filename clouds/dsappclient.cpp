@@ -642,6 +642,15 @@ bool dsAppClient::OnIdleAppInit( void )
     Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_bottomimpostor_posz = 
         new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<dsreal>( -800.0, 800.0 ), 237 );
 
+    Procedural::Vector* uv_bottom = new Procedural::Vector;
+    uv_bottom->SetValue( Utils::Vector( 0.75, 0.0, 1.0, 0.25 ) );
+
+    Procedural::Real* y_pos = new Procedural::Real;
+    y_pos->SetValue( -150.0 );
+
+    Procedural::Real* bottom_scale = new Procedural::Real;
+    bottom_scale->SetValue( 800.0 );
+
 
     Procedural::Array* add_bottom_impostor_array = new Procedural::Array;
 
@@ -655,8 +664,11 @@ bool dsAppClient::OnIdleAppInit( void )
         
 
     add_bottom_impostor_array->AddValue( add_bottom_impostor_string );        
-    add_bottom_impostor_array->AddValue( rand_bottom_impostor_posx );    
+    add_bottom_impostor_array->AddValue( rand_bottom_impostor_posx );
+    add_bottom_impostor_array->AddValue( y_pos );
     add_bottom_impostor_array->AddValue( rand_bottomimpostor_posz );
+    add_bottom_impostor_array->AddValue( uv_bottom );
+    add_bottom_impostor_array->AddValue( bottom_scale );
 
 
     Procedural::Repeat* cloud_bottom_loop = new Procedural::Repeat;
@@ -780,32 +792,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     main_loop->Apply();
 
-
-    /*
-    dsreal cloudspos_x = 0.0;
-    dsreal cloudspos_z = 0.0;
-
-    for( long i = 0; i < 20; i++ )
-    {
-        cloudspos_z = 0.0;
-
-        for( long j = 0; j < 20; j++ )
-        {
-            clouds_addcloud( cloudspos_x, cloudspos_z, m_idl );            
-
-            cloudspos_z -= 5500.0;
-        }
-
-        cloudspos_x += 5500.0;
-    }
-    */
     /////////////////////////////////////////////////
-
-
-
     
-    //clouds_impostors_init();
-
     m_idl.clear();
 
     for( size_t i = 0; i < m_clouds.size(); i++ )
@@ -1075,29 +1063,31 @@ void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
             static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 1 ) );
 
         Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posz = 
-            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 2 ) );
+            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 3 ) );
 
+        Procedural::Vector* impostor_uv = static_cast<Procedural::Vector*>( message->GetValueAt( 4 ) );
 
         Procedural::Real* posx = static_cast<Procedural::Real*>( rand_impostor_posx->GetResultValue() );
         Procedural::Real* posz = static_cast<Procedural::Real*>( rand_impostor_posz->GetResultValue() );
+        Procedural::Real* posy = static_cast<Procedural::Real*>( message->GetValueAt( 2 ) );
 
+        Procedural::Real* scale = static_cast<Procedural::Real*>( message->GetValueAt( 5 ) );
 
-        idle.width_scale = 800.0;
-        idle.height_scale = 800.0;
+        idle.width_scale = scale->GetValue();
+        idle.height_scale = scale->GetValue();
 
-        
-        idle.u1 = 0.75;
-        idle.v1 = 0.0;
-        idle.u2 = 1.0;
-        idle.v2 = 0.0;
-        idle.u3 = 1.0;
-        idle.v3 = 0.25;
-        idle.u4 = 0.75;
-        idle.v4 = 0.25;
-        
+        idle.u1 = impostor_uv->GetValue()[0];
+        idle.v1 = impostor_uv->GetValue()[1];
+        idle.u2 = impostor_uv->GetValue()[2];
+        idle.v2 = impostor_uv->GetValue()[1];
+        idle.u3 = impostor_uv->GetValue()[2];
+        idle.v3 = impostor_uv->GetValue()[3];
+        idle.u4 = impostor_uv->GetValue()[0];
+        idle.v4 = impostor_uv->GetValue()[3];
+
 
         idle.localpos[0] = m_new_cloud->pos[0] + posx->GetValue();
-        idle.localpos[1] = m_new_cloud->pos[1] - 150.0;
+        idle.localpos[1] = m_new_cloud->pos[1] + posy->GetValue();
         idle.localpos[2] = m_new_cloud->pos[2] + posz->GetValue();
     
         m_new_cloud->idl.push_back( idle );
