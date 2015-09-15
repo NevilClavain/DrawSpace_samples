@@ -945,10 +945,10 @@ bool dsAppClient::OnIdleAppInit( void )
     //// root
     Procedural::Batch* main_task = new Procedural::Batch;
     main_task->AddChild( pub_declare_cloud );
+    main_task->AddChild( cloud_frag_loop );
     main_task->AddChild( cloud_core_loop );
     main_task->AddChild( cloud_bottom_loop );
-    main_task->AddChild( cloud_loop );
-    main_task->AddChild( cloud_frag_loop );
+    main_task->AddChild( cloud_loop );    
     main_task->AddChild( pub_push_cloud );
 
     Procedural::Integer* nb_clouds = new Procedural::Integer;

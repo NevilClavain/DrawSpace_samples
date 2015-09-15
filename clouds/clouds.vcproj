@@ -4,7 +4,7 @@
 	Version="8,00"
 	Name="clouds"
 	ProjectGUID="{B9A7A650-24E1-4267-BB94-C31D0BBA2168}"
-	RootNamespace="orbiters"
+	RootNamespace="clouds"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
