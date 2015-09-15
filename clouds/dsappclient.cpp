@@ -832,7 +832,7 @@ bool dsAppClient::OnIdleAppInit( void )
         new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>( new std::uniform_real_distribution<dsreal>( -2600.0, 2600.0 ), 7553 );
 
     Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_frag_impostor_posy = 
-        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<dsreal>( -60.0, 60.0 ), 10998 );
+        new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<dsreal>( 180.0, 400.0 ), 10998 );
 
     Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_frag_impostor_posz = 
         new Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, DrawSpace::Procedural::Real>( new std::uniform_real_distribution<dsreal>( -2600.0, 2600.0 ), 17800 );
@@ -896,12 +896,32 @@ bool dsAppClient::OnIdleAppInit( void )
     add_fragimpostor_array->AddValue( rand_frag_impostor_posz );
 
 
-    Procedural::Repeat* cloud_frag_loop = new Procedural::Repeat;
+    
+
+    Procedural::Array* nb_frag_impostors_array = new Procedural::Array;
 
     Procedural::Integer* nb_frag_impostors = new Procedural::Integer;
-    nb_frag_impostors->SetValue( 20 );
+    nb_frag_impostors->SetValue( 12 );
+
+    Procedural::Integer* no_frag_impostors = new Procedural::Integer;
+    no_frag_impostors->SetValue( 0 );
+
+    nb_frag_impostors_array->AddValue( no_frag_impostors );
+    nb_frag_impostors_array->AddValue( no_frag_impostors );
+    nb_frag_impostors_array->AddValue( no_frag_impostors );
+    nb_frag_impostors_array->AddValue( nb_frag_impostors );
+
+    Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, Procedural::Integer>* rand_nb_frag_impostors = 
+    new Procedural::RandomDistribution<int, std::uniform_int_distribution<int>, Procedural::Integer>( new std::uniform_int_distribution<int>( 0, 3 ), 10899 );
+
+    Procedural::Index* nb_frag_impostors_index = new Procedural::Index;
+
+    nb_frag_impostors_index->SetArray( nb_frag_impostors_array );
+    nb_frag_impostors_index->SetIndex( rand_nb_frag_impostors );
+
+    Procedural::Repeat* cloud_frag_loop = new Procedural::Repeat;
     cloud_frag_loop->SetChild( pub_add_fragimpostor );
-    cloud_frag_loop->SetNbLoops( nb_frag_impostors );
+    cloud_frag_loop->SetNbLoops( nb_frag_impostors_index );
 
 
     ////
