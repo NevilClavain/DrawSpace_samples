@@ -83,39 +83,10 @@ protected:
 
 
 
-    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_impostor2_transfo_node;
-
-    DrawSpace::Chunk*                                                   m_impostor2;
-    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_impostor2_node;
-
-
     DrawSpace::Dynamics::Calendar*                                      m_calendar;
 
     
     NodesEventCallback*                                                 m_nodesevent_cb;
-
-    DrawSpace::ImpostorsDisplayList                                     m_idl;
-
-    Cloud*                                                              m_new_cloud;
-    
-    //std::vector<Cloud>                                                  m_clouds;
-    std::vector<Cloud*>                                                 m_clouds;
-
-    DrawSpace::Core::Mediator::MessageQueue*                            m_sort_msg;
-    DrawSpace::Core::Runner*                                            m_runner;
-    DrawSpace::Core::Task<DrawSpace::Core::Runner>*                     m_task;
-    RunnerMsgCb*                                                        m_runner_msg_cb;
-
-    DrawSpace::Utils::Mutex                                             m_runner_state_mutex;
-    int                                                                 m_runner_state;
-
-    bool                                                                m_update_clouds_meshes;
-
-    bool                                                                m_clouds_sort_request;
-
-    bool                                                                m_ready;
-
-    DrawSpace::Utils::Mutex                                             m_mutex;
 
 
     CameraEventCb*                                                      m_cameraevent_cb;
@@ -124,18 +95,7 @@ protected:
 
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_current_camera;
 
-    bool                                                                m_previous_camera_pos_avail;
-    DrawSpace::Utils::Vector                                            m_previous_camera_pos;
-
-
-    int                                                                 m_recompute_count;
-
     
-
-    bool                                                                m_sort_running;
-    
-    DrawSpace::Utils::Mutex                                             m_sort_run_mutex;
-
 
     ProceduralCb*                                                       m_procedural_cb;
 
@@ -143,20 +103,11 @@ protected:
    
 
     void on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node );
-    void on_sort_request( DrawSpace::Core::PropertyPool* p_args );
 
     void on_camera_event( DrawSpace::Core::SceneNodeGraph::CameraEvent p_event, DrawSpace::Core::BaseSceneNode* p_node );
 
     void on_procedural( DrawSpace::Procedural::Atomic* p_atom );
 
-
-    void clouds_addcloud( dsreal p_xpos, dsreal p_zpos, DrawSpace::ImpostorsDisplayList& p_idl );
-    void clouds_execsortz( const DrawSpace::Utils::Matrix& p_impostor_mat, const DrawSpace::Utils::Matrix& p_cam_mat );
-
-    void clouds_impostors_init( void );
-
-    //static bool clouds_nodes_comp( Cloud p_n1, Cloud p_n2 );
-    static bool clouds_nodes_comp( Cloud* p_n1, Cloud* p_n2 );
 
 
     dsAppClient( void );

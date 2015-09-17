@@ -16,7 +16,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_current_camera( NULL ), m_selected_camera( 0 ), m_recompute_count( 0 ), m_ready( false ), m_runner_state( 0 )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_current_camera( NULL ), m_selected_camera( 0 )
 {    
     _INIT_LOGGER( "logclouds.conf" )  
     m_w_title = "clouds test";
@@ -25,7 +25,7 @@ dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_spe
 
     m_procedural_cb = _DRAWSPACE_NEW_( ProceduralCb, ProceduralCb( this, &dsAppClient::on_procedural ) );
     
-    m_update_clouds_meshes = false;
+    
 
 }
 
@@ -34,35 +34,6 @@ dsAppClient::~dsAppClient( void )
 
 }
 
-void dsAppClient::on_sort_request( DrawSpace::Core::PropertyPool* p_args )
-{
-
-    Matrix ImpostorMat, CamMat;
-    ImpostorMat = p_args->GetPropValue<Matrix>( "ImpostorMat" );
-    CamMat = p_args->GetPropValue<Matrix>( "CamMat" );
-
-    m_sort_run_mutex.WaitInfinite();
-
-    clouds_execsortz( ImpostorMat, CamMat );
-
-
-    clouds_impostors_init();
-
-    
-
-    m_mutex.WaitInfinite();
-
-    m_update_clouds_meshes = true;
-
-    m_mutex.Release();
-
-    m_sort_run_mutex.Release();
-
-    m_runner_state_mutex.WaitInfinite();
-    m_runner_state = 0;
-    m_runner_state_mutex.Release();
-
-}
 
 void dsAppClient::on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node )
 {
@@ -79,31 +50,12 @@ void dsAppClient::on_camera_event( DrawSpace::Core::SceneNodeGraph::CameraEvent 
 
         if( prec_camera != m_current_camera )
         {
-            m_clouds_sort_request = true;
+         
         }
     }
 }
 
 
-void dsAppClient::clouds_impostors_init( void )
-{
-    m_idl.clear();
-
-    m_runner_state_mutex.WaitInfinite();
-    m_runner_state = 3;
-    m_runner_state_mutex.Release();
-
-    for( size_t i = 0; i < m_clouds.size(); i++ )
-    {
-        for( size_t j = 0; j < m_clouds[i]->idl.size(); j++ )
-        {     
-            m_idl.push_back( m_clouds[i]->idl[j] );
-        }
-    }
-
-    m_impostor2->SetImpostorsDisplayList( m_idl );
-
-}
 
 void dsAppClient::OnRenderFrame( void )
 {
@@ -116,15 +68,7 @@ void dsAppClient::OnRenderFrame( void )
 
 
 
-    m_mutex.WaitInfinite();
-    if( m_update_clouds_meshes )
-    {
-        m_impostor2->ImpostorsUpdate();
-
-        m_update_clouds_meshes = false;
-    }
-    m_mutex.Release();
-
+   
 
     
     m_texturepass->GetRenderingQueue()->Draw();
@@ -148,280 +92,10 @@ void dsAppClient::OnRenderFrame( void )
 
     m_freemove.SetSpeed( m_speed );
 
-    m_ready = true;
-
-
-    if( m_current_camera )
-    {
-        Matrix CamMat;
-        
-        m_current_camera->GetFinalTransform( CamMat );
-       
-
-        Vector current_camera_pos;
-
-        current_camera_pos[0] = CamMat( 3, 0 );
-        current_camera_pos[1] = CamMat( 3, 1 );
-        current_camera_pos[2] = CamMat( 3, 2 );
-        current_camera_pos[3] = 1.0;
-
-
-        if( m_previous_camera_pos_avail )
-        {
-            Vector delta_cam_pos;
-
-            delta_cam_pos[0] = current_camera_pos[0] - m_previous_camera_pos[0];
-            delta_cam_pos[0] = current_camera_pos[1] - m_previous_camera_pos[1];
-            delta_cam_pos[0] = current_camera_pos[2] - m_previous_camera_pos[2];
-            delta_cam_pos[3] = 1.0;
-
-            if( delta_cam_pos.Length() > 4000.0 )
-            {
-
-                m_clouds_sort_request = true;
-
-                /*
-                */
-
-                m_previous_camera_pos = current_camera_pos;
-            }
-
-        }
-        else
-        {
-            m_previous_camera_pos = current_camera_pos;
-            m_previous_camera_pos_avail = true;
-        }
-    }
-
-    bool busy = true;
-    if( m_sort_run_mutex.Wait( 0 ) )
-    {
-        busy = m_sort_running;
-    }
-    m_sort_run_mutex.Release();
-
-
-    if( m_clouds_sort_request )
-    {
-        if( !busy )
-        {
-            // get clouds node global transform
-            Matrix ImpostorMat;
-            m_impostor2_node->GetFinalTransform( ImpostorMat );
-
-            Matrix CamMat;
-            m_current_camera->GetFinalTransform( CamMat );
-
-
-
-            PropertyPool props;
-
-            props.AddPropValue<Matrix>( "ImpostorMat", ImpostorMat );
-            props.AddPropValue<Matrix>( "CamMat", CamMat );
-
-            m_sort_msg->PushMessage( props );
-            m_recompute_count++;
-
-            
-        }
-
-
-        m_clouds_sort_request = false;
-    }
        
 }
 
 
-void dsAppClient::clouds_addcloud( dsreal p_xpos, dsreal p_zpos, ImpostorsDisplayList& p_idl )
-{
-    ImpostorsDisplayListEntry idle;
-    ImpostorsDisplayList idl;
-
-
-    idle.width_scale = 1500.0;
-    idle.height_scale = 1500.0;
-
-    idle.u1 = 0.5;
-    idle.v1 = 0.5;
-    idle.u2 = 0.75;
-    idle.v2 = 0.5;
-    idle.u3 = 0.75;
-    idle.v3 = 0.75;
-    idle.u4 = 0.5;
-    idle.v4 = 0.75;
-
-    idle.localpos[0] = p_xpos;
-    idle.localpos[1] = 0.0;
-    idle.localpos[2] = p_zpos;
-    
-    idl.push_back( idle );
-
-
-
-    idle.width_scale = 1700.0;
-    idle.height_scale = 1700.0;
-
-    idle.u1 = 0.75;
-    idle.v1 = 0.75;
-    idle.u2 = 1.0;
-    idle.v2 = 0.75;
-    idle.u3 = 1.0;
-    idle.v3 = 1.0;
-    idle.u4 = 0.75;
-    idle.v4 = 1.0;
-
-    idle.localpos[0] = p_xpos + 950.0;
-    idle.localpos[1] = 90.0;
-    idle.localpos[2] = p_zpos;
-    
-    idl.push_back( idle );
-
-
-
-
-    idle.width_scale = 1400.0;
-    idle.height_scale = 1400.0;
-
-    idle.u1 = 0.25;
-    idle.v1 = 0.75;
-    idle.u2 = 0.5;
-    idle.v2 = 0.75;
-    idle.u3 = 0.5;
-    idle.v3 = 1.0;
-    idle.u4 = 0.25;
-    idle.v4 = 1.0;
-
-    idle.localpos[0] = p_xpos + 1750.0;
-    idle.localpos[1] = 190.0;
-    idle.localpos[2] = p_zpos - 700.0;
-    
-    idl.push_back( idle );
-
-
-
-
-
-    idle.width_scale = 1700.0;
-    idle.height_scale = 1700.0;
-
-    idle.u1 = 0.25;
-    idle.v1 = 0.75;
-    idle.u2 = 0.5;
-    idle.v2 = 0.75;
-    idle.u3 = 0.5;
-    idle.v3 = 1.0;
-    idle.u4 = 0.25;
-    idle.v4 = 1.0;
-
-    idle.localpos[0] = p_xpos + 1750.0;
-    idle.localpos[1] = 190.0;
-    idle.localpos[2] = p_zpos + 700.0;
-    
-    idl.push_back( idle );
-
-
-
-
-    idle.width_scale = 1800.0;
-    idle.height_scale = 1800.0;
-
-    idle.u1 = 0.75;
-    idle.v1 = 0.0;
-    idle.u2 = 1.0;
-    idle.v2 = 0.0;
-    idle.u3 = 1.0;
-    idle.v3 = 0.25;
-    idle.u4 = 0.75;
-    idle.v4 = 0.25;
-
-    idle.localpos[0] = p_xpos + 250.0;
-    idle.localpos[1] = -60.0;
-    idle.localpos[2] = p_zpos;
-    
-    idl.push_back( idle );
-
-
-    idle.width_scale = 1800.0;
-    idle.height_scale = 1800.0;
-
-    idle.u1 = 0.75;
-    idle.v1 = 0.0;
-    idle.u2 = 1.0;
-    idle.v2 = 0.0;
-    idle.u3 = 1.0;
-    idle.v3 = 0.25;
-    idle.u4 = 0.75;
-    idle.v4 = 0.25;
-
-    idle.localpos[0] = p_xpos + 700.0;
-    idle.localpos[1] = -60.0;
-    idle.localpos[2] = p_zpos;
-    
-    idl.push_back( idle );
-
-    Cloud* cloud = new Cloud;
-
-    cloud->idl = idl;
-    cloud->pos[0] = p_xpos;
-    cloud->pos[1] = 0.0;
-    cloud->pos[2] = p_zpos;
-    cloud->pos[3] = 1.0;
-
-    m_clouds.push_back( cloud );
-
-}
-
-
-void dsAppClient::clouds_execsortz( const DrawSpace::Utils::Matrix& p_impostor_mat, const DrawSpace::Utils::Matrix& p_cam_mat )
-{
-    // compute all camera-space z-depth
-
-    m_runner_state_mutex.WaitInfinite();
-    m_runner_state = 1;
-    m_runner_state_mutex.Release();
-
-    for( size_t i = 0; i < m_clouds.size(); i++ )
-    {
-        Matrix local_trans;
-
-        local_trans.Translation( m_clouds[i]->pos );
-
-        Matrix final = local_trans * p_impostor_mat;
-
-        Matrix cam_mat = p_cam_mat;
-
-        Vector point_imp( 0.0, 0.0, 0.0, 1.0 );
-        Vector point_cam( 0.0, 0.0, 0.0, 1.0 );
-
-        Vector t_point_imp, t_point_cam;
-
-        final.Transform( &point_imp, &t_point_imp );        
-        cam_mat.Transform( &point_cam, &t_point_cam );
-
-        // la distance entre l'impostor et le point camera;
-        Vector dist_imp;
-        
-        dist_imp[0] = t_point_imp[0] - t_point_cam[0];
-        dist_imp[1] = t_point_imp[1] - t_point_cam[1];
-        dist_imp[2] = t_point_imp[2] - t_point_cam[2];
-        dist_imp[3] = 1.0;
-
-        m_clouds[i]->dist_to_cam = dist_imp.Length();
-    }
-
-    m_runner_state_mutex.WaitInfinite();
-    m_runner_state = 2;
-    m_runner_state_mutex.Release();
-
-    std::sort( m_clouds.begin(), m_clouds.end(), dsAppClient::clouds_nodes_comp );
-}
-
-
-bool dsAppClient::clouds_nodes_comp( Cloud* p_n1, Cloud* p_n2 )
-{
-    return ( p_n1->dist_to_cam > p_n2->dist_to_cam );
-}
 
 
 
@@ -563,24 +237,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_scenenodegraph.AddNode( m_ground_node );
     m_scenenodegraph.RegisterNode( m_ground_node );
-
-
-
-    m_impostor2_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "impostor2_transfo" ) );
-    m_impostor2_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
-
-    Matrix impostor2_pos;
-    impostor2_pos.Translation( 6.0, 1200.0, -450.0 );
-
-    m_impostor2_transfo_node->GetContent()->PushMatrix( impostor2_pos );
-
-    m_scenenodegraph.AddNode( m_impostor2_transfo_node );
-    m_scenenodegraph.RegisterNode( m_impostor2_transfo_node );
-
-
-
-    m_impostor2 = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
-    m_impostor2->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
 
     /////////////////////////////////////////////////
@@ -962,104 +618,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     /////////////////////////////////////////////////
     
-    m_idl.clear();
-
-    for( size_t i = 0; i < m_clouds.size(); i++ )
-    {
-        for( size_t j = 0; j < m_clouds[i]->idl.size(); j++ )
-        {     
-            m_idl.push_back( m_clouds[i]->idl[j] );
-        }
-    }
-
-    m_impostor2->SetImpostorsDisplayList( m_idl );
-    m_impostor2->ImpostorsInit();
-
-
-
-    m_impostor2->RegisterPassSlot( m_texturepass2 );
-    m_impostor2->RegisterPassSlot( m_maskpass );
-
-    
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.vsh", false ) ) );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.psh", false ) ) );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->GetShader( 1 )->LoadFromFile();
-
-    
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
-    
-
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    
-
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-
-
-
-
-
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "clouds.bmp" ) ), 0 );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->GetTexture( 0 )->LoadFromFile();
-
-    
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetOrderNumber( 12000 );
-
-
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 0, "flags_v", 24 );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "flags_v", Vector( 0.5, 0.0, 0.0, 0.0 ) );
-
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 0, "clouds_dims", 25 );
-    //m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "clouds_dims", Vector( 900, -500, 1.0, 0.66 ) );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "clouds_dims", Vector( 400, -200, 1.0, 0.76 ) );
-
-
-
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 1, "flags", 0 );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "flags", Vector( 0.5, 0.0, 0.0, 0.0 ) );
-
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 1, "color", 1 );
-    m_impostor2->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "color", Vector( 0.99, 0.99, 0.99, 1.0 ) );
-    
-
-
-    m_impostor2->GetNodeFromPass( m_maskpass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_impostor2->GetNodeFromPass( m_maskpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.vsh", false ) ) );
-    m_impostor2->GetNodeFromPass( m_maskpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.psh", false ) ) );
-    m_impostor2->GetNodeFromPass( m_maskpass )->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_impostor2->GetNodeFromPass( m_maskpass )->GetFx()->GetShader( 1 )->LoadFromFile();
-
-    m_impostor2->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-    m_impostor2->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-    
-
-
-    
-    m_impostor2->GetNodeFromPass( m_maskpass )->SetOrderNumber( 12000 );
-
-
-    m_impostor2->GetNodeFromPass( m_maskpass )->AddShaderParameter( 1, "flags", 0 );
-    m_impostor2->GetNodeFromPass( m_maskpass )->SetShaderRealVector( "flags", Vector( 1.0, 0.0, 0.0, 0.0 ) );
-
-    m_impostor2->GetNodeFromPass( m_maskpass )->AddShaderParameter( 1, "color", 1 );
-    m_impostor2->GetNodeFromPass( m_maskpass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 1.0 ) );
-
-
-
-    m_impostor2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "impostor1" ) );
-
-    m_impostor2_node->SetContent( m_impostor2 );
-
-
-    m_scenenodegraph.RegisterNode( m_impostor2_node );
-
-    m_impostor2_node->LinkTo( m_impostor2_transfo_node );
 
 
     
@@ -1144,9 +702,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_camera2_node->LinkTo( m_camera2_transfo_node );
 
 
-    m_camera2->Lock( m_impostor2_node );
-
-
 
 
 
@@ -1166,27 +721,10 @@ bool dsAppClient::OnIdleAppInit( void )
     m_mouse_circularmode = true;
 
 
-    m_sort_running = false;
 
     m_calendar->Startup( 0 );
 
 
-
-
-
-
-    m_runner_msg_cb = _DRAWSPACE_NEW_( RunnerMsgCb, RunnerMsgCb( this, &dsAppClient::on_sort_request ) );
-
-    m_runner = _DRAWSPACE_NEW_( Runner, Runner );
-    DrawSpace::Core::Mediator* mediator = Mediator::GetInstance();
-    m_sort_msg = mediator->CreateMessageQueue( "ReqSortEvent" );
-    
-    m_runner->RegisterMsgHandler( m_sort_msg, m_runner_msg_cb );
-
-    m_task = _DRAWSPACE_NEW_( Task<Runner>, Task<Runner> );
-    m_task->Startup( m_runner );
-
-    m_previous_camera_pos_avail = false;
 
     
     m_cameraevent_cb = _DRAWSPACE_NEW_( CameraEventCb, CameraEventCb( this, &dsAppClient::on_camera_event ) );
@@ -1215,12 +753,6 @@ void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
         Procedural::Real* posz = static_cast<Procedural::Real*>( rand_cloudposz->GetResultValue() );
 
 
-        m_new_cloud = new Cloud;
-
-        m_new_cloud->pos[0] = posx->GetValue();
-        m_new_cloud->pos[1] = 0.0;
-        m_new_cloud->pos[2] = posz->GetValue();
-        m_new_cloud->pos[3] = 1.0;
 
     }
     else if( "add_core_impostor" == opcode->GetValue() )
@@ -1257,13 +789,11 @@ void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
         idle.u4 = impostor_uv->GetValue()[0];
         idle.v4 = impostor_uv->GetValue()[3];
 
-
+        /*
         idle.localpos[0] = m_new_cloud->pos[0] + posx->GetValue();
         idle.localpos[1] = m_new_cloud->pos[1];
         idle.localpos[2] = m_new_cloud->pos[2] + posz->GetValue();
-    
-        m_new_cloud->idl.push_back( idle );
-
+        */
 
     }
     else if( "add_bottom_impostor" == opcode->GetValue() )
@@ -1296,12 +826,11 @@ void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
         idle.u4 = impostor_uv->GetValue()[0];
         idle.v4 = impostor_uv->GetValue()[3];
 
-
+        /*
         idle.localpos[0] = m_new_cloud->pos[0] + posx->GetValue();
         idle.localpos[1] = m_new_cloud->pos[1] + posy->GetValue();
         idle.localpos[2] = m_new_cloud->pos[2] + posz->GetValue();
-    
-        m_new_cloud->idl.push_back( idle );
+        */
     
     }
     else if( "add_impostor" == opcode->GetValue() )
@@ -1345,17 +874,16 @@ void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
         idle.u4 = impostor_uv->GetValue()[0];
         idle.v4 = impostor_uv->GetValue()[3];
         
-
+        /*
         idle.localpos[0] = m_new_cloud->pos[0] + posx->GetValue();
         idle.localpos[1] = m_new_cloud->pos[1] + posy->GetValue();
         idle.localpos[2] = m_new_cloud->pos[2] + posz->GetValue();
-    
-        m_new_cloud->idl.push_back( idle );
+    */
     
     }
     else if( "push_cloud" == opcode->GetValue() )
     {
-        m_clouds.push_back( m_new_cloud );
+        
     }
 
 }

@@ -149,8 +149,7 @@ protected:
 
     void on_procedural( DrawSpace::Procedural::Atomic* p_atom );
 
-
-    void clouds_addcloud( dsreal p_xpos, dsreal p_zpos, DrawSpace::ImpostorsDisplayList& p_idl );
+    
     void clouds_execsortz( const DrawSpace::Utils::Matrix& p_impostor_mat, const DrawSpace::Utils::Matrix& p_cam_mat );
 
     void clouds_impostors_init( void );
