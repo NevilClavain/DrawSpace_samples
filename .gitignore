@@ -11,8 +11,24 @@
 [Rr]elease/
 x64/
 build/
-[Bb]in/
+# [Bb]in/
 [Oo]bj/
+
+bin/*.lua
+bin/*.psh
+bin/*.vsh
+bin/*.exe
+bin/*.dll
+bin/*.bak
+bin/*.bat
+bin/*.ilk
+bin/*.lib
+bin/*.pdb
+bin/*.out
+bin/*.exp
+bin/*.txt
+bin/*.pso
+bin/*.vso
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
