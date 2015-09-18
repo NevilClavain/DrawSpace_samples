@@ -115,7 +115,7 @@ void dsAppClient::OnRenderFrame( void )
     m_scenenodegraph.ComputeTransformations( m_timer );
 
 
-
+    ///////////////////////////////////////////////////////////////////
     m_mutex.WaitInfinite();
     if( m_update_clouds_meshes )
     {
@@ -124,31 +124,6 @@ void dsAppClient::OnRenderFrame( void )
         m_update_clouds_meshes = false;
     }
     m_mutex.Release();
-
-
-    
-    m_texturepass->GetRenderingQueue()->Draw();
-    m_texturepass2->GetRenderingQueue()->Draw();
-    m_maskpass->GetRenderingQueue()->Draw();
-    m_filterpass->GetRenderingQueue()->Draw();
-    
-    m_finalpass->GetRenderingQueue()->Draw();    
-
-    long current_fps = m_timer.GetFPS();
-    renderer->DrawText( 0, 0, 0, 10, 35, "%d", current_fps );
-    //renderer->DrawText( 0, 0, 0, 10, 55, "%d", m_recompute_count );
-
-
-
-    renderer->FlipScreen();
-
-
-
-    m_calendar->Run();
-
-    m_freemove.SetSpeed( m_speed );
-
-    m_ready = true;
 
 
     if( m_current_camera )
@@ -180,8 +155,7 @@ void dsAppClient::OnRenderFrame( void )
 
                 m_clouds_sort_request = true;
 
-                /*
-                */
+           
 
                 m_previous_camera_pos = current_camera_pos;
             }
@@ -229,6 +203,124 @@ void dsAppClient::OnRenderFrame( void )
 
         m_clouds_sort_request = false;
     }
+
+    ///////////////////////////////////////////////////////////////////
+
+    
+    m_texturepass->GetRenderingQueue()->Draw();
+    m_texturepass2->GetRenderingQueue()->Draw();
+    m_maskpass->GetRenderingQueue()->Draw();
+    m_filterpass->GetRenderingQueue()->Draw();
+    
+    m_finalpass->GetRenderingQueue()->Draw();    
+
+    long current_fps = m_timer.GetFPS();
+    renderer->DrawText( 0, 0, 0, 10, 35, "%d", current_fps );
+    //renderer->DrawText( 0, 0, 0, 10, 55, "%d", m_recompute_count );
+
+
+
+    renderer->FlipScreen();
+
+
+
+    m_calendar->Run();
+
+    m_freemove.SetSpeed( m_speed );
+
+    m_ready = true;
+
+    /*
+
+    m_mutex.WaitInfinite();
+    if( m_update_clouds_meshes )
+    {
+        m_impostor2->ImpostorsUpdate();
+
+        m_update_clouds_meshes = false;
+    }
+    m_mutex.Release();
+
+
+    if( m_current_camera )
+    {
+        Matrix CamMat;
+        
+        m_current_camera->GetFinalTransform( CamMat );
+       
+
+        Vector current_camera_pos;
+
+        current_camera_pos[0] = CamMat( 3, 0 );
+        current_camera_pos[1] = CamMat( 3, 1 );
+        current_camera_pos[2] = CamMat( 3, 2 );
+        current_camera_pos[3] = 1.0;
+
+
+        if( m_previous_camera_pos_avail )
+        {
+            Vector delta_cam_pos;
+
+            delta_cam_pos[0] = current_camera_pos[0] - m_previous_camera_pos[0];
+            delta_cam_pos[0] = current_camera_pos[1] - m_previous_camera_pos[1];
+            delta_cam_pos[0] = current_camera_pos[2] - m_previous_camera_pos[2];
+            delta_cam_pos[3] = 1.0;
+
+            if( delta_cam_pos.Length() > 4000.0 )
+            {
+
+                m_clouds_sort_request = true;
+
+           
+
+                m_previous_camera_pos = current_camera_pos;
+            }
+
+        }
+        else
+        {
+            m_previous_camera_pos = current_camera_pos;
+            m_previous_camera_pos_avail = true;
+        }
+    }
+
+    bool busy = true;
+    if( m_sort_run_mutex.Wait( 0 ) )
+    {
+        busy = m_sort_running;
+    }
+    m_sort_run_mutex.Release();
+
+
+    if( m_clouds_sort_request )
+    {
+        if( !busy )
+        {
+            // get clouds node global transform
+            Matrix ImpostorMat;
+            m_impostor2_node->GetFinalTransform( ImpostorMat );
+
+            Matrix CamMat;
+            m_current_camera->GetFinalTransform( CamMat );
+
+
+
+            PropertyPool props;
+
+            props.AddPropValue<Matrix>( "ImpostorMat", ImpostorMat );
+            props.AddPropValue<Matrix>( "CamMat", CamMat );
+
+            m_sort_msg->PushMessage( props );
+            m_recompute_count++;
+
+            
+        }
+
+
+        m_clouds_sort_request = false;
+    }
+
+    */
        
 }
 
