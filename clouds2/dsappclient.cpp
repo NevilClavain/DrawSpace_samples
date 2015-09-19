@@ -20,41 +20,12 @@ dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_spe
 {    
     _INIT_LOGGER( "logclouds.conf" )  
     m_w_title = "clouds test";
-
-    m_nodesevent_cb = _DRAWSPACE_NEW_( NodesEventCallback, NodesEventCallback( this, &dsAppClient::on_nodes_event ) );
-
-    m_procedural_cb = _DRAWSPACE_NEW_( ProceduralCb, ProceduralCb( this, &dsAppClient::on_procedural ) );
-    
-    
-
 }
 
 dsAppClient::~dsAppClient( void )
 {
 
 }
-
-
-void dsAppClient::on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node )
-{
-
-
-}
-
-void dsAppClient::on_camera_event( DrawSpace::Core::SceneNodeGraph::CameraEvent p_event, DrawSpace::Core::BaseSceneNode* p_node )
-{
-    if( DrawSpace::Core::SceneNodeGraph::ACTIVE == p_event )
-    {
-        DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* prec_camera = m_current_camera;        
-        m_current_camera = static_cast< DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* >( p_node );
-
-        if( prec_camera != m_current_camera )
-        {
-         
-        }
-    }
-}
-
 
 
 void dsAppClient::OnRenderFrame( void )
@@ -263,7 +234,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     DrawSpace::Procedural::Publisher* pub_declare_cloud = new DrawSpace::Procedural::Publisher;
     pub_declare_cloud->SetChild( declare_cloud_array );
-    pub_declare_cloud->RegisterHandler( m_procedural_cb );
+    //pub_declare_cloud->RegisterHandler( m_procedural_cb );
     ////
 
     //// add core cloud impostors
@@ -312,7 +283,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     DrawSpace::Procedural::Publisher* pub_add_core_impostor = new DrawSpace::Procedural::Publisher;
     pub_add_core_impostor->SetChild( add_core_impostor_array );
-    pub_add_core_impostor->RegisterHandler( m_procedural_cb );
+    //pub_add_core_impostor->RegisterHandler( m_procedural_cb );
 
         
 
@@ -361,7 +332,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     DrawSpace::Procedural::Publisher* pub_add_bottom_impostor = new DrawSpace::Procedural::Publisher;
     pub_add_bottom_impostor->SetChild( add_bottom_impostor_array );
-    pub_add_bottom_impostor->RegisterHandler( m_procedural_cb );
+    //pub_add_bottom_impostor->RegisterHandler( m_procedural_cb );
 
         
 
@@ -458,7 +429,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     DrawSpace::Procedural::Publisher* pub_add_impostor = new DrawSpace::Procedural::Publisher;
     pub_add_impostor->SetChild( add_impostor_array );
-    pub_add_impostor->RegisterHandler( m_procedural_cb );
+    //pub_add_impostor->RegisterHandler( m_procedural_cb );
 
         
 
@@ -540,7 +511,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     DrawSpace::Procedural::Publisher* pub_add_fragimpostor = new DrawSpace::Procedural::Publisher;
     pub_add_fragimpostor->SetChild( add_fragimpostor_array );
-    pub_add_fragimpostor->RegisterHandler( m_procedural_cb );
+    //pub_add_fragimpostor->RegisterHandler( m_procedural_cb );
 
         
 
@@ -594,7 +565,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     DrawSpace::Procedural::Publisher* pub_push_cloud = new DrawSpace::Procedural::Publisher;
     pub_push_cloud->SetChild( push_cloud_array );
-    pub_push_cloud->RegisterHandler( m_procedural_cb );
+    //pub_push_cloud->RegisterHandler( m_procedural_cb );
     /////
 
 
@@ -638,10 +609,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     ////////////////////////////////////////////////////
 
-
-    m_scenenodegraph.RegisterNodesEvtHandler( m_nodesevent_cb );
-
-    
   
 
     m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer ) );
@@ -725,167 +692,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_calendar->Startup( 0 );
 
 
-
-    
-    m_cameraevent_cb = _DRAWSPACE_NEW_( CameraEventCb, CameraEventCb( this, &dsAppClient::on_camera_event ) );
-
-    m_scenenodegraph.RegisterCameraEvtHandler( m_cameraevent_cb );
-
         
     return true;
-}
-
-void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
-{
-    // decode procedural rules messages
-    Procedural::Array* message = static_cast<Procedural::Array*>( p_atom );
-    Procedural::String* opcode = static_cast<Procedural::String*>( message->GetValueAt( 0 ) );
-
-    if( "declare_cloud" == opcode->GetValue() )
-    {
-        Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_cloudposx = 
-            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 1 ) );
-
-        Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_cloudposz = 
-            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 2 ) );
-
-        Procedural::Real* posx = static_cast<Procedural::Real*>( rand_cloudposx->GetResultValue() );
-        Procedural::Real* posz = static_cast<Procedural::Real*>( rand_cloudposz->GetResultValue() );
-
-
-
-    }
-    else if( "add_core_impostor" == opcode->GetValue() )
-    {
-        ImpostorsDisplayListEntry idle;
-
-        Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posx = 
-            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 1 ) );
-
-        Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posz = 
-            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 2 ) );
-
-        //Procedural::Vector* impostor_uv = static_cast<Procedural::Vector*>( message->GetValueAt( 3 ) );
-
-        Procedural::Index* impostor_uvindex = static_cast<Procedural::Index*>( message->GetValueAt( 3 ) );
-        Procedural::Vector* impostor_uv = static_cast<Procedural::Vector*>( impostor_uvindex->GetResultValue() );
-
-
-        Procedural::Real* posx = static_cast<Procedural::Real*>( rand_impostor_posx->GetResultValue() );
-        Procedural::Real* posz = static_cast<Procedural::Real*>( rand_impostor_posz->GetResultValue() );
-        
-
-        Procedural::Real* scale = static_cast<Procedural::Real*>( message->GetValueAt( 4 ) );
-
-        idle.width_scale = scale->GetValue();
-        idle.height_scale = scale->GetValue();
-
-        idle.u1 = impostor_uv->GetValue()[0];
-        idle.v1 = impostor_uv->GetValue()[1];
-        idle.u2 = impostor_uv->GetValue()[2];
-        idle.v2 = impostor_uv->GetValue()[1];
-        idle.u3 = impostor_uv->GetValue()[2];
-        idle.v3 = impostor_uv->GetValue()[3];
-        idle.u4 = impostor_uv->GetValue()[0];
-        idle.v4 = impostor_uv->GetValue()[3];
-
-        /*
-        idle.localpos[0] = m_new_cloud->pos[0] + posx->GetValue();
-        idle.localpos[1] = m_new_cloud->pos[1];
-        idle.localpos[2] = m_new_cloud->pos[2] + posz->GetValue();
-        */
-
-    }
-    else if( "add_bottom_impostor" == opcode->GetValue() )
-    {
-        ImpostorsDisplayListEntry idle;
-
-        Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posx = 
-            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 1 ) );
-
-        Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posz = 
-            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 3 ) );
-
-        Procedural::Vector* impostor_uv = static_cast<Procedural::Vector*>( message->GetValueAt( 4 ) );
-
-        Procedural::Real* posx = static_cast<Procedural::Real*>( rand_impostor_posx->GetResultValue() );
-        Procedural::Real* posz = static_cast<Procedural::Real*>( rand_impostor_posz->GetResultValue() );
-        Procedural::Real* posy = static_cast<Procedural::Real*>( message->GetValueAt( 2 ) );
-
-        Procedural::Real* scale = static_cast<Procedural::Real*>( message->GetValueAt( 5 ) );
-
-        idle.width_scale = scale->GetValue();
-        idle.height_scale = scale->GetValue();
-
-        idle.u1 = impostor_uv->GetValue()[0];
-        idle.v1 = impostor_uv->GetValue()[1];
-        idle.u2 = impostor_uv->GetValue()[2];
-        idle.v2 = impostor_uv->GetValue()[1];
-        idle.u3 = impostor_uv->GetValue()[2];
-        idle.v3 = impostor_uv->GetValue()[3];
-        idle.u4 = impostor_uv->GetValue()[0];
-        idle.v4 = impostor_uv->GetValue()[3];
-
-        /*
-        idle.localpos[0] = m_new_cloud->pos[0] + posx->GetValue();
-        idle.localpos[1] = m_new_cloud->pos[1] + posy->GetValue();
-        idle.localpos[2] = m_new_cloud->pos[2] + posz->GetValue();
-        */
-    
-    }
-    else if( "add_impostor" == opcode->GetValue() )
-    {
-        ImpostorsDisplayListEntry idle;
-
-        
-        Procedural::Index* impostor_uvindex = static_cast<Procedural::Index*>( message->GetValueAt( 1 ) );
-        Procedural::Vector* impostor_uv = static_cast<Procedural::Vector*>( impostor_uvindex->GetResultValue() );
-
-        Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostorscale = 
-            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 2 ) );
-
-        Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posx = 
-            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 3 ) );
-
-        Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posy = 
-            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 4 ) );
-
-        Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_impostor_posz = 
-            static_cast<Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>*>( message->GetValueAt( 5 ) );
-
-
-
-        Procedural::Real* impostor_scale = static_cast<Procedural::Real*>( rand_impostorscale->GetResultValue() );
-
-        idle.width_scale = impostor_scale->GetValue();
-        idle.height_scale = impostor_scale->GetValue();
-
-        Procedural::Real* posx = static_cast<Procedural::Real*>( rand_impostor_posx->GetResultValue() );
-        Procedural::Real* posy = static_cast<Procedural::Real*>( rand_impostor_posy->GetResultValue() );
-        Procedural::Real* posz = static_cast<Procedural::Real*>( rand_impostor_posz->GetResultValue() );
-
-        
-        idle.u1 = impostor_uv->GetValue()[0];
-        idle.v1 = impostor_uv->GetValue()[1];
-        idle.u2 = impostor_uv->GetValue()[2];
-        idle.v2 = impostor_uv->GetValue()[1];
-        idle.u3 = impostor_uv->GetValue()[2];
-        idle.v3 = impostor_uv->GetValue()[3];
-        idle.u4 = impostor_uv->GetValue()[0];
-        idle.v4 = impostor_uv->GetValue()[3];
-        
-        /*
-        idle.localpos[0] = m_new_cloud->pos[0] + posx->GetValue();
-        idle.localpos[1] = m_new_cloud->pos[1] + posy->GetValue();
-        idle.localpos[2] = m_new_cloud->pos[2] + posz->GetValue();
-    */
-    
-    }
-    else if( "push_cloud" == opcode->GetValue() )
-    {
-        
-    }
-
 }
 
 void dsAppClient::OnAppInit( void )

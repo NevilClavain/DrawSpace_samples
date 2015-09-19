@@ -86,7 +86,7 @@ protected:
     DrawSpace::Dynamics::Calendar*                                      m_calendar;
 
     
-    NodesEventCallback*                                                 m_nodesevent_cb;
+    
 
 
     CameraEventCb*                                                      m_cameraevent_cb;
@@ -101,13 +101,6 @@ protected:
 
     
    
-
-    void on_nodes_event( DrawSpace::Core::SceneNodeGraph::NodesEvent p_event, DrawSpace::Core::BaseSceneNode* p_node );
-
-    void on_camera_event( DrawSpace::Core::SceneNodeGraph::CameraEvent p_event, DrawSpace::Core::BaseSceneNode* p_node );
-
-    void on_procedural( DrawSpace::Procedural::Atomic* p_atom );
-
 
 
     dsAppClient( void );
