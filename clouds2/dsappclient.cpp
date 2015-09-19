@@ -210,6 +210,26 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph.RegisterNode( m_ground_node );
 
 
+
+
+    m_clouds_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "impostor2_transfo" ) );
+    m_clouds_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+
+    Matrix clouds_pos;
+    clouds_pos.Translation( 6.0, 1200.0, -450.0 );
+
+    m_clouds_transfo_node->GetContent()->PushMatrix( clouds_pos );
+
+    m_scenenodegraph.AddNode( m_clouds_transfo_node );
+    m_scenenodegraph.RegisterNode( m_clouds_transfo_node );
+
+
+
+    m_clouds = _DRAWSPACE_NEW_( DrawSpace::Clouds, DrawSpace::Clouds );
+    m_clouds->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
+    m_clouds->EnableDetails( true );
+
     /////////////////////////////////////////////////
 
    
@@ -234,7 +254,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     DrawSpace::Procedural::Publisher* pub_declare_cloud = new DrawSpace::Procedural::Publisher;
     pub_declare_cloud->SetChild( declare_cloud_array );
-    //pub_declare_cloud->RegisterHandler( m_procedural_cb );
+    pub_declare_cloud->RegisterHandler( m_clouds->GetProceduralCallback() );
     ////
 
     //// add core cloud impostors
@@ -283,7 +303,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     DrawSpace::Procedural::Publisher* pub_add_core_impostor = new DrawSpace::Procedural::Publisher;
     pub_add_core_impostor->SetChild( add_core_impostor_array );
-    //pub_add_core_impostor->RegisterHandler( m_procedural_cb );
+    pub_add_core_impostor->RegisterHandler( m_clouds->GetProceduralCallback() );
 
         
 
@@ -332,7 +352,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     DrawSpace::Procedural::Publisher* pub_add_bottom_impostor = new DrawSpace::Procedural::Publisher;
     pub_add_bottom_impostor->SetChild( add_bottom_impostor_array );
-    //pub_add_bottom_impostor->RegisterHandler( m_procedural_cb );
+    pub_add_bottom_impostor->RegisterHandler( m_clouds->GetProceduralCallback() );
 
         
 
@@ -429,7 +449,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     DrawSpace::Procedural::Publisher* pub_add_impostor = new DrawSpace::Procedural::Publisher;
     pub_add_impostor->SetChild( add_impostor_array );
-    //pub_add_impostor->RegisterHandler( m_procedural_cb );
+    pub_add_impostor->RegisterHandler( m_clouds->GetProceduralCallback() );
 
         
 
@@ -511,7 +531,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     DrawSpace::Procedural::Publisher* pub_add_fragimpostor = new DrawSpace::Procedural::Publisher;
     pub_add_fragimpostor->SetChild( add_fragimpostor_array );
-    //pub_add_fragimpostor->RegisterHandler( m_procedural_cb );
+    pub_add_fragimpostor->RegisterHandler( m_clouds->GetProceduralCallback() );
 
         
 
@@ -565,7 +585,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     DrawSpace::Procedural::Publisher* pub_push_cloud = new DrawSpace::Procedural::Publisher;
     pub_push_cloud->SetChild( push_cloud_array );
-    //pub_push_cloud->RegisterHandler( m_procedural_cb );
+    pub_push_cloud->RegisterHandler( m_clouds->GetProceduralCallback() );
     /////
 
 
@@ -590,8 +610,97 @@ bool dsAppClient::OnIdleAppInit( void )
     /////////////////////////////////////////////////
     
 
+    m_clouds->ImpostorsInit();
+    
+
+
+
+    m_clouds->RegisterPassSlot( m_texturepass2 );
+    m_clouds->RegisterPassSlot( m_maskpass );
 
     
+    m_clouds->GetNodeFromPass( m_texturepass2 )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_clouds->GetNodeFromPass( m_texturepass2 )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.vsh", false ) ) );
+    m_clouds->GetNodeFromPass( m_texturepass2 )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.psh", false ) ) );
+    m_clouds->GetNodeFromPass( m_texturepass2 )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_clouds->GetNodeFromPass( m_texturepass2 )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    
+    m_clouds->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_clouds->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    m_clouds->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    m_clouds->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );
+    m_clouds->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
+    
+
+    m_clouds->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    
+
+    m_clouds->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+    m_clouds->GetNodeFromPass( m_texturepass2 )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+
+
+
+
+    m_clouds->GetNodeFromPass( m_texturepass2 )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "clouds.bmp" ) ), 0 );
+    m_clouds->GetNodeFromPass( m_texturepass2 )->GetTexture( 0 )->LoadFromFile();
+
+    
+    m_clouds->GetNodeFromPass( m_texturepass2 )->SetOrderNumber( 12000 );
+
+
+    m_clouds->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 0, "flags_v", 24 );
+    m_clouds->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "flags_v", Vector( 0.5, 0.0, 0.0, 0.0 ) );
+
+    m_clouds->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 0, "clouds_dims", 25 );
+    //m_clouds->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "clouds_dims", Vector( 900, -500, 1.0, 0.66 ) );
+    m_clouds->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "clouds_dims", Vector( 400, -200, 1.0, 0.76 ) );
+
+
+
+    m_clouds->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 1, "flags", 0 );
+    m_clouds->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "flags", Vector( 0.5, 0.0, 0.0, 0.0 ) );
+
+    m_clouds->GetNodeFromPass( m_texturepass2 )->AddShaderParameter( 1, "color", 1 );
+    m_clouds->GetNodeFromPass( m_texturepass2 )->SetShaderRealVector( "color", Vector( 0.99, 0.99, 0.99, 1.0 ) );
+    
+
+
+    m_clouds->GetNodeFromPass( m_maskpass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_clouds->GetNodeFromPass( m_maskpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.vsh", false ) ) );
+    m_clouds->GetNodeFromPass( m_maskpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.psh", false ) ) );
+    m_clouds->GetNodeFromPass( m_maskpass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_clouds->GetNodeFromPass( m_maskpass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_clouds->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_clouds->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    
+
+
+    
+    m_clouds->GetNodeFromPass( m_maskpass )->SetOrderNumber( 12000 );
+
+
+    m_clouds->GetNodeFromPass( m_maskpass )->AddShaderParameter( 1, "flags", 0 );
+    m_clouds->GetNodeFromPass( m_maskpass )->SetShaderRealVector( "flags", Vector( 1.0, 0.0, 0.0, 0.0 ) );
+
+    m_clouds->GetNodeFromPass( m_maskpass )->AddShaderParameter( 1, "color", 1 );
+    m_clouds->GetNodeFromPass( m_maskpass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 1.0 ) );
+
+
+
+    m_clouds_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Clouds>, SceneNode<DrawSpace::Clouds>( "clouds_1" ) );
+
+    m_clouds_node->SetContent( m_clouds );
+
+
+    m_scenenodegraph.RegisterNode( m_clouds_node );
+
+    m_clouds_node->LinkTo( m_clouds_transfo_node );
+
+
+
 
     //////////////////////////////////////////////////////////////
 
@@ -670,7 +779,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-
+    m_camera2->Lock( m_clouds_node );
 
     m_scenenodegraph.SetCurrentCamera( "camera" );
 

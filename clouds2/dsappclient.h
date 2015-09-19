@@ -46,8 +46,7 @@ protected:
 
 
     DrawSpace::FinalPass*                                               m_finalpass;
-    //DrawSpace::FinalPass*                                               m_finalpass2;
-
+    
 
     DrawSpace::Utils::TimeManager                                       m_timer;
 
@@ -82,24 +81,19 @@ protected:
     DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_ground_node;
 
 
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_clouds_transfo_node;
+    DrawSpace::Clouds*                                                  m_clouds;
+    DrawSpace::Core::SceneNode<DrawSpace::Clouds>*                      m_clouds_node;
+
+
 
     DrawSpace::Dynamics::Calendar*                                      m_calendar;
 
-    
-    
-
-
-    CameraEventCb*                                                      m_cameraevent_cb;
-
     int                                                                 m_selected_camera;
-
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_current_camera;
 
     
-
-    ProceduralCb*                                                       m_procedural_cb;
-
-    
+       
    
 
 
