@@ -228,7 +228,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_clouds = _DRAWSPACE_NEW_( DrawSpace::Clouds, DrawSpace::Clouds );
     m_clouds->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
-    m_clouds->EnableDetails( true );
+    m_clouds->EnableDetails( false );
 
     /////////////////////////////////////////////////
 
