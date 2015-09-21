@@ -20,9 +20,16 @@ dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_spe
 {    
     _INIT_LOGGER( "logclouds.conf" )  
     m_w_title = "clouds test";
+
+    m_procedural_cb = _DRAWSPACE_NEW_( ProceduralCb, ProceduralCb( this, &dsAppClient::on_procedural ) );
 }
 
 dsAppClient::~dsAppClient( void )
+{
+
+}
+
+void dsAppClient::on_procedural( DrawSpace::Procedural::Atomic* p_atom )
 {
 
 }
@@ -209,7 +216,14 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph.AddNode( m_ground_node );
     m_scenenodegraph.RegisterNode( m_ground_node );
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    m_procedural_rules = new DrawSpace::Procedural::RulesPackage( m_procedural_cb );
+    m_procedural_rules->Run( "clouds.rules", " " );
+
+    m_procedural_rules->GetRootParser()->GetRules()->Apply();
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     m_clouds_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "impostor2_transfo" ) );
