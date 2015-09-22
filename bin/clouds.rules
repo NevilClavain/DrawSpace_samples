@@ -1,13 +1,30 @@
+batch
 
-repeat
- integer 3
- pub
-  array
-   integer 320
-   vector 10 11 12 13.4
-   string test_test
-   random_distribution uniform integer 1000 2000
-   random_distribution uniform real 5.1 6.0 
+ repeat
+  random uniform integer 2 5
+  pub
+   array
+    integer 320
+    vector 10 11 12 13.4
+    string test_test
+    random uniform integer 1000 2000
+    random uniform real 5.1 6.0 
+   end
   end
+ end
+
+ pub
+  index
+   random uniform integer 0 2
+   array
+    string str1
+    string str2
+    string str3
+   end
+  end
+ end
+
+ pub
+  string the_end
  end
 end
