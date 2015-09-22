@@ -1,9 +1,13 @@
 
-pub
- array
-  integer 320
-  vector 10 11 12 13.4
-  string test_test
-  random_distribution uniform integer 1000 2000
+repeat
+ integer 3
+ pub
+  array
+   integer 320
+   vector 10 11 12 13.4
+   string test_test
+   random_distribution uniform integer 1000 2000
+   random_distribution uniform real 5.1 6.0 
+  end
  end
 end
