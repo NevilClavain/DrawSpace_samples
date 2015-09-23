@@ -78,7 +78,8 @@ repeat
   # cloud details loop
 
   repeat
-   integer 7
+   
+   random uniform integer 10 25 29
 
    pub
     array
@@ -102,7 +103,7 @@ repeat
 
      # impostor pos x y z
      random uniform real -600.0 600.0 20
-     random uniform real -100.0 200.0 21     
+     random uniform real -100.0 400.0 21     
      random uniform real -600.0 600.0 22
      
     end
