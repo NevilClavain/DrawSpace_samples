@@ -1,0 +1,51 @@
+# clouds generation procedural rules
+
+  
+repeat
+ integer 320
+
+ batch
+
+  # declare_cloud message
+  pub
+   array
+    string declare_cloud
+    random uniform real -60000.0 60000.0 10
+    random uniform real -60000.0 60000.0 11
+   end
+  end
+
+  # cloud core loop
+  repeat
+   integer 20
+   pub
+
+    array
+     string add_core_impostor
+     random uniform real -600.0 600.0 12     
+     random uniform real -600.0 600.0 13
+
+     index
+      random uniform integer 0 2 14
+      array
+       vector 0.0 0.0 0.25 0.25
+       vector 0.25 0.0 0.5 0.25
+       vector 0.5 0.0 0.75 0.25       
+      end
+     end
+
+     real 600.0
+    end
+
+   end
+  end
+
+
+  # push_cloud message  
+  pub
+   array
+    string push_cloud
+   end
+  end
+ end
+end

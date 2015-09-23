@@ -220,10 +220,12 @@ bool dsAppClient::OnIdleAppInit( void )
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /*
     m_procedural_rules = new DrawSpace::Procedural::RulesPackage( m_procedural_cb );
     m_procedural_rules->Run( "clouds.rules", " " );
 
     m_procedural_rules->GetRootParser()->GetRules()->Apply();
+    */
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -248,7 +250,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     /////////////////////////////////////////////////
 
-   
+   /*
     //// declare cloud
 
     Procedural::RandomDistribution<dsreal, std::uniform_real_distribution<dsreal>, Procedural::Real>* rand_cloudposx = 
@@ -622,6 +624,15 @@ bool dsAppClient::OnIdleAppInit( void )
     main_loop->SetNbLoops( nb_clouds );
 
     main_loop->Apply();
+    */
+
+    m_procedural_rules = new DrawSpace::Procedural::RulesPackage( m_clouds->GetProceduralCallback() );
+    m_procedural_rules->Run( "clouds2.rules", " " );
+
+    m_procedural_rules->GetRootParser()->GetRules()->Apply();
+
+
+
 
     /////////////////////////////////////////////////
     
