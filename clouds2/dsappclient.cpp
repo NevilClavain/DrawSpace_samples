@@ -23,7 +23,7 @@ dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_spe
 
     m_procedural_cb = _DRAWSPACE_NEW_( ProceduralCb, ProceduralCb( this, &dsAppClient::on_procedural ) );
 
-    Procedural::SeedsBase::GetInstance()->Initialize( 387766 );    
+    Procedural::SeedsBase::GetInstance()->Initialize( 90787 );    
 }
 
 dsAppClient::~dsAppClient( void )

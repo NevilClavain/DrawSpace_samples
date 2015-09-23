@@ -1,21 +1,21 @@
 batch
 
  repeat
-  random uniform integer 2 5
+  random uniform integer 2 5 45
   pub
    array
     integer 320
     vector 10 11 12 13.4
     string test_test
-    random uniform integer 1000 2000
-    random uniform real 5.1 6.0 
+    random uniform integer 1000 2000 46
+    random uniform real 5.1 6.0 47
    end
   end
  end
 
  pub
   index
-   random uniform integer 0 2
+   random uniform integer 0 2 48
    array
     string str1
     string str2
