@@ -13,8 +13,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "orbiters2", "orbiters2\orbi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "orbiters", "orbiters\orbiters.vcxproj", "{0B1674C4-9277-4125-A67E-58F66D75EFA9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "clouds", "clouds\clouds.vcxproj", "{8EE3148E-6586-48D3-B98C-BCC95C29A90D}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "clouds2", "clouds2\clouds2.vcxproj", "{1323EE9E-FBD3-4E08-B818-800485D187FB}"
 EndProject
 Global
@@ -43,10 +41,6 @@ Global
 		{0B1674C4-9277-4125-A67E-58F66D75EFA9}.Debug|Win32.Build.0 = Debug|Win32
 		{0B1674C4-9277-4125-A67E-58F66D75EFA9}.Release|Win32.ActiveCfg = Release|Win32
 		{0B1674C4-9277-4125-A67E-58F66D75EFA9}.Release|Win32.Build.0 = Release|Win32
-		{8EE3148E-6586-48D3-B98C-BCC95C29A90D}.Debug|Win32.ActiveCfg = Debug|Win32
-		{8EE3148E-6586-48D3-B98C-BCC95C29A90D}.Debug|Win32.Build.0 = Debug|Win32
-		{8EE3148E-6586-48D3-B98C-BCC95C29A90D}.Release|Win32.ActiveCfg = Release|Win32
-		{8EE3148E-6586-48D3-B98C-BCC95C29A90D}.Release|Win32.Build.0 = Release|Win32
 		{1323EE9E-FBD3-4E08-B818-800485D187FB}.Debug|Win32.ActiveCfg = Debug|Win32
 		{1323EE9E-FBD3-4E08-B818-800485D187FB}.Debug|Win32.Build.0 = Debug|Win32
 		{1323EE9E-FBD3-4E08-B818-800485D187FB}.Release|Win32.ActiveCfg = Release|Win32

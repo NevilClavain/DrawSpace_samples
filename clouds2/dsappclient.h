@@ -93,15 +93,11 @@ protected:
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_current_camera;
 
     
-    ProceduralCb*                                                       m_procedural_cb;
-
     DrawSpace::Procedural::RulesPackage*                                m_procedural_rules;
    
 
 
     dsAppClient( void );
-
-    void on_procedural( DrawSpace::Procedural::Atomic* p_atom );
 
 
 public:
