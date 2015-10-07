@@ -19,9 +19,7 @@ dsAppClient* dsAppClient::m_instance = NULL;
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_speed( 0.0 ), m_speed_speed( 5.0 ), m_current_camera( NULL ), m_selected_camera( 0 )
 {    
     _INIT_LOGGER( "logclouds.conf" )  
-    m_w_title = "clouds test";
-    
-    Procedural::SeedsBase::GetInstance()->Initialize( 170313 );    
+    m_w_title = "clouds test";           
 }
 
 dsAppClient::~dsAppClient( void )
@@ -233,6 +231,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     /////////////////////////////////////////////////
     m_procedural_rules = new DrawSpace::Procedural::RulesPackage( m_clouds->GetProceduralCallback() );
+
+    m_procedural_rules->InitializeSeedBase( 56645 );
     m_procedural_rules->Run( "clouds.rules", " " );
 
     m_procedural_rules->GetRootParser()->GetRules()->Apply();
