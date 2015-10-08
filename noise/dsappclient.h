@@ -21,7 +21,8 @@ protected:
     bool                                                                m_mouselb;
     bool                                                                m_mouserb;
 
-    
+    DrawSpace::Core::Texture*                                           m_perlinnoise_texture;
+    void*                                                               m_texture_content;
 
     dsAppClient( void );
 

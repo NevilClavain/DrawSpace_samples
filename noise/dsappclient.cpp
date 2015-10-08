@@ -29,6 +29,17 @@ void dsAppClient::OnRenderFrame( void )
 
     m_scenenodegraph.ComputeTransformations( m_timer );
 
+
+    unsigned char* color_ptr = (unsigned char*)m_texture_content;
+
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 255; color_ptr++;
+
+    m_perlinnoise_texture->UpdateTextureContent();
+
+
     m_finalpass->GetRenderingQueue()->Draw();
 
 
@@ -51,8 +62,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass->Initialize();
     m_finalpass->CreateViewportQuad();
     m_finalpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.vsh", false ) ) );
+    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.psh", false ) ) );
     m_finalpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
     m_finalpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
@@ -60,7 +71,11 @@ bool dsAppClient::OnIdleAppInit( void )
     //m_finalpass->GetViewportQuad()->SetTexture( m_fogblendpass->GetTargetTexture(), 0 );
         
 
-    
+    m_perlinnoise_texture = new Texture();
+    m_perlinnoise_texture->SetFormat( 256, 256, 4 );
+    m_perlinnoise_texture->SetPurpose( Texture::PURPOSE_COLOR );
+
+    m_finalpass->GetViewportQuad()->SetVertexTexture( m_perlinnoise_texture, 0 );
 
     /////////////////////////////////////////////////////////////////
 
@@ -70,6 +85,10 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
+
+    m_perlinnoise_texture->AllocTextureContent();
+    m_texture_content = m_perlinnoise_texture->GetTextureContentPtr();
+
 
 
     return true;
