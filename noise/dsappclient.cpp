@@ -29,13 +29,22 @@ void dsAppClient::OnRenderFrame( void )
 
     m_scenenodegraph.ComputeTransformations( m_timer );
 
-
+    /*
     unsigned char* color_ptr = (unsigned char*)m_texture_content;
 
     *color_ptr = 0; color_ptr++;
     *color_ptr = 128; color_ptr++;
     *color_ptr = 0; color_ptr++;
     *color_ptr = 255; color_ptr++;
+    
+    */
+
+    float* float_ptr = (float*)m_texture_content;
+    *float_ptr = 0.25f; float_ptr++;
+    *float_ptr = 0.5f; float_ptr++;
+    *float_ptr = 0.75f; float_ptr++;
+
+
 
     m_perlinnoise_texture->UpdateTextureContent();
 
@@ -73,7 +82,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_perlinnoise_texture = new Texture();
     m_perlinnoise_texture->SetFormat( 256, 256, 4 );
-    m_perlinnoise_texture->SetPurpose( Texture::PURPOSE_COLOR );
+    m_perlinnoise_texture->SetPurpose( Texture::PURPOSE_FLOAT );
 
     m_finalpass->GetViewportQuad()->SetVertexTexture( m_perlinnoise_texture, 0 );
 
