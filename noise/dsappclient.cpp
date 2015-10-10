@@ -40,9 +40,18 @@ void dsAppClient::OnRenderFrame( void )
     */
 
     float* float_ptr = (float*)m_texture_content;
+
+    for( int i = 0; i < 256 * 256; i++ )
+    {
+        *float_ptr = 0.0; float_ptr++;
+    }
+
+
+    float_ptr = (float*)m_texture_content;
+    
+    *float_ptr = 0.95f; float_ptr++;
     *float_ptr = 0.25f; float_ptr++;
-    *float_ptr = 0.5f; float_ptr++;
-    *float_ptr = 0.75f; float_ptr++;
+    *float_ptr = 0.25f; float_ptr++;
 
 
 
