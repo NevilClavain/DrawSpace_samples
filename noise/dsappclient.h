@@ -21,8 +21,14 @@ protected:
     bool                                                                m_mouselb;
     bool                                                                m_mouserb;
 
-    DrawSpace::Core::Texture*                                           m_perlinnoise_texture;
-    void*                                                               m_texture_content;
+    void*                                                               m_pnbufftexture_content;
+    void*                                                               m_pnmaptexture_content;
+
+    DrawSpace::Core::Texture*                                           m_perlinnoisebuffer_texture;
+    DrawSpace::Core::Texture*                                           m_perlinnoisemap_texture;
+
+    DrawSpace::Utils::CFractal*                                         m_fractal;
+
 
     dsAppClient( void );
 

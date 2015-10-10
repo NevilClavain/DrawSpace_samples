@@ -29,33 +29,7 @@ void dsAppClient::OnRenderFrame( void )
 
     m_scenenodegraph.ComputeTransformations( m_timer );
 
-    /*
-    unsigned char* color_ptr = (unsigned char*)m_texture_content;
 
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 255; color_ptr++;
-    
-    */
-
-    float* float_ptr = (float*)m_texture_content;
-
-    for( int i = 0; i < 256 * 256; i++ )
-    {
-        *float_ptr = 0.0; float_ptr++;
-    }
-
-
-    float_ptr = (float*)m_texture_content;
-    
-    *float_ptr = 0.95f; float_ptr++;
-    *float_ptr = 0.25f; float_ptr++;
-    *float_ptr = 0.25f; float_ptr++;
-
-
-
-    m_perlinnoise_texture->UpdateTextureContent();
 
 
     m_finalpass->GetRenderingQueue()->Draw();
@@ -86,14 +60,22 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    //m_finalpass->GetViewportQuad()->SetTexture( m_fogblendpass->GetTargetTexture(), 0 );
-        
+       
 
-    m_perlinnoise_texture = new Texture();
-    m_perlinnoise_texture->SetFormat( 256, 256, 4 );
-    m_perlinnoise_texture->SetPurpose( Texture::PURPOSE_FLOAT );
 
-    m_finalpass->GetViewportQuad()->SetVertexTexture( m_perlinnoise_texture, 0 );
+    m_perlinnoisebuffer_texture = new Texture();
+    m_perlinnoisebuffer_texture->SetFormat( 3, 256, 4 );
+    m_perlinnoisebuffer_texture->SetPurpose( Texture::PURPOSE_FLOAT );
+
+
+    m_perlinnoisemap_texture = new Texture();
+    m_perlinnoisemap_texture->SetFormat( 256, 1, 4 );
+    m_perlinnoisemap_texture->SetPurpose( Texture::PURPOSE_COLOR );
+
+
+    m_finalpass->GetViewportQuad()->SetVertexTexture( m_perlinnoisebuffer_texture, 0 );
+    m_finalpass->GetViewportQuad()->SetVertexTexture( m_perlinnoisemap_texture, 1 );
+
 
     /////////////////////////////////////////////////////////////////
 
@@ -101,12 +83,33 @@ bool dsAppClient::OnIdleAppInit( void )
     m_mouse_circularmode = true;
 
 
-
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
 
-    m_perlinnoise_texture->AllocTextureContent();
-    m_texture_content = m_perlinnoise_texture->GetTextureContentPtr();
+    m_perlinnoisebuffer_texture->AllocTextureContent();
+    m_pnbufftexture_content = m_perlinnoisebuffer_texture->GetTextureContentPtr();
 
+
+    m_perlinnoisemap_texture->AllocTextureContent();
+    m_pnmaptexture_content = m_perlinnoisemap_texture->GetTextureContentPtr();
+
+    m_fractal = new CFractal( 3, 66543, 0.5, 2.0 );
+    
+    unsigned char* color_ptr = (unsigned char*)m_pnmaptexture_content;
+    
+    *color_ptr = 0; color_ptr++; // B
+    *color_ptr = 255; color_ptr++;  // G
+    *color_ptr = 255; color_ptr++;  // R 
+    *color_ptr = 0; color_ptr++; // A
+    
+    m_perlinnoisemap_texture->UpdateTextureContent();
+
+    float* float_ptr = (float*)m_pnbufftexture_content;
+
+    *float_ptr = 0.09f; float_ptr++;
+    *float_ptr = 0.9f; float_ptr++;
+    *float_ptr = 0.9f; float_ptr++;
+
+    m_perlinnoisebuffer_texture->UpdateTextureContent();
 
 
     return true;
