@@ -95,22 +95,39 @@ bool dsAppClient::OnIdleAppInit( void )
     m_fractal = new CFractal( 3, 66543, 0.5, 2.0 );
     
     unsigned char* color_ptr = (unsigned char*)m_pnmaptexture_content;
-    
+    float* float_ptr = (float*)m_pnbufftexture_content;
+
+
+    for( long i = 0; i < 256; i++ )
+    {
+        for(long j = 0; j < 3; j++ )
+        {
+            *float_ptr = m_fractal->GetNBuffer( i, j ); float_ptr++;
+        }
+    }
+
+    for( long i = 0; i < 256; i++ )
+    {
+        *color_ptr = m_fractal->GetNMap( i ); color_ptr += 4;
+    }
+
+
+    /*
     *color_ptr = 0; color_ptr++; // B
     *color_ptr = 255; color_ptr++;  // G
     *color_ptr = 255; color_ptr++;  // R 
     *color_ptr = 0; color_ptr++; // A
     
-    m_perlinnoisemap_texture->UpdateTextureContent();
 
-    float* float_ptr = (float*)m_pnbufftexture_content;
 
     *float_ptr = 0.09f; float_ptr++;
     *float_ptr = 0.9f; float_ptr++;
     *float_ptr = 0.9f; float_ptr++;
+    */
 
+
+    m_perlinnoisemap_texture->UpdateTextureContent();
     m_perlinnoisebuffer_texture->UpdateTextureContent();
-
 
     return true;
 }
