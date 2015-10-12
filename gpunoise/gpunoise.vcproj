@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="noise"
+	Name="gpunoise"
 	ProjectGUID="{94E6FE01-3A30-47BD-8AF3-4619DFF0F28D}"
-	RootNamespace="noise"
+	RootNamespace="gpunoise"
 	Keyword="Win32Proj"
 	>
 	<Platforms>

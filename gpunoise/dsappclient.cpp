@@ -12,8 +12,8 @@ dsAppClient* dsAppClient::m_instance = NULL;
 
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false )
 {    
-    _INIT_LOGGER( "lognoise.conf" )  
-    m_w_title = "noise test";
+    _INIT_LOGGER( "loggpunoise.conf" )  
+    m_w_title = "gpu perlin noise test";
 }
 
 dsAppClient::~dsAppClient( void )

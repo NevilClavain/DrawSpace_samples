@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FFA37F08-ED2A-408B-AB85-43702DB97303}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>noise</RootNamespace>
+    <RootNamespace>gpunoise</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

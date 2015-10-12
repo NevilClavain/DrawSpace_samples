@@ -15,7 +15,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "orbiters", "orbiters\orbite
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "clouds2", "clouds2\clouds2.vcxproj", "{1323EE9E-FBD3-4E08-B818-800485D187FB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "noise", "noise\noise.vcxproj", "{FFA37F08-ED2A-408B-AB85-43702DB97303}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gpunoise", "gpunoise\gpunoise.vcxproj", "{FFA37F08-ED2A-408B-AB85-43702DB97303}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
