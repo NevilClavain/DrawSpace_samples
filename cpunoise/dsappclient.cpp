@@ -81,7 +81,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_output_texture->AllocTextureContent();
     m_outputtexture_content = m_output_texture->GetTextureContentPtr();
 
-    m_fractal = new CFractal( 3, 87699, 0.5, 2.0 );
+    m_fractal = new Fractal( 3, 290001, 0.65, 1.29 );
     
     unsigned char* color_ptr = (unsigned char*)m_outputtexture_content;
 
@@ -100,18 +100,34 @@ bool dsAppClient::OnIdleAppInit( void )
         for( int x = 0; x < OUTPUT_TEXTURE_SIZE; x++ )
         {
             double f_array[3];
+            unsigned char color;
 
-            f_array[0] = ( (double)x / OUTPUT_TEXTURE_SIZE ) * 16.0; 
-            f_array[1] = ( (double)y / OUTPUT_TEXTURE_SIZE ) * 16.0;
+            f_array[0] = ( (double)x / OUTPUT_TEXTURE_SIZE ) * 4.0; 
+            f_array[1] = ( (double)y / OUTPUT_TEXTURE_SIZE ) * 4.0;
             f_array[2] = 1.0;
 
-            double res = m_fractal->Noise( f_array );          
-            unsigned char color = 255.0 * ( ( res * 0.5 ) + 0.5 );
+            //double res = m_fractal->GetNoise( f_array );
 
-            *color_ptr = color; color_ptr++;
-            *color_ptr = color; color_ptr++;
-            *color_ptr = color; color_ptr++;
-            *color_ptr = color; color_ptr++;
+            double res = m_fractal->fBm( f_array, 15.0 );
+
+            if( res >= 0.2 )
+            {
+                color = 255.0 * ( ( res * 0.5 ) + 0.5 );
+                *color_ptr = color; color_ptr++;
+                *color_ptr = color; color_ptr++;
+                *color_ptr = color; color_ptr++;
+                *color_ptr = color; color_ptr++;
+
+            }
+            
+            else
+            {
+                *color_ptr = 100; color_ptr++;
+                *color_ptr = 0; color_ptr++;
+                *color_ptr = 0; color_ptr++;
+                *color_ptr = 0; color_ptr++;                
+            }
+            
         }    
     }
 

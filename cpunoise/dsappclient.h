@@ -4,7 +4,7 @@
 
 #include <dsapp.h>
 
-#define OUTPUT_TEXTURE_SIZE 1024
+#define OUTPUT_TEXTURE_SIZE 512
 
 class dsAppClient : public DrawSpace::App
 {
@@ -26,7 +26,7 @@ protected:
     DrawSpace::Core::Texture*                                           m_output_texture;
     void*                                                               m_outputtexture_content;
 
-    DrawSpace::Utils::CFractal*                                         m_fractal;
+    DrawSpace::Utils::Fractal*                                          m_fractal;
 
 
     dsAppClient( void );

@@ -65,8 +65,7 @@ bool dsAppClient::OnIdleAppInit( void )
        
 
 
-    m_perlinnoisebuffer_texture = new Texture();
-    //m_perlinnoisebuffer_texture->SetFormat( 3, 256, 4 );
+    m_perlinnoisebuffer_texture = new Texture();    
     m_perlinnoisebuffer_texture->SetFormat( 256, 3, 4 );
     m_perlinnoisebuffer_texture->SetPurpose( Texture::PURPOSE_FLOAT );
 
@@ -75,6 +74,12 @@ bool dsAppClient::OnIdleAppInit( void )
     m_perlinnoisemap_texture->SetFormat( 256, 1, 4 );
     m_perlinnoisemap_texture->SetPurpose( Texture::PURPOSE_COLOR );
 
+
+    m_fbmexp_texture = new Texture();    
+    m_fbmexp_texture->SetFormat( Fractal::MaxOctaves, 1, 4 );
+    m_fbmexp_texture->SetPurpose( Texture::PURPOSE_FLOAT );
+
+
     /*
     m_finalpass->GetViewportQuad()->SetVertexTexture( m_perlinnoisebuffer_texture, 0 );
     m_finalpass->GetViewportQuad()->SetVertexTexture( m_perlinnoisemap_texture, 1 );
@@ -82,9 +87,16 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_finalpass->GetViewportQuad()->SetTexture( m_perlinnoisebuffer_texture, 0 );
     m_finalpass->GetViewportQuad()->SetTexture( m_perlinnoisemap_texture, 1 );
+    m_finalpass->GetViewportQuad()->SetTexture( m_fbmexp_texture, 2 );
 
 
     /////////////////////////////////////////////////////////////////
+
+    m_fractal = new Fractal( 3, 290001, 0.65, 1.29 );
+
+    m_finalpass->GetViewportQuad()->AddShaderParameter( 1, "lacunarity", 0 );
+    m_finalpass->GetViewportQuad()->SetShaderRealVector( "lacunarity", Vector( m_fractal->GetLacunarity(), 0.0, 0.0, 0.0 ) );
+
 
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
@@ -92,11 +104,11 @@ bool dsAppClient::OnIdleAppInit( void )
     m_perlinnoisebuffer_texture->AllocTextureContent();
     m_pnbufftexture_content = m_perlinnoisebuffer_texture->GetTextureContentPtr();
 
-
     m_perlinnoisemap_texture->AllocTextureContent();
     m_pnmaptexture_content = m_perlinnoisemap_texture->GetTextureContentPtr();
 
-    m_fractal = new CFractal( 3, 87699, 0.5, 2.0 );
+    m_fbmexp_texture->AllocTextureContent();
+    m_fbmexptexture_content = m_fbmexp_texture->GetTextureContentPtr();
     
     unsigned char* color_ptr = (unsigned char*)m_pnmaptexture_content;
     float* float_ptr = (float*)m_pnbufftexture_content;
@@ -119,8 +131,18 @@ bool dsAppClient::OnIdleAppInit( void )
         *color_ptr = m_fractal->GetNMap( i ); color_ptr++;
     }
 
+
+    float_ptr = (float*)m_fbmexptexture_content;
+
+    for( long i = 0; i < Fractal::MaxOctaves; i++ )
+    {
+        float temp = m_fractal->GetExponent( i );
+        *float_ptr = temp; float_ptr++;
+    }
+
     m_perlinnoisemap_texture->UpdateTextureContent();
     m_perlinnoisebuffer_texture->UpdateTextureContent();
+    m_fbmexp_texture->UpdateTextureContent();
     
     return true;
 }
