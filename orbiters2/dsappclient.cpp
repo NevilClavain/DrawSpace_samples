@@ -1128,12 +1128,17 @@ bool dsAppClient::OnIdleAppInit( void )
         m_planet->GetNodeFromPass( m_texturepass, i )->GetFx()->GetShader( 0 )->LoadFromFile();
         m_planet->GetNodeFromPass( m_texturepass, i )->GetFx()->GetShader( 1 )->LoadFromFile();
 
+        /*
         m_planet->GetNodeFromPass( m_texturepass, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
         m_planet->GetNodeFromPass( m_texturepass, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
         m_planet->GetNodeFromPass( m_texturepass, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
         m_planet->GetNodeFromPass( m_texturepass, i )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
         m_planet->GetNodeFromPass( m_texturepass, i )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
         m_planet->GetNodeFromPass( m_texturepass, i )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+        */
+
+        m_planet->GetNodeFromPass( m_texturepass, i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mapcolor.bmp" ) ), 0 );
+        m_planet->GetNodeFromPass( m_texturepass, i )->GetTexture( 0 )->LoadFromFile();
     }
     
 
@@ -1188,12 +1193,17 @@ bool dsAppClient::OnIdleAppInit( void )
         m_moon->GetNodeFromPass( m_texturepass, i )->GetFx()->GetShader( 0 )->LoadFromFile();
         m_moon->GetNodeFromPass( m_texturepass, i )->GetFx()->GetShader( 1 )->LoadFromFile();
 
+        /*
         m_moon->GetNodeFromPass( m_texturepass, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
         m_moon->GetNodeFromPass( m_texturepass, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
         m_moon->GetNodeFromPass( m_texturepass, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
         m_moon->GetNodeFromPass( m_texturepass, i )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
         m_moon->GetNodeFromPass( m_texturepass, i )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
         m_moon->GetNodeFromPass( m_texturepass, i )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+        */
+
+        m_moon->GetNodeFromPass( m_texturepass, i )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "mapcolor.bmp" ) ), 0 );
+        m_planet->GetNodeFromPass( m_texturepass, i )->GetTexture( 0 )->LoadFromFile();
     }
     
 
