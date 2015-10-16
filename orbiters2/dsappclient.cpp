@@ -1137,10 +1137,10 @@ bool dsAppClient::OnIdleAppInit( void )
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
         m_planet->AddShader( m_texturepass, i, planet_vshader );
-        m_planet->AddShader( m_texturepass, i, planet_pshader );
-
-        m_planet->BindExternalGlobalTexture( texture_planet, m_texturepass, i );
+        m_planet->AddShader( m_texturepass, i, planet_pshader );        
     }
+
+    m_planet->CreateProceduralGlobalTextures( m_texturepass, 128 );
     
 
     m_planet->SetOrbitDuration( 0.333 );
@@ -1673,6 +1673,8 @@ bool dsAppClient::OnIdleAppInit( void )
     //m_finalpass_hyperspace->GetRenderingQueue()->UpdateOutputQueue();
     //m_texturepass_hyperspace->GetRenderingQueue()->UpdateOutputQueue();
 
+
+    m_planet->InitProceduralGlobalTextures();
 
     
     m_freemove.Init( DrawSpace::Utils::Vector( 265000000.0, 0.0, 50.0, 1.0 ) );
