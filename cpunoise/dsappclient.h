@@ -4,7 +4,7 @@
 
 #include <dsapp.h>
 
-#define OUTPUT_TEXTURE_SIZE 512
+
 
 class dsAppClient : public DrawSpace::App
 {

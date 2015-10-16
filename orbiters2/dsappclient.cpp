@@ -1129,7 +1129,12 @@ bool dsAppClient::OnIdleAppInit( void )
     
     for( long i = 0; i < 6; i++ )
     {
-        m_planet->CreateFx( m_texturepass, i );
+        Fx* fx = m_planet->CreateFx( m_texturepass, i );
+
+        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+        fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+        fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
         m_planet->AddShader( m_texturepass, i, planet_vshader );
         m_planet->AddShader( m_texturepass, i, planet_pshader );
@@ -1182,7 +1187,12 @@ bool dsAppClient::OnIdleAppInit( void )
     
     for( long i = 0; i < 6; i++ )
     {
-        m_moon->CreateFx( m_texturepass, i );
+        Fx* fx = m_moon->CreateFx( m_texturepass, i );
+
+        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+        fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+        fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
         m_moon->AddShader( m_texturepass, i, planet_vshader );
         m_moon->AddShader( m_texturepass, i, planet_pshader );
