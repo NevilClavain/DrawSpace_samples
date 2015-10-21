@@ -1119,7 +1119,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_planet->RegisterPassSlot( m_texturepass );
 
-    Texture* texture_planet = _DRAWSPACE_NEW_( Texture, Texture( "mapcolor.bmp" ) );
+    Texture* texture_planet = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
     texture_planet->LoadFromFile();
 
     Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.vsh", false ) );
@@ -1137,7 +1137,9 @@ bool dsAppClient::OnIdleAppInit( void )
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
         m_planet->AddShader( m_texturepass, i, planet_vshader );
-        m_planet->AddShader( m_texturepass, i, planet_pshader );        
+        m_planet->AddShader( m_texturepass, i, planet_pshader ); 
+
+        //m_planet->BindExternalGlobalTexture( texture_planet, m_texturepass, i );
     }
 
     m_planet->CreateProceduralGlobalTextures( m_texturepass, 128 );
