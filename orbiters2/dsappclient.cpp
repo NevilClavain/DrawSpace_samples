@@ -1131,10 +1131,12 @@ bool dsAppClient::OnIdleAppInit( void )
     {
         Fx* fx = m_planet->CreateFx( m_texturepass, i );
 
+        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
         fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+        fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
 
         m_planet->AddShader( m_texturepass, i, planet_vshader );
         m_planet->AddShader( m_texturepass, i, planet_pshader ); 
@@ -1142,7 +1144,7 @@ bool dsAppClient::OnIdleAppInit( void )
         //m_planet->BindExternalGlobalTexture( texture_planet, m_texturepass, i );
     }
 
-    m_planet->CreateProceduralGlobalTextures( m_texturepass, 128 );
+    m_planet->CreateProceduralGlobalTextures( m_texturepass, 64 );
     
 
     m_planet->SetOrbitDuration( 0.333 );

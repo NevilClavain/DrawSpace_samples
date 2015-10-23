@@ -1,0 +1,943 @@
+
+#include "dsappclient.h"
+
+
+
+using namespace DrawSpace;
+using namespace DrawSpace::Interface;
+using namespace DrawSpace::Core;
+using namespace DrawSpace::Gui;
+using namespace DrawSpace::Utils;
+using namespace DrawSpace::Dynamics;
+
+
+dsAppClient* dsAppClient::m_instance = NULL;
+
+
+_DECLARE_DS_LOGGER( logger, "AppClient", DrawSpace::Logger::Configuration::GetInstance() )
+
+
+#define SHIP_MASS 50.0
+
+
+#define HYPERSPACE_SCALE_Z             4000.0
+#define HYPERSPACE_SCALE_XY            200.0
+
+#define HYPERSPACE_LAYER2_SCALE_Z      12000.0
+#define HYPERSPACE_LAYER2_SCALE_XY     600.0
+
+#define HYPERSPACE_1_ROTZINIT           0.0
+#define HYPERSPACE_2_ROTZINIT           90.0
+
+#define HYPERSPACE_LAYER2_1_ROTZINIT    33.0
+#define HYPERSPACE_LAYER2_2_ROTZINIT    124.0
+
+#define HYPERSPACE_TRANSLATION_SPEED    7000.0
+
+#define HYPERSPACE_1_ROTZ_SPEED         30.0
+#define HYPERSPACE_2_ROTZ_SPEED         35.0
+
+#define HYPERSPACE_LAYER2_1_ROTZ_SPEED  45.0
+#define HYPERSPACE_LAYER2_2_ROTZ_SPEED  50.0
+
+#define HYPERSPACE_TRANSITION_SPEED     70000.0
+
+#define HYPERSPACE_ACCELERATION_MAX_SPEED 50000000.0
+
+#define HYPERSPACE_TRANSITION_INIT_Z    -350000.0
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+dsAppClient::dsAppClient( void ) : 
+m_mouselb( false ), 
+m_mouserb( false ), 
+m_speed( 0.0 ), 
+m_speed_speed( 5.0 ),
+m_curr_camera( NULL )
+{    
+    _INIT_LOGGER( "logorbiters3.conf" )  
+    m_w_title = "orbiters 3 test";
+    m_mouseleftbuttondown_eventhandler = _DRAWSPACE_NEW_( WidgetEventHandler, WidgetEventHandler( this, &dsAppClient::on_mouseleftbuttondown ) );
+}
+
+dsAppClient::~dsAppClient( void )
+{
+
+}
+
+
+#define SPEED     1.5
+
+
+void dsAppClient::OnRenderFrame( void )
+{
+    
+
+    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
+
+    m_scenenodegraph.ComputeTransformations( m_timer );
+
+    m_text_widget->SetVirtualTranslation( 100, 75 );
+    m_text_widget_2->SetVirtualTranslation( -60, 160 );
+
+    char distance[64];
+    sprintf( distance, "%.3f km", m_reticle_widget->GetLastDistance() / 1000.0 );
+
+    m_text_widget_2->SetText( -40, 0, 30, dsstring( distance ), DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
+    m_reticle_widget->Transform();
+    m_reticle_widget->Draw();
+    
+
+    //////////////////////////////////////////////////////////////
+
+
+   
+
+    m_texturepass->GetRenderingQueue()->Draw();
+
+    m_text_widget->Draw();
+
+    m_finalpass->GetRenderingQueue()->Draw();
+
+
+    long current_fps = m_timer.GetFPS();
+    renderer->DrawText( 0, 255, 0, 10, 35, "%d", current_fps );
+
+    dsstring date;
+    m_calendar->GetFormatedDate( date );    
+    renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
+
+    
+
+
+    dsreal speed = m_ship->GetLinearSpeedMagnitude();
+
+    renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h ( %.1f m/s) - aspeed = %.1f", speed * 3.6, speed, m_ship->GetAngularSpeedMagnitude() );
+
+  
+    renderer->FlipScreen();
+
+    m_calendar->Run();
+
+    }
+
+
+bool dsAppClient::OnIdleAppInit( void )
+{
+    DrawSpace::Dynamics::Body::Parameters cube_params;
+
+    World::m_scale = 1.0;
+    DrawSpace::SphericalLOD::Body::BuildMeshe();
+
+
+    RegisterMouseInputEventsProvider( &m_mouse_input );
+
+
+    bool status;
+
+     m_meshe_import = new DrawSpace::Utils::AC3DMesheImport();
+    /////////////////////////////////////
+
+
+    m_font_import = new DrawSpace::Utils::CBFGFontImport();
+    m_font = _DRAWSPACE_NEW_( Font, Font );
+    m_font->SetImporter( m_font_import );
+
+    status = m_font->Build( "mangalfont.bmp", "mangalfont.csv" );
+    if( !status )
+    {
+        return false;
+    }
+
+
+    /////////////////////////////////////    
+
+    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
+    renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+
+    m_texturepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
+    m_texturepass->Initialize();
+
+    m_texturepass->GetRenderingQueue()->EnableDepthClearing( true );
+    m_texturepass->GetRenderingQueue()->EnableTargetClearing( /*false*/ true );
+    m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 255 );
+    
+
+
+    //////////////////////////////////////////////////////////////
+
+    m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
+    m_finalpass->Initialize();
+    m_finalpass->CreateViewportQuad();
+
+    m_finalpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) ) ;
+    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_finalpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_finalpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+    
+
+    m_finalpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
+
+
+
+    //////////////////////////////////////////////////////////////
+
+
+    m_spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
+    m_spacebox->RegisterPassSlot( m_texturepass );
+    
+
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, m_texturepass );
+
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::FrontQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_front5.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::FrontQuad )->GetTexture( 0 )->LoadFromFile();
+
+
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::RearQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_back6.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::RearQuad )->GetTexture( 0 )->LoadFromFile();
+
+
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::TopQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_top3.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::TopQuad )->GetTexture( 0 )->LoadFromFile();
+
+
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::BottomQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_bottom4.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::BottomQuad )->GetTexture( 0 )->LoadFromFile();
+
+
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::LeftQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_left2.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::LeftQuad )->GetTexture( 0 )->LoadFromFile();
+
+
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::RightQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "spacebox_right1.png" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::RightQuad )->GetTexture( 0 )->LoadFromFile();
+
+
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::FrontQuad )->SetOrderNumber( 90 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::RearQuad )->SetOrderNumber( 90 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::TopQuad )->SetOrderNumber( 90 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::BottomQuad )->SetOrderNumber( 90 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::LeftQuad )->SetOrderNumber( 90 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::RightQuad )->SetOrderNumber( 90 );
+
+    
+
+    m_spacebox_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Spacebox>, SceneNode<DrawSpace::Spacebox>( "spacebox" ) );
+    m_spacebox_node->SetContent( m_spacebox );
+
+    m_scenenodegraph.RegisterNode( m_spacebox_node );
+
+
+    m_spacebox_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "spacebox_transfo" ) );
+    m_spacebox_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+    Matrix spacebox_scale;
+    spacebox_scale.Scale( 20.0, 20.0, 20.0 );
+    m_spacebox_transfo_node->GetContent()->PushMatrix( spacebox_scale );
+
+    m_scenenodegraph.AddNode( m_spacebox_transfo_node );
+    m_scenenodegraph.RegisterNode( m_spacebox_transfo_node );
+    m_spacebox_node->LinkTo( m_spacebox_transfo_node );
+
+   
+    //////////////////////////////////////////////////////////////
+
+
+    m_world.Initialize();
+    
+       
+    ///////////////////////////////////////////////////////////////
+
+
+    
+    m_building = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+
+    m_building->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
+    m_building->RegisterPassSlot( m_texturepass );
+    
+    m_building->GetMeshe()->SetImporter( m_meshe_import );
+
+    m_building->GetMeshe()->LoadFromFile( "building3.ac", 0 );  
+
+
+
+    m_building->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_building->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_building->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_building->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_building->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_building->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_building->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_building->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_building->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    m_building->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "building3.bmp" ) ), 0 );
+    m_building->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+
+
+    m_building_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "building" ) );
+    m_building_node->SetContent( m_building );
+
+
+    m_scenenodegraph.RegisterNode( m_building_node );
+  
+    
+    DrawSpace::Dynamics::Body::Parameters bld_params;
+    bld_params.mass = 0.0;
+    bld_params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
+    bld_params.shape_descr.meshe = *( m_building->GetMeshe() );
+   
+    m_building_collider = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Collider, DrawSpace::Dynamics::Collider );
+
+    m_building_collider->SetKinematic( bld_params );
+
+
+
+    m_building_collider_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::Collider>, SceneNode<DrawSpace::Dynamics::Collider>( "building_collider" ) );
+    m_building_collider_node->SetContent( m_building_collider );
+
+    m_scenenodegraph.RegisterNode( m_building_collider_node );
+
+    m_building_node->LinkTo( m_building_collider_node );
+
+
+
+    m_longlat_mvt3 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    m_longlat_mvt3->Init( -21.0000, 20.0089, 400114.0, 80.0, 0.0 );
+
+    m_longlatmvt3_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LongLatMovement>, SceneNode<DrawSpace::Core::LongLatMovement>( "longlatmvt3_node" ) );
+    m_longlatmvt3_node->SetContent( m_longlat_mvt3 );
+
+    m_scenenodegraph.RegisterNode( m_longlatmvt3_node );
+
+    m_building_collider_node->LinkTo( m_longlatmvt3_node );
+    
+    
+
+    ///////////////////////////////////////////////////////////////
+
+
+    m_socle = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+
+    m_socle->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
+    m_socle->RegisterPassSlot( m_texturepass );
+
+
+    
+    m_socle->GetMeshe()->SetImporter( m_meshe_import );
+
+    m_socle->GetMeshe()->LoadFromFile( "socle.ac", 0 );  
+
+
+
+    m_socle->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_socle->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_socle->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_socle->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_socle->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_socle->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_socle->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_socle->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_socle->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    m_socle->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "socle.bmp" ) ), 0 );
+
+    m_socle->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+
+
+    m_socle_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "socle" ) );
+    m_socle_node->SetContent( m_socle );
+
+
+    m_scenenodegraph.RegisterNode( m_socle_node );
+
+    
+  
+    
+    DrawSpace::Dynamics::Body::Parameters socle_params;
+    socle_params.mass = 0.0;
+    socle_params.shape_descr.shape = DrawSpace::Dynamics::Body::MESHE_SHAPE;
+    socle_params.shape_descr.meshe = *( m_socle->GetMeshe() );
+
+
+   
+    m_socle_collider = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Collider, DrawSpace::Dynamics::Collider );
+
+    m_socle_collider->SetKinematic( socle_params );
+
+
+    m_socle_collider_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::Collider>, SceneNode<DrawSpace::Dynamics::Collider>( "socle_collider" ) );
+    m_socle_collider_node->SetContent( m_socle_collider );
+
+    m_scenenodegraph.RegisterNode( m_socle_collider_node );
+
+    m_socle_node->LinkTo( m_socle_collider_node );
+
+
+
+    m_longlat_mvt4 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    m_longlat_mvt4->Init( -21.0929, 20.0000, 400129.0, 40.0, 0.0 );
+
+
+
+    m_longlatmvt4_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LongLatMovement>, SceneNode<DrawSpace::Core::LongLatMovement>( "longlatmvt4_node" ) );
+    m_longlatmvt4_node->SetContent( m_longlat_mvt4 );
+
+    m_scenenodegraph.RegisterNode( m_longlatmvt4_node );
+
+    m_socle_collider_node->LinkTo( m_longlatmvt4_node );
+
+
+
+    ///////////////////////////////////////////////////////////////
+
+
+
+
+    
+    m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", 400.0 ) );
+
+    m_planet->RegisterPassSlot( m_texturepass );
+
+    Texture* texture_planet = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
+    texture_planet->LoadFromFile();
+
+    Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.vsh", false ) );
+    Shader* planet_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.psh", false ) );
+    planet_vshader->LoadFromFile();
+    planet_pshader->LoadFromFile();
+    
+    for( long i = 0; i < 6; i++ )
+    {
+        Fx* fx = m_planet->CreateFx( m_texturepass, i );
+
+        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
+        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+        fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+        fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+        fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+
+        m_planet->AddShader( m_texturepass, i, planet_vshader );
+        m_planet->AddShader( m_texturepass, i, planet_pshader ); 
+
+        //m_planet->BindExternalGlobalTexture( texture_planet, m_texturepass, i );
+    }
+
+    m_planet->CreateProceduralGlobalTextures( m_texturepass, 64 );
+    
+
+    m_planet->SetOrbitDuration( 0.333 );
+    m_planet->SetRevolutionTiltAngle( 25.0 );
+    m_planet->SetRevolutionDuration( 1.0 );
+
+
+    m_planet_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Planetoid::Body>, SceneNode<DrawSpace::Planetoid::Body>( "planet01" ) );
+    m_planet_node->SetContent( m_planet );
+
+    m_scenenodegraph.RegisterNode( m_planet_node );
+
+    
+    m_longlatmvt3_node->LinkTo( m_planet_node );
+    m_longlatmvt4_node->LinkTo( m_planet_node );
+
+
+    m_planet_orbit = _DRAWSPACE_NEW_( Orbit, Orbit( 270000000.0, 0.99, 0.0, 0.0, 0.0, 0.0, 0.333, 25.0, 1.0, NULL ) );
+    m_planet_orbit_node = _DRAWSPACE_NEW_( SceneNode<Orbit>, SceneNode<Orbit>( "planet01_orbit" ) );
+    m_planet_orbit_node->SetContent( m_planet_orbit );
+
+    m_scenenodegraph.AddNode( m_planet_orbit_node );
+    m_scenenodegraph.RegisterNode( m_planet_orbit_node );
+
+
+    m_planet_node->LinkTo( m_planet_orbit_node );
+
+    
+
+
+    m_building_collider->SetReferentOrbiter( m_planet );
+    m_socle_collider->SetReferentOrbiter( m_planet );
+
+
+    //////////////////////////////////////////////////////////////
+
+
+    m_ship_drawable = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+
+    m_ship_drawable->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
+    m_ship_drawable->RegisterPassSlot( m_texturepass );
+
+    
+    m_ship_drawable->GetMeshe()->SetImporter( m_meshe_import );
+
+    m_ship_drawable->GetMeshe()->LoadFromFile( "survey.ac", 0 );    
+
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "surveyship_color.jpg" ) ), 0 );
+
+
+
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+
+    
+
+    m_ship_drawable_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "rocket" ) );
+    m_ship_drawable_node->SetContent( m_ship_drawable );
+    
+
+    m_scenenodegraph.RegisterNode( m_ship_drawable_node );
+
+
+
+    cube_params.mass = SHIP_MASS;
+    cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
+    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285 / 2.0, 21.4704 / 2.0, 81.911 / 2.0, 1.0 );
+    
+    //cube_params.initial_attitude.Translation( 265000000.0, 0.0, 0.0 );
+    cube_params.initial_attitude.Translation( 269000000.0, 0.0, 9000000.0 );
+
+    m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, cube_params ) );
+   
+    m_ship_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::Rocket>, SceneNode<DrawSpace::Dynamics::Rocket>( "rocket_body" ) );
+    m_ship_node->SetContent( m_ship );
+
+    m_scenenodegraph.AddNode( m_ship_node );
+    m_scenenodegraph.RegisterNode( m_ship_node );
+
+    m_ship_drawable_node->LinkTo( m_ship_node );
+
+    //////////////////////////////////////////////////////////////
+
+
+   
+
+    m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
+    //m_camera3->LockOnBody( "ship", m_ship );
+    m_camera3->Lock( m_ship_node );
+    m_camera3->SetReferentBody( m_ship );
+    
+    m_camera3_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera3" ) );
+    m_camera3_node->SetContent( m_camera3 );
+    m_scenenodegraph.RegisterNode( m_camera3_node );
+
+
+    m_circular_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
+    m_circular_mvt->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 385.0, 90.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
+
+    m_circmvt_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::CircularMovement>, SceneNode<DrawSpace::Core::CircularMovement>( "circmvt" ) );
+
+
+    m_circmvt_node->SetContent( m_circular_mvt );
+    m_scenenodegraph.RegisterNode( m_circmvt_node );
+
+    m_camera3_node->LinkTo( m_circmvt_node );
+
+
+    m_circmvt_node->LinkTo( m_ship_node );
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////
+
+
+    m_reticle_widget = _DRAWSPACE_NEW_( ReticleWidget, ReticleWidget( "reticle_widget", (long)10, (long)10, &m_scenenodegraph, NULL ) );
+    
+
+
+    
+    m_text_widget = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget", DRAWSPACE_GUI_WIDTH, DRAWSPACE_GUI_HEIGHT, m_font, true, m_reticle_widget ) );
+
+
+    m_text_widget->GetBackgroundImage()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_text_widget->GetBackgroundImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_text_widget->GetBackgroundImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+
+
+    m_text_widget->GetBackgroundImage()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget->GetBackgroundImage()->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_text_widget->GetBackgroundImage()->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "reticle.bmp" ) ), 0 );
+    m_text_widget->GetBackgroundImage()->GetTexture( 0 )->LoadFromFile();
+
+
+    m_text_widget->GetImage()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );  
+    m_text_widget->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_text_widget->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+
+    m_text_widget->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_text_widget->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add"  ) );
+    m_text_widget->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always"  ) );
+    m_text_widget->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one"  ) );
+    m_text_widget->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha"  ) );
+    m_text_widget->GetImage()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+
+    m_text_widget->GetImage()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget->GetImage()->GetFx()->GetShader( 1 )->LoadFromFile();
+
+
+    m_text_widget->GetText()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );      
+    m_text_widget->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
+    m_text_widget->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
+    m_text_widget->GetText()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget->GetText()->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_text_widget->GetText()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_text_widget->GetText()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+
+    m_text_widget->GetText()->AddShaderParameter( 1, "color", 0 );
+    m_text_widget->GetText()->SetShaderRealVector( "color", Utils::Vector( 1.0, 1.0, 0.0, 1.0 ) );
+
+    m_text_widget->GetImage()->SetOrderNumber( 20000 );
+    m_text_widget->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
+
+    m_text_widget->RegisterToPass( m_finalpass );
+    
+
+
+
+
+
+    
+
+    m_text_widget_2 = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget_2", 1200, 360, m_font, false, m_text_widget ) );
+    
+    m_text_widget_2->GetImage()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_text_widget_2->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_text_widget_2->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+
+    m_text_widget_2->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_text_widget_2->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add"  ) );
+    m_text_widget_2->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always"  ) );
+    m_text_widget_2->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one"  ) );
+    m_text_widget_2->GetImage()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha"  ) );
+    m_text_widget_2->GetImage()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+
+    m_text_widget_2->GetImage()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget_2->GetImage()->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_text_widget_2->GetText()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_text_widget_2->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
+    m_text_widget_2->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
+    m_text_widget_2->GetText()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_text_widget_2->GetText()->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_text_widget_2->GetText()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_text_widget_2->GetText()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_text_widget_2->GetText()->AddShaderParameter( 1, "color", 0 );
+    m_text_widget_2->GetText()->SetShaderRealVector( "color", Utils::Vector( 0.0, 1.0, 0.0, 1.0 ) );
+
+
+    m_text_widget_2->GetImage()->SetOrderNumber( 20000 );
+    m_text_widget_2->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
+
+    m_text_widget_2->RegisterToPass( m_finalpass );
+
+    m_reticle_widget->Lock( m_building_node );
+
+    
+    DrawSpace::Gui::ReticleWidget::ClippingParams clp;
+    clp.clipping_policy = DrawSpace::Gui::ReticleWidget::CLIPPING_HOLD;
+    clp.xmin = -0.5;
+    clp.xmax = 0.5;
+    clp.ymin = -0.375;
+    clp.ymax = 0.375;
+
+    m_reticle_widget->SetClippingParams( clp );
+
+    m_reticle_widget->RegisterMouseLeftButtonDownEventHandler( m_mouseleftbuttondown_eventhandler );
+
+
+    m_mouse_input.RegisterWidget( m_reticle_widget );
+    
+    ///////////////////////////////////////////////////////////////
+
+    m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
+
+
+    m_planet->InitProceduralGlobalTextures();
+
+
+
+    m_mouse_circularmode = true;
+
+
+    m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer ) );
+
+    m_calendar->RegisterWorld( &m_world );
+    m_calendar->RegisterWorld( m_planet->GetWorld() );
+
+    m_calendar->RegisterOrbit( m_planet_orbit );
+    m_calendar->RegisterOrbiter( m_planet );
+
+
+    
+   
+    m_scenenodegraph.SetCurrentCamera( "camera3" );
+    m_curr_camera = m_camera3;
+
+       
+
+        
+    m_planet->RegisterScenegraphCallbacks( m_scenenodegraph );
+  
+    
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////
+
+
+    //m_calendar->Startup( 162682566 );
+    m_calendar->Startup( 0 );
+
+
+    return true;
+}
+
+
+void dsAppClient::OnAppInit( void )
+{
+
+}
+
+void dsAppClient::OnClose( void )
+{
+}
+
+void dsAppClient::OnKeyPress( long p_key ) 
+{
+    switch( p_key )
+    {
+        case 'Q':
+
+
+            m_timer.TranslationSpeedInc( &m_speed, m_speed_speed );
+            m_speed_speed *= 1.83;
+          
+            break;
+
+        case 'W':
+
+            m_timer.TranslationSpeedDec( &m_speed, m_speed_speed );
+            m_speed_speed *= 1.86;
+ 
+            break;
+
+
+        case 'E':
+
+            m_ship->ApplyUpPitch( 50000.0 );
+            break;
+
+        case 'C':
+
+            m_ship->ApplyDownPitch( 50000.0 );
+            break;
+
+        case 'S':
+
+            m_ship->ApplyLeftYaw( 50000.0 );
+            break;
+
+        case 'F':
+
+            m_ship->ApplyRightYaw( 50000.0 );
+            break;
+
+
+        case 'Z':
+
+            m_ship->ApplyLeftRoll( 50000.0 );
+            break;
+
+        case 'R':
+
+            m_ship->ApplyRightRoll( 50000.0 );
+            break;
+
+        case 'T':
+
+            m_ship->ApplyFwdForce( 51000000.0 );
+            break;
+
+
+        case 'M':
+            m_ship->ZeroASpeed();
+            break;
+
+
+        case 'L':
+            
+            m_ship->ZeroLSpeed();
+            break;
+
+
+        case VK_SPACE:
+            break;
+
+        case VK_RETURN:
+
+            m_ship->ApplyFwdForce( 110000.0 );
+            break;
+
+        case VK_UP:
+
+            m_ship->ApplyFwdForce( -30000.0 );
+            break;
+
+        case VK_DOWN:
+
+            m_ship->ApplyDownForce( -10000.0 );
+            break;
+
+
+        case VK_LEFT:
+
+            m_circular_mvt->SetAngularSpeed( 30.0 );
+            break;
+
+        case VK_RIGHT:
+
+            m_circular_mvt->SetAngularSpeed( -30.0 );
+            break;
+
+
+    }
+}
+
+void dsAppClient::OnEndKeyPress( long p_key )
+{
+    switch( p_key )
+    {
+        case 'Q':
+
+            m_speed_speed = 5.0;
+            break;
+
+
+        case 'W':
+
+            m_speed_speed = 5.0;                        
+            break;
+
+        case VK_SPACE:
+
+            m_speed = 0.0;
+            break;
+
+        case VK_LEFT:
+        case VK_RIGHT:
+            m_circular_mvt->SetAngularSpeed( 0.0 );
+            break;
+
+    }
+}
+
+void dsAppClient::OnKeyPulse( long p_key )
+{
+    switch( p_key )
+    {
+        case VK_F1:
+
+            m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+            break;
+
+        case VK_F2:
+
+            m_calendar->SetTimeFactor( Calendar::MUL2_TIME );
+            break;
+
+        case VK_F3:
+
+            m_calendar->SetTimeFactor( Calendar::MUL10_TIME );
+            break;
+
+        case VK_F4:
+
+            m_calendar->SetTimeFactor( Calendar::MUL100_TIME );
+            break;
+
+        case VK_F5:
+
+            m_calendar->SetTimeFactor( Calendar::SEC_1HOUR_TIME );
+            break;
+
+
+        case VK_F6:
+
+            m_calendar->SetTimeFactor( Calendar::SEC_1DAY_TIME );
+            break;
+
+        case VK_F7:
+          
+            break;
+    }
+}
+
+void dsAppClient::OnMouseMove( long p_xm, long p_ym, long p_dx, long p_dy )
+{
+}
+
+void dsAppClient::OnMouseLeftButtonDown( long p_xm, long p_ym )
+{
+    m_mouselb = true;
+}
+
+void dsAppClient::OnMouseLeftButtonUp( long p_xm, long p_ym )
+{
+    m_mouselb = false;
+}
+
+void dsAppClient::OnMouseRightButtonDown( long p_xm, long p_ym )
+{
+    m_mouserb = true;
+}
+
+void dsAppClient::OnMouseRightButtonUp( long p_xm, long p_ym )
+{
+    m_mouserb = false;
+}
+
+void dsAppClient::OnAppEvent( WPARAM p_wParam, LPARAM p_lParam )
+{
+
+}
+
+void dsAppClient::on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget )
+{
+
+}

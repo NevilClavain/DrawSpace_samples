@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gpunoise", "gpunoise\gpunoi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cpunoise", "cpunoise\cpunoise.vcxproj", "{7D8BA71A-4953-4EA9-8B49-C7BF768A9A4F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "orbiters3", "orbiters3\orbiters3.vcxproj", "{FA260606-B21F-424B-884C-C817C0D0694B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -57,6 +59,10 @@ Global
 		{7D8BA71A-4953-4EA9-8B49-C7BF768A9A4F}.Debug|Win32.Build.0 = Debug|Win32
 		{7D8BA71A-4953-4EA9-8B49-C7BF768A9A4F}.Release|Win32.ActiveCfg = Release|Win32
 		{7D8BA71A-4953-4EA9-8B49-C7BF768A9A4F}.Release|Win32.Build.0 = Release|Win32
+		{FA260606-B21F-424B-884C-C817C0D0694B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FA260606-B21F-424B-884C-C817C0D0694B}.Debug|Win32.Build.0 = Debug|Win32
+		{FA260606-B21F-424B-884C-C817C0D0694B}.Release|Win32.ActiveCfg = Release|Win32
+		{FA260606-B21F-424B-884C-C817C0D0694B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
