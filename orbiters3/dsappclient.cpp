@@ -1,7 +1,7 @@
 
 #include "dsappclient.h"
 
-
+#define PLANET_RAY 6000.0
 
 using namespace DrawSpace;
 using namespace DrawSpace::Interface;
@@ -115,12 +115,37 @@ void dsAppClient::OnRenderFrame( void )
 
     renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h ( %.1f m/s) - aspeed = %.1f", speed * 3.6, speed, m_ship->GetAngularSpeedMagnitude() );
 
+    bool hotstate = m_planet->GetFragment( 0 )->GetHotState();
+    if( hotstate )
+    {
+        renderer->DrawText( 0, 255, 0, 10, 130, "fragment hot" );
+
+        dsreal alt = m_planet->GetFragment( 0 )->GetPlanetBody()->GetHotPointAltitud();
+
+        if( alt > 10000.0 )
+        {
+            renderer->DrawText( 0, 255, 0, 10, 145, "hotpoint altitude = %.3f km", alt / 1000.0 );
+        }
+        else
+        {
+            renderer->DrawText( 0, 255, 0, 10, 145, "hotpoint altitude = %.1f m", alt );
+        }
+
+        int currentface = m_planet->GetFragment( 0 )->GetPlanetBody()->GetCurrentFace();
+
+        if( currentface != -1 )
+        {
+            renderer->DrawText( 0, 255, 0, 10, 160, "current face = %d", currentface );
+            dsreal faceLOD = m_planet->GetFragment( 0 )->GetPlanetBody()->GetFace( currentface )->GetCurrentLOD();
+            renderer->DrawText( 0, 255, 0, 10, 175, "current face actual LOD = %f", faceLOD );
+        }
+    }
   
     renderer->FlipScreen();
 
     m_calendar->Run();
 
-    }
+}
 
 
 bool dsAppClient::OnIdleAppInit( void )
@@ -307,7 +332,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_longlat_mvt3 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    m_longlat_mvt3->Init( -21.0000, 20.0089, 400114.0, 80.0, 0.0 );
+    m_longlat_mvt3->Init( -21.0000, 20.0089, /*400114.0*/PLANET_RAY * 1000.0 + 114.0, 80.0, 0.0 );
 
     m_longlatmvt3_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LongLatMovement>, SceneNode<DrawSpace::Core::LongLatMovement>( "longlatmvt3_node" ) );
     m_longlatmvt3_node->SetContent( m_longlat_mvt3 );
@@ -382,7 +407,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_longlat_mvt4 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    m_longlat_mvt4->Init( -21.0929, 20.0000, 400129.0, 40.0, 0.0 );
+    m_longlat_mvt4->Init( -21.0929, 20.0000, /*400129.0*/ PLANET_RAY * 1000.0 + 129.0, 40.0, 0.0 );
 
 
 
@@ -401,7 +426,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     
-    m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", 400.0 ) );
+    m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY ) );
 
     m_planet->RegisterPassSlot( m_texturepass );
 
@@ -511,7 +536,7 @@ bool dsAppClient::OnIdleAppInit( void )
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285 / 2.0, 21.4704 / 2.0, 81.911 / 2.0, 1.0 );
     
     //cube_params.initial_attitude.Translation( 265000000.0, 0.0, 0.0 );
-    cube_params.initial_attitude.Translation( 269000000.0, 0.0, 9000000.0 );
+    cube_params.initial_attitude.Translation( 269000000.0, 0.0, 59000000.0 );
 
     m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, cube_params ) );
    
