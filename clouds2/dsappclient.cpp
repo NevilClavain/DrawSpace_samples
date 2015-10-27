@@ -50,9 +50,6 @@ void dsAppClient::OnRenderFrame( void )
 
     long current_fps = m_timer.GetFPS();
     renderer->DrawText( 0, 0, 0, 10, 35, "%d", current_fps );
-    renderer->DrawText( 0, 0, 0, 10, 55, "%d %d", m_clouds->m_recompute_count, m_clouds->m_recompute_count2 );
-
-
 
     renderer->FlipScreen();
 
