@@ -140,6 +140,10 @@ void dsAppClient::OnRenderFrame( void )
             renderer->DrawText( 0, 255, 0, 10, 175, "current face actual LOD = %f", faceLOD );
         }
     }
+
+    renderer->DrawText( 0, 255, 0, 10, 200, "%d %d %d %d %d %d", m_planet->m_front_done, m_planet->m_rear_done, m_planet->m_left_done,
+                                                                m_planet->m_right_done, m_planet->m_top_done, m_planet->m_bottom_done );
+
   
     renderer->FlipScreen();
 
@@ -929,6 +933,7 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F7:
           
+            m_planet->run_textures();
             break;
     }
 }
