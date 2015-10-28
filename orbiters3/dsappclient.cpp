@@ -459,7 +459,7 @@ bool dsAppClient::OnIdleAppInit( void )
         //m_planet->BindExternalGlobalTexture( texture_planet, m_texturepass, i );
     }
 
-    m_planet->CreateProceduralGlobalTextures( m_texturepass, 64 );
+    m_planet->CreateProceduralGlobalTextures( m_texturepass, 512 );
     
 
     m_planet->SetOrbitDuration( 0.333 );
@@ -933,7 +933,7 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F7:
           
-            m_planet->run_textures();
+            m_planet->run_textures( m_texturepass );
             break;
     }
 }
