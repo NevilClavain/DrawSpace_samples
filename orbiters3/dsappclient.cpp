@@ -143,6 +143,9 @@ void dsAppClient::OnRenderFrame( void )
 
     renderer->DrawText( 0, 255, 0, 10, 200, "%d %d %d %d %d %d", m_planet->m_front_done, m_planet->m_rear_done, m_planet->m_left_done,
                                                                 m_planet->m_right_done, m_planet->m_top_done, m_planet->m_bottom_done );
+    dsreal rel_alt;
+    m_planet->GetInertBodyRelativeAltitude( m_ship, rel_alt );
+    renderer->DrawText( 0, 255, 0, 10, 220, "relative_alt = %f", rel_alt );
 
   
     renderer->FlipScreen();
@@ -446,12 +449,12 @@ bool dsAppClient::OnIdleAppInit( void )
     {
         Fx* fx = m_planet->CreateFx( m_texturepass, i );
 
-        //fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
+        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
         fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-        //fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+        fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
 
         m_planet->AddShader( m_texturepass, i, planet_vshader );
         m_planet->AddShader( m_texturepass, i, planet_pshader ); 
@@ -934,6 +937,12 @@ void dsAppClient::OnKeyPulse( long p_key )
         case VK_F7:
           
             m_planet->run_textures( m_texturepass );
+            break;
+
+
+        case VK_F8:
+
+            m_planet->GetFragment( 0 )->GetPlanetBody()->GetFace( 0 )->RecursiveSplitFromRoot();
             break;
     }
 }
