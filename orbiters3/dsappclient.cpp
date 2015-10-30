@@ -131,6 +131,7 @@ void dsAppClient::OnRenderFrame( void )
             renderer->DrawText( 0, 255, 0, 10, 145, "hotpoint altitude = %.1f m", alt );
         }
 
+        /*
         int currentface = m_planet->GetFragment( 0 )->GetPlanetBody()->GetCurrentFace();
 
         if( currentface != -1 )
@@ -139,6 +140,7 @@ void dsAppClient::OnRenderFrame( void )
             dsreal faceLOD = m_planet->GetFragment( 0 )->GetPlanetBody()->GetFace( currentface )->GetCurrentLOD();
             renderer->DrawText( 0, 255, 0, 10, 175, "current face actual LOD = %f", faceLOD );
         }
+        */
     }
 
     renderer->DrawText( 0, 255, 0, 10, 200, "%d %d %d %d %d %d", m_planet->m_front_done, m_planet->m_rear_done, m_planet->m_left_done,

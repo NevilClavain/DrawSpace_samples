@@ -9,23 +9,6 @@ class dsAppClient : public DrawSpace::App
 {
 protected:
 
-
-    typedef enum
-    {
-        HP_NONE,
-        HP_ACCELERATE,
-        HP_IN,
-        HP_CRUISE,
-        HP_OUT,
-        HP_DECELERATE
-
-    } HyperSpace_state;
-
-
-    
-
-
-
     typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Gui::Widget*>   WidgetEventHandler;
 
 
