@@ -943,8 +943,6 @@ void dsAppClient::OnKeyPulse( long p_key )
 
 
         case VK_F8:
-
-            m_planet->GetFragment( 0 )->GetPlanetBody()->GetFace( 0 )->RecursiveSplitFromRoot();
             break;
     }
 }
