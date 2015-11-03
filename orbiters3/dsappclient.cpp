@@ -130,17 +130,6 @@ void dsAppClient::OnRenderFrame( void )
         {
             renderer->DrawText( 0, 255, 0, 10, 145, "hotpoint altitude = %.1f m", alt );
         }
-
-        /*
-        int currentface = m_planet->GetFragment( 0 )->GetPlanetBody()->GetCurrentFace();
-
-        if( currentface != -1 )
-        {
-            renderer->DrawText( 0, 255, 0, 10, 160, "current face = %d", currentface );
-            dsreal faceLOD = m_planet->GetFragment( 0 )->GetPlanetBody()->GetFace( currentface )->GetCurrentLOD();
-            renderer->DrawText( 0, 255, 0, 10, 175, "current face actual LOD = %f", faceLOD );
-        }
-        */
     }
 
     renderer->DrawText( 0, 255, 0, 10, 200, "%d %d %d %d %d %d", m_planet->m_front_done, m_planet->m_rear_done, m_planet->m_left_done,
@@ -149,6 +138,21 @@ void dsAppClient::OnRenderFrame( void )
     m_planet->GetInertBodyRelativeAltitude( m_ship, rel_alt );
     renderer->DrawText( 0, 255, 0, 10, 220, "relative_alt = %f", rel_alt );
 
+    DrawSpace::SphericalLOD::Patch* current_patch = m_planet->GetFragment( 0 )->GetCurrentPatch();
+
+    if( current_patch )
+    {
+        int face = current_patch->GetOrientation();
+        double xpos, ypos;
+        current_patch->GetUnitPos( xpos, ypos );
+        double sidelength = current_patch->GetUnitSideLenght();
+
+        renderer->DrawText( 0, 255, 0, 10, 245, "current_patch => face %d width = %f x = %f y = %f", face, sidelength, xpos, ypos );
+    }
+    else
+    {
+        renderer->DrawText( 0, 255, 0, 10, 245, "current_patch => null" );
+    }
   
     renderer->FlipScreen();
 
@@ -453,9 +457,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
         fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
         fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+        //fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-        fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+        //fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
 
         m_planet->AddShader( m_texturepass, i, planet_vshader );
@@ -464,7 +468,7 @@ bool dsAppClient::OnIdleAppInit( void )
         //m_planet->BindExternalGlobalTexture( texture_planet, m_texturepass, i );
     }
 
-    m_planet->CreateProceduralGlobalTextures( m_texturepass, 512 );
+    m_planet->CreateProceduralGlobalTextures( m_texturepass, 32 );
     
 
     m_planet->SetOrbitDuration( 0.333 );
