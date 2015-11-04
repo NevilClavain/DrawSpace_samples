@@ -146,8 +146,13 @@ void dsAppClient::OnRenderFrame( void )
         double xpos, ypos;
         current_patch->GetUnitPos( xpos, ypos );
         double sidelength = current_patch->GetUnitSideLenght();
+        int lod = m_planet->GetFragment( 0 )->GetCurrentPatchLOD();
+        long nb_meshebuild;
+        m_planet->GetFragment( 0 )->GetCollisionMesheBuildStats( nb_meshebuild );
 
-        renderer->DrawText( 0, 255, 0, 10, 245, "current_patch => face %d width = %f x = %f y = %f", face, sidelength, xpos, ypos );
+        renderer->DrawText( 0, 255, 0, 10, 245, "current_patch => face %d lod %d", face, lod, sidelength, xpos, ypos, nb_meshebuild );
+        renderer->DrawText( 0, 255, 0, 10, 260, "width = %f x = %f y = %f, %d", sidelength, xpos, ypos, nb_meshebuild );
+
     }
     else
     {
