@@ -449,7 +449,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     
-    m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY ) );
+    m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer ) );
 
     m_planet->RegisterPassSlot( m_texturepass );
 
