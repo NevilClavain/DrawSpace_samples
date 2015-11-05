@@ -153,6 +153,11 @@ void dsAppClient::OnRenderFrame( void )
         renderer->DrawText( 0, 255, 0, 10, 245, "current_patch => face %d lod %d", face, lod, sidelength, xpos, ypos, nb_meshebuild );
         renderer->DrawText( 0, 255, 0, 10, 260, "width = %f x = %f y = %f, %d", sidelength, xpos, ypos, nb_meshebuild );
 
+        std::vector<DrawSpace::SphericalLOD::Patch*> displaylist;
+
+        m_planet->GetFragment( 0 )->GetPlanetBody()->GetFace( face )->GetDisplayList( displaylist );
+
+        renderer->DrawText( 0, 255, 0, 10, 275, "dl size = %d", displaylist.size() );
     }
     else
     {
@@ -462,9 +467,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
         fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
         fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-        //fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-        //fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+        fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
 
         m_planet->AddShader( m_texturepass, i, planet_vshader );
@@ -473,7 +478,7 @@ bool dsAppClient::OnIdleAppInit( void )
         //m_planet->BindExternalGlobalTexture( texture_planet, m_texturepass, i );
     }
 
-    m_planet->CreateProceduralGlobalTextures( m_texturepass, 32 );
+    m_planet->CreateProceduralGlobalTextures( m_texturepass, 1024 );
     
 
     m_planet->SetOrbitDuration( 0.333 );
