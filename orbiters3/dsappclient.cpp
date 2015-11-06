@@ -735,6 +735,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_planet->InitProceduralGlobalTextures( m_texturepass, 112, 146, 190 );
+    m_planet->InitHeightMapTextures();
 
 
 
