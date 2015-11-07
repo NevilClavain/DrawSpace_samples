@@ -153,16 +153,20 @@ void dsAppClient::OnRenderFrame( void )
         renderer->DrawText( 0, 255, 0, 10, 245, "current_patch => face %d lod %d", face, lod, sidelength, xpos, ypos, nb_meshebuild );
         renderer->DrawText( 0, 255, 0, 10, 260, "width = %f x = %f y = %f, %d", sidelength, xpos, ypos, nb_meshebuild );
 
-        std::vector<DrawSpace::SphericalLOD::Patch*> displaylist;
+        SphericalLOD::FaceDrawingNode::Stats stats;
+        SphericalLOD::FaceDrawingNode* facenode;
 
-        m_planet->GetFragment( 0 )->GetPlanetBody()->GetFace( face )->GetDisplayList( displaylist );
+        facenode = static_cast<SphericalLOD::FaceDrawingNode*>( m_planet->GetNodeFromPass( m_texturepass, face ) );
 
-        renderer->DrawText( 0, 255, 0, 10, 275, "dl size = %d", displaylist.size() );
+        facenode->GetStats( stats );
+
+        renderer->DrawText( 0, 255, 0, 10, 275, "nb patch %d nb hm update %d", stats.nb_patchs, stats.nb_hm_updates );
     }
     else
     {
         renderer->DrawText( 0, 255, 0, 10, 245, "current_patch => null" );
     }
+
   
     renderer->FlipScreen();
 
