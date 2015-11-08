@@ -15,6 +15,8 @@ protected:
 
     DrawSpace::FinalPass*                                               m_finalpass;
 
+    DrawSpace::IntermediatePass*                                        m_texturepass;
+
 
     DrawSpace::Utils::TimeManager                                       m_timer;
 

@@ -31,7 +31,7 @@ void dsAppClient::OnRenderFrame( void )
 
 
 
-
+    m_texturepass->GetRenderingQueue()->Draw();
     m_finalpass->GetRenderingQueue()->Draw();
 
 
@@ -49,20 +49,28 @@ bool dsAppClient::OnIdleAppInit( void )
 {
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
     renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
-   
-    m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
-    m_finalpass->Initialize();
-    m_finalpass->CreateViewportQuad();
-    m_finalpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.vsh", false ) ) );
-    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.psh", false ) ) );
-    m_finalpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_finalpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
-    m_finalpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    m_finalpass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    
 
-       
+
+    m_texturepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
+    m_texturepass->SetTargetDimsFromRenderer( false );
+    m_texturepass->SetTargetDims( 64, 64 );
+    m_texturepass->Initialize();
+    m_texturepass->CreateViewportQuad();
+    
+    m_texturepass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_texturepass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.vsh", false ) ) );
+    m_texturepass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.psh", false ) ) );
+    m_texturepass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_texturepass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_texturepass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_texturepass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+
+    m_fractal = new Fractal( 3, 290001, 0.5, 2.0 );
+
+    m_texturepass->GetViewportQuad()->AddShaderParameter( 1, "lacunarity", 0 );
+    m_texturepass->GetViewportQuad()->SetShaderRealVector( "lacunarity", Vector( m_fractal->GetLacunarity(), 0.0, 0.0, 0.0 ) );
+
 
 
     m_perlinnoisebuffer_texture = new Texture();    
@@ -80,26 +88,52 @@ bool dsAppClient::OnIdleAppInit( void )
     m_fbmexp_texture->SetPurpose( Texture::PURPOSE_FLOAT );
 
 
-    /*
-    m_finalpass->GetViewportQuad()->SetVertexTexture( m_perlinnoisebuffer_texture, 0 );
-    m_finalpass->GetViewportQuad()->SetVertexTexture( m_perlinnoisemap_texture, 1 );
+    m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoisebuffer_texture, 0 );
+    m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoisemap_texture, 1 );
+    m_texturepass->GetViewportQuad()->SetTexture( m_fbmexp_texture, 2 );
+
+
+    
+   /*
+    m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
+    m_finalpass->Initialize();
+    m_finalpass->CreateViewportQuad();
+    m_finalpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.vsh", false ) ) );
+    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.psh", false ) ) );
+    m_finalpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_finalpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_finalpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_finalpass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
     */
 
-    m_finalpass->GetViewportQuad()->SetTexture( m_perlinnoisebuffer_texture, 0 );
-    m_finalpass->GetViewportQuad()->SetTexture( m_perlinnoisemap_texture, 1 );
-    m_finalpass->GetViewportQuad()->SetTexture( m_fbmexp_texture, 2 );
+    m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
+    m_finalpass->Initialize();
+    m_finalpass->CreateViewportQuad();
+    m_finalpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_finalpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_finalpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_finalpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_finalpass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    
+
+    m_finalpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
+
+
+       
+
+
 
 
     /////////////////////////////////////////////////////////////////
 
-    m_fractal = new Fractal( 3, 290001, 0.5, 2.0 );
-
-    m_finalpass->GetViewportQuad()->AddShaderParameter( 1, "lacunarity", 0 );
-    m_finalpass->GetViewportQuad()->SetShaderRealVector( "lacunarity", Vector( m_fractal->GetLacunarity(), 0.0, 0.0, 0.0 ) );
 
 
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
 
     m_perlinnoisebuffer_texture->AllocTextureContent();
     m_pnbufftexture_content = m_perlinnoisebuffer_texture->GetTextureContentPtr();

@@ -160,7 +160,7 @@ void dsAppClient::OnRenderFrame( void )
 
         facenode->GetStats( stats );
 
-        renderer->DrawText( 0, 255, 0, 10, 275, "nb patch %d nb hm update %d", stats.nb_patchs, stats.nb_hm_updates );
+        renderer->DrawText( 0, 255, 0, 10, 275, "nb patch %d", stats.nb_patchs );
     }
     else
     {
@@ -739,8 +739,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_planet->InitProceduralGlobalTextures( m_texturepass, 112, 146, 190 );
-    m_planet->InitHeightMapTextures();
-
 
 
     m_mouse_circularmode = true;
