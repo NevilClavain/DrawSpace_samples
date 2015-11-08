@@ -92,7 +92,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     /////////////////////////////////////////////////////////////////
 
-    m_fractal = new Fractal( 3, 290001, 0.65, 1.29 );
+    m_fractal = new Fractal( 3, 290001, 0.5, 2.0 );
 
     m_finalpass->GetViewportQuad()->AddShaderParameter( 1, "lacunarity", 0 );
     m_finalpass->GetViewportQuad()->SetShaderRealVector( "lacunarity", Vector( m_fractal->GetLacunarity(), 0.0, 0.0, 0.0 ) );

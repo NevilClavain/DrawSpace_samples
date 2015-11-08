@@ -8,7 +8,7 @@ using namespace DrawSpace::Gui;
 
 dsAppClient* dsAppClient::m_instance = NULL;
 
-#define OUTPUT_TEXTURE_SIZE 512
+#define OUTPUT_TEXTURE_SIZE 128
 
 
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false )
@@ -82,7 +82,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_output_texture->AllocTextureContent();
     m_outputtexture_content = m_output_texture->GetTextureContentPtr();
 
-    m_fractal = new Fractal( 3, 19034, 0.55, 1.39 );
+    m_fractal = new Fractal( 3, 290001, 0.5, 2.0 );
     
     
     unsigned char* color_ptr = (unsigned char*)m_outputtexture_content;
@@ -104,45 +104,19 @@ bool dsAppClient::OnIdleAppInit( void )
             double f_array[3];
             unsigned char color;
 
-            f_array[0] = ( (double)x / OUTPUT_TEXTURE_SIZE ) * 3.0; 
-            f_array[1] = ( (double)y / OUTPUT_TEXTURE_SIZE ) * 3.0;
-            f_array[2] = 3.0;
+            f_array[0] = Maths::Lerp( -16.0, 16.0, (double)x / (double)OUTPUT_TEXTURE_SIZE );
+            f_array[1] = Maths::Lerp( -16.0, 16.0, (double)y / (double)OUTPUT_TEXTURE_SIZE );
+            f_array[2] = 1.0;
 
-            //double res = m_fractal->GetNoise( f_array );
+            double res = m_fractal->GetNoise( f_array );
 
-            double res = m_fractal->fBm( f_array, 15.0 );
+            //double res = m_fractal->fBm( f_array, 5.0 );
 
-            if( res >= 0.15 && res < 0.65 )
-            {
-                color = 255.0 * ( ( res * 0.5 ) + 0.5 );
-                *color_ptr = color * 0.6; color_ptr++;
-                *color_ptr = color * 0.8; color_ptr++;
-                *color_ptr = color * 0.6; color_ptr++;
-                *color_ptr = color; color_ptr++;
-
-            }
-            else if ( res >= 0.65 && res < 0.9 )
-            {
-                color = 255.0 * ( ( res * 0.5 ) + 0.5 );
-                *color_ptr = color * 0.6; color_ptr++;
-                *color_ptr = color * 0.6; color_ptr++;
-                *color_ptr = color * 0.6; color_ptr++;
-                *color_ptr = color; color_ptr++;
-            }            
-            else if( res >= 0.9 )
-            {
-                *color_ptr = 255; color_ptr++;
-                *color_ptr = 255; color_ptr++;
-                *color_ptr = 255; color_ptr++;
-                *color_ptr = 255; color_ptr++;            
-            }
-            else
-            {
-                *color_ptr = 75; color_ptr++;
-                *color_ptr = 0; color_ptr++;
-                *color_ptr = 0; color_ptr++;
-                *color_ptr = 0; color_ptr++;                
-            }
+            color = 255.0 * ( ( res * 0.5 ) + 0.5 );
+            *color_ptr = color; color_ptr++;
+            *color_ptr = color; color_ptr++;
+            *color_ptr = color; color_ptr++;
+            *color_ptr = color; color_ptr++;
             
         }    
     }
