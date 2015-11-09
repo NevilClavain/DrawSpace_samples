@@ -8,7 +8,7 @@ using namespace DrawSpace::Gui;
 
 dsAppClient* dsAppClient::m_instance = NULL;
 
-#define OUTPUT_TEXTURE_SIZE 128
+#define OUTPUT_TEXTURE_SIZE 256
 
 
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false )
@@ -59,7 +59,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_finalpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
     m_finalpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
-    m_finalpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_finalpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
     m_finalpass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
     
 
@@ -82,7 +82,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_output_texture->AllocTextureContent();
     m_outputtexture_content = m_output_texture->GetTextureContentPtr();
 
-    m_fractal = new Fractal( 3, 290001, 0.5, 2.0 );
+    m_fractal = new Fractal( 3, 137668, 0.025, 2.0 );
     
     
     unsigned char* color_ptr = (unsigned char*)m_outputtexture_content;
@@ -103,21 +103,37 @@ bool dsAppClient::OnIdleAppInit( void )
         {
             double f_array[3];
             unsigned char color;
+            
+            //f_array[0] = Maths::Lerp( -0.000122, 0.000122, (double)x / (double)OUTPUT_TEXTURE_SIZE );
+            //f_array[1] = Maths::Lerp( -0.000122, 0.000122, (double)y / (double)OUTPUT_TEXTURE_SIZE );
+            
 
-            f_array[0] = Maths::Lerp( -16.0, 16.0, (double)x / (double)OUTPUT_TEXTURE_SIZE );
-            f_array[1] = Maths::Lerp( -16.0, 16.0, (double)y / (double)OUTPUT_TEXTURE_SIZE );
+            f_array[0] = Maths::Lerp( -0.999, 0.999, (double)x / (double)OUTPUT_TEXTURE_SIZE );
+            f_array[1] = Maths::Lerp( -0.999, 0.999, (double)y / (double)OUTPUT_TEXTURE_SIZE );
+
+
             f_array[2] = 1.0;
 
-            double res = m_fractal->GetNoise( f_array );
+            //double res = m_fractal->GetNoise( f_array );
 
-            //double res = m_fractal->fBm( f_array, 5.0 );
+            double res = m_fractal->fBm( f_array, 15.0 );
 
             color = 255.0 * ( ( res * 0.5 ) + 0.5 );
-            *color_ptr = color; color_ptr++;
-            *color_ptr = color; color_ptr++;
-            *color_ptr = color; color_ptr++;
-            *color_ptr = color; color_ptr++;
-            
+
+            if( res < 0.0 )
+            {
+                *color_ptr = 255; color_ptr++;
+                *color_ptr = 0; color_ptr++;
+                *color_ptr = 0; color_ptr++;
+                *color_ptr = 0; color_ptr++;            
+            }
+            else
+            {
+                *color_ptr = color; color_ptr++;
+                *color_ptr = color; color_ptr++;
+                *color_ptr = color; color_ptr++;
+                *color_ptr = color; color_ptr++;
+            }            
         }    
     }
 

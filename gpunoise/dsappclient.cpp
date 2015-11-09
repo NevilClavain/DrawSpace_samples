@@ -66,10 +66,10 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
 
-    m_fractal = new Fractal( 3, 290001, 0.75, 1.29 );
+    m_fractal = new Fractal( 3, 290001, 0.025, 2.0 );
 
     m_texturepass->GetViewportQuad()->AddShaderParameter( 1, "flags", 0 );
-    m_texturepass->GetViewportQuad()->SetShaderRealVector( "flags", Vector( m_fractal->GetLacunarity(), 1.0, -0.0025, 0.0025 ) );
+    m_texturepass->GetViewportQuad()->SetShaderRealVector( "flags", Vector( m_fractal->GetLacunarity(), 1.0, -0.025, 0.025 ) );
     
 
 
