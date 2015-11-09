@@ -53,24 +53,24 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_texturepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
     m_texturepass->SetTargetDimsFromRenderer( false );
-    m_texturepass->SetTargetDims( 64, 64 );
+    m_texturepass->SetTargetDims( 200, 200 );
     m_texturepass->Initialize();
     m_texturepass->CreateViewportQuad();
     
     m_texturepass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_texturepass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.vsh", false ) ) );
-    m_texturepass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.psh", false ) ) );
+    m_texturepass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.pso", true ) ) );
     m_texturepass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
     m_texturepass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     m_texturepass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
     m_texturepass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
 
-    m_fractal = new Fractal( 3, 290001, 0.5, 2.0 );
+    m_fractal = new Fractal( 3, 290001, 0.75, 1.29 );
 
-    m_texturepass->GetViewportQuad()->AddShaderParameter( 1, "lacunarity", 0 );
-    m_texturepass->GetViewportQuad()->SetShaderRealVector( "lacunarity", Vector( m_fractal->GetLacunarity(), 0.0, 0.0, 0.0 ) );
-
+    m_texturepass->GetViewportQuad()->AddShaderParameter( 1, "flags", 0 );
+    m_texturepass->GetViewportQuad()->SetShaderRealVector( "flags", Vector( m_fractal->GetLacunarity(), 1.0, -0.0025, 0.0025 ) );
+    
 
 
     m_perlinnoisebuffer_texture = new Texture();    

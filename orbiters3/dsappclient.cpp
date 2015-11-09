@@ -150,7 +150,7 @@ void dsAppClient::OnRenderFrame( void )
         long nb_meshebuild;
         m_planet->GetFragment( 0 )->GetCollisionMesheBuildStats( nb_meshebuild );
 
-        renderer->DrawText( 0, 255, 0, 10, 245, "current_patch => face %d lod %d", face, lod, sidelength, xpos, ypos, nb_meshebuild );
+        renderer->DrawText( 0, 255, 0, 10, 245, "current_patch => face %d lod %d dims %f", face, lod, sidelength, xpos, ypos, nb_meshebuild, current_patch->GetUnitSideLenght() );
         renderer->DrawText( 0, 255, 0, 10, 260, "width = %f x = %f y = %f, %d", sidelength, xpos, ypos, nb_meshebuild );
 
         SphericalLOD::FaceDrawingNode::Stats stats;
