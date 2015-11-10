@@ -737,6 +737,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
 
+    m_planet->InitNoisingTextures();
 
     m_planet->InitProceduralGlobalTextures( m_texturepass, 112, 146, 190 );
 
