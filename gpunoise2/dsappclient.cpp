@@ -67,10 +67,11 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
 
-    m_fractal = new Fractal( 3, 290001, 0.025, 2.0 );
+    m_fractal = new Fractal( 3, 3744567, 0.5, 2.0 );
 
-    //m_texturepass->GetViewportQuad()->AddShaderParameter( 1, "flags", 0 );
-    //m_texturepass->GetViewportQuad()->SetShaderRealVector( "flags", Vector( m_fractal->GetLacunarity(), 1.0, -0.025, 0.025 ) );
+    m_texturepass->GetViewportQuad()->AddShaderParameter( 0, "flags", 27 );
+    double lacunarity = m_fractal->GetLacunarity();
+    m_texturepass->GetViewportQuad()->SetShaderRealVector( "flags", Vector( lacunarity, 9.0, -10.0, 10.0 ) );
     
 
 
@@ -89,9 +90,9 @@ bool dsAppClient::OnIdleAppInit( void )
     m_fbmexp_texture->SetPurpose( Texture::PURPOSE_FLOAT );
 
 
-    m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoisebuffer_texture, 0 );
-    m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoisemap_texture, 1 );
-    m_texturepass->GetViewportQuad()->SetTexture( m_fbmexp_texture, 2 );
+    m_texturepass->GetViewportQuad()->SetVertexTexture( m_perlinnoisebuffer_texture, 0 );
+    m_texturepass->GetViewportQuad()->SetVertexTexture( m_perlinnoisemap_texture, 1 );
+    m_texturepass->GetViewportQuad()->SetVertexTexture( m_fbmexp_texture, 2 );
 
 
    
@@ -220,20 +221,22 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F2:
             {
-                m_texturepass->GetTargetTexture()->CopyTextureContent();
 
-                float* ptr = (float*)m_texture_content;
+                Utils::Vector finput;
 
-                float val = *ptr;
+                finput[0] = -4.0231;
+                finput[1] = 9.27;
+                finput[2] = -0.25;
+                finput[3] = 0.0;
 
-                val = 0;
-
-                ptr++;
-
-                val = *ptr;
-
-                _asm nop
         
+                //double val1 = m_fractal->GetNoise( finput.GetArray() );
+                double val1 = 12000.0 * m_fractal->fBm( finput.GetArray(), 9 );
+
+                m_texturepass->GetTargetTexture()->CopyTextureContent();
+                float* ptr = (float*)m_texture_content;
+                float val = *ptr;
+                _asm nop
             }
             break;
     }
