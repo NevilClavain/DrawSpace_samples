@@ -82,7 +82,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_perlinnoisemap_texture = new Texture();
     m_perlinnoisemap_texture->SetFormat( 256, 1, 4 );
-    m_perlinnoisemap_texture->SetPurpose( Texture::PURPOSE_COLOR );
+    //m_perlinnoisemap_texture->SetPurpose( Texture::PURPOSE_COLOR );
+    m_perlinnoisemap_texture->SetPurpose( Texture::PURPOSE_FLOAT );
 
 
     m_fbmexp_texture = new Texture();    
@@ -133,7 +134,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_fbmexp_texture->AllocTextureContent();
     m_fbmexptexture_content = m_fbmexp_texture->GetTextureContentPtr();
     
-    unsigned char* color_ptr = (unsigned char*)m_pnmaptexture_content;
+    //unsigned char* color_ptr = (unsigned char*)m_pnmaptexture_content;
     float* float_ptr = (float*)m_pnbufftexture_content;
 
         
@@ -146,12 +147,11 @@ bool dsAppClient::OnIdleAppInit( void )
         }
     }
 
+    float_ptr = (float*)m_pnmaptexture_content;
     for( long i = 0; i < 256; i++ )
     {
-        *color_ptr = m_fractal->GetNMap( i ); color_ptr++;
-        *color_ptr = m_fractal->GetNMap( i ); color_ptr++;
-        *color_ptr = m_fractal->GetNMap( i ); color_ptr++;
-        *color_ptr = m_fractal->GetNMap( i ); color_ptr++;
+        float temp = m_fractal->GetNMap( i );
+        *float_ptr = temp; float_ptr++;
     }
 
 
@@ -224,12 +224,18 @@ void dsAppClient::OnKeyPulse( long p_key )
 
                 Utils::Vector finput;
 
-                finput[0] = -4.0231;
-                finput[1] = 9.27;
-                finput[2] = -0.25;
+                /*
+                finput[0] = 0.0231;
+                finput[1] = 0.777;
+                finput[2] = -2.25;
+                finput[3] = 0.0;
+                */
+
+                finput[0] = 3.031415;
+                finput[1] = 0.97;
+                finput[2] = -1.0025;
                 finput[3] = 0.0;
 
-        
                 //double val1 = m_fractal->GetNoise( finput.GetArray() );
                 double val1 = 12000.0 * m_fractal->fBm( finput.GetArray(), 9 );
 
