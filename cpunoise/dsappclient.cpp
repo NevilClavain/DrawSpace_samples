@@ -82,7 +82,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_output_texture->AllocTextureContent();
     m_outputtexture_content = m_output_texture->GetTextureContentPtr();
 
-    m_fractal = new Fractal( 3, 137668, 0.025, 2.0 );
+    m_fractal = new Fractal( 3, 137668, 0.5, 2.0 );
     
     
     unsigned char* color_ptr = (unsigned char*)m_outputtexture_content;
@@ -104,19 +104,15 @@ bool dsAppClient::OnIdleAppInit( void )
             double f_array[3];
             unsigned char color;
             
-            //f_array[0] = Maths::Lerp( -0.000122, 0.000122, (double)x / (double)OUTPUT_TEXTURE_SIZE );
-            //f_array[1] = Maths::Lerp( -0.000122, 0.000122, (double)y / (double)OUTPUT_TEXTURE_SIZE );
-            
-
-            f_array[0] = Maths::Lerp( -0.999, 0.999, (double)x / (double)OUTPUT_TEXTURE_SIZE );
-            f_array[1] = Maths::Lerp( -0.999, 0.999, (double)y / (double)OUTPUT_TEXTURE_SIZE );
+            f_array[0] = Maths::Lerp( -4.999, 4.999, (double)x / (double)OUTPUT_TEXTURE_SIZE );
+            f_array[1] = Maths::Lerp( -4.999, 4.999, (double)y / (double)OUTPUT_TEXTURE_SIZE );
 
 
             f_array[2] = 1.0;
 
             //double res = m_fractal->GetNoise( f_array );
 
-            double res = m_fractal->fBm( f_array, 15.0 );
+            double res = m_fractal->fBm( f_array, 9 );
 
             color = 255.0 * ( ( res * 0.5 ) + 0.5 );
 

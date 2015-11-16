@@ -53,23 +53,23 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_texturepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
     m_texturepass->SetTargetDimsFromRenderer( false );
-    m_texturepass->SetTargetDims( 200, 200 );
+    m_texturepass->SetTargetDims( 256, 256 );
     m_texturepass->Initialize();
     m_texturepass->CreateViewportQuad();
     
     m_texturepass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_texturepass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.vsh", false ) ) );
-    m_texturepass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.pso", true ) ) );
+    m_texturepass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.psh", false ) ) );
     m_texturepass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
     m_texturepass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     m_texturepass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
     m_texturepass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
 
-    m_fractal = new Fractal( 3, 290001, 0.025, 2.0 );
+    m_fractal = new Fractal( 3, 137668, 0.5, 2.0 );
 
     m_texturepass->GetViewportQuad()->AddShaderParameter( 1, "flags", 0 );
-    m_texturepass->GetViewportQuad()->SetShaderRealVector( "flags", Vector( m_fractal->GetLacunarity(), 1.0, -0.025, 0.025 ) );
+    m_texturepass->GetViewportQuad()->SetShaderRealVector( "flags", Vector( 0.0, 0.0, -4.999, 4.999 ) );
     
 
 
@@ -80,7 +80,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_perlinnoisemap_texture = new Texture();
     m_perlinnoisemap_texture->SetFormat( 256, 1, 4 );
-    m_perlinnoisemap_texture->SetPurpose( Texture::PURPOSE_COLOR );
+    m_perlinnoisemap_texture->SetPurpose( Texture::PURPOSE_FLOAT );
 
 
     m_fbmexp_texture = new Texture();    
@@ -143,8 +143,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_fbmexp_texture->AllocTextureContent();
     m_fbmexptexture_content = m_fbmexp_texture->GetTextureContentPtr();
-    
-    unsigned char* color_ptr = (unsigned char*)m_pnmaptexture_content;
+        
     float* float_ptr = (float*)m_pnbufftexture_content;
 
         
@@ -157,12 +156,11 @@ bool dsAppClient::OnIdleAppInit( void )
         }
     }
 
+
+    float_ptr = (float*)m_pnmaptexture_content;
     for( long i = 0; i < 256; i++ )
     {
-        *color_ptr = m_fractal->GetNMap( i ); color_ptr++;
-        *color_ptr = m_fractal->GetNMap( i ); color_ptr++;
-        *color_ptr = m_fractal->GetNMap( i ); color_ptr++;
-        *color_ptr = m_fractal->GetNMap( i ); color_ptr++;
+        *float_ptr = m_fractal->GetNMap( i ); float_ptr++;
     }
 
 
