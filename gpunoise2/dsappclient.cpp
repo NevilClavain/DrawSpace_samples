@@ -154,7 +154,7 @@ bool dsAppClient::OnIdleAppInit( void )
         *float_ptr = temp; float_ptr++;
     }
 
-
+    
     float_ptr = (float*)m_fbmexptexture_content;
 
     for( long i = 0; i < Fractal::MaxOctaves; i++ )
@@ -162,6 +162,7 @@ bool dsAppClient::OnIdleAppInit( void )
         float temp = m_fractal->GetExponent( i );
         *float_ptr = temp; float_ptr++;
     }
+    
 
     m_perlinnoisemap_texture->UpdateTextureContent();
     m_perlinnoisebuffer_texture->UpdateTextureContent();
