@@ -20,33 +20,6 @@ _DECLARE_DS_LOGGER( logger, "AppClient", DrawSpace::Logger::Configuration::GetIn
 #define SHIP_MASS 50.0
 
 
-#define HYPERSPACE_SCALE_Z             4000.0
-#define HYPERSPACE_SCALE_XY            200.0
-
-#define HYPERSPACE_LAYER2_SCALE_Z      12000.0
-#define HYPERSPACE_LAYER2_SCALE_XY     600.0
-
-#define HYPERSPACE_1_ROTZINIT           0.0
-#define HYPERSPACE_2_ROTZINIT           90.0
-
-#define HYPERSPACE_LAYER2_1_ROTZINIT    33.0
-#define HYPERSPACE_LAYER2_2_ROTZINIT    124.0
-
-#define HYPERSPACE_TRANSLATION_SPEED    7000.0
-
-#define HYPERSPACE_1_ROTZ_SPEED         30.0
-#define HYPERSPACE_2_ROTZ_SPEED         35.0
-
-#define HYPERSPACE_LAYER2_1_ROTZ_SPEED  45.0
-#define HYPERSPACE_LAYER2_2_ROTZ_SPEED  50.0
-
-#define HYPERSPACE_TRANSITION_SPEED     70000.0
-
-#define HYPERSPACE_ACCELERATION_MAX_SPEED 50000000.0
-
-#define HYPERSPACE_TRANSITION_INIT_Z    -350000.0
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 dsAppClient::dsAppClient( void ) : 
@@ -130,6 +103,7 @@ void dsAppClient::OnRenderFrame( void )
         {
             renderer->DrawText( 0, 255, 0, 10, 145, "hotpoint altitude = %.1f m", alt );
         }
+        
     }
 
     renderer->DrawText( 0, 255, 0, 10, 200, "%d %d %d %d %d %d", m_planet->m_front_done, m_planet->m_rear_done, m_planet->m_left_done,
@@ -161,6 +135,10 @@ void dsAppClient::OnRenderFrame( void )
         facenode->GetStats( stats );
 
         renderer->DrawText( 0, 255, 0, 10, 275, "nb patch %d", stats.nb_patchs );
+
+        SphericalLOD::Face* curr_face = m_planet->GetFragment( 0 )->GetPlanetBody()->GetFace( face );
+
+        renderer->DrawText( 0, 255, 0, 10, 305, "ground alt %.1f", curr_face->GetHotpointGroundAltitud() );
     }
     else
     {

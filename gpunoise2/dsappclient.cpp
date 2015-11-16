@@ -67,7 +67,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
 
-    m_fractal = new Fractal( 3, 3744567, 0.5, 2.0 );
+    m_fractal = new Fractal( 3, 3345764, 0.5, 2.0 );
 
     m_texturepass->GetViewportQuad()->AddShaderParameter( 0, "flags", 27 );
     double lacunarity = m_fractal->GetLacunarity();
@@ -232,9 +232,9 @@ void dsAppClient::OnKeyPulse( long p_key )
                 finput[3] = 0.0;
                 */
 
-                finput[0] = 3.031415;
-                finput[1] = 0.97;
-                finput[2] = -1.0025;
+                finput[0] = 0.360;
+                finput[1] = 0.667;
+                finput[2] = 0.590;
                 finput[3] = 0.0;
 
                 //double val1 = m_fractal->GetNoise( finput.GetArray() );
