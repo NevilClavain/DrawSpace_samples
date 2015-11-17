@@ -136,9 +136,6 @@ void dsAppClient::OnRenderFrame( void )
 
         renderer->DrawText( 0, 255, 0, 10, 275, "nb patch %d", stats.nb_patchs );
 
-        SphericalLOD::Face* curr_face = m_planet->GetFragment( 0 )->GetPlanetBody()->GetFace( face );
-
-        renderer->DrawText( 0, 255, 0, 10, 305, "ground alt %.1f", curr_face->GetHotpointGroundAltitud() );
     }
     else
     {
