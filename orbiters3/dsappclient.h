@@ -20,6 +20,7 @@ protected:
     DrawSpace::IntermediatePass*                m_patchespass;
     DrawSpace::IntermediatePass*                m_texturepass;
     DrawSpace::FinalPass*                       m_finalpass;
+    DrawSpace::FinalPass*                       m_finalpass2;
 
 
     DrawSpace::Utils::TimeManager               m_timer;
@@ -119,7 +120,7 @@ protected:
     DrawSpace::Gui::TextWidget*                 m_text_widget_2;
 
 
-
+    bool                                        m_show_patch_render;
 
 
     DrawSpace::SystemMouseInputProvider         m_mouse_input;

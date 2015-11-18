@@ -27,7 +27,8 @@ m_mouselb( false ),
 m_mouserb( false ), 
 m_speed( 0.0 ), 
 m_speed_speed( 5.0 ),
-m_curr_camera( NULL )
+m_curr_camera( NULL ),
+m_show_patch_render( false )
 {    
     _INIT_LOGGER( "logorbiters3.conf" )  
     m_w_title = "orbiters 3 test";
@@ -66,12 +67,15 @@ void dsAppClient::OnRenderFrame( void )
 
 
    
+    m_patchespass->GetRenderingQueue()->Draw();
 
     m_texturepass->GetRenderingQueue()->Draw();
 
     m_text_widget->Draw();
 
     m_finalpass->GetRenderingQueue()->Draw();
+
+    m_finalpass2->GetRenderingQueue()->Draw();
 
 
     long current_fps = m_timer.GetFPS();
@@ -194,12 +198,12 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_patchespass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
+    m_patchespass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "patches_pass" ) );
     m_patchespass->Initialize();
 
     m_patchespass->GetRenderingQueue()->EnableDepthClearing( true );
     m_patchespass->GetRenderingQueue()->EnableTargetClearing( true );
-    m_patchespass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 255 );
+    m_patchespass->GetRenderingQueue()->SetTargetClearingColor( 255, 0, 0, 255 );
 
 
 
@@ -217,8 +221,24 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
     m_finalpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
+    
 
 
+
+    m_finalpass2 = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass2" ) );
+    m_finalpass2->Initialize();
+    m_finalpass2->CreateViewportQuad();
+
+    m_finalpass2->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) ) ;
+    m_finalpass2->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_finalpass2->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+    
+
+    m_finalpass2->GetViewportQuad()->SetTexture( m_patchespass->GetTargetTexture(), 0 );
+
+    m_finalpass2->GetViewportQuad()->SetDrawingState( false );
 
     //////////////////////////////////////////////////////////////
 
@@ -746,6 +766,7 @@ bool dsAppClient::OnIdleAppInit( void )
     ///////////////////////////////////////////////////////////////
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_finalpass2->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     m_patchespass->GetRenderingQueue()->UpdateOutputQueue();
 
@@ -973,6 +994,18 @@ void dsAppClient::OnKeyPulse( long p_key )
 
 
         case VK_F8:
+
+            if( !m_show_patch_render )
+            {
+                m_show_patch_render = true;
+                m_finalpass2->GetViewportQuad()->SetDrawingState( false );
+            }
+            else
+            {
+                m_show_patch_render = false;
+                m_finalpass2->GetViewportQuad()->SetDrawingState( true );
+            }
+
             break;
     }
 }
