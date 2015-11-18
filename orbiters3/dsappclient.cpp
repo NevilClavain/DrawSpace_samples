@@ -130,7 +130,7 @@ void dsAppClient::OnRenderFrame( void )
         SphericalLOD::FaceDrawingNode::Stats stats;
         SphericalLOD::FaceDrawingNode* facenode;
 
-        facenode = static_cast<SphericalLOD::FaceDrawingNode*>( m_planet->GetNodeFromPass( m_texturepass, face ) );
+        facenode = static_cast<SphericalLOD::FaceDrawingNode*>( m_planet->GetPlanetBodyNodeFromPass( m_texturepass, face ) );
 
         facenode->GetStats( stats );
 
@@ -184,13 +184,23 @@ bool dsAppClient::OnIdleAppInit( void )
     renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
 
 
+
     m_texturepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
     m_texturepass->Initialize();
 
     m_texturepass->GetRenderingQueue()->EnableDepthClearing( true );
     m_texturepass->GetRenderingQueue()->EnableTargetClearing( /*false*/ true );
     m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 255 );
-    
+
+
+
+    m_patchespass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
+    m_patchespass->Initialize();
+
+    m_patchespass->GetRenderingQueue()->EnableDepthClearing( true );
+    m_patchespass->GetRenderingQueue()->EnableTargetClearing( true );
+    m_patchespass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 255 );
+
 
 
     //////////////////////////////////////////////////////////////
@@ -432,6 +442,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_planet->RegisterPlanetBodyPassSlot( m_texturepass );
 
+    m_planet->RegisterSinglePassSlot( m_patchespass );
+
     Texture* texture_planet = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
     texture_planet->LoadFromFile();
 
@@ -442,7 +454,7 @@ bool dsAppClient::OnIdleAppInit( void )
     
     for( long i = 0; i < 6; i++ )
     {
-        Fx* fx = m_planet->CreateFx( m_texturepass, i );
+        Fx* fx = m_planet->CreatePlanetBodyFx( m_texturepass, i );
 
         fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
         fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
@@ -451,13 +463,37 @@ bool dsAppClient::OnIdleAppInit( void )
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
 
-        m_planet->AddShader( m_texturepass, i, planet_vshader );
-        m_planet->AddShader( m_texturepass, i, planet_pshader ); 
+        /*
+        m_planet->AddPlanetBodyShader( m_texturepass, i, planet_vshader );
+        m_planet->AddPlanetBodyShader( m_texturepass, i, planet_pshader ); 
+        */
+
+        fx->AddShader( planet_vshader );
+        fx->AddShader( planet_pshader );
 
         //m_planet->BindExternalGlobalTexture( texture_planet, m_texturepass, i );
     }
 
     m_planet->CreateProceduralGlobalTextures( m_texturepass, 128 );
+
+
+
+    Shader* patch_vshader = _DRAWSPACE_NEW_( Shader, Shader( "color.vsh", false ) );
+    Shader* patch_pshader = _DRAWSPACE_NEW_( Shader, Shader( "color.psh", false ) );
+    patch_vshader->LoadFromFile();
+    patch_pshader->LoadFromFile();
+
+    Fx* patch_fx = m_planet->CreateSingleNodeFx( m_patchespass );
+
+    patch_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
+    patch_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    patch_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    patch_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    patch_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    patch_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+
+    patch_fx->AddShader( patch_vshader );
+    patch_fx->AddShader( patch_pshader );
     
 
     m_planet->SetOrbitDuration( 0.333 );
@@ -711,6 +747,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
+    m_patchespass->GetRenderingQueue()->UpdateOutputQueue();
 
     m_planet->InitNoisingTextures();
 
