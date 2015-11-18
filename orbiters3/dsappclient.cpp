@@ -430,7 +430,7 @@ bool dsAppClient::OnIdleAppInit( void )
     
     m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer ) );
 
-    m_planet->RegisterPassSlot( m_texturepass );
+    m_planet->RegisterPlanetBodyPassSlot( m_texturepass );
 
     Texture* texture_planet = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
     texture_planet->LoadFromFile();
