@@ -66,6 +66,18 @@ void dsAppClient::OnRenderFrame( void )
     //////////////////////////////////////////////////////////////
 
 
+    DrawSpace::SphericalLOD::Patch* current_patch = m_planet->GetFragment( 0 )->GetCurrentPatch();
+    std::vector<DrawSpace::SphericalLOD::Patch*> dl;
+
+    if( current_patch )
+    {
+        dl.push_back( current_patch );
+    }
+    m_patchesnode->SetDisplayList( dl );
+
+
+
+
    
     m_patchespass->GetRenderingQueue()->Draw();
 
@@ -116,7 +128,7 @@ void dsAppClient::OnRenderFrame( void )
     m_planet->GetInertBodyRelativeAltitude( m_ship, rel_alt );
     renderer->DrawText( 0, 255, 0, 10, 220, "relative_alt = %f", rel_alt );
 
-    DrawSpace::SphericalLOD::Patch* current_patch = m_planet->GetFragment( 0 )->GetCurrentPatch();
+    
 
     if( current_patch )
     {
@@ -208,7 +220,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_patchespass->GetRenderingQueue()->EnableDepthClearing( true );
     m_patchespass->GetRenderingQueue()->EnableTargetClearing( true );
-    m_patchespass->GetRenderingQueue()->SetTargetClearingColor( 255, 0, 0, 255 );
+    m_patchespass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 255 );
 
 
 
@@ -468,6 +480,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_planet->RegisterPlanetBodyPassSlot( m_texturepass );
 
     m_planet->RegisterSinglePassSlot( m_patchespass );
+    m_patchesnode = static_cast<SphericalLOD::FaceDrawingNode*>( m_planet->GetSingleNodeFromPass( m_patchespass ) );
 
     Texture* texture_planet = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
     texture_planet->LoadFromFile();
