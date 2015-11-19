@@ -199,6 +199,11 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_patchespass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "patches_pass" ) );
+
+    m_patchespass->SetTargetDimsFromRenderer( false );
+    m_patchespass->SetTargetDims( 256, 256 );
+
+
     m_patchespass->Initialize();
 
     m_patchespass->GetRenderingQueue()->EnableDepthClearing( true );
@@ -998,12 +1003,12 @@ void dsAppClient::OnKeyPulse( long p_key )
             if( !m_show_patch_render )
             {
                 m_show_patch_render = true;
-                m_finalpass2->GetViewportQuad()->SetDrawingState( false );
+                m_finalpass2->GetViewportQuad()->SetDrawingState( true );
             }
             else
             {
                 m_show_patch_render = false;
-                m_finalpass2->GetViewportQuad()->SetDrawingState( true );
+                m_finalpass2->GetViewportQuad()->SetDrawingState( false );
             }
 
             break;
