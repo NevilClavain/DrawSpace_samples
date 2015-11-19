@@ -516,19 +516,19 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    Shader* patch_vshader = _DRAWSPACE_NEW_( Shader, Shader( "color.vsh", false ) );
-    Shader* patch_pshader = _DRAWSPACE_NEW_( Shader, Shader( "color.psh", false ) );
+    Shader* patch_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planethm.vsh", false ) );
+    Shader* patch_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planethm.psh", false ) );
     patch_vshader->LoadFromFile();
     patch_pshader->LoadFromFile();
 
     Fx* patch_fx = m_planet->CreateSingleNodeFx( m_patchespass );
 
-    patch_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
+    //patch_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
     patch_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-    patch_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    //patch_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
     patch_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-    patch_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    patch_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+    //patch_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    //patch_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
 
     patch_fx->AddShader( patch_vshader );
     patch_fx->AddShader( patch_pshader );
