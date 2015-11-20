@@ -67,19 +67,22 @@ void dsAppClient::OnRenderFrame( void )
 
 
     DrawSpace::SphericalLOD::Patch* current_patch = m_planet->GetFragment( 0 )->GetCurrentPatch();
-    std::vector<DrawSpace::SphericalLOD::Patch*> dl;
 
+    /*
+    std::vector<DrawSpace::SphericalLOD::Patch*> dl;
     if( current_patch )
     {
         dl.push_back( current_patch );
     }
     m_patchesnode->SetDisplayList( dl );
-
+    */
 
 
 
    
-    m_patchespass->GetRenderingQueue()->Draw();
+    //m_patchespass->GetRenderingQueue()->Draw();
+
+    m_planet->DrawSubPasses();
 
     m_texturepass->GetRenderingQueue()->Draw();
 
@@ -209,11 +212,13 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 255 );
 
 
-
+    /*
     m_patchespass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "patches_pass" ) );
 
     m_patchespass->SetTargetDimsFromRenderer( false );
-    m_patchespass->SetTargetDims( 256, 256 );
+    //m_patchespass->SetTargetDims( 256, 256 );
+    m_patchespass->SetTargetDims( 11, 11 );
+    //m_patchespass->SetRenderPurpose( Texture::RENDERPURPOSE_FLOAT32 );
 
 
     m_patchespass->Initialize();
@@ -221,7 +226,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_patchespass->GetRenderingQueue()->EnableDepthClearing( true );
     m_patchespass->GetRenderingQueue()->EnableTargetClearing( true );
     m_patchespass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 255 );
-
+    */
 
 
     //////////////////////////////////////////////////////////////
@@ -253,7 +258,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    m_finalpass2->GetViewportQuad()->SetTexture( m_patchespass->GetTargetTexture(), 0 );
+    //m_finalpass2->GetViewportQuad()->SetTexture( m_patchespass->GetTargetTexture(), 0 );
 
     m_finalpass2->GetViewportQuad()->SetDrawingState( false );
 
@@ -479,8 +484,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_planet->RegisterPlanetBodyPassSlot( m_texturepass );
 
-    m_planet->RegisterSinglePassSlot( m_patchespass );
-    m_patchesnode = static_cast<SphericalLOD::FaceDrawingNode*>( m_planet->GetSingleNodeFromPass( m_patchespass ) );
+    //m_planet->RegisterSinglePassSlot( m_patchespass );
+    //m_patchesnode = static_cast<SphericalLOD::FaceDrawingNode*>( m_planet->GetSingleNodeFromPass( m_patchespass ) );
 
     Texture* texture_planet = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
     texture_planet->LoadFromFile();
@@ -521,6 +526,7 @@ bool dsAppClient::OnIdleAppInit( void )
     patch_vshader->LoadFromFile();
     patch_pshader->LoadFromFile();
 
+    /*
     Fx* patch_fx = m_planet->CreateSingleNodeFx( m_patchespass );
 
     //patch_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
@@ -532,7 +538,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     patch_fx->AddShader( patch_vshader );
     patch_fx->AddShader( patch_pshader );
-    
+    */
 
     m_planet->SetOrbitDuration( 0.333 );
     m_planet->SetRevolutionTiltAngle( 25.0 );
@@ -786,7 +792,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_finalpass2->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
-    m_patchespass->GetRenderingQueue()->UpdateOutputQueue();
+    //m_patchespass->GetRenderingQueue()->UpdateOutputQueue();
 
     m_planet->InitNoisingTextures();
 
