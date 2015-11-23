@@ -920,17 +920,17 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case VK_RETURN:
 
-            m_ship->ApplyFwdForce( 110000.0 );
+            m_ship->ApplyFwdForce( 11000.0 );
             break;
 
         case VK_UP:
 
-            m_ship->ApplyFwdForce( -30000.0 );
+            m_ship->ApplyFwdForce( -3000.0 );
             break;
 
         case VK_DOWN:
 
-            m_ship->ApplyDownForce( -10000.0 );
+            m_ship->ApplyDownForce( -1000.0 );
             break;
 
 
