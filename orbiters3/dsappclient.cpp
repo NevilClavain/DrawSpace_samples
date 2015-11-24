@@ -68,20 +68,6 @@ void dsAppClient::OnRenderFrame( void )
 
     DrawSpace::SphericalLOD::Patch* current_patch = m_planet->GetFragment( 0 )->GetCurrentPatch();
 
-    /*
-    std::vector<DrawSpace::SphericalLOD::Patch*> dl;
-    if( current_patch )
-    {
-        dl.push_back( current_patch );
-    }
-    m_patchesnode->SetDisplayList( dl );
-    */
-
-
-
-   
-    //m_patchespass->GetRenderingQueue()->Draw();
-
     m_planet->DrawSubPasses();
 
     m_texturepass->GetRenderingQueue()->Draw();
@@ -125,8 +111,6 @@ void dsAppClient::OnRenderFrame( void )
         
     }
 
-    renderer->DrawText( 0, 255, 0, 10, 200, "%d %d %d %d %d %d", m_planet->m_front_done, m_planet->m_rear_done, m_planet->m_left_done,
-                                                                m_planet->m_right_done, m_planet->m_top_done, m_planet->m_bottom_done );
     dsreal rel_alt;
     m_planet->GetInertBodyRelativeAltitude( m_ship, rel_alt );
     renderer->DrawText( 0, 255, 0, 10, 220, "relative_alt = %f", rel_alt );
@@ -506,18 +490,13 @@ bool dsAppClient::OnIdleAppInit( void )
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
 
-        /*
-        m_planet->AddPlanetBodyShader( m_texturepass, i, planet_vshader );
-        m_planet->AddPlanetBodyShader( m_texturepass, i, planet_pshader ); 
-        */
-
         fx->AddShader( planet_vshader );
         fx->AddShader( planet_pshader );
 
         //m_planet->BindExternalGlobalTexture( texture_planet, m_texturepass, i );
     }
 
-    m_planet->CreateProceduralGlobalTextures( m_texturepass, 128 );
+    
 
 
 
@@ -526,19 +505,7 @@ bool dsAppClient::OnIdleAppInit( void )
     patch_vshader->LoadFromFile();
     patch_pshader->LoadFromFile();
 
-    /*
-    Fx* patch_fx = m_planet->CreateSingleNodeFx( m_patchespass );
 
-    //patch_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
-    patch_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-    //patch_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    patch_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-    //patch_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    //patch_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
-
-    patch_fx->AddShader( patch_vshader );
-    patch_fx->AddShader( patch_pshader );
-    */
 
     m_planet->SetOrbitDuration( 0.333 );
     m_planet->SetRevolutionTiltAngle( 25.0 );
@@ -792,11 +759,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_finalpass2->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
-    //m_patchespass->GetRenderingQueue()->UpdateOutputQueue();
-
-    //m_planet->InitNoisingTextures();
-
-    m_planet->InitProceduralGlobalTextures( m_texturepass, 112, 146, 190 );
 
 
     m_mouse_circularmode = true;
@@ -1011,10 +973,6 @@ void dsAppClient::OnKeyPulse( long p_key )
             m_calendar->SetTimeFactor( Calendar::SEC_1DAY_TIME );
             break;
 
-        case VK_F7:
-          
-            m_planet->run_textures( m_texturepass );
-            break;
 
 
         case VK_F8:

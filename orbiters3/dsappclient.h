@@ -17,10 +17,6 @@ protected:
     DrawSpace::Core::SceneNodeGraph             m_scenenodegraph;
 
 
-    //DrawSpace::IntermediatePass*                m_patchespass;
-    //DrawSpace::SphericalLOD::FaceDrawingNode*   m_patchesnode;
-
-
     DrawSpace::IntermediatePass*                m_texturepass;
     DrawSpace::FinalPass*                       m_finalpass;
     DrawSpace::FinalPass*                       m_finalpass2;
