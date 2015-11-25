@@ -887,12 +887,12 @@ void dsAppClient::OnKeyPress( long p_key )
 
         case VK_UP:
 
-            m_ship->ApplyFwdForce( -3000.0 );
+            m_ship->ApplyFwdForce( -5000.0 );
             break;
 
         case VK_DOWN:
 
-            m_ship->ApplyDownForce( -1000.0 );
+            m_ship->ApplyDownForce( -10000.0 );
             break;
 
 
