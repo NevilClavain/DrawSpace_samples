@@ -462,9 +462,13 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
+    SphericalLOD::Config config;
 
+    config.m_amplitude = 12000.0;
+    config.m_fbmClamp = false;
+    config.m_lod0base = 19000.0;
     
-    m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer ) );
+    m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer, config ) );
 
     m_planet->RegisterPlanetBodyPassSlot( m_texturepass );
 
