@@ -83,30 +83,11 @@ bool dsAppClient::OnIdleAppInit( void )
     m_perlinnoisemap_texture->SetPurpose( Texture::PURPOSE_FLOAT );
 
 
-    m_fbmexp_texture = new Texture();    
-    m_fbmexp_texture->SetFormat( Fractal::MaxOctaves, 1, 4 );
-    m_fbmexp_texture->SetPurpose( Texture::PURPOSE_FLOAT );
-
-
     m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoisebuffer_texture, 0 );
     m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoisemap_texture, 1 );
-    m_texturepass->GetViewportQuad()->SetTexture( m_fbmexp_texture, 2 );
 
 
     
-   /*
-    m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
-    m_finalpass->Initialize();
-    m_finalpass->CreateViewportQuad();
-    m_finalpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.vsh", false ) ) );
-    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "noise.psh", false ) ) );
-    m_finalpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_finalpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
-    m_finalpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    m_finalpass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    */
-
     m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
     m_finalpass->Initialize();
     m_finalpass->CreateViewportQuad();
@@ -141,8 +122,6 @@ bool dsAppClient::OnIdleAppInit( void )
     m_perlinnoisemap_texture->AllocTextureContent();
     m_pnmaptexture_content = m_perlinnoisemap_texture->GetTextureContentPtr();
 
-    m_fbmexp_texture->AllocTextureContent();
-    m_fbmexptexture_content = m_fbmexp_texture->GetTextureContentPtr();
         
     float* float_ptr = (float*)m_pnbufftexture_content;
 
@@ -164,17 +143,8 @@ bool dsAppClient::OnIdleAppInit( void )
     }
 
 
-    float_ptr = (float*)m_fbmexptexture_content;
-
-    for( long i = 0; i < Fractal::MaxOctaves; i++ )
-    {
-        float temp = m_fractal->GetExponent( i );
-        *float_ptr = temp; float_ptr++;
-    }
-
     m_perlinnoisemap_texture->UpdateTextureContent();
     m_perlinnoisebuffer_texture->UpdateTextureContent();
-    m_fbmexp_texture->UpdateTextureContent();
     
     return true;
 }

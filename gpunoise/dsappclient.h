@@ -25,11 +25,10 @@ protected:
 
     void*                                                               m_pnbufftexture_content;
     void*                                                               m_pnmaptexture_content;
-    void*                                                               m_fbmexptexture_content;
 
     DrawSpace::Core::Texture*                                           m_perlinnoisebuffer_texture;
     DrawSpace::Core::Texture*                                           m_perlinnoisemap_texture;
-    DrawSpace::Core::Texture*                                           m_fbmexp_texture;
+
 
     DrawSpace::Utils::Fractal*                                          m_fractal;
 
