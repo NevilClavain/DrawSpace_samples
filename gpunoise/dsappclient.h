@@ -30,7 +30,15 @@ protected:
     DrawSpace::Core::Texture*                                           m_perlinnoisemap_texture;
 
 
+    void*                                                               m_pnbufftexture_content2;
+    void*                                                               m_pnmaptexture_content2;
+
+    DrawSpace::Core::Texture*                                           m_perlinnoisebuffer_texture2;
+    DrawSpace::Core::Texture*                                           m_perlinnoisemap_texture2;
+
+
     DrawSpace::Utils::Fractal*                                          m_fractal;
+    DrawSpace::Utils::Fractal*                                          m_fractal2;
 
 
     dsAppClient( void );
