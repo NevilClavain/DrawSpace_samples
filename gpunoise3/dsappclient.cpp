@@ -9,7 +9,6 @@ using namespace DrawSpace::Gui;
 dsAppClient* dsAppClient::m_instance = NULL;
 
 
-
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false )
 {    
     _INIT_LOGGER( "loggpunoise3.conf" )  
@@ -66,36 +65,21 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
 
-    m_fractal = new Fractal( 3, 1000068, 0.5, 2.0 );
-    m_fractal2 = new Fractal( 3, 173345, 0.5, 2.0 );
+
+    m_perlinnoiseperm_texture = new Texture();    
+    m_perlinnoiseperm_texture->SetFormat( 256, 1, 4 );
+    m_perlinnoiseperm_texture->SetPurpose( Texture::PURPOSE_FLOAT );
 
 
-    m_perlinnoisebuffer_texture = new Texture();    
-    m_perlinnoisebuffer_texture->SetFormat( 256, 3, 4 );
-    m_perlinnoisebuffer_texture->SetPurpose( Texture::PURPOSE_FLOAT );
-
-
-    m_perlinnoisemap_texture = new Texture();
-    m_perlinnoisemap_texture->SetFormat( 256, 1, 4 );
-    m_perlinnoisemap_texture->SetPurpose( Texture::PURPOSE_FLOAT );
+    m_perlinnoisegrad_texture = new Texture();
+    m_perlinnoisegrad_texture->SetFormat( 16, 1, 4 );
+    m_perlinnoisegrad_texture->SetPurpose( Texture::PURPOSE_COLOR );
 
 
 
-    m_perlinnoisebuffer_texture2 = new Texture();    
-    m_perlinnoisebuffer_texture2->SetFormat( 256, 3, 4 );
-    m_perlinnoisebuffer_texture2->SetPurpose( Texture::PURPOSE_FLOAT );
+    m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoiseperm_texture, 0 );
+    m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoisegrad_texture, 1 );
 
-
-    m_perlinnoisemap_texture2 = new Texture();
-    m_perlinnoisemap_texture2->SetFormat( 256, 1, 4 );
-    m_perlinnoisemap_texture2->SetPurpose( Texture::PURPOSE_FLOAT );
-
-
-    m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoisebuffer_texture, 0 );
-    m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoisemap_texture, 1 );
-
-    m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoisebuffer_texture2, 2 );
-    m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoisemap_texture2, 3 );
 
     
     m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
@@ -126,65 +110,139 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
 
-    m_perlinnoisebuffer_texture->AllocTextureContent();
-    m_pnbufftexture_content = m_perlinnoisebuffer_texture->GetTextureContentPtr();
+    m_perlinnoiseperm_texture->AllocTextureContent();
+    m_permtexture_content = m_perlinnoiseperm_texture->GetTextureContentPtr();
 
-    m_perlinnoisemap_texture->AllocTextureContent();
-    m_pnmaptexture_content = m_perlinnoisemap_texture->GetTextureContentPtr();
-
-
-    m_perlinnoisebuffer_texture2->AllocTextureContent();
-    m_pnbufftexture_content2 = m_perlinnoisebuffer_texture2->GetTextureContentPtr();
-
-    m_perlinnoisemap_texture2->AllocTextureContent();
-    m_pnmaptexture_content2 = m_perlinnoisemap_texture2->GetTextureContentPtr();
+    m_perlinnoisegrad_texture->AllocTextureContent();
+    m_gradtexture_content = m_perlinnoisegrad_texture->GetTextureContentPtr();
 
 
+
+    std::default_random_engine generator;
+    std::uniform_real_distribution<double> rf( -0.5, 0.5 );
+    std::uniform_int_distribution<int> ri( 0, 255 );
+    generator.seed( 144539 );
+
+    float perm[256];
+    int i, j;
+    float k;
+
+    for( i = 0; i < 256; i++ )
+    {
+        perm[i] = float(i) / 256.0;
+    }
+    
+	while( --i )
+	{
+        j = ri( generator );
+
+        k = perm[i];
+        perm[i] = perm[j];
+        perm[j] = k;
+	}
+
+    
     float* float_ptr;
-
-    float_ptr = (float*)m_pnbufftexture_content;        
-    for(long j = 0; j < 3; j++ )
-    {
-        for( long i = 0; i < 256; i++ )    
-        {
-            float temp = m_fractal->GetNBuffer( i, j );
-            *float_ptr = temp; float_ptr++;
-        }
-    }
-
-
-    float_ptr = (float*)m_pnmaptexture_content;
+    
+    float_ptr = (float*)m_permtexture_content;        
     for( long i = 0; i < 256; i++ )
     {
-        *float_ptr = m_fractal->GetNMap( i ); float_ptr++;
+       *float_ptr = perm[i];
+       float_ptr++;
     }
 
 
+    unsigned char* color_ptr = (unsigned char*)m_gradtexture_content;
 
-    float_ptr = (float*)m_pnbufftexture_content2;        
-    for(long j = 0; j < 3; j++ )
-    {
-        for( long i = 0; i < 256; i++ )    
-        {
-            float temp = m_fractal2->GetNBuffer( i, j );
-            *float_ptr = temp; float_ptr++;
-        }
-    }
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 0; color_ptr++;
 
 
-    float_ptr = (float*)m_pnmaptexture_content2;
-    for( long i = 0; i < 256; i++ )
-    {
-        *float_ptr = m_fractal2->GetNMap( i ); float_ptr++;
-    }
+
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 0; color_ptr++;
 
 
 
-    m_perlinnoisemap_texture->UpdateTextureContent();
-    m_perlinnoisebuffer_texture->UpdateTextureContent();
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 0; color_ptr++;
 
-    m_perlinnoisemap_texture2->UpdateTextureContent();
-    m_perlinnoisebuffer_texture2->UpdateTextureContent();
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+
+
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 255; color_ptr++;
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+
+    *color_ptr = 128; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+    *color_ptr = 0; color_ptr++;
+
+
+    m_perlinnoiseperm_texture->UpdateTextureContent();
+    m_perlinnoisegrad_texture->UpdateTextureContent();
+
 
 
     return true;
