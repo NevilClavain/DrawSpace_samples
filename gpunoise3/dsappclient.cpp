@@ -28,9 +28,16 @@ void dsAppClient::OnRenderFrame( void )
 
     m_scenenodegraph.ComputeTransformations( m_timer );
 
+    static int once = false;
+
+    if( !once )
+    {
+        m_perlinpass->GetRenderingQueue()->Draw();
+        once = true;
+    }
 
 
-    m_texturepass->GetRenderingQueue()->Draw();
+    m_texturepass->GetRenderingQueue()->Draw();    
     m_finalpass->GetRenderingQueue()->Draw();
 
 
@@ -50,6 +57,23 @@ bool dsAppClient::OnIdleAppInit( void )
     renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
 
 
+    m_perlinpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "perlin_pass" ) );
+    m_perlinpass->SetTargetDimsFromRenderer( false );
+    m_perlinpass->SetTargetDims( 1024, 1024 );
+    m_perlinpass->SetRenderPurpose( Texture::RENDERPURPOSE_FLOAT32 );
+    
+    m_perlinpass->Initialize();
+    m_perlinpass->CreateViewportQuad();
+    
+    m_perlinpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_perlinpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "perlin.vsh", false ) ) );
+    m_perlinpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "perlin.psh", false ) ) );
+    m_perlinpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_perlinpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_perlinpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_perlinpass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    
     m_texturepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
     m_texturepass->SetTargetDimsFromRenderer( false );
     m_texturepass->SetTargetDims( 256, 256 );
@@ -63,22 +87,24 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     m_texturepass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
     m_texturepass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    
+    m_texturepass->GetViewportQuad()->SetTexture( m_perlinpass->GetTargetTexture(), 0 );
+
+    m_fractal = new Fractal( 3, 37665, 0.5, 2.0 );
+
+    m_perlinnoisebuffer_texture = new Texture();    
+    m_perlinnoisebuffer_texture->SetFormat( 256, 3, 4 );
+    m_perlinnoisebuffer_texture->SetPurpose( Texture::PURPOSE_FLOAT );
+
+
+    m_perlinnoisemap_texture = new Texture();
+    m_perlinnoisemap_texture->SetFormat( 256, 1, 4 );
+    m_perlinnoisemap_texture->SetPurpose( Texture::PURPOSE_FLOAT );
 
 
 
-    m_perlinnoiseperm_texture = new Texture();    
-    m_perlinnoiseperm_texture->SetFormat( 256, 1, 4 );
-    m_perlinnoiseperm_texture->SetPurpose( Texture::PURPOSE_FLOAT );
-
-
-    m_perlinnoisegrad_texture = new Texture();
-    m_perlinnoisegrad_texture->SetFormat( 16, 1, 4 );
-    m_perlinnoisegrad_texture->SetPurpose( Texture::PURPOSE_COLOR );
-
-
-
-    m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoiseperm_texture, 0 );
-    m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoisegrad_texture, 1 );
+    m_perlinpass->GetViewportQuad()->SetTexture( m_perlinnoisebuffer_texture, 0 );
+    m_perlinpass->GetViewportQuad()->SetTexture( m_perlinnoisemap_texture, 1 );
 
 
     
@@ -90,160 +116,49 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
     m_finalpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
     m_finalpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
-    m_finalpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_finalpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
     m_finalpass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
     
 
     m_finalpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
 
 
-       
-
-
-
-
     /////////////////////////////////////////////////////////////////
 
 
-
-
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_perlinpass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
 
-    m_perlinnoiseperm_texture->AllocTextureContent();
-    m_permtexture_content = m_perlinnoiseperm_texture->GetTextureContentPtr();
+    m_perlinnoisebuffer_texture->AllocTextureContent();
+    m_pnbufftexture_content = m_perlinnoisebuffer_texture->GetTextureContentPtr();
 
-    m_perlinnoisegrad_texture->AllocTextureContent();
-    m_gradtexture_content = m_perlinnoisegrad_texture->GetTextureContentPtr();
+    m_perlinnoisemap_texture->AllocTextureContent();
+    m_pnmaptexture_content = m_perlinnoisemap_texture->GetTextureContentPtr();
 
 
 
-    std::default_random_engine generator;
-    std::uniform_real_distribution<double> rf( -0.5, 0.5 );
-    std::uniform_int_distribution<int> ri( 0, 255 );
-    generator.seed( 144539 );
-
-    float perm[256];
-    int i, j;
-    float k;
-
-    for( i = 0; i < 256; i++ )
-    {
-        perm[i] = float(i) / 256.0;
-    }
-    
-	while( --i )
-	{
-        j = ri( generator );
-
-        k = perm[i];
-        perm[i] = perm[j];
-        perm[j] = k;
-	}
-
-    
     float* float_ptr;
-    
-    float_ptr = (float*)m_permtexture_content;        
+
+    float_ptr = (float*)m_pnbufftexture_content;        
+    for(long j = 0; j < 3; j++ )
+    {
+        for( long i = 0; i < 256; i++ )    
+        {
+            float temp = m_fractal->GetNBuffer( i, j );
+            *float_ptr = temp; float_ptr++;
+        }
+    }
+
+
+    float_ptr = (float*)m_pnmaptexture_content;
     for( long i = 0; i < 256; i++ )
     {
-       *float_ptr = perm[i];
-       float_ptr++;
+        *float_ptr = m_fractal->GetNMap( i ); float_ptr++;
     }
 
-
-    unsigned char* color_ptr = (unsigned char*)m_gradtexture_content;
-
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-
-
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-
-
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 255; color_ptr++;
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-    *color_ptr = 128; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-    *color_ptr = 0; color_ptr++;
-
-
-    m_perlinnoiseperm_texture->UpdateTextureContent();
-    m_perlinnoisegrad_texture->UpdateTextureContent();
-
-
+    m_perlinnoisemap_texture->UpdateTextureContent();
+    m_perlinnoisebuffer_texture->UpdateTextureContent();
 
     return true;
 }

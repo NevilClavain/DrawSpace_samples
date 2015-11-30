@@ -15,6 +15,7 @@ protected:
 
     DrawSpace::FinalPass*                                               m_finalpass;
 
+    DrawSpace::IntermediatePass*                                        m_perlinpass;
     DrawSpace::IntermediatePass*                                        m_texturepass;
 
 
@@ -23,15 +24,13 @@ protected:
     bool                                                                m_mouselb;
     bool                                                                m_mouserb;
 
-    void*                                                               m_permtexture_content;
-    void*                                                               m_gradtexture_content;
+    void*                                                               m_pnbufftexture_content;
+    void*                                                               m_pnmaptexture_content;
 
-    DrawSpace::Core::Texture*                                           m_perlinnoiseperm_texture;
-    DrawSpace::Core::Texture*                                           m_perlinnoisegrad_texture;
+    DrawSpace::Core::Texture*                                           m_perlinnoisebuffer_texture;
+    DrawSpace::Core::Texture*                                           m_perlinnoisemap_texture;
 
-
-
-
+    DrawSpace::Utils::Fractal*                                          m_fractal;
 
     dsAppClient( void );
 
