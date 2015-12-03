@@ -28,14 +28,6 @@ void dsAppClient::OnRenderFrame( void )
 
     m_scenenodegraph.ComputeTransformations( m_timer );
 
-    static int once = false;
-
-    if( !once )
-    {
-        m_perlinpass->GetRenderingQueue()->Draw();
-        once = true;
-    }
-
 
     m_texturepass->GetRenderingQueue()->Draw();    
     m_finalpass->GetRenderingQueue()->Draw();
@@ -56,24 +48,6 @@ bool dsAppClient::OnIdleAppInit( void )
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
     renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
 
-
-    m_perlinpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "perlin_pass" ) );
-    m_perlinpass->SetTargetDimsFromRenderer( false );
-    m_perlinpass->SetTargetDims( 1024, 1024 );
-    m_perlinpass->SetRenderPurpose( Texture::RENDERPURPOSE_FLOAT32 );
-    
-    m_perlinpass->Initialize();
-    m_perlinpass->CreateViewportQuad();
-    
-    m_perlinpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_perlinpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "perlin.vsh", false ) ) );
-    m_perlinpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "perlin.psh", false ) ) );
-    m_perlinpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_perlinpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
-    m_perlinpass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    m_perlinpass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-
-    
     m_texturepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
     m_texturepass->SetTargetDimsFromRenderer( false );
     m_texturepass->SetTargetDims( 256, 256 );
@@ -88,23 +62,22 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->GetViewportQuad()->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
     m_texturepass->GetViewportQuad()->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
     
-    m_texturepass->GetViewportQuad()->SetTexture( m_perlinpass->GetTargetTexture(), 0 );
-
+ 
     m_fractal = new Fractal( 3, 37665, 0.5, 2.0 );
 
-    m_perlinnoisebuffer_texture = new Texture();    
-    m_perlinnoisebuffer_texture->SetFormat( 256, 3, 4 );
-    m_perlinnoisebuffer_texture->SetPurpose( Texture::PURPOSE_FLOAT );
+    m_perlinnoisegrad_texture = new Texture();    
+    m_perlinnoisegrad_texture->SetFormat( 256, 1, 4 );
+    m_perlinnoisegrad_texture->SetPurpose( Texture::PURPOSE_FLOATVECTOR );
 
 
-    m_perlinnoisemap_texture = new Texture();
-    m_perlinnoisemap_texture->SetFormat( 256, 1, 4 );
-    m_perlinnoisemap_texture->SetPurpose( Texture::PURPOSE_FLOAT );
+    m_perlinnoiseperm_texture = new Texture();
+    m_perlinnoiseperm_texture->SetFormat( 256, 256, 4 );
+    m_perlinnoiseperm_texture->SetPurpose( Texture::PURPOSE_FLOAT );
 
 
 
-    m_perlinpass->GetViewportQuad()->SetTexture( m_perlinnoisebuffer_texture, 0 );
-    m_perlinpass->GetViewportQuad()->SetTexture( m_perlinnoisemap_texture, 1 );
+    m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoisegrad_texture, 0 );
+    m_texturepass->GetViewportQuad()->SetTexture( m_perlinnoiseperm_texture, 1 );
 
 
     
@@ -127,19 +100,19 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
-    m_perlinpass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
 
-    m_perlinnoisebuffer_texture->AllocTextureContent();
-    m_pnbufftexture_content = m_perlinnoisebuffer_texture->GetTextureContentPtr();
+    m_perlinnoisegrad_texture->AllocTextureContent();
+    m_pngradtexture_content = m_perlinnoisegrad_texture->GetTextureContentPtr();
 
-    m_perlinnoisemap_texture->AllocTextureContent();
-    m_pnmaptexture_content = m_perlinnoisemap_texture->GetTextureContentPtr();
+    m_perlinnoiseperm_texture->AllocTextureContent();
+    m_pnpermtexture_content = m_perlinnoiseperm_texture->GetTextureContentPtr();
 
 
 
     float* float_ptr;
-
+    char* color_ptr;
+    /*
     float_ptr = (float*)m_pnbufftexture_content;        
     for(long j = 0; j < 3; j++ )
     {
@@ -156,9 +129,38 @@ bool dsAppClient::OnIdleAppInit( void )
     {
         *float_ptr = m_fractal->GetNMap( i ); float_ptr++;
     }
+    */
 
-    m_perlinnoisemap_texture->UpdateTextureContent();
-    m_perlinnoisebuffer_texture->UpdateTextureContent();
+    char tab_grad[16][3] = 
+    {
+        {1,1,0},
+        {-1,1,0},
+        {1,-1,0},
+        {-1,-1,0},
+        {1,0,1},
+        {-1,0,1},
+        {1,0,-1},
+        {-1,0,-1}, 
+        {0,1,1},
+        {0,-1,1},
+        {0,1,-1},
+        {0,-1,-1},
+        {1,1,0},
+        {0,-1,1},
+        {-1,1,0},
+        {0,-1,-1}    
+    };
+
+
+    float_ptr = (float*)m_pngradtexture_content;
+
+    *float_ptr = -2.0; float_ptr++;
+    *float_ptr = 0.0; float_ptr++;
+    *float_ptr = 3.0; float_ptr++;
+
+
+    m_perlinnoiseperm_texture->UpdateTextureContent();
+    m_perlinnoisegrad_texture->UpdateTextureContent();
 
     return true;
 }
