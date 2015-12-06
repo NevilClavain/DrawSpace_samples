@@ -242,7 +242,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    //m_finalpass2->GetViewportQuad()->SetTexture( m_patchespass->GetTargetTexture(), 0 );
+    
 
     m_finalpass2->GetViewportQuad()->SetDrawingState( false );
 
@@ -467,13 +467,11 @@ bool dsAppClient::OnIdleAppInit( void )
     config.m_amplitude = 12000.0;
     config.m_fbmClamp = false;
     config.m_lod0base = 19000.0;
+    config.m_fbmInputHalfRange = 20.0;
     
     m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer, config ) );
 
     m_planet->RegisterPlanetBodyPassSlot( m_texturepass );
-
-    //m_planet->RegisterSinglePassSlot( m_patchespass );
-    //m_patchesnode = static_cast<SphericalLOD::FaceDrawingNode*>( m_planet->GetSingleNodeFromPass( m_patchespass ) );
 
     Texture* texture_planet = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
     texture_planet->LoadFromFile();
@@ -500,20 +498,14 @@ bool dsAppClient::OnIdleAppInit( void )
         //m_planet->BindExternalGlobalTexture( texture_planet, m_texturepass, i );
     }
 
-    
-
-
-
-    Shader* patch_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planethm.vsh", false ) );
-    Shader* patch_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planethm.psh", false ) );
-    patch_vshader->LoadFromFile();
-    patch_pshader->LoadFromFile();
-
-
+   
 
     m_planet->SetOrbitDuration( 0.333 );
     m_planet->SetRevolutionTiltAngle( 25.0 );
     m_planet->SetRevolutionDuration( 1.0 );
+
+
+    m_finalpass2->GetViewportQuad()->SetTexture( m_planet->GetColorTexture( 0 ), 0 );
 
 
     m_planet_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Planetoid::Body>, SceneNode<DrawSpace::Planetoid::Body>( "planet01" ) );
