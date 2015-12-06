@@ -498,7 +498,8 @@ bool dsAppClient::OnIdleAppInit( void )
         //m_planet->BindExternalGlobalTexture( texture_planet, m_texturepass, i );
     }
 
-   
+    m_planet->BindGlobalTexture( m_texturepass );
+
 
     m_planet->SetOrbitDuration( 0.333 );
     m_planet->SetRevolutionTiltAngle( 25.0 );
