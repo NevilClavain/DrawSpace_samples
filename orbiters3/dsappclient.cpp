@@ -159,6 +159,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     World::m_scale = 1.0;
     DrawSpace::SphericalLOD::Body::BuildMeshe();
+    DrawSpace::SphericalLOD::Body::BuildMesheHigh();
 
 
     RegisterMouseInputEventsProvider( &m_mouse_input );
@@ -467,7 +468,7 @@ bool dsAppClient::OnIdleAppInit( void )
     config.m_amplitude = 12000.0;
     config.m_fbmClamp = false;
     config.m_lod0base = 19000.0;
-    config.m_fbmInputHalfRange = 20.0;
+    config.m_fbmInputHalfRange = 4.0;
     
     m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer, config ) );
 
@@ -485,12 +486,12 @@ bool dsAppClient::OnIdleAppInit( void )
     {
         Fx* fx = m_planet->CreatePlanetBodyFx( m_texturepass, i );
 
-        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
+        //fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
         fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
         fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
         fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-        fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+        //fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
 
         fx->AddShader( planet_vshader );
         fx->AddShader( planet_pshader );
