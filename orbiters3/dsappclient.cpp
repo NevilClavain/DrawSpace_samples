@@ -477,8 +477,8 @@ bool dsAppClient::OnIdleAppInit( void )
     Texture* texture_planet = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
     texture_planet->LoadFromFile();
 
-    Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.vsh", false ) );
-    Shader* planet_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.psh", false ) );
+    Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.vso", true ) );
+    Shader* planet_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.pso", true ) );
     planet_vshader->LoadFromFile();
     planet_pshader->LoadFromFile();
     
