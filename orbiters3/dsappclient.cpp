@@ -507,7 +507,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_planet->SetRevolutionDuration( 1.0 );
 
 
-    m_finalpass2->GetViewportQuad()->SetTexture( m_planet->GetColorTexture( 0 ), 0 );
+    //m_finalpass2->GetViewportQuad()->SetTexture( m_planet->GetColorTexture( 0 ), 0 );
 
 
     m_planet_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Planetoid::Body>, SceneNode<DrawSpace::Planetoid::Body>( "planet01" ) );
