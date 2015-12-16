@@ -126,7 +126,13 @@ protected:
 
     WidgetEventHandler*                         m_mouseleftbuttondown_eventhandler;
 
+    bool                                        m_ready;
 
+    int                                         m_init_count;
+
+
+    void init( void );
+    void render_universe( void );
 
     void on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget );
 
