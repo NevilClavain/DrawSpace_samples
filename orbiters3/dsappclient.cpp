@@ -499,15 +499,11 @@ bool dsAppClient::OnIdleAppInit( void )
         //m_planet->BindExternalGlobalTexture( texture_planet, m_texturepass, i );
     }
 
-    m_planet->BindGlobalTexture( m_texturepass );
-
 
     m_planet->SetOrbitDuration( 0.333 );
     m_planet->SetRevolutionTiltAngle( 25.0 );
     m_planet->SetRevolutionDuration( 1.0 );
 
-
-    //m_finalpass2->GetViewportQuad()->SetTexture( m_planet->GetColorTexture( 0 ), 0 );
 
 
     m_planet_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Planetoid::Body>, SceneNode<DrawSpace::Planetoid::Body>( "planet01" ) );
