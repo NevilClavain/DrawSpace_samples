@@ -45,37 +45,31 @@ dsAppClient::~dsAppClient( void )
 
 #define SPEED     1.5
 
-void dsAppClient::init( void )
-{
-    DrawSpace::Dynamics::Body::Parameters cube_params;
 
-    World::m_scale = 1.0;
+void dsAppClient::init_planet_meshes( void )
+{
     DrawSpace::SphericalLOD::Body::BuildMeshe();
     DrawSpace::SphericalLOD::Body::BuildMesheHigh();
+}
 
-
+void dsAppClient::init_assets_loaders( void )
+{
     RegisterMouseInputEventsProvider( &m_mouse_input );
-
 
     bool status;
 
-     m_meshe_import = new DrawSpace::Utils::AC3DMesheImport();
+    m_meshe_import = new DrawSpace::Utils::AC3DMesheImport();
     /////////////////////////////////////
-
 
     m_font_import = new DrawSpace::Utils::CBFGFontImport();
     m_font = _DRAWSPACE_NEW_( Font, Font );
     m_font->SetImporter( m_font_import );
 
     status = m_font->Build( "mangalfont.bmp", "mangalfont.csv" );
+}
 
-    /////////////////////////////////////    
-
-    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
-    renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
-
-
-
+void dsAppClient::init_passes( void )
+{
     m_texturepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
     m_texturepass->Initialize();
 
@@ -99,9 +93,6 @@ void dsAppClient::init( void )
 
     m_finalpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
     
-
-
-
     m_finalpass2 = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass2" ) );
     m_finalpass2->Initialize();
     m_finalpass2->CreateViewportQuad();
@@ -113,13 +104,21 @@ void dsAppClient::init( void )
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    
-
     m_finalpass2->GetViewportQuad()->SetDrawingState( false );
 
-    //////////////////////////////////////////////////////////////
+    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
+    renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
 
+}
 
+void dsAppClient::init_world_physics( void )
+{
+    World::m_scale = 1.0;
+    m_world.Initialize();
+}
+
+void dsAppClient::init_spacebox( void )
+{
     m_spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
     m_spacebox->RegisterPassSlot( m_texturepass );
     
@@ -174,18 +173,10 @@ void dsAppClient::init( void )
     m_scenenodegraph.AddNode( m_spacebox_transfo_node );
     m_scenenodegraph.RegisterNode( m_spacebox_transfo_node );
     m_spacebox_node->LinkTo( m_spacebox_transfo_node );
+}
 
-   
-    //////////////////////////////////////////////////////////////
-
-
-    m_world.Initialize();
-    
-       
-    ///////////////////////////////////////////////////////////////
-
-
-    
+void dsAppClient::init_buildings( void )
+{
     m_building = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
 
     m_building->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
@@ -241,7 +232,7 @@ void dsAppClient::init( void )
 
 
     m_longlat_mvt3 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    m_longlat_mvt3->Init( -21.0000, 20.0089, /*400114.0*/PLANET_RAY * 1000.0 + 114.0, 80.0, 0.0 );
+    m_longlat_mvt3->Init( -21.0000, 20.0089, /*400114.0*/PLANET_RAY * 1000.0 + 114.0 + 2000.0, 80.0, 0.0 );
 
     m_longlatmvt3_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LongLatMovement>, SceneNode<DrawSpace::Core::LongLatMovement>( "longlatmvt3_node" ) );
     m_longlatmvt3_node->SetContent( m_longlat_mvt3 );
@@ -316,7 +307,7 @@ void dsAppClient::init( void )
 
 
     m_longlat_mvt4 = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    m_longlat_mvt4->Init( -21.0929, 20.0000, /*400129.0*/ PLANET_RAY * 1000.0 + 129.0, 40.0, 0.0 );
+    m_longlat_mvt4->Init( -21.0129, 20.0089, /*400129.0*/ PLANET_RAY * 1000.0 + 129.0 + 2000.0, 40.0, 0.0 );
 
 
 
@@ -328,11 +319,11 @@ void dsAppClient::init( void )
     m_socle_collider_node->LinkTo( m_longlatmvt4_node );
 
 
-
     ///////////////////////////////////////////////////////////////
+}
 
-
-
+void dsAppClient::init_planet( void )
+{
     SphericalLOD::Config config;
 
     config.m_amplitude = 12000.0;
@@ -393,17 +384,20 @@ void dsAppClient::init( void )
     m_scenenodegraph.AddNode( m_planet_orbit_node );
     m_scenenodegraph.RegisterNode( m_planet_orbit_node );
 
-
     m_planet_node->LinkTo( m_planet_orbit_node );
-
-    
-
 
     m_building_collider->SetReferentOrbiter( m_planet );
     m_socle_collider->SetReferentOrbiter( m_planet );
 
+    ///////////////////////////////////
 
-    //////////////////////////////////////////////////////////////
+    m_planet->RegisterScenegraphCallbacks( m_scenenodegraph );
+}
+
+
+void dsAppClient::init_ship( void )
+{
+    DrawSpace::Dynamics::Body::Parameters cube_params;
 
 
     m_ship_drawable = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
@@ -463,9 +457,11 @@ void dsAppClient::init( void )
 
     //////////////////////////////////////////////////////////////
 
+}
 
-   
 
+void dsAppClient::init_cameras( void )
+{
     m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     //m_camera3->LockOnBody( "ship", m_ship );
     m_camera3->Lock( m_ship_node );
@@ -487,34 +483,31 @@ void dsAppClient::init( void )
 
     m_camera3_node->LinkTo( m_circmvt_node );
 
-
     m_circmvt_node->LinkTo( m_ship_node );
+}
 
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-    ///////////////////////////////////////////////////////////////
-
-
+void dsAppClient::init_reticle( void )
+{
     m_reticle_widget = _DRAWSPACE_NEW_( ReticleWidget, ReticleWidget( "reticle_widget", (long)10, (long)10, &m_scenenodegraph, NULL ) );
-    
 
-
+    m_reticle_widget->Lock( m_socle_node );
     
+    DrawSpace::Gui::ReticleWidget::ClippingParams clp;
+    clp.clipping_policy = DrawSpace::Gui::ReticleWidget::CLIPPING_HOLD;
+    clp.xmin = -0.5;
+    clp.xmax = 0.5;
+    clp.ymin = -0.375;
+    clp.ymax = 0.375;
+
+    m_reticle_widget->SetClippingParams( clp );
+
+    m_reticle_widget->RegisterMouseLeftButtonDownEventHandler( m_mouseleftbuttondown_eventhandler );
+
+    m_mouse_input.RegisterWidget( m_reticle_widget );    
+}
+
+void dsAppClient::init_text_assets( void )
+{
     m_text_widget = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget", DRAWSPACE_GUI_WIDTH, DRAWSPACE_GUI_HEIGHT, m_font, true, m_reticle_widget ) );
 
 
@@ -562,13 +555,6 @@ void dsAppClient::init( void )
 
     m_text_widget->RegisterToPass( m_finalpass );
     
-
-
-
-
-
-    
-
     m_text_widget_2 = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget_2", 1200, 360, m_font, false, m_text_widget ) );
     
     m_text_widget_2->GetImage()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
@@ -600,34 +586,17 @@ void dsAppClient::init( void )
     m_text_widget_2->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
 
     m_text_widget_2->RegisterToPass( m_finalpass );
+}
 
-    m_reticle_widget->Lock( m_building_node );
-
-    
-    DrawSpace::Gui::ReticleWidget::ClippingParams clp;
-    clp.clipping_policy = DrawSpace::Gui::ReticleWidget::CLIPPING_HOLD;
-    clp.xmin = -0.5;
-    clp.xmax = 0.5;
-    clp.ymin = -0.375;
-    clp.ymax = 0.375;
-
-    m_reticle_widget->SetClippingParams( clp );
-
-    m_reticle_widget->RegisterMouseLeftButtonDownEventHandler( m_mouseleftbuttondown_eventhandler );
-
-
-    m_mouse_input.RegisterWidget( m_reticle_widget );
-    
-    ///////////////////////////////////////////////////////////////
-
+void dsAppClient::init_rendering_queues( void )
+{
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_finalpass2->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
+}
 
-
-    m_mouse_circularmode = true;
-
-
+void dsAppClient::init_calendar( void )
+{
     m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer ) );
 
     m_calendar->RegisterWorld( &m_world );
@@ -635,32 +604,12 @@ void dsAppClient::init( void )
 
     m_calendar->RegisterOrbit( m_planet_orbit );
     m_calendar->RegisterOrbiter( m_planet );
+}
 
-
-    
-   
-    m_scenenodegraph.SetCurrentCamera( "camera3" );
-    m_curr_camera = m_camera3;
-
-       
-
-        
-    m_planet->RegisterScenegraphCallbacks( m_scenenodegraph );
-  
-    
-
+void dsAppClient::init_planet_noise( void )
+{
+    //m_planet->RegisterScenegraphCallbacks( m_scenenodegraph );
     m_planet->InitNoisingTextures();
-
-
-
-    ///////////////////////////////////////////////////////////////
-
-
-    //m_calendar->Startup( 162682566 );
-    m_calendar->Startup( 0 );
-
-    m_ready = true;
-
 }
 
 
@@ -769,6 +718,16 @@ void dsAppClient::render_universe( void )
     m_calendar->Run();
 }
 
+void dsAppClient::print_init_trace( const dsstring& p_string )
+{
+    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
+
+    renderer->BeginScreen();
+    renderer->DrawText( 255, 0, 0, 10, ( m_init_count * 20 ) + 30, p_string.c_str() );
+    renderer->EndScreen();
+}
+
+
 void dsAppClient::OnRenderFrame( void )
 {
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -778,17 +737,91 @@ void dsAppClient::OnRenderFrame( void )
         switch( m_init_count )
         {
             case 0:
-                renderer->BeginScreen();
-                renderer->DrawText( 255, 0, 0, 10, 30, "initialising universe..." );
-                renderer->EndScreen();
-                
+                print_init_trace( "initialising universe..." );
                 break;
 
             case 1:
-
-                init();
+                print_init_trace( "planets patches meshes initialisation..." );
+                init_planet_meshes();
                 break;
-        
+
+            case 2:
+                print_init_trace( "assets loaders initialisation..." );
+                init_assets_loaders();
+                break;
+
+            case 3:
+                print_init_trace( "rendering passes creation..." );
+                init_passes();
+                break;
+
+            case 4:
+                print_init_trace( "physics world initialisation..." );
+                init_world_physics();
+                break;
+
+            case 5:
+                print_init_trace( "spacebox creation..." );
+                init_spacebox();
+                break;
+
+            case 6:                
+                print_init_trace( "buildings creation..." );
+                init_buildings();
+                break;
+
+            case 7:
+                print_init_trace( "planet creation..." );
+                init_planet();
+                break;
+
+            case 8:
+                print_init_trace( "ship creation..." );
+                init_ship();
+                break;
+
+            case 9:
+                print_init_trace( "cameras initialisation..." );
+                init_cameras();
+                break;
+
+            case 10:
+                print_init_trace( "reticle creation..." );
+                init_reticle();
+                break;
+
+            case 11:
+                print_init_trace( "text display assets creation..." );
+                init_text_assets();
+                break;
+
+            case 12:
+                print_init_trace( "rendering queues update..." );
+                init_rendering_queues();
+                break;
+
+            case 13:
+                print_init_trace( "planet noise data initialisation..." );
+                break;
+
+            case 14:                
+                init_planet_noise();
+                break;
+
+            case 15:
+                print_init_trace( "calendar initialisation..." );
+                init_calendar();
+                break;
+
+            case 16:
+                print_init_trace( "launching simulation..." );
+                m_mouse_circularmode = true;
+                m_scenenodegraph.SetCurrentCamera( "camera3" );
+                m_curr_camera = m_camera3;   
+                //m_calendar->Startup( 162682566 );
+                m_calendar->Startup( 0 );
+                m_ready = true;
+                break;        
         }
 
         renderer->FlipScreen();
@@ -805,7 +838,6 @@ void dsAppClient::OnRenderFrame( void )
 
 bool dsAppClient::OnIdleAppInit( void )
 {
-    //init();
     return true;
 }
 

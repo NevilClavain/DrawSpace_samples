@@ -130,9 +130,24 @@ protected:
 
     int                                         m_init_count;
 
+    void init_planet_meshes( void );
+    void init_assets_loaders( void );
+    void init_passes( void );
+    void init_world_physics( void );
+    void init_spacebox( void );
+    void init_buildings( void );
+    void init_planet( void );
+    void init_ship( void );
+    void init_cameras( void );
+    void init_reticle( void );
+    void init_text_assets( void );
+    void init_rendering_queues( void );
+    void init_calendar( void );
+    void init_planet_noise( void );
 
-    void init( void );
     void render_universe( void );
+
+    void print_init_trace( const dsstring& p_string );
 
     void on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget );
 
