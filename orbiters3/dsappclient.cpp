@@ -329,7 +329,7 @@ void dsAppClient::init_planet( void )
     config.m_amplitude = 12000.0;
     config.m_fbmClamp = false;
     config.m_lod0base = 19000.0;
-    config.m_fbmInputHalfRange = 14.0;
+    config.m_fbmInputHalfRange = 3.0;
     
     m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer, config ) );
 
