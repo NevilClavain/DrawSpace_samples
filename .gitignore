@@ -17,6 +17,7 @@ build/
 bin/*.lua
 bin/*.psh
 bin/*.vsh
+bin/*.hlsl
 bin/*.exe
 bin/*.dll
 bin/*.bak
