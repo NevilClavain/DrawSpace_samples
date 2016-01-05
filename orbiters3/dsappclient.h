@@ -108,6 +108,8 @@ protected:
     DrawSpace::Planetoid::Body*                                         m_planet;
     DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>*             m_planet_node;
 
+    DrawSpace::SphericalLOD::LandscapeMultiFbm*                         m_multiFbm;
+
 
 
 
