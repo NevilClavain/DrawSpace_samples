@@ -355,9 +355,9 @@ void dsAppClient::init_planet( void )
     SphericalLOD::Config config;
 
     config.m_amplitude = 12000.0;
-    config.m_fbmClamp = false;
+    //config.m_fbmClamp = false;
     config.m_lod0base = 19000.0;
-    config.m_fbmInputHalfRange = 3.0;
+    //config.m_fbmInputHalfRange = 3.0;
 
     m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer, config ) );
 
@@ -635,9 +635,8 @@ void dsAppClient::init_calendar( void )
 }
 
 void dsAppClient::init_planet_noise( void )
-{
-    //m_planet->RegisterScenegraphCallbacks( m_scenenodegraph );
-    m_planet->InitNoisingTextures();
+{    
+    //m_planet->InitNoisingTextures();
 }
 
 
