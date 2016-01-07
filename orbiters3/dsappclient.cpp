@@ -359,6 +359,8 @@ void dsAppClient::init_planet( void )
     config.m_lod0base = 19000.0;
     //config.m_fbmInputHalfRange = 3.0;
 
+    config.m_landscape = m_multiFbm;
+
     m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer, config ) );
 
     m_planet->RegisterPlanetBodyPassSlot( m_texturepass );
