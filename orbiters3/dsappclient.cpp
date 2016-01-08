@@ -349,15 +349,34 @@ void dsAppClient::init_planet( void )
 
     m_multiFbm = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::LandscapeMultiFbm, DrawSpace::SphericalLOD::LandscapeMultiFbm );
 
+    m_multiFbm->m_fbmInputHalfRange = 13.0;
+    m_multiFbm->m_fbmSeed = 334;////3345764;
     m_multiFbm->InitialiseResources();
+
+
+    Shader* hm_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planethm.vso", true ) );
+    Shader* hm_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planethm.pso", true ) );
+    hm_vshader->LoadFromFile();
+    hm_pshader->LoadFromFile();
+
+
+    Shader* colors_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planetcolors.vso", true ) );
+    Shader* colors_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planetcolors.pso", true ) );
+    colors_vshader->LoadFromFile();
+    colors_pshader->LoadFromFile();
+
+
+    m_multiFbm->AddCollisionsShaders( hm_vshader );
+    m_multiFbm->AddCollisionsShaders( hm_pshader );
+
+    m_multiFbm->AddColorsTextureShaders( colors_vshader );
+    m_multiFbm->AddColorsTextureShaders( colors_pshader );
 
 
     SphericalLOD::Config config;
 
     config.m_amplitude = 12000.0;
-    //config.m_fbmClamp = false;
     config.m_lod0base = 19000.0;
-    //config.m_fbmInputHalfRange = 3.0;
 
     config.m_landscape = m_multiFbm;
 
