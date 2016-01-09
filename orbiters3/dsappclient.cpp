@@ -349,8 +349,8 @@ void dsAppClient::init_planet( void )
 
     m_multiFbm = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::LandscapeMultiFbm, DrawSpace::SphericalLOD::LandscapeMultiFbm );
 
-    m_multiFbm->m_fbmInputHalfRange = 13.0;
-    m_multiFbm->m_fbmSeed = 334;////3345764;
+    m_multiFbm->m_fbmParams[0].m_fbmInputHalfRange = 3.0;
+    m_multiFbm->m_fbmParams[0].m_fbmSeed = 1023;////3345764;
     m_multiFbm->InitialiseResources();
 
 
