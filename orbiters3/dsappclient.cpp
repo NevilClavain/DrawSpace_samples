@@ -354,7 +354,7 @@ void dsAppClient::init_planet( void )
     m_multiFbm->m_fbmParams[0].m_fbmSeed = 1023;////3345764;
     */
 
-    m_multiFbm->m_fbm.m_InputHalfRange = 1.0;
+    m_multiFbm->m_fbm.m_InputHalfRange = 15.0;
     m_multiFbm->m_fbm.m_Lacunarity = 2.0;
     m_multiFbm->m_fbm.m_Roughness = 0.5;
 
@@ -384,7 +384,7 @@ void dsAppClient::init_planet( void )
 
     SphericalLOD::Config config;
 
-    config.m_amplitude = 9000.0; //12000.0;
+    //config.m_amplitude = 9000.0; //12000.0;
     config.m_lod0base = 19000.0;
 
     config.m_landscape = m_multiFbm;
