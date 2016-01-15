@@ -351,17 +351,17 @@ void dsAppClient::init_planet( void )
 
     
     m_multiFbm->m_fbm.m_Seed = 3345764;
-    m_multiFbm->m_fbm.m_InputHalfRange = 20.0;
+    m_multiFbm->m_fbm.m_InputHalfRange = 10.0; //30.0; //20.0;
 
 
     // montagnes
     m_multiFbm->m_fbm2.m_Seed = 34456; //3345764;
-    m_multiFbm->m_fbm2.m_Amplitude = 3000.0;
-    m_multiFbm->m_fbm2.m_InputHalfRange = 18.0; //14.0;
+    m_multiFbm->m_fbm2.m_Amplitude = 6000.0;
+    m_multiFbm->m_fbm2.m_InputHalfRange = 18;//14.0;
     m_multiFbm->m_fbm2.m_Clamp = false;
     m_multiFbm->m_fbm2.m_Lacunarity = 2.0;
 
-    m_multiFbm->m_fbm2.m_Roughness = 0.20; //0.25;  // montagnes plus ou moins pointues
+    m_multiFbm->m_fbm2.m_Roughness = 0.20; //0.25;
 
     
     // plaines et cotes
@@ -369,10 +369,7 @@ void dsAppClient::init_planet( void )
     m_multiFbm->m_fbm3.m_Amplitude = 1000.0;
     m_multiFbm->m_fbm3.m_InputHalfRange = 2.0;
 
-    // pour avoir certaines cotes "nettes" (courbe, lignes presque doites)
-    m_multiFbm->m_fbm3.m_Lacunarity = 1.5;
-    m_multiFbm->m_fbm3.m_Roughness = 0.75;
-
+   
 
     m_multiFbm->InitialiseResources();
 
