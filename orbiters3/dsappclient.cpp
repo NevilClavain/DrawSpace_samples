@@ -351,12 +351,12 @@ void dsAppClient::init_planet( void )
 
     
     m_multiFbm->m_fbm.m_Seed = 3345764;
-    m_multiFbm->m_fbm.m_InputHalfRange = 10.0; //30.0; //20.0;
+    m_multiFbm->m_fbm.m_InputHalfRange = 18.0; //20.0;
 
 
     // montagnes
     m_multiFbm->m_fbm2.m_Seed = 34456; //3345764;
-    m_multiFbm->m_fbm2.m_Amplitude = 6000.0;
+    m_multiFbm->m_fbm2.m_Amplitude = 9000.0;
     m_multiFbm->m_fbm2.m_InputHalfRange = 18;//14.0;
     m_multiFbm->m_fbm2.m_Clamp = false;
     m_multiFbm->m_fbm2.m_Lacunarity = 2.0;
