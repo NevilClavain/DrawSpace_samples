@@ -350,24 +350,27 @@ void dsAppClient::init_planet( void )
     m_multiFbm = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::LandscapeMultiFbm, DrawSpace::SphericalLOD::LandscapeMultiFbm );
 
     
-    m_multiFbm->m_fbm.m_Seed = 3345764;
-    m_multiFbm->m_fbm.m_InputHalfRange = 10.0; //30.0; //20.0;
-
+    m_multiFbm->m_fbm.m_Seed = 6643232;
+    m_multiFbm->m_fbm.m_InputHalfRange = 20.0;
 
     // montagnes
-    m_multiFbm->m_fbm2.m_Seed = 34456; //3345764;
-    m_multiFbm->m_fbm2.m_Amplitude = 6000.0;
-    m_multiFbm->m_fbm2.m_InputHalfRange = 18;//14.0;
+    m_multiFbm->m_fbm2.m_Seed = 3345764;
+    m_multiFbm->m_fbm2.m_Amplitude = 4000.0;
+    m_multiFbm->m_fbm2.m_InputHalfRange = 8.0;
     m_multiFbm->m_fbm2.m_Clamp = false;
     m_multiFbm->m_fbm2.m_Lacunarity = 2.0;
 
-    m_multiFbm->m_fbm2.m_Roughness = 0.20; //0.25;
+    m_multiFbm->m_fbm2.m_Roughness = 0.20; // montagnes plus ou moins pointues
 
     
     // plaines et cotes
-    m_multiFbm->m_fbm3.m_Seed = 865;
+    m_multiFbm->m_fbm3.m_Seed = 7709778;
     m_multiFbm->m_fbm3.m_Amplitude = 1000.0;
     m_multiFbm->m_fbm3.m_InputHalfRange = 2.0;
+
+    // pour avoir certaines cotes "nettes" (courbe, lignes presque doites)
+    //m_multiFbm->m_fbm3.m_Lacunarity = 1.80;
+    //m_multiFbm->m_fbm3.m_Roughness = 0.65;
 
    
 
