@@ -374,9 +374,8 @@ void dsAppClient::init_planet( void )
     m_multiFbm->m_fbm3.m_Amplitude = 1000.0;
     m_multiFbm->m_fbm3.m_InputHalfRange = 0.8; //2.0;
 
-    // pour avoir certaines cotes "nettes" (courbe, lignes presque doites)
-    //m_multiFbm->m_fbm3.m_Lacunarity = 1.80;
-    //m_multiFbm->m_fbm3.m_Roughness = 0.65;
+    m_multiFbm->m_fbm3.m_Lacunarity = 2.40;
+    m_multiFbm->m_fbm3.m_Roughness = 0.5;
 
     m_multiFbm->m_fbm3.m_Seed1 = 3468;
     m_multiFbm->m_fbm3.m_Seed2 = 170032;
@@ -406,7 +405,6 @@ void dsAppClient::init_planet( void )
 
     SphericalLOD::Config config;
 
-    //config.m_amplitude = 9000.0; //12000.0;
     config.m_lod0base = 19000.0;
 
     config.m_landscape = m_multiFbm;
@@ -553,7 +551,7 @@ void dsAppClient::init_cameras( void )
 
 
     m_circular_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
-    m_circular_mvt->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 385.0, 90.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 0.0, 0.0, 0.0 );
+    m_circular_mvt->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 385.0, 90.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 270.0, 0.0, 0.0 );
 
     m_circmvt_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::CircularMovement>, SceneNode<DrawSpace::Core::CircularMovement>( "circmvt" ) );
 
@@ -953,32 +951,44 @@ void dsAppClient::OnKeyPress( long p_key )
         case 'E':
 
             m_ship->ApplyUpPitch( 50000.0 );
+
+            m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
             break;
 
         case 'C':
 
             m_ship->ApplyDownPitch( 50000.0 );
+
+            m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
             break;
 
         case 'S':
 
             m_ship->ApplyLeftYaw( 50000.0 );
+
+            m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
             break;
 
         case 'F':
 
             m_ship->ApplyRightYaw( 50000.0 );
+
+            m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
             break;
 
 
         case 'Z':
 
             m_ship->ApplyLeftRoll( 50000.0 );
+
+            m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
             break;
 
         case 'R':
 
             m_ship->ApplyRightRoll( 50000.0 );
+
+            m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
             break;
 
         case 'T':
