@@ -350,7 +350,6 @@ void dsAppClient::init_planet( void )
     m_multiFbm = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::LandscapeMultiFbm, DrawSpace::SphericalLOD::LandscapeMultiFbm );
 
     
-    m_multiFbm->m_fbm.m_Seed = 6643232;
     m_multiFbm->m_fbm.m_InputHalfRange = 20.0;
 
     m_multiFbm->m_fbm.m_Seed1 = 7665;
@@ -359,7 +358,6 @@ void dsAppClient::init_planet( void )
 
 
     // montagnes
-    m_multiFbm->m_fbm2.m_Seed = 3345764;
     m_multiFbm->m_fbm2.m_Amplitude = 4000.0;
     m_multiFbm->m_fbm2.m_InputHalfRange = 8.0;
     m_multiFbm->m_fbm2.m_Clamp = false;
@@ -373,7 +371,6 @@ void dsAppClient::init_planet( void )
 
     
     // plaines et cotes
-    m_multiFbm->m_fbm3.m_Seed = 7709778;
     m_multiFbm->m_fbm3.m_Amplitude = 1000.0;
     m_multiFbm->m_fbm3.m_InputHalfRange = 0.8; //2.0;
 
