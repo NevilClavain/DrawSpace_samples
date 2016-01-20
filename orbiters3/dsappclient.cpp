@@ -349,37 +349,16 @@ void dsAppClient::init_planet( void )
 
     m_multiFbm = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::LandscapeMultiFbm, DrawSpace::SphericalLOD::LandscapeMultiFbm );
 
-    
-    m_multiFbm->m_fbm.m_InputHalfRange = 20.0;
+  
+    m_multiFbm->m_mask_seed1 = 345.0;
+    m_multiFbm->m_mask_seed2 = 7889.0;
 
-    m_multiFbm->m_fbm.m_Seed1 = 7665;
-    m_multiFbm->m_fbm.m_Seed2 = 300001;
+    m_multiFbm->m_mountains_seed1 = 20298.0;
+    m_multiFbm->m_mountains_seed2 = 755331.0;
 
+    m_multiFbm->m_plains_seed1 = 18887.0;
+    m_multiFbm->m_plains_seed2 = 2048.0;
 
-
-    // montagnes
-    m_multiFbm->m_fbm2.m_Amplitude = 4000.0;
-    m_multiFbm->m_fbm2.m_InputHalfRange = 8.0;
-    m_multiFbm->m_fbm2.m_Clamp = false;
-    m_multiFbm->m_fbm2.m_Lacunarity = 2.0;
-
-    m_multiFbm->m_fbm2.m_Roughness = 0.25;
-
-    m_multiFbm->m_fbm2.m_Seed1 = 2098;
-    m_multiFbm->m_fbm2.m_Seed2 = 121;
-
-
-    
-    // plaines et cotes
-    m_multiFbm->m_fbm3.m_Amplitude = 1000.0;
-    m_multiFbm->m_fbm3.m_InputHalfRange = 0.8; //2.0;
-
-    m_multiFbm->m_fbm3.m_Lacunarity = 2.40;
-    m_multiFbm->m_fbm3.m_Roughness = 0.5;
-
-    m_multiFbm->m_fbm3.m_Seed1 = 3468;
-    m_multiFbm->m_fbm3.m_Seed2 = 170032;
-   
 
     m_multiFbm->InitialiseResources();
 
