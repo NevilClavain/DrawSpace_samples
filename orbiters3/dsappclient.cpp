@@ -369,8 +369,8 @@ void dsAppClient::init_planet( void )
     hm_pshader->LoadFromFile();
 
 
-    Shader* colors_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planetcolors.vso", true ) );
-    Shader* colors_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planetcolors.pso", true ) );
+    Shader* colors_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_ht.vso", true ) );
+    Shader* colors_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_ht.pso", true ) );
     colors_vshader->LoadFromFile();
     colors_pshader->LoadFromFile();
 
