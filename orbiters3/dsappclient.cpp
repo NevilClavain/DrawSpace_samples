@@ -350,14 +350,14 @@ void dsAppClient::init_planet( void )
     m_multiFbm = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::LandscapeMultiFbm, DrawSpace::SphericalLOD::LandscapeMultiFbm );
 
   
-    m_multiFbm->m_mask_seed1 = 345.0;
-    m_multiFbm->m_mask_seed2 = 7889.0;
+    m_multiFbm->m_mask_seed1 = 7666.0;
+    m_multiFbm->m_mask_seed2 = 3889.0;
 
-    m_multiFbm->m_mountains_seed1 = 20298.0;
-    m_multiFbm->m_mountains_seed2 = 755331.0;
+    m_multiFbm->m_mountains_seed1 = 1111.0;
+    m_multiFbm->m_mountains_seed2 = 645443.0;
 
-    m_multiFbm->m_plains_seed1 = 18887.0;
-    m_multiFbm->m_plains_seed2 = 2048.0;
+    m_multiFbm->m_plains_seed1 = 908.0;
+    m_multiFbm->m_plains_seed2 = 16704.0;
 
 
     m_multiFbm->InitialiseResources();
@@ -395,6 +395,9 @@ void dsAppClient::init_planet( void )
     Texture* texture_planet = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
     texture_planet->LoadFromFile();
 
+    Texture* texture_th_pixels = _DRAWSPACE_NEW_( Texture, Texture( "earth_th_pixels.jpg" ) );
+    texture_th_pixels->LoadFromFile();
+
     Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.vso", true ) );
     Shader* planet_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.pso", true ) );
     planet_vshader->LoadFromFile();
@@ -415,6 +418,8 @@ void dsAppClient::init_planet( void )
         fx->AddShader( planet_pshader );
 
         //m_planet->BindExternalGlobalTexture( texture_planet, m_texturepass, i );
+
+        m_planet->GetPlanetBodyNodeFromPass( m_texturepass, i )->SetTexture( texture_th_pixels, 1 );
     }
 
 
