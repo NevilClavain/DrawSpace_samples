@@ -356,8 +356,9 @@ void dsAppClient::init_planet( void )
     m_multiFbm->m_mountains_seed1 = 1111.0;
     m_multiFbm->m_mountains_seed2 = 645443.0;
 
-    m_multiFbm->m_plains_seed1 = 908.0;
+    m_multiFbm->m_plains_seed1 = 137000.0;
     m_multiFbm->m_plains_seed2 = 16704.0;
+
 
 
     m_multiFbm->InitialiseResources();
@@ -398,6 +399,11 @@ void dsAppClient::init_planet( void )
     Texture* texture_th_pixels = _DRAWSPACE_NEW_( Texture, Texture( "earth_th_pixels.jpg" ) );
     texture_th_pixels->LoadFromFile();
 
+
+    Texture* texture_th_splatting = _DRAWSPACE_NEW_( Texture, Texture( "earth_th_splatting.jpg" ) );
+    texture_th_splatting->LoadFromFile();
+
+
     Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.vso", true ) );
     Shader* planet_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.pso", true ) );
     planet_vshader->LoadFromFile();
@@ -420,6 +426,7 @@ void dsAppClient::init_planet( void )
         //m_planet->BindExternalGlobalTexture( texture_planet, m_texturepass, i );
 
         m_planet->GetPlanetBodyNodeFromPass( m_texturepass, i )->SetTexture( texture_th_pixels, 1 );
+        m_planet->GetPlanetBodyNodeFromPass( m_texturepass, i )->SetTexture( texture_th_splatting, 2 );
     }
 
 
