@@ -38,6 +38,8 @@ protected:
 
     DrawSpace::Core::SceneNodeGraph             m_scenenodegraph;
 
+    bool                                        m_showinfos;
+
 
     DrawSpace::IntermediatePass*                m_texturepass;
     DrawSpace::FinalPass*                       m_finalpass;

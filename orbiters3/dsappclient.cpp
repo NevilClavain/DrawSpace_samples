@@ -52,7 +52,8 @@ m_speed_speed( 5.0 ),
 m_curr_camera( NULL ),
 m_show_patch_render( false ),
 m_ready( false ),
-m_init_count( 0 )
+m_init_count( 0 ),
+m_showinfos( true )
 {    
     _INIT_LOGGER( "logorbiters3.conf" )  
     m_w_title = "orbiters 3 test";
@@ -524,8 +525,8 @@ void dsAppClient::init_ship( void )
 
     m_ship_drawable_node->LinkTo( m_ship_node );
 
+    
     //////////////////////////////////////////////////////////////
-
 }
 
 
@@ -715,72 +716,74 @@ void dsAppClient::render_universe( void )
 
 
     long current_fps = m_timer.GetFPS();
-    renderer->DrawText( 0, 255, 0, 10, 35, "%d", current_fps );
+    renderer->DrawText( 0, 255, 0, 10, 35, "%d fps", current_fps );
 
-    dsstring date;
-    m_calendar->GetFormatedDate( date );    
-    renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
+    if( m_showinfos )
+    {
+        dsstring date;
+        m_calendar->GetFormatedDate( date );    
+        renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
 
     
 
 
-    dsreal speed = m_ship->GetLinearSpeedMagnitude();
+        dsreal speed = m_ship->GetLinearSpeedMagnitude();
 
-    renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h ( %.1f m/s) - aspeed = %.1f", speed * 3.6, speed, m_ship->GetAngularSpeedMagnitude() );
+        renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h ( %.1f m/s) - aspeed = %.1f", speed * 3.6, speed, m_ship->GetAngularSpeedMagnitude() );
 
-    bool hotstate = m_planet->GetFragment( 0 )->GetHotState();
-    if( hotstate )
-    {
-        renderer->DrawText( 0, 255, 0, 10, 130, "fragment hot" );
-
-        dsreal alt = m_planet->GetFragment( 0 )->GetPlanetBody()->GetHotPointAltitud();
-
-        if( alt > 10000.0 )
+        bool hotstate = m_planet->GetFragment( 0 )->GetHotState();
+        if( hotstate )
         {
-            renderer->DrawText( 0, 255, 0, 10, 145, "hotpoint altitude = %.3f km", alt / 1000.0 );
+            renderer->DrawText( 0, 255, 0, 10, 130, "fragment hot" );
+
+            dsreal alt = m_planet->GetFragment( 0 )->GetPlanetBody()->GetHotPointAltitud();
+
+            if( alt > 10000.0 )
+            {
+                renderer->DrawText( 0, 255, 0, 10, 145, "hotpoint altitude = %.3f km", alt / 1000.0 );
+            }
+            else
+            {
+                renderer->DrawText( 0, 255, 0, 10, 145, "hotpoint altitude = %.1f m", alt );
+            }
+        
+        }
+
+        dsreal rel_alt;
+        m_planet->GetInertBodyRelativeAltitude( m_ship, rel_alt );
+        renderer->DrawText( 0, 255, 0, 10, 220, "relative_alt = %f", rel_alt );
+
+    
+        /*
+        if( current_patch )
+        {
+            int face = current_patch->GetOrientation();
+            double xpos, ypos;
+            current_patch->GetUnitPos( xpos, ypos );
+            double sidelength = current_patch->GetUnitSideLenght();
+            int lod = m_planet->GetFragment( 0 )->GetCurrentPatchLOD();
+            long nb_meshebuild;
+            m_planet->GetFragment( 0 )->GetCollisionMesheBuildStats( nb_meshebuild );
+
+            renderer->DrawText( 0, 255, 0, 10, 245, "current_patch => face %d lod %d dims %f", face, lod, sidelength, xpos, ypos, nb_meshebuild, current_patch->GetUnitSideLenght() );
+            renderer->DrawText( 0, 255, 0, 10, 260, "width = %f x = %f y = %f, %d", sidelength, xpos, ypos, nb_meshebuild );
+
+            SphericalLOD::FaceDrawingNode::Stats stats;
+            SphericalLOD::FaceDrawingNode* facenode;
+
+            facenode = static_cast<SphericalLOD::FaceDrawingNode*>( m_planet->GetPlanetBodyNodeFromPass( m_texturepass, face ) );
+
+            facenode->GetStats( stats );
+
+            renderer->DrawText( 0, 255, 0, 10, 275, "nb patch %d", stats.nb_patchs );
+
         }
         else
         {
-            renderer->DrawText( 0, 255, 0, 10, 145, "hotpoint altitude = %.1f m", alt );
+            renderer->DrawText( 0, 255, 0, 10, 245, "current_patch => null" );
         }
-        
+        */
     }
-
-    dsreal rel_alt;
-    m_planet->GetInertBodyRelativeAltitude( m_ship, rel_alt );
-    renderer->DrawText( 0, 255, 0, 10, 220, "relative_alt = %f", rel_alt );
-
-    
-    /*
-    if( current_patch )
-    {
-        int face = current_patch->GetOrientation();
-        double xpos, ypos;
-        current_patch->GetUnitPos( xpos, ypos );
-        double sidelength = current_patch->GetUnitSideLenght();
-        int lod = m_planet->GetFragment( 0 )->GetCurrentPatchLOD();
-        long nb_meshebuild;
-        m_planet->GetFragment( 0 )->GetCollisionMesheBuildStats( nb_meshebuild );
-
-        renderer->DrawText( 0, 255, 0, 10, 245, "current_patch => face %d lod %d dims %f", face, lod, sidelength, xpos, ypos, nb_meshebuild, current_patch->GetUnitSideLenght() );
-        renderer->DrawText( 0, 255, 0, 10, 260, "width = %f x = %f y = %f, %d", sidelength, xpos, ypos, nb_meshebuild );
-
-        SphericalLOD::FaceDrawingNode::Stats stats;
-        SphericalLOD::FaceDrawingNode* facenode;
-
-        facenode = static_cast<SphericalLOD::FaceDrawingNode*>( m_planet->GetPlanetBodyNodeFromPass( m_texturepass, face ) );
-
-        facenode->GetStats( stats );
-
-        renderer->DrawText( 0, 255, 0, 10, 275, "nb patch %d", stats.nb_patchs );
-
-    }
-    else
-    {
-        renderer->DrawText( 0, 255, 0, 10, 245, "current_patch => null" );
-    }
-    */
-
   
     renderer->FlipScreen();
 
@@ -1111,6 +1114,18 @@ void dsAppClient::OnKeyPulse( long p_key )
                 m_finalpass2->GetViewportQuad()->SetDrawingState( false );
             }
 
+            break;
+
+        case VK_F9:
+
+            m_ship_drawable->SetDrawingState( m_texturepass, false );
+            m_showinfos = false;
+            break;
+
+        case VK_F7:
+
+            m_ship_drawable->SetDrawingState( m_texturepass, true );
+            m_showinfos = true;
             break;
     }
 }
