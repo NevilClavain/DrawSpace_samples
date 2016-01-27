@@ -751,7 +751,7 @@ void dsAppClient::render_universe( void )
     renderer->DrawText( 0, 255, 0, 10, 220, "relative_alt = %f", rel_alt );
 
     
-
+    /*
     if( current_patch )
     {
         int face = current_patch->GetOrientation();
@@ -779,6 +779,7 @@ void dsAppClient::render_universe( void )
     {
         renderer->DrawText( 0, 255, 0, 10, 245, "current_patch => null" );
     }
+    */
 
   
     renderer->FlipScreen();
