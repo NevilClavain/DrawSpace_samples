@@ -357,7 +357,7 @@ void dsAppClient::init_planet( void )
     m_multiFbm->m_mountains_seed1 = 1111.0;
     m_multiFbm->m_mountains_seed2 = 645443.0;
     m_multiFbm->m_mountains_input_half_range = 16.0;
-    m_multiFbm->m_mountains_lacunarity = 2.2;
+    m_multiFbm->m_mountains_lacunarity = 2.15;
     m_multiFbm->m_mountains_roughness = 0.25;
 
     m_multiFbm->m_plains_seed1 = 137000.0;
@@ -400,7 +400,7 @@ void dsAppClient::init_planet( void )
     Texture* texture_planet = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
     texture_planet->LoadFromFile();
 
-    Texture* texture_th_pixels = _DRAWSPACE_NEW_( Texture, Texture( "earth_th_pixels.jpg" ) );
+    Texture* texture_th_pixels = _DRAWSPACE_NEW_( Texture, Texture( "earth_th_pixels_16.jpg" ) );
     texture_th_pixels->LoadFromFile();
 
 
