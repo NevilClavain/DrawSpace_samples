@@ -351,17 +351,17 @@ void dsAppClient::init_planet( void )
     m_multiFbm = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::LandscapeMultiFbm, DrawSpace::SphericalLOD::LandscapeMultiFbm );
 
   
-    m_multiFbm->m_mask_seed1 = 7666.0;
-    m_multiFbm->m_mask_seed2 = 3889.0;
+    m_multiFbm->m_mask_seed1 = 671.0;
+    m_multiFbm->m_mask_seed2 = 8444.0;
 
-    m_multiFbm->m_mountains_seed1 = 1111.0;
-    m_multiFbm->m_mountains_seed2 = 645443.0;
+    m_multiFbm->m_mountains_seed1 = 117.0;
+    m_multiFbm->m_mountains_seed2 = 245443.0;
     m_multiFbm->m_mountains_input_half_range = 16.0;
     m_multiFbm->m_mountains_lacunarity = 2.15;
     m_multiFbm->m_mountains_roughness = 0.25;
 
-    m_multiFbm->m_plains_seed1 = 137000.0;
-    m_multiFbm->m_plains_seed2 = 16704.0;
+    m_multiFbm->m_plains_seed1 = 178.0;
+    m_multiFbm->m_plains_seed2 = 3400.0;
 
 
 
