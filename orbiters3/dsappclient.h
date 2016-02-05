@@ -27,6 +27,67 @@
 #include <dsapp.h>
 
 
+class MultiFractalBinder : public DrawSpace::SphericalLOD::Binder
+{
+    DrawSpace::Interface::Renderer*         m_renderer;
+
+public:
+
+    dsreal                                  m_mask_seed1;
+    dsreal                                  m_mask_seed2;
+    dsreal                                  m_mask_input_half_range;
+
+    dsreal                                  m_mountains_lacunarity;
+    dsreal                                  m_mountains_roughness;
+    dsreal                                  m_mountains_input_half_range;
+    dsreal                                  m_mountains_amplitude;
+    dsreal                                  m_mountains_seed1;
+    dsreal                                  m_mountains_seed2;
+
+    dsreal                                  m_plains_lacunarity;
+    dsreal                                  m_plains_roughness;
+    dsreal                                  m_plains_input_half_range;
+    dsreal                                  m_plains_amplitude;
+    dsreal                                  m_plains_seed1;
+    dsreal                                  m_plains_seed2;
+
+public:
+
+    MultiFractalBinder( void );
+
+    virtual void Initialise( void );
+    virtual void Bind( void );
+    virtual void Unbind( void );
+};
+
+class PlanetClimateBinder : public MultiFractalBinder
+{
+protected:
+
+public:
+
+    PlanetClimateBinder( void );
+
+    virtual void Initialise( void );
+    virtual void Bind( void );
+    virtual void Unbind( void );
+};
+
+class PlanetDetailsBinder : public MultiFractalBinder
+{
+protected:
+
+public:
+
+    PlanetDetailsBinder( void );
+
+    virtual void Initialise( void );
+    virtual void Bind( void );
+    virtual void Unbind( void );
+};
+
+
+
 class dsAppClient : public DrawSpace::App
 {
 protected:
@@ -112,6 +173,11 @@ protected:
 
     DrawSpace::SphericalLOD::LandscapeMultiFbm*                         m_multiFbm;
 
+    MultiFractalBinder                                                  m_planet_collisions_binder;
+
+    PlanetClimateBinder                                                 m_planet_climate_binder;
+
+    PlanetDetailsBinder                                                 m_planet_detail_binder;
 
 
 

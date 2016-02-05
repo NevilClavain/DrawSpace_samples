@@ -44,6 +44,121 @@ _DECLARE_DS_LOGGER( logger, "AppClient", DrawSpace::Logger::Configuration::GetIn
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+MultiFractalBinder::MultiFractalBinder( void ) :
+m_mask_seed1( 500.0 ),
+m_mask_seed2( 600.0 ),
+m_mask_input_half_range( 20.0 ),
+m_mountains_lacunarity( 2.15 ),
+m_mountains_roughness( 0.25 ),
+m_mountains_input_half_range( 16.0 ),
+m_mountains_amplitude( 4000.0 ),
+m_mountains_seed1( 500 ),
+m_mountains_seed2( 600 ),
+m_plains_lacunarity( 2.6 ),
+m_plains_roughness( 0.5 ),
+m_plains_input_half_range( 0.8 ),
+m_plains_amplitude( 1000.0 ),
+m_plains_seed1( 500.0 ),
+m_plains_seed2( 600.0 )
+{
+    m_renderer = SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
+}
+
+void MultiFractalBinder::Initialise( void )
+{
+}
+
+void MultiFractalBinder::Bind( void )
+{
+    Vector fbm_params;
+    Vector fbm_params2;
+
+    Vector fbm_params3;
+    Vector fbm_params4;
+
+    Vector fbm_params5;
+    Vector fbm_params6;
+
+  
+    fbm_params[1] = m_mask_input_half_range;
+    fbm_params2[0] = m_mask_seed1;
+    fbm_params2[1] = m_mask_seed2;
+
+    fbm_params3[0] = m_mountains_lacunarity;
+    fbm_params3[1] = m_mountains_input_half_range;
+    fbm_params3[3] = m_mountains_amplitude;
+
+    fbm_params4[0] = m_mountains_seed1;
+    fbm_params4[1] = m_mountains_seed2;
+    fbm_params4[2] = m_mountains_roughness;
+
+
+    fbm_params5[0] = m_plains_lacunarity;
+    fbm_params5[1] = m_plains_input_half_range;
+    fbm_params5[3] = m_plains_amplitude;
+
+    fbm_params6[0] = m_plains_seed1;
+    fbm_params6[1] = m_plains_seed2;
+    fbm_params6[2] = m_plains_roughness;
+
+
+    m_renderer->SetFxShaderParams( 0, 27, fbm_params );
+    m_renderer->SetFxShaderParams( 0, 28, fbm_params2 );
+
+    m_renderer->SetFxShaderParams( 0, 29, fbm_params3 );
+    m_renderer->SetFxShaderParams( 0, 30, fbm_params4 );
+
+    m_renderer->SetFxShaderParams( 0, 31, fbm_params5 );
+    m_renderer->SetFxShaderParams( 0, 32, fbm_params6 );
+}
+
+void MultiFractalBinder::Unbind( void )
+{
+
+}
+
+
+
+PlanetClimateBinder::PlanetClimateBinder( void ) : MultiFractalBinder()
+{
+}
+
+void PlanetClimateBinder::Initialise( void )
+{
+}
+
+void PlanetClimateBinder::Bind( void )
+{
+    MultiFractalBinder::Bind();
+}
+
+void PlanetClimateBinder::Unbind( void )
+{
+    MultiFractalBinder::Unbind();
+}
+
+
+
+PlanetDetailsBinder::PlanetDetailsBinder( void )
+{
+}
+
+void PlanetDetailsBinder::Initialise( void )
+{
+}
+
+void PlanetDetailsBinder::Bind( void )
+{
+    MultiFractalBinder::Bind();
+}
+
+void PlanetDetailsBinder::Unbind( void )
+{
+    MultiFractalBinder::Unbind();
+}
+
+
+
 dsAppClient::dsAppClient( void ) : 
 m_mouselb( false ), 
 m_mouserb( false ), 
@@ -392,6 +507,11 @@ void dsAppClient::init_planet( void )
     config.m_lod0base = 19000.0;
 
     config.m_landscape = m_multiFbm;
+
+    config.m_groundCollisionsBinder = &m_planet_collisions_binder;
+    config.m_mainRenderingBinder = &m_planet_detail_binder;
+    config.m_patchTexturesBinder = &m_planet_climate_binder;
+
 
     m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer, config ) );
 
