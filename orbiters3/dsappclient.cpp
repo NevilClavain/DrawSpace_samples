@@ -45,21 +45,21 @@ _DECLARE_DS_LOGGER( logger, "AppClient", DrawSpace::Logger::Configuration::GetIn
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 MultiFractalBinder::MultiFractalBinder( void ) :
-m_mask_seed1( 500.0 ),
-m_mask_seed2( 600.0 ),
+m_mask_seed1( 635.298681 ),
+m_mask_seed2( 682.357502 ),
 m_mask_input_half_range( 20.0 ),
 m_mountains_lacunarity( 2.15 ),
 m_mountains_roughness( 0.25 ),
 m_mountains_input_half_range( 16.0 ),
 m_mountains_amplitude( 4000.0 ),
-m_mountains_seed1( 500 ),
-m_mountains_seed2( 600 ),
+m_mountains_seed1( 635.298681 ),
+m_mountains_seed2( 682.357502 ),
 m_plains_lacunarity( 2.6 ),
 m_plains_roughness( 0.5 ),
 m_plains_input_half_range( 0.8 ),
 m_plains_amplitude( 1000.0 ),
-m_plains_seed1( 500.0 ),
-m_plains_seed2( 600.0 )
+m_plains_seed1( 635.298681 ),
+m_plains_seed2( 682.357502 )
 {
     m_renderer = SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 }
@@ -478,8 +478,6 @@ void dsAppClient::init_planet( void )
     m_multiFbm->m_plains_seed1 = 178.0;
     m_multiFbm->m_plains_seed2 = 3400.0;
 
-
-
     m_multiFbm->InitialiseResources();
 
 
@@ -494,31 +492,11 @@ void dsAppClient::init_planet( void )
     colors_vshader->LoadFromFile();
     colors_pshader->LoadFromFile();
 
+    Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.vso", true ) );
+    Shader* planet_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.pso", true ) );
+    planet_vshader->LoadFromFile();
+    planet_pshader->LoadFromFile();
 
-    m_multiFbm->AddCollisionsShaders( hm_vshader );
-    m_multiFbm->AddCollisionsShaders( hm_pshader );
-
-    m_multiFbm->AddColorsTextureShaders( colors_vshader );
-    m_multiFbm->AddColorsTextureShaders( colors_pshader );
-
-
-    SphericalLOD::Config config;
-
-    config.m_lod0base = 19000.0;
-
-    config.m_landscape = m_multiFbm;
-
-    config.m_groundCollisionsBinder = &m_planet_collisions_binder;
-    config.m_mainRenderingBinder = &m_planet_detail_binder;
-    config.m_patchTexturesBinder = &m_planet_climate_binder;
-
-
-    m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer, config ) );
-
-    m_planet->RegisterPlanetBodyPassSlot( m_texturepass );
-
-    Texture* texture_planet = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
-    texture_planet->LoadFromFile();
 
     Texture* texture_th_pixels = _DRAWSPACE_NEW_( Texture, Texture( "earth_th_pixels_16.jpg" ) );
     texture_th_pixels->LoadFromFile();
@@ -528,10 +506,93 @@ void dsAppClient::init_planet( void )
     texture_th_splatting->LoadFromFile();
 
 
-    Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.vso", true ) );
-    Shader* planet_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.pso", true ) );
-    planet_vshader->LoadFromFile();
-    planet_pshader->LoadFromFile();
+
+    m_multiFbm->AddCollisionsShaders( hm_vshader );
+    m_multiFbm->AddCollisionsShaders( hm_pshader );
+
+    m_multiFbm->AddColorsTextureShaders( colors_vshader );
+    m_multiFbm->AddColorsTextureShaders( colors_pshader );
+
+
+
+
+    SphericalLOD::Config config;
+
+    config.m_lod0base = 19000.0;
+
+    config.m_landscape = m_multiFbm;
+
+    Fx* collisions_fx = new Fx;
+    collisions_fx->AddShader( hm_vshader );
+    collisions_fx->AddShader( hm_pshader );
+
+    m_planet_collisions_binder.SetFx( collisions_fx );
+
+
+    m_planet_collisions_binder.m_mask_seed1 = 671.0;
+    m_planet_collisions_binder.m_mask_seed2 = 8444.0;
+
+    m_planet_collisions_binder.m_mountains_seed1 = 117.0;
+    m_planet_collisions_binder.m_mountains_seed2 = 245443.0;
+    m_planet_collisions_binder.m_mountains_input_half_range = 16.0;
+    m_planet_collisions_binder.m_mountains_lacunarity = 2.15;
+    m_planet_collisions_binder.m_mountains_roughness = 0.25;
+
+    m_planet_collisions_binder.m_plains_seed1 = 178.0;
+    m_planet_collisions_binder.m_plains_seed2 = 3400.0;
+
+
+
+
+
+    Fx* climate_fx = new Fx;
+    climate_fx->AddShader( colors_vshader );
+    climate_fx->AddShader( colors_pshader );
+
+    m_planet_climate_binder.SetFx( climate_fx );
+
+    Fx* main_fx = new Fx;
+
+    main_fx->AddShader( planet_vshader );
+    main_fx->AddShader( planet_pshader );
+
+    //main_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
+    main_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    main_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    main_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    main_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    //main_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+
+    m_planet_detail_binder.SetFx( main_fx );
+    m_planet_detail_binder.SetTexture( texture_th_pixels, 1 );
+    m_planet_detail_binder.SetTexture( texture_th_splatting, 2 );
+
+    DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
+
+    m_planet_collisions_binder.SetRenderer( renderer );
+    m_planet_detail_binder.SetRenderer( renderer );
+    m_planet_climate_binder.SetRenderer( renderer );
+
+
+
+
+    config.m_groundCollisionsBinder = &m_planet_collisions_binder;
+    config.m_mainRenderingBinder = &m_planet_detail_binder;
+    config.m_patchTexturesBinder = &m_planet_climate_binder;
+
+
+    m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer, config ) );
+
+
+
+
+    m_planet->RegisterPlanetBodyPassSlot( m_texturepass );
+
+    //Texture* texture_planet = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
+    //texture_planet->LoadFromFile();
+
+
+
     
     for( long i = 0; i < 6; i++ )
     {

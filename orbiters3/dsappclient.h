@@ -29,8 +29,6 @@
 
 class MultiFractalBinder : public DrawSpace::SphericalLOD::Binder
 {
-    DrawSpace::Interface::Renderer*         m_renderer;
-
 public:
 
     dsreal                                  m_mask_seed1;
