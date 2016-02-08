@@ -587,6 +587,23 @@ void dsAppClient::init_planet( void )
     m_planet_detail_binder.SetTexture( texture_th_pixels, 1 );
     m_planet_detail_binder.SetTexture( texture_th_splatting, 2 );
 
+
+    m_planet_detail_binder.m_mask_seed1 = 671.0;
+    m_planet_detail_binder.m_mask_seed2 = 8444.0;
+
+    m_planet_detail_binder.m_mountains_seed1 = 117.0;
+    m_planet_detail_binder.m_mountains_seed2 = 245443.0;
+    m_planet_detail_binder.m_mountains_input_half_range = 16.0;
+    m_planet_detail_binder.m_mountains_lacunarity = 2.15;
+    m_planet_detail_binder.m_mountains_roughness = 0.25;
+
+    m_planet_detail_binder.m_plains_seed1 = 178.0;
+    m_planet_detail_binder.m_plains_seed2 = 3400.0;
+
+
+
+
+
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
     m_planet_collisions_binder.SetRenderer( renderer );
@@ -597,7 +614,7 @@ void dsAppClient::init_planet( void )
 
 
     config.m_groundCollisionsBinder = &m_planet_collisions_binder;
-    config.m_mainRenderingBinder = &m_planet_detail_binder;
+    
     config.m_patchTexturesBinder = &m_planet_climate_binder;
 
 
@@ -606,14 +623,14 @@ void dsAppClient::init_planet( void )
 
 
 
-    m_planet->RegisterPlanetBodyPassSlot( m_texturepass );
+    m_planet->RegisterPlanetBodyPassSlot( m_texturepass, &m_planet_detail_binder );
 
     //Texture* texture_planet = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
     //texture_planet->LoadFromFile();
 
 
 
-    
+    /*
     for( long i = 0; i < 6; i++ )
     {
         Fx* fx = m_planet->CreatePlanetBodyFx( m_texturepass, i );
@@ -633,6 +650,7 @@ void dsAppClient::init_planet( void )
         m_planet->GetPlanetBodyNodeFromPass( m_texturepass, i )->SetTexture( texture_th_pixels, 1 );
         m_planet->GetPlanetBodyNodeFromPass( m_texturepass, i )->SetTexture( texture_th_splatting, 2 );
     }
+    */
 
 
     m_planet->SetOrbitDuration( 0.333 );
