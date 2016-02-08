@@ -551,6 +551,26 @@ void dsAppClient::init_planet( void )
 
     m_planet_climate_binder.SetFx( climate_fx );
 
+
+    m_planet_climate_binder.m_mask_seed1 = 671.0;
+    m_planet_climate_binder.m_mask_seed2 = 8444.0;
+
+    m_planet_climate_binder.m_mountains_seed1 = 117.0;
+    m_planet_climate_binder.m_mountains_seed2 = 245443.0;
+    m_planet_climate_binder.m_mountains_input_half_range = 16.0;
+    m_planet_climate_binder.m_mountains_lacunarity = 2.15;
+    m_planet_climate_binder.m_mountains_roughness = 0.25;
+
+    m_planet_climate_binder.m_plains_seed1 = 178.0;
+    m_planet_climate_binder.m_plains_seed2 = 3400.0;
+
+
+
+
+
+
+
+
     Fx* main_fx = new Fx;
 
     main_fx->AddShader( planet_vshader );
