@@ -463,24 +463,6 @@ void dsAppClient::init_buildings( void )
 void dsAppClient::init_planet( void )
 {
 
-    m_multiFbm = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::LandscapeMultiFbm, DrawSpace::SphericalLOD::LandscapeMultiFbm );
-
-  
-    m_multiFbm->m_mask_seed1 = 671.0;
-    m_multiFbm->m_mask_seed2 = 8444.0;
-
-    m_multiFbm->m_mountains_seed1 = 117.0;
-    m_multiFbm->m_mountains_seed2 = 245443.0;
-    m_multiFbm->m_mountains_input_half_range = 16.0;
-    m_multiFbm->m_mountains_lacunarity = 2.15;
-    m_multiFbm->m_mountains_roughness = 0.25;
-
-    m_multiFbm->m_plains_seed1 = 178.0;
-    m_multiFbm->m_plains_seed2 = 3400.0;
-
-    m_multiFbm->InitialiseResources();
-
-
     Shader* hm_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planethm.vso", true ) );
     Shader* hm_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planethm.pso", true ) );
     hm_vshader->LoadFromFile();
@@ -507,20 +489,10 @@ void dsAppClient::init_planet( void )
 
 
 
-    m_multiFbm->AddCollisionsShaders( hm_vshader );
-    m_multiFbm->AddCollisionsShaders( hm_pshader );
-
-    m_multiFbm->AddColorsTextureShaders( colors_vshader );
-    m_multiFbm->AddColorsTextureShaders( colors_pshader );
-
-
-
-
     SphericalLOD::Config config;
 
     config.m_lod0base = 19000.0;
 
-    config.m_landscape = m_multiFbm;
 
     Fx* collisions_fx = new Fx;
     collisions_fx->AddShader( hm_vshader );
@@ -532,8 +504,8 @@ void dsAppClient::init_planet( void )
     m_planet_collisions_binder.m_mask_seed1 = 671.0;
     m_planet_collisions_binder.m_mask_seed2 = 8444.0;
 
-    m_planet_collisions_binder.m_mountains_seed1 = 117.0;
-    m_planet_collisions_binder.m_mountains_seed2 = 245443.0;
+    //m_planet_collisions_binder.m_mountains_seed1 = 117.0;
+    //m_planet_collisions_binder.m_mountains_seed2 = 245443.0;
     m_planet_collisions_binder.m_mountains_input_half_range = 16.0;
     m_planet_collisions_binder.m_mountains_lacunarity = 2.15;
     m_planet_collisions_binder.m_mountains_roughness = 0.25;
@@ -555,8 +527,8 @@ void dsAppClient::init_planet( void )
     m_planet_climate_binder.m_mask_seed1 = 671.0;
     m_planet_climate_binder.m_mask_seed2 = 8444.0;
 
-    m_planet_climate_binder.m_mountains_seed1 = 117.0;
-    m_planet_climate_binder.m_mountains_seed2 = 245443.0;
+    //m_planet_climate_binder.m_mountains_seed1 = 117.0;
+    //m_planet_climate_binder.m_mountains_seed2 = 245443.0;
     m_planet_climate_binder.m_mountains_input_half_range = 16.0;
     m_planet_climate_binder.m_mountains_lacunarity = 2.15;
     m_planet_climate_binder.m_mountains_roughness = 0.25;
@@ -591,8 +563,8 @@ void dsAppClient::init_planet( void )
     m_planet_detail_binder.m_mask_seed1 = 671.0;
     m_planet_detail_binder.m_mask_seed2 = 8444.0;
 
-    m_planet_detail_binder.m_mountains_seed1 = 117.0;
-    m_planet_detail_binder.m_mountains_seed2 = 245443.0;
+    //m_planet_detail_binder.m_mountains_seed1 = 117.0;
+    //m_planet_detail_binder.m_mountains_seed2 = 245443.0;
     m_planet_detail_binder.m_mountains_input_half_range = 16.0;
     m_planet_detail_binder.m_mountains_lacunarity = 2.15;
     m_planet_detail_binder.m_mountains_roughness = 0.25;
@@ -624,33 +596,6 @@ void dsAppClient::init_planet( void )
 
 
     m_planet->RegisterPlanetBodyPassSlot( m_texturepass, &m_planet_detail_binder );
-
-    //Texture* texture_planet = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
-    //texture_planet->LoadFromFile();
-
-
-
-    /*
-    for( long i = 0; i < 6; i++ )
-    {
-        Fx* fx = m_planet->CreatePlanetBodyFx( m_texturepass, i );
-
-        //fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
-        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-        fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-        fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-        fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-        //fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
-
-        fx->AddShader( planet_vshader );
-        fx->AddShader( planet_pshader );
-
-        //m_planet->BindExternalGlobalTexture( texture_planet, m_texturepass, i );
-
-        m_planet->GetPlanetBodyNodeFromPass( m_texturepass, i )->SetTexture( texture_th_pixels, 1 );
-        m_planet->GetPlanetBodyNodeFromPass( m_texturepass, i )->SetTexture( texture_th_splatting, 2 );
-    }
-    */
 
 
     m_planet->SetOrbitDuration( 0.333 );
