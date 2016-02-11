@@ -215,8 +215,7 @@ dsAppClient::~dsAppClient( void )
 
 void dsAppClient::init_planet_meshes( void )
 {
-    DrawSpace::SphericalLOD::Body::BuildMeshe();
-    DrawSpace::SphericalLOD::Body::BuildMesheHigh();
+    DrawSpace::SphericalLOD::Body::BuildMeshes();
 }
 
 void dsAppClient::init_assets_loaders( void )
