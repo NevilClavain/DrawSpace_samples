@@ -59,7 +59,8 @@ m_plains_roughness( 0.5 ),
 m_plains_input_half_range( 0.8 ),
 m_plains_amplitude( 1000.0 ),
 m_plains_seed1( 635.298681 ),
-m_plains_seed2( 682.357502 )
+m_plains_seed2( 682.357502 ),
+m_vertical_offset( 0.0 )
 {
     m_renderer = SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 }
@@ -81,6 +82,8 @@ void MultiFractalBinder::Bind( void )
 
   
     fbm_params[1] = m_mask_input_half_range;
+    fbm_params[2] = m_vertical_offset;
+
     fbm_params2[0] = m_mask_seed1;
     fbm_params2[1] = m_mask_seed2;
 
@@ -532,6 +535,8 @@ void dsAppClient::init_planet( void )
     m_planet_collisions_binder.m_mask_seed1 = 671.0;
     m_planet_collisions_binder.m_mask_seed2 = 8444.0;
 
+    //m_planet_collisions_binder.m_vertical_offset = -1500.0;
+
     //m_planet_collisions_binder.m_mountains_seed1 = 117.0;
     //m_planet_collisions_binder.m_mountains_seed2 = 245443.0;
     m_planet_collisions_binder.m_mountains_input_half_range = 16.0;
@@ -555,17 +560,17 @@ void dsAppClient::init_planet( void )
     m_planet_climate_binder.m_mask_seed1 = 671.0;
     m_planet_climate_binder.m_mask_seed2 = 8444.0;
 
+    //m_planet_climate_binder.m_vertical_offset = -1500.0;
+
     //m_planet_climate_binder.m_mountains_seed1 = 117.0;
     //m_planet_climate_binder.m_mountains_seed2 = 245443.0;
     m_planet_climate_binder.m_mountains_input_half_range = 16.0;
     m_planet_climate_binder.m_mountains_lacunarity = 2.15;
     m_planet_climate_binder.m_mountains_roughness = 0.25;
 
+
     m_planet_climate_binder.m_plains_seed1 = 178.0;
     m_planet_climate_binder.m_plains_seed2 = 3400.0;
-
-
-
 
 
 
@@ -590,6 +595,8 @@ void dsAppClient::init_planet( void )
 
     m_planet_detail_binder.m_mask_seed1 = 671.0;
     m_planet_detail_binder.m_mask_seed2 = 8444.0;
+
+    //m_planet_detail_binder.m_vertical_offset = -1500.0;
 
     //m_planet_detail_binder.m_mountains_seed1 = 117.0;
     //m_planet_detail_binder.m_mountains_seed2 = 245443.0;

@@ -49,6 +49,8 @@ public:
     dsreal                                  m_plains_seed1;
     dsreal                                  m_plains_seed2;
 
+    dsreal                                  m_vertical_offset;
+
 public:
 
     MultiFractalBinder( void );
