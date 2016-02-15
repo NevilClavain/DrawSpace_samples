@@ -955,6 +955,11 @@ void dsAppClient::render_universe( void )
         m_planet->GetInertBodyRelativeAltitude( m_ship, rel_alt );
         renderer->DrawText( 0, 255, 0, 10, 220, "relative_alt = %f", rel_alt );
 
+
+        renderer->DrawText( 0, 255, 0, 10, 160, "subpasses stack size = %d", m_planet->GetSingleShotSubPassesStackSize() );
+
+
+
     
         /*
         if( current_patch )
@@ -1188,11 +1193,6 @@ void dsAppClient::OnKeyPress( long p_key )
             m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
             break;
 
-        case 'T':
-
-            m_ship->ApplyFwdForce( 51000000.0 );
-            break;
-
 
         case 'M':
             m_ship->ZeroASpeed();
@@ -1328,6 +1328,12 @@ void dsAppClient::OnKeyPulse( long p_key )
 
             m_ship_drawable->SetDrawingState( m_texturepass, true );
             m_showinfos = true;
+            break;
+
+
+        case 'Y':
+
+            m_planet->ResetRegisteredBodyFragment( m_ship );
             break;
     }
 }
