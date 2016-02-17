@@ -1333,7 +1333,18 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case 'Y':
 
+            _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> planet reset begin <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
             m_planet->ResetRegisteredBodyFragment( m_ship );
+            _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> planet reset end <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
+            break;
+
+
+        case 'U':
+
+            _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> memalloc dump begin <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
+            MemAlloc::GetInstance()->DumpContent();
+            _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> memalloc dump end   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
+
             break;
     }
 }
