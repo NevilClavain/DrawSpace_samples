@@ -22,6 +22,7 @@
 
 
 #include "dsappclient.h"
+#include "Psapi.h"
 
 #define PLANET_RAY 6000.0
 
@@ -956,8 +957,15 @@ void dsAppClient::render_universe( void )
         renderer->DrawText( 0, 255, 0, 10, 220, "relative_alt = %f", rel_alt );
 
 
-        renderer->DrawText( 0, 255, 0, 10, 160, "subpasses stack size = %d", m_planet->GetSingleShotSubPassesStackSize() );
+        
 
+
+        PROCESS_MEMORY_COUNTERS pmc;
+
+        GetProcessMemoryInfo( GetCurrentProcess(), &pmc, sizeof( PROCESS_MEMORY_COUNTERS ) );
+
+        renderer->DrawText( 0, 255, 0, 10, 250, "working set size = %d", pmc.WorkingSetSize );
+        renderer->DrawText( 0, 255, 0, 10, 280, "subpasses stack size = %d", m_planet->GetSingleShotSubPassesStackSize() );
 
 
     
