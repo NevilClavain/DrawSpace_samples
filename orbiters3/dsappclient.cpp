@@ -541,7 +541,7 @@ void dsAppClient::init_planet( void )
     //m_planet_collisions_binder.m_mountains_seed1 = 117.0;
     //m_planet_collisions_binder.m_mountains_seed2 = 245443.0;
     m_planet_collisions_binder.m_mountains_input_half_range = 16.0;
-    m_planet_collisions_binder.m_mountains_lacunarity = 2.15;
+    m_planet_collisions_binder.m_mountains_lacunarity = 2.10;
     m_planet_collisions_binder.m_mountains_roughness = 0.25;
 
     m_planet_collisions_binder.m_plains_seed1 = 178.0;
@@ -566,7 +566,7 @@ void dsAppClient::init_planet( void )
     //m_planet_climate_binder.m_mountains_seed1 = 117.0;
     //m_planet_climate_binder.m_mountains_seed2 = 245443.0;
     m_planet_climate_binder.m_mountains_input_half_range = 16.0;
-    m_planet_climate_binder.m_mountains_lacunarity = 2.15;
+    m_planet_climate_binder.m_mountains_lacunarity = 2.10;
     m_planet_climate_binder.m_mountains_roughness = 0.25;
 
 
@@ -602,7 +602,7 @@ void dsAppClient::init_planet( void )
     //m_planet_detail_binder.m_mountains_seed1 = 117.0;
     //m_planet_detail_binder.m_mountains_seed2 = 245443.0;
     m_planet_detail_binder.m_mountains_input_half_range = 16.0;
-    m_planet_detail_binder.m_mountains_lacunarity = 2.15;
+    m_planet_detail_binder.m_mountains_lacunarity = 2.10;
     m_planet_detail_binder.m_mountains_roughness = 0.25;
 
     m_planet_detail_binder.m_plains_seed1 = 178.0;
