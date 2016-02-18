@@ -1340,10 +1340,16 @@ void dsAppClient::OnKeyPulse( long p_key )
 
 
         case 'U':
+            {
+                _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> memalloc dump begin <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
 
-            _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> memalloc dump begin <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
-            MemAlloc::GetInstance()->DumpContent();
-            _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> memalloc dump end   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
+                //_DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> core dump <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
+                //MemAlloc::GetInstance()->DumpContent();
+                _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> plugin dump <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
+                DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
+                renderer->DumpMemoryAllocs();
+                _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> memalloc dump end   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
+            }
 
             break;
     }
