@@ -179,6 +179,7 @@ void PlanetDetailsBinder::Initialise( void )
 void PlanetDetailsBinder::Bind( void )
 {
     Vector flags2( 16.0, 1.095, 1.0040, 0.0 );
+    
     m_renderer->SetFxShaderParams( 1, 1, flags2 );
 
 
@@ -541,7 +542,7 @@ void dsAppClient::init_planet( void )
     //m_planet_collisions_binder.m_mountains_seed1 = 117.0;
     //m_planet_collisions_binder.m_mountains_seed2 = 245443.0;
     m_planet_collisions_binder.m_mountains_input_half_range = 16.0;
-    m_planet_collisions_binder.m_mountains_lacunarity = 2.10;
+    m_planet_collisions_binder.m_mountains_lacunarity = 2.0;
     m_planet_collisions_binder.m_mountains_roughness = 0.25;
 
     m_planet_collisions_binder.m_plains_seed1 = 178.0;
@@ -566,7 +567,7 @@ void dsAppClient::init_planet( void )
     //m_planet_climate_binder.m_mountains_seed1 = 117.0;
     //m_planet_climate_binder.m_mountains_seed2 = 245443.0;
     m_planet_climate_binder.m_mountains_input_half_range = 16.0;
-    m_planet_climate_binder.m_mountains_lacunarity = 2.10;
+    m_planet_climate_binder.m_mountains_lacunarity = 2.0;
     m_planet_climate_binder.m_mountains_roughness = 0.25;
 
 
@@ -602,7 +603,7 @@ void dsAppClient::init_planet( void )
     //m_planet_detail_binder.m_mountains_seed1 = 117.0;
     //m_planet_detail_binder.m_mountains_seed2 = 245443.0;
     m_planet_detail_binder.m_mountains_input_half_range = 16.0;
-    m_planet_detail_binder.m_mountains_lacunarity = 2.10;
+    m_planet_detail_binder.m_mountains_lacunarity = 2.0;
     m_planet_detail_binder.m_mountains_roughness = 0.25;
 
     m_planet_detail_binder.m_plains_seed1 = 178.0;
@@ -1352,7 +1353,7 @@ void dsAppClient::OnKeyPulse( long p_key )
                 _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> memalloc dump begin <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
 
                 //_DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> core dump <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
-                //MemAlloc::GetInstance()->DumpContent();
+                MemAlloc::GetInstance()->DumpContent();
                 _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> plugin dump <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
                 DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
                 renderer->DumpMemoryAllocs();
