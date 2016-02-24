@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="orbiters3"
+	Name="orbiters4"
 	ProjectGUID="{FF6C5F7F-4108-4DE5-97DE-44564FD7A737}"
-	RootNamespace="orbiters3"
+	RootNamespace="orbiters4"
 	Keyword="Win32Proj"
 	>
 	<Platforms>

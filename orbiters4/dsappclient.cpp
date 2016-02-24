@@ -204,8 +204,8 @@ m_ready( false ),
 m_init_count( 0 ),
 m_showinfos( true )
 {    
-    _INIT_LOGGER( "logorbiters3.conf" )  
-    m_w_title = "orbiters 3 test";
+    _INIT_LOGGER( "logorbiters4.conf" )  
+    m_w_title = "orbiters 4 test";
     m_mouseleftbuttondown_eventhandler = _DRAWSPACE_NEW_( WidgetEventHandler, WidgetEventHandler( this, &dsAppClient::on_mouseleftbuttondown ) );
 }
 
@@ -1338,6 +1338,7 @@ void dsAppClient::OnKeyPulse( long p_key )
             m_ship_drawable->SetDrawingState( m_texturepass, true );
             m_showinfos = true;
             break;
+
 
         case 'U':
             {
