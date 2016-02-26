@@ -521,6 +521,9 @@ void dsAppClient::init_planet( void )
     texture_th_splatting->LoadFromFile();
 
 
+    Texture* texture_map_planet_00 = _DRAWSPACE_NEW_( Texture, Texture( "map_planet_00.jpg" ) );
+    texture_map_planet_00->LoadFromFile();
+
 
     SphericalLOD::Config config;
 
@@ -557,6 +560,7 @@ void dsAppClient::init_planet( void )
     climate_fx->AddShader( colors_pshader );
 
     m_planet_climate_binder.SetFx( climate_fx );
+    m_planet_climate_binder.SetVertexTexture( texture_map_planet_00, 0 );
 
 
     m_planet_climate_binder.m_mask_seed1 = 671.0;
