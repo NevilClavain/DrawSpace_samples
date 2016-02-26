@@ -496,19 +496,19 @@ void dsAppClient::init_buildings( void )
 void dsAppClient::init_planet( void )
 {
 
-    Shader* hm_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planethm.vso", true ) );
-    Shader* hm_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planethm.pso", true ) );
+    Shader* hm_vshader = _DRAWSPACE_NEW_( Shader, Shader( "map_planethm.vso", true ) );
+    Shader* hm_pshader = _DRAWSPACE_NEW_( Shader, Shader( "map_planethm.pso", true ) );
     hm_vshader->LoadFromFile();
     hm_pshader->LoadFromFile();
 
 
-    Shader* colors_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_ht.vso", true ) );
-    Shader* colors_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_ht.pso", true ) );
+    Shader* colors_vshader = _DRAWSPACE_NEW_( Shader, Shader( "map_planet_ht.vso", true ) );
+    Shader* colors_pshader = _DRAWSPACE_NEW_( Shader, Shader( "map_planet_ht.pso", true ) );
     colors_vshader->LoadFromFile();
     colors_pshader->LoadFromFile();
 
-    Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.vso", true ) );
-    Shader* planet_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.pso", true ) );
+    Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "map_planet2.vso", true ) );
+    Shader* planet_pshader = _DRAWSPACE_NEW_( Shader, Shader( "map_planet2.pso", true ) );
     planet_vshader->LoadFromFile();
     planet_pshader->LoadFromFile();
 
