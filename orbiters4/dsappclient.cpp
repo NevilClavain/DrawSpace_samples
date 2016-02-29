@@ -106,14 +106,14 @@ void MultiFractalBinder::Bind( void )
     fbm_params6[2] = m_plains_roughness;
 
 
-    m_renderer->SetFxShaderParams( 0, 27, fbm_params );
-    m_renderer->SetFxShaderParams( 0, 28, fbm_params2 );
+    m_renderer->SetFxShaderParams( 0, 30, fbm_params );
+    m_renderer->SetFxShaderParams( 0, 31, fbm_params2 );
 
-    m_renderer->SetFxShaderParams( 0, 29, fbm_params3 );
-    m_renderer->SetFxShaderParams( 0, 30, fbm_params4 );
+    m_renderer->SetFxShaderParams( 0, 32, fbm_params3 );
+    m_renderer->SetFxShaderParams( 0, 33, fbm_params4 );
 
-    m_renderer->SetFxShaderParams( 0, 31, fbm_params5 );
-    m_renderer->SetFxShaderParams( 0, 32, fbm_params6 );
+    m_renderer->SetFxShaderParams( 0, 34, fbm_params5 );
+    m_renderer->SetFxShaderParams( 0, 35, fbm_params6 );
 }
 
 void MultiFractalBinder::Unbind( void )
@@ -155,8 +155,8 @@ void PlanetClimateBinder::Bind( void )
     //Vector thparams2( 0.92, 1.5, 0.37, 0.99 );
 
 
-    m_renderer->SetFxShaderParams( 0, 33, thparams );
-    m_renderer->SetFxShaderParams( 0, 34, thparams2 );
+    m_renderer->SetFxShaderParams( 0, 36, thparams );
+    m_renderer->SetFxShaderParams( 0, 37, thparams2 );
 
     MultiFractalBinder::Bind();
 }
@@ -535,6 +535,7 @@ void dsAppClient::init_planet( void )
     collisions_fx->AddShader( hm_pshader );
 
     m_planet_collisions_binder.SetFx( collisions_fx );
+    m_planet_collisions_binder.SetVertexTexture( texture_map_planet_00, 0 );
 
 
     m_planet_collisions_binder.m_mask_seed1 = 671.0;
@@ -547,6 +548,8 @@ void dsAppClient::init_planet( void )
     m_planet_collisions_binder.m_mountains_input_half_range = 16.0;
     m_planet_collisions_binder.m_mountains_lacunarity = 2.0;
     m_planet_collisions_binder.m_mountains_roughness = 0.35;
+
+    m_planet_collisions_binder.m_mountains_amplitude = 24000.0;
 
     m_planet_collisions_binder.m_plains_seed1 = 178.0;
     m_planet_collisions_binder.m_plains_seed2 = 3400.0;
@@ -574,6 +577,8 @@ void dsAppClient::init_planet( void )
     m_planet_climate_binder.m_mountains_lacunarity = 2.0;
     m_planet_climate_binder.m_mountains_roughness = 0.35;
 
+    m_planet_climate_binder.m_mountains_amplitude = 24000.0;
+
 
     m_planet_climate_binder.m_plains_seed1 = 178.0;
     m_planet_climate_binder.m_plains_seed2 = 3400.0;
@@ -598,6 +603,8 @@ void dsAppClient::init_planet( void )
     m_planet_detail_binder.SetTexture( texture_th_pixels, 1 );
     m_planet_detail_binder.SetTexture( texture_th_splatting, 2 );
 
+    m_planet_detail_binder.SetVertexTexture( texture_map_planet_00, 0 );
+
 
     m_planet_detail_binder.m_mask_seed1 = 671.0;
     m_planet_detail_binder.m_mask_seed2 = 8444.0;
@@ -609,6 +616,8 @@ void dsAppClient::init_planet( void )
     m_planet_detail_binder.m_mountains_input_half_range = 16.0;
     m_planet_detail_binder.m_mountains_lacunarity = 2.0;
     m_planet_detail_binder.m_mountains_roughness = 0.35;
+
+    m_planet_detail_binder.m_mountains_amplitude = 24000.0;
 
     m_planet_detail_binder.m_plains_seed1 = 178.0;
     m_planet_detail_binder.m_plains_seed2 = 3400.0;

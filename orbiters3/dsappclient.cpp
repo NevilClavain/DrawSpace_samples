@@ -106,14 +106,14 @@ void MultiFractalBinder::Bind( void )
     fbm_params6[2] = m_plains_roughness;
 
 
-    m_renderer->SetFxShaderParams( 0, 27, fbm_params );
-    m_renderer->SetFxShaderParams( 0, 28, fbm_params2 );
+    m_renderer->SetFxShaderParams( 0, 30, fbm_params );
+    m_renderer->SetFxShaderParams( 0, 31, fbm_params2 );
 
-    m_renderer->SetFxShaderParams( 0, 29, fbm_params3 );
-    m_renderer->SetFxShaderParams( 0, 30, fbm_params4 );
+    m_renderer->SetFxShaderParams( 0, 32, fbm_params3 );
+    m_renderer->SetFxShaderParams( 0, 33, fbm_params4 );
 
-    m_renderer->SetFxShaderParams( 0, 31, fbm_params5 );
-    m_renderer->SetFxShaderParams( 0, 32, fbm_params6 );
+    m_renderer->SetFxShaderParams( 0, 34, fbm_params5 );
+    m_renderer->SetFxShaderParams( 0, 35, fbm_params6 );
 }
 
 void MultiFractalBinder::Unbind( void )
@@ -155,8 +155,8 @@ void PlanetClimateBinder::Bind( void )
     //Vector thparams2( 0.92, 1.5, 0.37, 0.99 );
 
 
-    m_renderer->SetFxShaderParams( 0, 33, thparams );
-    m_renderer->SetFxShaderParams( 0, 34, thparams2 );
+    m_renderer->SetFxShaderParams( 0, 36, thparams );
+    m_renderer->SetFxShaderParams( 0, 37, thparams2 );
 
     MultiFractalBinder::Bind();
 }
