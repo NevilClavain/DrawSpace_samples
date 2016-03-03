@@ -521,7 +521,7 @@ void dsAppClient::init_planet( void )
     texture_th_splatting->LoadFromFile();
 
 
-    Texture* texture_map_planet_00 = _DRAWSPACE_NEW_( Texture, Texture( "map_planet_00.jpg" ) );
+    Texture* texture_map_planet_00 = _DRAWSPACE_NEW_( Texture, Texture( "map_planet_00.bmp" ) );
     texture_map_planet_00->LoadFromFile();
 
 
@@ -549,7 +549,7 @@ void dsAppClient::init_planet( void )
     m_planet_collisions_binder.m_mountains_lacunarity = 2.0;
     m_planet_collisions_binder.m_mountains_roughness = 0.35;
 
-    m_planet_collisions_binder.m_mountains_amplitude = 24000.0;
+    
 
     m_planet_collisions_binder.m_plains_seed1 = 178.0;
     m_planet_collisions_binder.m_plains_seed2 = 3400.0;
@@ -577,7 +577,7 @@ void dsAppClient::init_planet( void )
     m_planet_climate_binder.m_mountains_lacunarity = 2.0;
     m_planet_climate_binder.m_mountains_roughness = 0.35;
 
-    m_planet_climate_binder.m_mountains_amplitude = 24000.0;
+    
 
 
     m_planet_climate_binder.m_plains_seed1 = 178.0;
@@ -617,7 +617,7 @@ void dsAppClient::init_planet( void )
     m_planet_detail_binder.m_mountains_lacunarity = 2.0;
     m_planet_detail_binder.m_mountains_roughness = 0.35;
 
-    m_planet_detail_binder.m_mountains_amplitude = 24000.0;
+
 
     m_planet_detail_binder.m_plains_seed1 = 178.0;
     m_planet_detail_binder.m_plains_seed2 = 3400.0;
