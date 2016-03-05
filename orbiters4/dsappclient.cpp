@@ -522,6 +522,7 @@ void dsAppClient::init_planet( void )
 
 
     Texture* texture_map_planet_00 = _DRAWSPACE_NEW_( Texture, Texture( "map_planet_00.bmp" ) );
+    //Texture* texture_map_planet_00 = _DRAWSPACE_NEW_( Texture, Texture( "earthbm002.jpg" ) );
     texture_map_planet_00->LoadFromFile();
 
 
@@ -536,6 +537,8 @@ void dsAppClient::init_planet( void )
 
     collisions_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "linear" ) );
     collisions_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "none" ) );
+    collisions_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    collisions_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
 
     m_planet_collisions_binder.SetFx( collisions_fx );
@@ -568,6 +571,8 @@ void dsAppClient::init_planet( void )
 
     climate_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "linear" ) );
     climate_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "none" ) );
+    climate_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    climate_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
     m_planet_climate_binder.SetFx( climate_fx );
     m_planet_climate_binder.SetVertexTexture( texture_map_planet_00, 0 );
