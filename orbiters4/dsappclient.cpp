@@ -534,6 +534,10 @@ void dsAppClient::init_planet( void )
     collisions_fx->AddShader( hm_vshader );
     collisions_fx->AddShader( hm_pshader );
 
+    collisions_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "linear" ) );
+    collisions_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "none" ) );
+
+
     m_planet_collisions_binder.SetFx( collisions_fx );
     m_planet_collisions_binder.SetVertexTexture( texture_map_planet_00, 0 );
 
@@ -561,6 +565,9 @@ void dsAppClient::init_planet( void )
     Fx* climate_fx = new Fx;
     climate_fx->AddShader( colors_vshader );
     climate_fx->AddShader( colors_pshader );
+
+    climate_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "linear" ) );
+    climate_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "none" ) );
 
     m_planet_climate_binder.SetFx( climate_fx );
     m_planet_climate_binder.SetVertexTexture( texture_map_planet_00, 0 );
@@ -595,8 +602,10 @@ void dsAppClient::init_planet( void )
     //main_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
     main_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
     main_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    main_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "linear" ) );
     main_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     main_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    main_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "none" ) );
     //main_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
 
     m_planet_detail_binder.SetFx( main_fx );
