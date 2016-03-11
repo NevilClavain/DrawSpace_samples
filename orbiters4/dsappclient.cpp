@@ -659,7 +659,11 @@ void dsAppClient::init_planet( void )
 
 
 
-    m_planet->RegisterPlanetBodyPassSlot( m_texturepass, &m_planet_detail_binder );
+    //m_planet->RegisterPlanetBodyPassSlot( m_texturepass, &m_planet_detail_binder );
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, &m_planet_detail_binder, i );
+    }
 
 
     m_planet->SetOrbitDuration( 0.333 );

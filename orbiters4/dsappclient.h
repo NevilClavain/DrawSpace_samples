@@ -174,9 +174,7 @@ protected:
     
 
     MultiFractalBinder                                                  m_planet_collisions_binder;
-
     PlanetClimateBinder                                                 m_planet_climate_binder;
-
     PlanetDetailsBinder                                                 m_planet_detail_binder;
 
 
