@@ -496,6 +496,13 @@ void dsAppClient::init_buildings( void )
 void dsAppClient::init_planet( void )
 {
 
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_collisions_binder[i] = new MultiFractalBinder;
+        m_planet_climate_binder[i] = new PlanetClimateBinder;
+        m_planet_detail_binder[i] = new PlanetDetailsBinder;
+    }
+
     Shader* hm_vshader = _DRAWSPACE_NEW_( Shader, Shader( "map_planethm.vso", true ) );
     Shader* hm_pshader = _DRAWSPACE_NEW_( Shader, Shader( "map_planethm.pso", true ) );
     hm_vshader->LoadFromFile();
@@ -541,26 +548,23 @@ void dsAppClient::init_planet( void )
     collisions_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
 
-    m_planet_collisions_binder.SetFx( collisions_fx );
-    m_planet_collisions_binder.SetVertexTexture( texture_map_planet_00, 0 );
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_collisions_binder[i]->SetFx( collisions_fx );
+        m_planet_collisions_binder[i]->SetVertexTexture( texture_map_planet_00, 0 );
 
+        m_planet_collisions_binder[i]->m_mask_seed1 = 671.0;
+        m_planet_collisions_binder[i]->m_mask_seed2 = 8444.0;
 
-    m_planet_collisions_binder.m_mask_seed1 = 671.0;
-    m_planet_collisions_binder.m_mask_seed2 = 8444.0;
+        //m_planet_collisions_binder[i]->m_vertical_offset = -1500.0;
 
-    //m_planet_collisions_binder.m_vertical_offset = -1500.0;
+        m_planet_collisions_binder[i]->m_mountains_input_half_range = 16.0;
+        m_planet_collisions_binder[i]->m_mountains_lacunarity = 2.0;
+        m_planet_collisions_binder[i]->m_mountains_roughness = 0.35;
 
-    //m_planet_collisions_binder.m_mountains_seed1 = 117.0;
-    //m_planet_collisions_binder.m_mountains_seed2 = 245443.0;
-    m_planet_collisions_binder.m_mountains_input_half_range = 16.0;
-    m_planet_collisions_binder.m_mountains_lacunarity = 2.0;
-    m_planet_collisions_binder.m_mountains_roughness = 0.35;
-
-    
-
-    m_planet_collisions_binder.m_plains_seed1 = 178.0;
-    m_planet_collisions_binder.m_plains_seed2 = 3400.0;
-
+        m_planet_collisions_binder[i]->m_plains_seed1 = 178.0;
+        m_planet_collisions_binder[i]->m_plains_seed2 = 3400.0;
+    }
 
 
 
@@ -574,28 +578,24 @@ void dsAppClient::init_planet( void )
     climate_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
     climate_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
-    m_planet_climate_binder.SetFx( climate_fx );
-    m_planet_climate_binder.SetVertexTexture( texture_map_planet_00, 0 );
 
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_climate_binder[i]->SetFx( climate_fx );
+        m_planet_climate_binder[i]->SetVertexTexture( texture_map_planet_00, 0 );
 
-    m_planet_climate_binder.m_mask_seed1 = 671.0;
-    m_planet_climate_binder.m_mask_seed2 = 8444.0;
+        m_planet_climate_binder[i]->m_mask_seed1 = 671.0;
+        m_planet_climate_binder[i]->m_mask_seed2 = 8444.0;
 
-    //m_planet_climate_binder.m_vertical_offset = -1500.0;
+        //m_planet_climate_binder[i]->m_vertical_offset = -1500.0;
 
-    //m_planet_climate_binder.m_mountains_seed1 = 117.0;
-    //m_planet_climate_binder.m_mountains_seed2 = 245443.0;
-    m_planet_climate_binder.m_mountains_input_half_range = 16.0;
-    m_planet_climate_binder.m_mountains_lacunarity = 2.0;
-    m_planet_climate_binder.m_mountains_roughness = 0.35;
+        m_planet_climate_binder[i]->m_mountains_input_half_range = 16.0;
+        m_planet_climate_binder[i]->m_mountains_lacunarity = 2.0;
+        m_planet_climate_binder[i]->m_mountains_roughness = 0.35;
 
-    
-
-
-    m_planet_climate_binder.m_plains_seed1 = 178.0;
-    m_planet_climate_binder.m_plains_seed2 = 3400.0;
-
-
+        m_planet_climate_binder[i]->m_plains_seed1 = 178.0;
+        m_planet_climate_binder[i]->m_plains_seed2 = 3400.0;
+    }
 
 
 
@@ -613,56 +613,50 @@ void dsAppClient::init_planet( void )
     main_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "none" ) );
     //main_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
 
-    m_planet_detail_binder.SetFx( main_fx );
-    m_planet_detail_binder.SetTexture( texture_th_pixels, 1 );
-    m_planet_detail_binder.SetTexture( texture_th_splatting, 2 );
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_detail_binder[i]->SetFx( main_fx );
+        m_planet_detail_binder[i]->SetTexture( texture_th_pixels, 1 );
+        m_planet_detail_binder[i]->SetTexture( texture_th_splatting, 2 );
 
-    m_planet_detail_binder.SetVertexTexture( texture_map_planet_00, 0 );
+        m_planet_detail_binder[i]->SetVertexTexture( texture_map_planet_00, 0 );
 
+        m_planet_detail_binder[i]->m_mask_seed1 = 671.0;
+        m_planet_detail_binder[i]->m_mask_seed2 = 8444.0;
 
-    m_planet_detail_binder.m_mask_seed1 = 671.0;
-    m_planet_detail_binder.m_mask_seed2 = 8444.0;
+        //m_planet_detail_binder[i]->m_vertical_offset = -1500.0;
 
-    //m_planet_detail_binder.m_vertical_offset = -1500.0;
+        m_planet_detail_binder[i]->m_mountains_input_half_range = 16.0;
+        m_planet_detail_binder[i]->m_mountains_lacunarity = 2.0;
+        m_planet_detail_binder[i]->m_mountains_roughness = 0.35;
 
-    //m_planet_detail_binder.m_mountains_seed1 = 117.0;
-    //m_planet_detail_binder.m_mountains_seed2 = 245443.0;
-    m_planet_detail_binder.m_mountains_input_half_range = 16.0;
-    m_planet_detail_binder.m_mountains_lacunarity = 2.0;
-    m_planet_detail_binder.m_mountains_roughness = 0.35;
-
-
-
-    m_planet_detail_binder.m_plains_seed1 = 178.0;
-    m_planet_detail_binder.m_plains_seed2 = 3400.0;
-
-
+        m_planet_detail_binder[i]->m_plains_seed1 = 178.0;
+        m_planet_detail_binder[i]->m_plains_seed2 = 3400.0;
+    }
 
 
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
-    m_planet_collisions_binder.SetRenderer( renderer );
-    m_planet_detail_binder.SetRenderer( renderer );
-    m_planet_climate_binder.SetRenderer( renderer );
-
-
-
-
-    config.m_groundCollisionsBinder = &m_planet_collisions_binder;
-    
-    config.m_patchTexturesBinder = &m_planet_climate_binder;
-
-
-    m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer, config ) );
-
-
-
-
-    //m_planet->RegisterPlanetBodyPassSlot( m_texturepass, &m_planet_detail_binder );
     for( int i = 0; i < 6; i++ )
     {
-        m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, &m_planet_detail_binder, i );
+        m_planet_collisions_binder[i]->SetRenderer( renderer );
+        m_planet_detail_binder[i]->SetRenderer( renderer );
+        m_planet_climate_binder[i]->SetRenderer( renderer );
+    }
+
+
+    for( int i = 0; i < 6; i++ )
+    {
+        config.m_groundCollisionsBinder[i] = m_planet_collisions_binder[i];
+        config.m_patchTexturesBinder[i] = m_planet_climate_binder[i];
+    }
+
+    m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer, config ) );
+    
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, m_planet_detail_binder[i], i );
     }
 
 

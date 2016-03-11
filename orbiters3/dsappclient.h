@@ -173,11 +173,11 @@ protected:
 
     
 
-    MultiFractalBinder                                                  m_planet_collisions_binder;
+    MultiFractalBinder*                                                 m_planet_collisions_binder[6];
 
-    PlanetClimateBinder                                                 m_planet_climate_binder;
+    PlanetClimateBinder*                                                m_planet_climate_binder[6];
 
-    PlanetDetailsBinder                                                 m_planet_detail_binder;
+    PlanetDetailsBinder*                                                m_planet_detail_binder[6];
 
 
 
