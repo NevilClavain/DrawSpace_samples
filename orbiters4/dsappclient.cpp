@@ -52,13 +52,13 @@ m_mask_input_half_range( 20.0 ),
 m_mountains_lacunarity( 2.15 ),
 m_mountains_roughness( 0.25 ),
 m_mountains_input_half_range( 16.0 ),
-m_mountains_amplitude( /*4000.0*/ 1100.0 ),
-m_mountains_seed1( 635.298681 ),
-m_mountains_seed2( 682.357502 ),
+m_mountains_amplitude( /*4000.0*/ 1200.0 ),
+m_mountains_seed1( 32245.0 ),
+m_mountains_seed2( 16702.0 ),
 m_plains_lacunarity( 2.6 ),
 m_plains_roughness( 0.5 ),
 m_plains_input_half_range( 0.8 ),
-m_plains_amplitude( 1000.0 ),
+m_plains_amplitude( 2000.0 ),
 m_plains_seed1( 635.298681 ),
 m_plains_seed2( 682.357502 ),
 m_vertical_offset( 0.0 )
@@ -134,8 +134,8 @@ void PlanetClimateBinder::Initialise( void )
 void PlanetClimateBinder::Bind( void )
 {
     // planete temperee
-    Vector thparams( 300.0, 600.0, 6.4, 25.0 );
-    Vector thparams2( 0.48, 0.75, 0.45, 0.55 );
+    //Vector thparams( 300.0, 600.0, 6.4, 25.0 );
+    //Vector thparams2( 0.48, 0.75, 0.45, 0.55 );
 
     // planete chaude et peu humide (aride) : desertique
     //Vector thparams( 0.0, 10.0, 6.4, 25.0 );
@@ -153,6 +153,10 @@ void PlanetClimateBinder::Bind( void )
     // monde froid et plutot humide
     //Vector thparams( 1400.0, 1900.0, 6.4, 25.0 );
     //Vector thparams2( 0.92, 1.5, 0.37, 0.99 );
+
+
+    Vector thparams( 300.0, 600.0, 6.4, 25.0 );
+    Vector thparams2( 0.0, 1.1, 0.45, 0.45 );
 
 
     m_renderer->SetFxShaderParams( 0, 36, thparams );
@@ -533,6 +537,10 @@ void dsAppClient::init_planet( void )
     texture_map_planet_00->LoadFromFile();
 
 
+    Texture* texture_map_planet_01 = _DRAWSPACE_NEW_( Texture, Texture( "map_planet_01.bmp" ) );
+    texture_map_planet_01->LoadFromFile();
+
+
     SphericalLOD::Config config;
 
     config.m_lod0base = 19000.0;
@@ -551,7 +559,16 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet_collisions_binder[i]->SetFx( collisions_fx );
-        m_planet_collisions_binder[i]->SetVertexTexture( texture_map_planet_00, 0 );
+
+
+        if( i == DrawSpace::SphericalLOD::Patch::TopPlanetFace )
+        {
+            m_planet_collisions_binder[i]->SetVertexTexture( texture_map_planet_01, 0 );
+        }
+        else
+        {
+            m_planet_collisions_binder[i]->SetVertexTexture( texture_map_planet_00, 0 );
+        }
 
         m_planet_collisions_binder[i]->m_mask_seed1 = 671.0;
         m_planet_collisions_binder[i]->m_mask_seed2 = 8444.0;
@@ -582,7 +599,16 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet_climate_binder[i]->SetFx( climate_fx );
-        m_planet_climate_binder[i]->SetVertexTexture( texture_map_planet_00, 0 );
+
+
+        if( i == DrawSpace::SphericalLOD::Patch::TopPlanetFace )
+        {
+            m_planet_climate_binder[i]->SetVertexTexture( texture_map_planet_01, 0 );
+        }
+        else
+        {
+            m_planet_climate_binder[i]->SetVertexTexture( texture_map_planet_00, 0 );
+        }
 
         m_planet_climate_binder[i]->m_mask_seed1 = 671.0;
         m_planet_climate_binder[i]->m_mask_seed2 = 8444.0;
@@ -619,7 +645,14 @@ void dsAppClient::init_planet( void )
         m_planet_detail_binder[i]->SetTexture( texture_th_pixels, 1 );
         m_planet_detail_binder[i]->SetTexture( texture_th_splatting, 2 );
 
-        m_planet_detail_binder[i]->SetVertexTexture( texture_map_planet_00, 0 );
+        if( i == DrawSpace::SphericalLOD::Patch::TopPlanetFace )
+        {
+            m_planet_detail_binder[i]->SetVertexTexture( texture_map_planet_01, 0 );
+        }
+        else
+        {        
+            m_planet_detail_binder[i]->SetVertexTexture( texture_map_planet_00, 0 );
+        }
 
         m_planet_detail_binder[i]->m_mask_seed1 = 671.0;
         m_planet_detail_binder[i]->m_mask_seed2 = 8444.0;
