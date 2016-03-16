@@ -537,6 +537,8 @@ void dsAppClient::init_planet( void )
     Fx* collisions_fx = new Fx;
     collisions_fx->AddShader( hm_vshader );
     collisions_fx->AddShader( hm_pshader );
+    collisions_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    collisions_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
 
     for( int i = 0; i < 6; i++ )
