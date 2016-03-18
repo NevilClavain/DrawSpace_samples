@@ -184,7 +184,7 @@ void PlanetDetailsBinder::Bind( void )
 {
     Vector flags2( 16.0, 1.095, 1.0040, 0.0 );
     
-    m_renderer->SetFxShaderParams( 1, 1, flags2 );
+    m_renderer->SetFxShaderParams( 1, 6, flags2 );
 
 
     MultiFractalBinder::Bind();

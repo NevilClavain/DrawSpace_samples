@@ -134,8 +134,10 @@ void PlanetClimateBinder::Initialise( void )
 void PlanetClimateBinder::Bind( void )
 {
     // planete temperee
+    
     Vector thparams( 300.0, 600.0, 6.4, 25.0 );
     Vector thparams2( 0.48, 0.75, 0.45, 0.55 );
+    
 
     // planete chaude et peu humide (aride) : desertique
     //Vector thparams( 0.0, 10.0, 6.4, 25.0 );
@@ -180,7 +182,7 @@ void PlanetDetailsBinder::Bind( void )
 {
     Vector flags2( 16.0, 1.095, 1.0040, 0.0 );
     
-    m_renderer->SetFxShaderParams( 1, 1, flags2 );
+    m_renderer->SetFxShaderParams( 1, 6, flags2 );
 
 
     MultiFractalBinder::Bind();
