@@ -59,9 +59,9 @@ m_plains_lacunarity( 2.6 ),
 m_plains_roughness( 0.5 ),
 m_plains_input_half_range( 0.8 ),
 m_plains_amplitude( 800.0 ),
-m_plains_seed1( 221.0 ),
-m_plains_seed2( 144.0 ),
-m_vertical_offset( 0.0 )
+m_plains_seed1( 18086.0 ),
+m_plains_seed2( 3321.0 ),
+m_vertical_offset( -200.0 )
 {
     m_renderer = SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 }
@@ -170,8 +170,13 @@ void PlanetClimateBinder::Unbind( void )
 
 
 
-PlanetDetailsBinder::PlanetDetailsBinder( void )
+PlanetDetailsBinder::PlanetDetailsBinder( void ) :
+m_planet_node( NULL )
 {
+    m_light0_dir[0] = -1.0;
+    m_light0_dir[1] = 0.0;
+    m_light0_dir[2] = 0.0;
+    m_light0_dir[3] = 1.0;
 }
 
 void PlanetDetailsBinder::Initialise( void )
@@ -180,10 +185,10 @@ void PlanetDetailsBinder::Initialise( void )
 
 void PlanetDetailsBinder::Bind( void )
 {
-    Vector flags2( 16.0, 1.095, 1.0040, 0.0 );
-    
+    Vector flags2( 16.0, 1.095, 1.0040, 0.0 );    
     m_renderer->SetFxShaderParams( 1, 6, flags2 );
 
+    m_renderer->SetFxShaderParams( 1, 7, m_light0_local_dir );
 
     MultiFractalBinder::Bind();
 }
@@ -191,6 +196,23 @@ void PlanetDetailsBinder::Bind( void )
 void PlanetDetailsBinder::Unbind( void )
 {
     MultiFractalBinder::Unbind();
+}
+
+void PlanetDetailsBinder::SetPlanetNode( DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* p_planet_node )
+{
+    m_planet_node = p_planet_node;
+}
+
+void PlanetDetailsBinder::Update( void )
+{
+    Matrix planet_final_transform;
+
+    m_planet_node->GetFinalTransform( planet_final_transform );
+
+    planet_final_transform.ClearTranslation();
+    planet_final_transform.Transpose();
+
+    planet_final_transform.Transform( &m_light0_dir, &m_light0_local_dir );
 }
 
 
@@ -647,6 +669,12 @@ void dsAppClient::init_planet( void )
     ///////////////////////////////////
 
     m_planet->RegisterScenegraphCallbacks( m_scenenodegraph );
+
+
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_detail_binder[i]->SetPlanetNode( m_planet_node );
+    }
 }
 
 
@@ -872,6 +900,11 @@ void dsAppClient::render_universe( void )
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
     m_scenenodegraph.ComputeTransformations( m_timer );
+
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_detail_binder[i]->Update();
+    }
 
     m_text_widget->SetVirtualTranslation( 100, 75 );
     m_text_widget_2->SetVirtualTranslation( -60, 160 );

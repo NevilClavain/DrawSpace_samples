@@ -77,6 +77,11 @@ class PlanetDetailsBinder : public MultiFractalBinder
 {
 protected:
 
+    DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* m_planet_node;
+
+    DrawSpace::Utils::Vector                                m_light0_dir;
+    DrawSpace::Utils::Vector                                m_light0_local_dir;
+
 public:
 
     PlanetDetailsBinder( void );
@@ -84,6 +89,10 @@ public:
     virtual void Initialise( void );
     virtual void Bind( void );
     virtual void Unbind( void );
+
+    void SetPlanetNode( DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* p_planet_node );
+    void Update( void );
+
 };
 
 
