@@ -31,25 +31,14 @@ class MultiFractalBinder : public DrawSpace::SphericalLOD::Binder
 {
 public:
 
-    dsreal                                  m_mask_seed1;
-    dsreal                                  m_mask_seed2;
-    dsreal                                  m_mask_input_half_range;
-
-    dsreal                                  m_mountains_lacunarity;
-    dsreal                                  m_mountains_roughness;
-    dsreal                                  m_mountains_input_half_range;
-    dsreal                                  m_mountains_amplitude;
-    dsreal                                  m_mountains_seed1;
-    dsreal                                  m_mountains_seed2;
-
-    dsreal                                  m_plains_lacunarity;
-    dsreal                                  m_plains_roughness;
-    dsreal                                  m_plains_input_half_range;
     dsreal                                  m_plains_amplitude;
+    dsreal                                  m_mountains_amplitude;
+    dsreal                                  m_vertical_offset;
+
     dsreal                                  m_plains_seed1;
     dsreal                                  m_plains_seed2;
-
-    dsreal                                  m_vertical_offset;
+    dsreal                                  m_mix_seed1;
+    dsreal                                  m_mix_seed2;
 
 public:
 

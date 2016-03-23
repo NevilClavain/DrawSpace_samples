@@ -46,22 +46,13 @@ _DECLARE_DS_LOGGER( logger, "AppClient", DrawSpace::Logger::Configuration::GetIn
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 MultiFractalBinder::MultiFractalBinder( void ) :
-m_mask_seed1( 635.298681 ),
-m_mask_seed2( 682.357502 ),
-m_mask_input_half_range( 20.0 ),
-m_mountains_lacunarity( 2.0 ),
-m_mountains_roughness( 0.35 ),
-m_mountains_input_half_range( 16.0 ),
-m_mountains_amplitude( 1600.0 ),
-m_mountains_seed1( 635.298681 ),
-m_mountains_seed2( 682.357502 ),
-m_plains_lacunarity( 2.6 ),
-m_plains_roughness( 0.5 ),
-m_plains_input_half_range( 0.8 ),
 m_plains_amplitude( 800.0 ),
-m_plains_seed1( 18086.0 ),
+m_mountains_amplitude( 2200.0 ),
+m_vertical_offset( -200.0 ),
+m_plains_seed1( 133.0 ),
 m_plains_seed2( 3321.0 ),
-m_vertical_offset( -200.0 )
+m_mix_seed1( 635.298681 ),
+m_mix_seed2( 682.357502 )
 {
     m_renderer = SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 }
@@ -72,53 +63,24 @@ void MultiFractalBinder::Initialise( void )
 
 void MultiFractalBinder::Bind( void )
 {
-    Vector fbm_params;
-    Vector fbm_params2;
+    Vector landscape_control;
+    Vector seeds;
 
-    Vector fbm_params3;
-    Vector fbm_params4;
+    landscape_control[0] = m_plains_amplitude;
+    landscape_control[1] = m_mountains_amplitude;
+    landscape_control[2] = m_vertical_offset;
 
-    Vector fbm_params5;
-    Vector fbm_params6;
+    seeds[0] = m_plains_seed1;
+    seeds[1] = m_plains_seed2;
+    seeds[2] = m_mix_seed1;
+    seeds[3] = m_mix_seed2;
 
-  
-    fbm_params[1] = m_mask_input_half_range;
-    fbm_params[2] = m_vertical_offset;
-
-    fbm_params2[0] = m_mask_seed1;
-    fbm_params2[1] = m_mask_seed2;
-
-    fbm_params3[0] = m_mountains_lacunarity;
-    fbm_params3[1] = m_mountains_input_half_range;
-    fbm_params3[3] = m_mountains_amplitude;
-
-    fbm_params4[0] = m_mountains_seed1;
-    fbm_params4[1] = m_mountains_seed2;
-    fbm_params4[2] = m_mountains_roughness;
-
-
-    fbm_params5[0] = m_plains_lacunarity;
-    fbm_params5[1] = m_plains_input_half_range;
-    fbm_params5[3] = m_plains_amplitude;
-
-    fbm_params6[0] = m_plains_seed1;
-    fbm_params6[1] = m_plains_seed2;
-    fbm_params6[2] = m_plains_roughness;
-
-
-    m_renderer->SetFxShaderParams( 0, 30, fbm_params );
-    m_renderer->SetFxShaderParams( 0, 31, fbm_params2 );
-
-    m_renderer->SetFxShaderParams( 0, 32, fbm_params3 );
-    m_renderer->SetFxShaderParams( 0, 33, fbm_params4 );
-
-    m_renderer->SetFxShaderParams( 0, 34, fbm_params5 );
-    m_renderer->SetFxShaderParams( 0, 35, fbm_params6 );
+    m_renderer->SetFxShaderParams( 0, 30, landscape_control );
+    m_renderer->SetFxShaderParams( 0, 31, seeds );
 }
 
 void MultiFractalBinder::Unbind( void )
 {
-
 }
 
 
@@ -157,8 +119,8 @@ void PlanetClimateBinder::Bind( void )
     //Vector thparams2( 0.92, 1.5, 0.37, 0.99 );
 
 
-    m_renderer->SetFxShaderParams( 0, 36, thparams );
-    m_renderer->SetFxShaderParams( 0, 37, thparams2 );
+    m_renderer->SetFxShaderParams( 0, 32, thparams );
+    m_renderer->SetFxShaderParams( 0, 33, thparams2 );
 
     MultiFractalBinder::Bind();
 }
