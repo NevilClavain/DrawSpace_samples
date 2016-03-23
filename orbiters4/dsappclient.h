@@ -38,6 +38,7 @@ public:
     dsreal                                  m_vertical_offset;
     dsreal                                  m_uvnoise_seed1;
     dsreal                                  m_uvnoise_seed2;
+    dsreal                                  m_uvnoise_weight;
 
 
 public:

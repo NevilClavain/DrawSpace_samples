@@ -50,7 +50,8 @@ m_uvnoise_seed1( 671.0 ),
 m_uvnoise_seed2( 8444.0 ),
 m_mountains_amplitude( 900.0 ),
 m_plains_amplitude( 2000.0 ),
-m_vertical_offset( 0.0 )
+m_vertical_offset( 0.0 ),
+m_uvnoise_weight( 0.04 )
 {
     m_renderer = SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 }
@@ -67,6 +68,7 @@ void MultiFractalBinder::Bind( void )
     landscape_control[0] = m_plains_amplitude;
     landscape_control[1] = m_mountains_amplitude;
     landscape_control[2] = m_vertical_offset;
+    landscape_control[3] = m_uvnoise_weight;
 
     seeds[0] = m_uvnoise_seed1;
     seeds[1] = m_uvnoise_seed2;
