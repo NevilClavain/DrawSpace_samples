@@ -51,7 +51,7 @@ m_uvnoise_seed2( 8444.0 ),
 m_mountains_amplitude( 900.0 ),
 m_plains_amplitude( 2000.0 ),
 m_vertical_offset( 0.0 ),
-m_uvnoise_weight( 0.04 )
+m_uvnoise_weight( 0.0025 )
 {
     m_renderer = SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 }
