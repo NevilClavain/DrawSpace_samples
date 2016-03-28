@@ -68,6 +68,11 @@ protected:
 
     DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* m_planet_node;
 
+    bool                                                    m_ambient;
+    DrawSpace::Utils::Vector                                m_ambient_color;
+
+    bool                                                    m_light0;
+    DrawSpace::Utils::Vector                                m_light0_color;
     DrawSpace::Utils::Vector                                m_light0_dir;
     DrawSpace::Utils::Vector                                m_light0_local_dir;
 
