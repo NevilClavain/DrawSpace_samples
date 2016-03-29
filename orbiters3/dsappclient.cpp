@@ -49,10 +49,10 @@ MultiFractalBinder::MultiFractalBinder( void ) :
 m_plains_amplitude( 800.0 ),
 m_mountains_amplitude( 2200.0 ),
 m_vertical_offset( -200.0 ),
-m_plains_seed1( 133.0 ),
-m_plains_seed2( 3321.0 ),
-m_mix_seed1( 635.298681 ),
-m_mix_seed2( 682.357502 )
+m_plains_seed1( 1025.0 ),
+m_plains_seed2( 777.0 ),
+m_mix_seed1( 635.0 ),
+m_mix_seed2( 82.0 )
 {
     m_renderer = SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 }
@@ -139,6 +139,20 @@ m_planet_node( NULL )
     m_light0_dir[1] = 0.0;
     m_light0_dir[2] = 0.0;
     m_light0_dir[3] = 1.0;
+
+    m_light0 = true;
+    m_light0_color[0] = 1.0;
+    m_light0_color[1] = 0.4;
+    m_light0_color[2] = 0.4;
+    m_light0_color[3] = 1.0;
+
+
+    m_ambient = true;
+    m_ambient_color[0] = 0.1;
+    m_ambient_color[1] = 0.1;
+    m_ambient_color[2] = 0.1;
+    m_ambient_color[3] = 1.0;
+
 }
 
 void PlanetDetailsBinder::Initialise( void )
@@ -150,8 +164,8 @@ void PlanetDetailsBinder::Bind( void )
     Vector flags6( 16.0, 1.095, 1.0040, 0.0 );
     
     Vector flags7;
-    flags7[0] = (m_ambient ? 1.0 : 0.0 );
-    flags7[1] = (m_light0 ? 1.0 : 0.0 );
+    flags7[0] = ( m_ambient ? 1.0 : 0.0 );
+    flags7[1] = ( m_light0 ? 1.0 : 0.0 );
 
     m_renderer->SetFxShaderParams( 1, 6, flags6 );
     m_renderer->SetFxShaderParams( 1, 7, flags7 );
