@@ -62,6 +62,23 @@ public:
     virtual void Unbind( void );
 };
 
+class PlanetLight
+{
+public:
+
+    PlanetLight( void ) :
+        m_enable( false )
+    {
+    };
+
+
+    bool                                                    m_enable;
+    DrawSpace::Utils::Vector                                m_color;
+    DrawSpace::Utils::Vector                                m_dir;
+    DrawSpace::Utils::Vector                                m_local_dir;
+
+};
+
 class PlanetDetailsBinder : public MultiFractalBinder
 {
 protected:
@@ -71,10 +88,8 @@ protected:
     bool                                                    m_ambient;
     DrawSpace::Utils::Vector                                m_ambient_color;
 
-    bool                                                    m_light0;
-    DrawSpace::Utils::Vector                                m_light0_color;
-    DrawSpace::Utils::Vector                                m_light0_dir;
-    DrawSpace::Utils::Vector                                m_light0_local_dir;
+    PlanetLight                                             m_lights[3];
+
 
 public:
 

@@ -135,19 +135,38 @@ void PlanetClimateBinder::Unbind( void )
 PlanetDetailsBinder::PlanetDetailsBinder( void ) :
 m_planet_node( NULL )
 {
-    m_light0_dir[0] = -1.0;
-    m_light0_dir[1] = 0.0;
-    m_light0_dir[2] = 0.0;
-    m_light0_dir[3] = 1.0;
 
-    m_light0 = true;
-    m_light0_color[0] = 1.0;
-    m_light0_color[1] = 0.4;
-    m_light0_color[2] = 0.4;
-    m_light0_color[3] = 1.0;
+    m_lights[0].m_enable = false;
+    m_lights[0].m_color[0] = 1.0;
+    m_lights[0].m_color[1] = 0.99;
+    m_lights[0].m_color[2] = 0.99;
+    m_lights[0].m_color[3] = 1.0;
+    m_lights[0].m_dir[0] = -1.0;
+    m_lights[0].m_dir[1] = 0.0;
+    m_lights[0].m_dir[2] = 0.0;
+    m_lights[0].m_dir[3] = 1.0;
 
+    m_lights[1].m_enable = true;
+    m_lights[1].m_color[0] = 1.0;
+    m_lights[1].m_color[1] = 0.0;
+    m_lights[1].m_color[2] = 0.0;
+    m_lights[1].m_color[3] = 1.0;
+    m_lights[1].m_dir[0] = 0.0;
+    m_lights[1].m_dir[1] = 1.0;
+    m_lights[1].m_dir[2] = 0.0;
+    m_lights[1].m_dir[3] = 1.0;
 
-    m_ambient = true;
+    m_lights[2].m_enable = true;
+    m_lights[2].m_color[0] = 1.0;
+    m_lights[2].m_color[1] = 1.0;
+    m_lights[2].m_color[2] = 1.0;
+    m_lights[2].m_color[3] = 1.0;
+    m_lights[2].m_dir[0] = 0.0;
+    m_lights[2].m_dir[1] = -1.0;
+    m_lights[2].m_dir[2] = 0.0;
+    m_lights[2].m_dir[3] = 1.0;
+
+    m_ambient = false;
     m_ambient_color[0] = 0.1;
     m_ambient_color[1] = 0.1;
     m_ambient_color[2] = 0.1;
@@ -165,13 +184,18 @@ void PlanetDetailsBinder::Bind( void )
     
     Vector flags7;
     flags7[0] = ( m_ambient ? 1.0 : 0.0 );
-    flags7[1] = ( m_light0 ? 1.0 : 0.0 );
+    flags7[1] = ( m_lights[0].m_enable ? 1.0 : 0.0 );
+    flags7[2] = ( m_lights[1].m_enable ? 1.0 : 0.0 );
 
     m_renderer->SetFxShaderParams( 1, 6, flags6 );
     m_renderer->SetFxShaderParams( 1, 7, flags7 );
     m_renderer->SetFxShaderParams( 1, 8, m_ambient_color );
-    m_renderer->SetFxShaderParams( 1, 9, m_light0_local_dir );
-    m_renderer->SetFxShaderParams( 1, 10, m_light0_color );
+    m_renderer->SetFxShaderParams( 1, 9, m_lights[0].m_local_dir );
+    m_renderer->SetFxShaderParams( 1, 10, m_lights[0].m_color );
+    m_renderer->SetFxShaderParams( 1, 11, m_lights[1].m_local_dir );
+    m_renderer->SetFxShaderParams( 1, 12, m_lights[1].m_color );
+    m_renderer->SetFxShaderParams( 1, 13, m_lights[2].m_local_dir );
+    m_renderer->SetFxShaderParams( 1, 14, m_lights[2].m_color );
     
     MultiFractalBinder::Bind();
 }
@@ -195,7 +219,13 @@ void PlanetDetailsBinder::Update( void )
     planet_final_transform.ClearTranslation();
     planet_final_transform.Transpose();
 
-    planet_final_transform.Transform( &m_light0_dir, &m_light0_local_dir );
+    for( long i = 0; i < 3; i++ )
+    {
+        if( m_lights[i].m_enable )
+        {
+            planet_final_transform.Transform( &m_lights[i].m_dir, &m_lights[i].m_local_dir );
+        }
+    }
 }
 
 
