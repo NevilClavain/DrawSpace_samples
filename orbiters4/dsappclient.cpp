@@ -133,8 +133,45 @@ void PlanetClimateBinder::Unbind( void )
 
 
 
-PlanetDetailsBinder::PlanetDetailsBinder( void )
+PlanetDetailsBinder::PlanetDetailsBinder( void ) :
+m_planet_node( NULL )
 {
+    m_lights[0].m_enable = true;
+    m_lights[0].m_color[0] = 1.0;
+    m_lights[0].m_color[1] = 0.99;
+    m_lights[0].m_color[2] = 0.99;
+    m_lights[0].m_color[3] = 1.0;
+    m_lights[0].m_dir[0] = -1.0;
+    m_lights[0].m_dir[1] = 0.0;
+    m_lights[0].m_dir[2] = 0.0;
+    m_lights[0].m_dir[3] = 1.0;
+
+    m_lights[1].m_enable = false;
+    m_lights[1].m_color[0] = 1.0;
+    m_lights[1].m_color[1] = 0.0;
+    m_lights[1].m_color[2] = 0.0;
+    m_lights[1].m_color[3] = 1.0;
+    m_lights[1].m_dir[0] = 0.0;
+    m_lights[1].m_dir[1] = 1.0;
+    m_lights[1].m_dir[2] = 0.0;
+    m_lights[1].m_dir[3] = 1.0;
+
+    m_lights[2].m_enable = false;
+    m_lights[2].m_color[0] = 1.0;
+    m_lights[2].m_color[1] = 1.0;
+    m_lights[2].m_color[2] = 1.0;
+    m_lights[2].m_color[3] = 1.0;
+    m_lights[2].m_dir[0] = 0.0;
+    m_lights[2].m_dir[1] = -1.0;
+    m_lights[2].m_dir[2] = 0.0;
+    m_lights[2].m_dir[3] = 1.0;
+
+    m_ambient = false;
+    m_ambient_color[0] = 0.1;
+    m_ambient_color[1] = 0.1;
+    m_ambient_color[2] = 0.1;
+    m_ambient_color[3] = 1.0;
+
 }
 
 void PlanetDetailsBinder::Initialise( void )
@@ -143,9 +180,22 @@ void PlanetDetailsBinder::Initialise( void )
 
 void PlanetDetailsBinder::Bind( void )
 {
-    Vector flags2( 16.0, 1.095, 1.0040, 0.0 );
+    Vector flags2( 16.0, 3.095, 1.0040, 0.0 );
+
+    Vector flags7;
+    flags7[0] = ( m_ambient ? 1.0 : 0.0 );
+    flags7[1] = ( m_lights[0].m_enable ? 1.0 : 0.0 );
+    flags7[2] = ( m_lights[1].m_enable ? 1.0 : 0.0 );
     
     m_renderer->SetFxShaderParams( 1, 6, flags2 );
+    m_renderer->SetFxShaderParams( 1, 7, flags7 );
+    m_renderer->SetFxShaderParams( 1, 8, m_ambient_color );
+    m_renderer->SetFxShaderParams( 1, 9, m_lights[0].m_local_dir );
+    m_renderer->SetFxShaderParams( 1, 10, m_lights[0].m_color );
+    m_renderer->SetFxShaderParams( 1, 11, m_lights[1].m_local_dir );
+    m_renderer->SetFxShaderParams( 1, 12, m_lights[1].m_color );
+    m_renderer->SetFxShaderParams( 1, 13, m_lights[2].m_local_dir );
+    m_renderer->SetFxShaderParams( 1, 14, m_lights[2].m_color );
 
 
     MultiFractalBinder::Bind();
@@ -156,6 +206,28 @@ void PlanetDetailsBinder::Unbind( void )
     MultiFractalBinder::Unbind();
 }
 
+void PlanetDetailsBinder::SetPlanetNode( DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* p_planet_node )
+{
+    m_planet_node = p_planet_node;
+}
+
+void PlanetDetailsBinder::Update( void )
+{
+    Matrix planet_final_transform;
+
+    m_planet_node->GetFinalTransform( planet_final_transform );
+
+    planet_final_transform.ClearTranslation();
+    planet_final_transform.Transpose();
+
+    for( long i = 0; i < 3; i++ )
+    {
+        if( m_lights[i].m_enable )
+        {
+            planet_final_transform.Transform( &m_lights[i].m_dir, &m_lights[i].m_local_dir );
+        }
+    }
+}
 
 
 dsAppClient::dsAppClient( void ) : 
@@ -647,6 +719,11 @@ void dsAppClient::init_planet( void )
     ///////////////////////////////////
 
     m_planet->RegisterScenegraphCallbacks( m_scenenodegraph );
+
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_detail_binder[i]->SetPlanetNode( m_planet_node );
+    }
 }
 
 
@@ -872,6 +949,11 @@ void dsAppClient::render_universe( void )
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
     m_scenenodegraph.ComputeTransformations( m_timer );
+
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_detail_binder[i]->Update();
+    }
 
     m_text_widget->SetVirtualTranslation( 100, 75 );
     m_text_widget_2->SetVirtualTranslation( -60, 160 );

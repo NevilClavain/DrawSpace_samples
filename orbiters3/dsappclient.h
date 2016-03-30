@@ -90,7 +90,6 @@ protected:
 
     PlanetLight                                             m_lights[3];
 
-
 public:
 
     PlanetDetailsBinder( void );

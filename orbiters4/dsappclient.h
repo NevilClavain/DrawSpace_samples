@@ -31,8 +31,6 @@ class MultiFractalBinder : public DrawSpace::SphericalLOD::Binder
 {
 public:
 
-
-
     dsreal                                  m_plains_amplitude;
     dsreal                                  m_mountains_amplitude;
     dsreal                                  m_vertical_offset;
@@ -63,9 +61,34 @@ public:
     virtual void Unbind( void );
 };
 
+
+class PlanetLight
+{
+public:
+
+    PlanetLight( void ) :
+        m_enable( false )
+    {
+    };
+
+
+    bool                                                    m_enable;
+    DrawSpace::Utils::Vector                                m_color;
+    DrawSpace::Utils::Vector                                m_dir;
+    DrawSpace::Utils::Vector                                m_local_dir;
+
+};
+
 class PlanetDetailsBinder : public MultiFractalBinder
 {
 protected:
+
+    DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* m_planet_node;
+
+    bool                                                    m_ambient;
+    DrawSpace::Utils::Vector                                m_ambient_color;
+
+    PlanetLight                                             m_lights[3];
 
 public:
 
@@ -74,6 +97,10 @@ public:
     virtual void Initialise( void );
     virtual void Bind( void );
     virtual void Unbind( void );
+
+    void SetPlanetNode( DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* p_planet_node );
+    void Update( void );
+
 };
 
 
