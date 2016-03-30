@@ -136,7 +136,7 @@ PlanetDetailsBinder::PlanetDetailsBinder( void ) :
 m_planet_node( NULL )
 {
 
-    m_lights[0].m_enable = false;
+    m_lights[0].m_enable = true;
     m_lights[0].m_color[0] = 1.0;
     m_lights[0].m_color[1] = 0.99;
     m_lights[0].m_color[2] = 0.99;
@@ -146,7 +146,7 @@ m_planet_node( NULL )
     m_lights[0].m_dir[2] = 0.0;
     m_lights[0].m_dir[3] = 1.0;
 
-    m_lights[1].m_enable = true;
+    m_lights[1].m_enable = false;
     m_lights[1].m_color[0] = 1.0;
     m_lights[1].m_color[1] = 0.0;
     m_lights[1].m_color[2] = 0.0;
@@ -156,7 +156,7 @@ m_planet_node( NULL )
     m_lights[1].m_dir[2] = 0.0;
     m_lights[1].m_dir[3] = 1.0;
 
-    m_lights[2].m_enable = true;
+    m_lights[2].m_enable = false;
     m_lights[2].m_color[0] = 1.0;
     m_lights[2].m_color[1] = 1.0;
     m_lights[2].m_color[2] = 1.0;
@@ -927,7 +927,7 @@ void dsAppClient::render_universe( void )
 
     m_text_widget_2->SetText( -40, 0, 30, dsstring( distance ), DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
     m_reticle_widget->Transform();
-    m_reticle_widget->Draw();
+    //m_reticle_widget->Draw(); // pour ne plus afficher le reticule
     
 
     //////////////////////////////////////////////////////////////
@@ -939,7 +939,7 @@ void dsAppClient::render_universe( void )
 
     m_texturepass->GetRenderingQueue()->Draw();
 
-    m_text_widget->Draw();
+    //m_text_widget->Draw();  // pour ne plus afficher le reticule
 
     m_finalpass->GetRenderingQueue()->Draw();
 
