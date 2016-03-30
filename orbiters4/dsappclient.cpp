@@ -116,8 +116,10 @@ void PlanetClimateBinder::Bind( void )
     //Vector thparams2( 0.92, 1.5, 0.37, 0.99 );
 
 
-    Vector thparams( 300.0, 600.0, 6.4, 25.0 );
-    Vector thparams2( 0.0, 1.1, 0.45, 0.45 );
+    Vector thparams( 300.0, 500.0, 6.4, 25.0 );
+    //Vector thparams2( 0.0, 1.1, 0.45, 0.45 );
+
+    Vector thparams2( 0.0, 0.85, 0.18, 0.48 );
 
 
     m_renderer->SetFxShaderParams( 0, 32, thparams );
