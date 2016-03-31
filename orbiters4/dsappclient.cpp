@@ -971,7 +971,7 @@ void dsAppClient::render_universe( void )
     //////////////////////////////////////////////////////////////
 
 
-    DrawSpace::SphericalLOD::Patch* current_patch = m_planet->GetFragment( 0 )->GetCurrentPatch();
+    //DrawSpace::SphericalLOD::Patch* current_patch = m_planet->GetFragment( 0 )->GetCurrentPatch();
 
     m_planet->DrawSubPasses();
 
