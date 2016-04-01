@@ -1000,12 +1000,12 @@ void dsAppClient::render_universe( void )
 
         renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h ( %.1f m/s) - aspeed = %.1f", speed * 3.6, speed, m_ship->GetAngularSpeedMagnitude() );
 
-        bool hotstate = m_planet->GetFragment( 0 )->GetHotState();
+        bool hotstate = m_planet->GetFragment( m_ship, 0 )->GetHotState();
         if( hotstate )
         {
             renderer->DrawText( 0, 255, 0, 10, 130, "fragment hot" );
 
-            dsreal alt = m_planet->GetFragment( 0 )->GetPlanetBody()->GetHotPointAltitud();
+            dsreal alt = m_planet->GetFragment( m_ship, 0 )->GetPlanetBody()->GetHotPointAltitud();
 
             if( alt > 10000.0 )
             {
