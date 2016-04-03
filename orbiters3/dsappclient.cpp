@@ -569,6 +569,7 @@ void dsAppClient::init_planet( void )
     SphericalLOD::Config config;
 
     config.m_lod0base = 19000.0;
+    config.m_ground_fragment = 0;
 
 
     Fx* collisions_fx = new Fx;

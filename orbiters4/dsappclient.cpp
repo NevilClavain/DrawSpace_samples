@@ -48,8 +48,8 @@ _DECLARE_DS_LOGGER( logger, "AppClient", DrawSpace::Logger::Configuration::GetIn
 MultiFractalBinder::MultiFractalBinder( void ) :
 m_uvnoise_seed1( 671.0 ),
 m_uvnoise_seed2( 8444.0 ),
-m_mountains_amplitude( 900.0 ),
-m_plains_amplitude( 2000.0 ),
+m_mountains_amplitude( 1100.0 ),
+m_plains_amplitude( 3000.0 ),
 m_vertical_offset( 0.0 ),
 m_uvnoise_weight( 0.0025 )
 {
@@ -579,6 +579,7 @@ void dsAppClient::init_planet( void )
     SphericalLOD::Config config;
 
     config.m_lod0base = 19000.0;
+    config.m_ground_fragment = 0;
 
 
     Fx* collisions_fx = new Fx;
