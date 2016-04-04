@@ -564,12 +564,12 @@ void dsAppClient::init_planet( void )
     Texture* texture_th_splatting = _DRAWSPACE_NEW_( Texture, Texture( "earth_th_splatting_16.jpg" ) );
     texture_th_splatting->LoadFromFile();
 
-
-
     SphericalLOD::Config config;
 
     config.m_lod0base = 19000.0;
     config.m_ground_fragment = 0;
+
+    config.m_fragments_descr.push_back( { true, true, 0, PLANET_RAY } );
 
 
     Fx* collisions_fx = new Fx;
