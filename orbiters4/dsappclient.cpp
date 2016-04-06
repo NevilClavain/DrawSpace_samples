@@ -689,7 +689,7 @@ void dsAppClient::init_planet( void )
     
     for( int i = 0; i < 6; i++ )
     {
-        m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, m_planet_detail_binder[i], i );
+        m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, m_planet_detail_binder[i], i, 0 );
     }
 
 
