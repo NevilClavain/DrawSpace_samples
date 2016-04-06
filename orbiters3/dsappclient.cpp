@@ -551,8 +551,15 @@ void dsAppClient::init_planet( void )
     colors_vshader->LoadFromFile();
     colors_pshader->LoadFromFile();
 
+    
     Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.vso", true ) );
     Shader* planet_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.pso", true ) );
+    
+    /*
+    Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere.vso", true ) );
+    Shader* planet_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere.pso", true ) );
+    */
+
     planet_vshader->LoadFromFile();
     planet_pshader->LoadFromFile();
 
@@ -570,6 +577,7 @@ void dsAppClient::init_planet( void )
     config.m_ground_fragment = 0;
 
     config.m_fragments_descr.push_back( { true, true, true, 0, PLANET_RAY } );
+    //config.m_fragments_descr.push_back( { false, true, true, 0, PLANET_RAY } );
 
 
     Fx* collisions_fx = new Fx;
