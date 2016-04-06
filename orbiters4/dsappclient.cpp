@@ -581,7 +581,7 @@ void dsAppClient::init_planet( void )
     config.m_lod0base = 19000.0;
     config.m_ground_fragment = 0;
 
-    config.m_fragments_descr.push_back( { true, true, 0, PLANET_RAY } );
+    config.m_fragments_descr.push_back( { true, true, true, 0, PLANET_RAY } );
 
 
     Fx* collisions_fx = new Fx;
