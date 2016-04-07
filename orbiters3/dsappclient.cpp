@@ -57,10 +57,6 @@ m_mix_seed2( 82.0 )
     m_renderer = SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 }
 
-void MultiFractalBinder::Initialise( void )
-{
-}
-
 void MultiFractalBinder::Bind( void )
 {
     Vector landscape_control;
@@ -86,10 +82,6 @@ void MultiFractalBinder::Unbind( void )
 
 
 PlanetClimateBinder::PlanetClimateBinder( void ) : MultiFractalBinder()
-{
-}
-
-void PlanetClimateBinder::Initialise( void )
 {
 }
 
@@ -174,10 +166,6 @@ m_planet_node( NULL )
 
 }
 
-void PlanetDetailsBinder::Initialise( void )
-{
-}
-
 void PlanetDetailsBinder::Bind( void )
 {
     Vector flags6( 16.0, 1.095, 1.0040, 0.0 );
@@ -232,6 +220,11 @@ void PlanetDetailsBinder::Update( void )
 
 PlanetAtmosphereBinder::PlanetAtmosphereBinder( void )
 {
+    m_lookuptable = new Texture;
+    m_lookuptable->SetPurpose( DrawSpace::Core::Texture::PURPOSE_FLOAT32VECTOR );
+    m_lookuptable->SetFormat( 128, 128, 16 );
+
+    SetVertexTexture( m_lookuptable, 0 );
 }
 
 void PlanetAtmosphereBinder::Bind( void )
@@ -239,6 +232,28 @@ void PlanetAtmosphereBinder::Bind( void )
     PlanetDetailsBinder::Bind();
 
     // ajout de params specifiques ici...
+
+    float* color = (float*)m_texture_content;
+
+    for( int i = 0; i < 128 * 128; i++ )
+    {
+        *color = 1.0; color++;
+        *color = 1.0; color++;
+        *color = 1.0; color++;
+        *color = 1.0; color++;
+    }
+
+    m_lookuptable->UpdateTextureContent();
+}
+
+void PlanetAtmosphereBinder::InitLookupTable( void )
+{
+    m_lookuptable->AllocTextureContent();
+    
+    m_texture_content = m_lookuptable->GetTextureContentPtr();
+
+
+    _asm nop
 }
 
 
@@ -766,6 +781,8 @@ void dsAppClient::init_planet( void )
     {
         m_planet_detail_binder[i]->SetPlanetNode( m_planet_node );
     }
+
+    ////////////////////////
 }
 
 
@@ -1193,7 +1210,12 @@ void dsAppClient::OnRenderFrame( void )
                 break;
 
             case 13:
-                print_init_trace( "planet noise data initialisation..." );
+                print_init_trace( "planet atmosphere data initialisation..." );
+
+                for( int i = 0; i < 6; i++ )
+                {
+                    m_planet_atmosphere_binder[i]->InitLookupTable();
+                }
                 break;
 
             case 14:                

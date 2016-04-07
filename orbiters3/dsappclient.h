@@ -44,7 +44,6 @@ public:
 
     MultiFractalBinder( void );
 
-    virtual void Initialise( void );
     virtual void Bind( void );
     virtual void Unbind( void );
 };
@@ -57,7 +56,6 @@ public:
 
     PlanetClimateBinder( void );
 
-    virtual void Initialise( void );
     virtual void Bind( void );
     virtual void Unbind( void );
 };
@@ -94,7 +92,6 @@ public:
 
     PlanetDetailsBinder( void );
 
-    virtual void Initialise( void );
     virtual void Bind( void );
     virtual void Unbind( void );
 
@@ -107,10 +104,16 @@ class PlanetAtmosphereBinder : public PlanetDetailsBinder
 {
 protected:
 
+    DrawSpace::Core::Texture*           m_lookuptable;
+    void*                               m_texture_content;
+
 public:
 
     PlanetAtmosphereBinder( void );
+
     virtual void Bind( void );
+
+    void InitLookupTable( void );
 };
 
 
