@@ -581,8 +581,6 @@ void dsAppClient::init_planet( void )
     config.m_lod0base = 19000.0;
     config.m_ground_fragment = 0;
 
-    config.m_fragments_descr.push_back( { true, true, true, 0, PLANET_RAY } );
-
 
     Fx* collisions_fx = new Fx;
     collisions_fx->AddShader( hm_vshader );
@@ -679,11 +677,21 @@ void dsAppClient::init_planet( void )
     }
 
 
+    SphericalLOD::Config::FragmentDescriptor planet_surface;
+    planet_surface.enable_collisions = true;
+    planet_surface.enable_datatextures = true;
+    planet_surface.enable_lod = true;
+    planet_surface.min_lodlevel = 0;
+    planet_surface.ray = PLANET_RAY;
     for( int i = 0; i < 6; i++ )
     {
-        config.m_groundCollisionsBinder[i] = m_planet_collisions_binder[i];
-        config.m_patchTexturesBinder[i] = m_planet_climate_binder[i];
+        planet_surface.groundCollisionsBinder[i] = m_planet_collisions_binder[i];
+        planet_surface.patchTexturesBinder[i] = m_planet_climate_binder[i];
     }
+
+    config.m_fragments_descr.push_back( planet_surface );
+
+
 
     m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer, config ) );
     
