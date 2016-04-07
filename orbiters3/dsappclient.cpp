@@ -230,6 +230,20 @@ void PlanetDetailsBinder::Update( void )
 
 
 
+PlanetAtmosphereBinder::PlanetAtmosphereBinder( void )
+{
+}
+
+void PlanetAtmosphereBinder::Bind( void )
+{
+    PlanetDetailsBinder::Bind();
+
+    // ajout de params specifiques ici...
+}
+
+
+
+
 dsAppClient::dsAppClient( void ) : 
 m_mouselb( false ), 
 m_mouserb( false ), 
@@ -538,6 +552,8 @@ void dsAppClient::init_planet( void )
         m_planet_collisions_binder[i] = new MultiFractalBinder;
         m_planet_climate_binder[i] = new PlanetClimateBinder;
         m_planet_detail_binder[i] = new PlanetDetailsBinder;
+
+        m_planet_atmosphere_binder[i] = new PlanetAtmosphereBinder;
     }
 
     Shader* hm_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planethm.vso", true ) );
@@ -554,14 +570,17 @@ void dsAppClient::init_planet( void )
     
     Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.vso", true ) );
     Shader* planet_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.pso", true ) );
-    
-    /*
-    Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere.vso", true ) );
-    Shader* planet_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere.pso", true ) );
-    */
 
     planet_vshader->LoadFromFile();
     planet_pshader->LoadFromFile();
+
+    
+    Shader* planet_atmo_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere.vso", true ) );
+    Shader* planet_atmo_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere.pso", true ) );
+    
+    planet_atmo_vshader->LoadFromFile();
+    planet_atmo_pshader->LoadFromFile();
+
 
 
     Texture* texture_th_pixels = _DRAWSPACE_NEW_( Texture, Texture( "earth_th_pixels_16.jpg" ) );
@@ -622,9 +641,28 @@ void dsAppClient::init_planet( void )
         m_planet_detail_binder[i]->SetFx( main_fx );
         m_planet_detail_binder[i]->SetTexture( texture_th_pixels, 1 );
         m_planet_detail_binder[i]->SetTexture( texture_th_splatting, 2 );
-
     }
 
+
+    Fx* atmo_fx = new Fx;
+
+    atmo_fx->AddShader( planet_atmo_vshader );
+    atmo_fx->AddShader( planet_atmo_pshader );
+
+    atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "ccw" ) );
+    //atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
+    atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    atmo_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    atmo_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    //atmo_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+    atmo_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_atmosphere_binder[i]->SetFx( atmo_fx );
+    }
 
 
 
@@ -653,6 +691,23 @@ void dsAppClient::init_planet( void )
     config.m_fragments_descr.push_back( planet_surface );
 
 
+    SphericalLOD::Config::FragmentDescriptor planet_atmosphere;
+    planet_atmosphere.enable_collisions = false;
+    planet_atmosphere.enable_datatextures = false;
+    planet_atmosphere.enable_lod = false;
+    planet_atmosphere.min_lodlevel = 0;
+    planet_atmosphere.ray = PLANET_RAY + 100.0;
+
+    for( int i = 0; i < 6; i++ )
+    {
+        planet_atmosphere.groundCollisionsBinder[i] = NULL;
+        planet_atmosphere.patchTexturesBinder[i] = NULL;
+    }
+
+    config.m_fragments_descr.push_back( planet_atmosphere );
+
+
+
     m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer, config ) );
 
 
@@ -660,7 +715,17 @@ void dsAppClient::init_planet( void )
 
     for( int i = 0; i < 6; i++ )
     {
-        m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, m_planet_detail_binder[i], i, DrawSpace::SphericalLOD::Body::LOWRES_SKIRT_MESHE, 0 );
+        SphericalLOD::FaceDrawingNode* node = m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, m_planet_detail_binder[i], i, DrawSpace::SphericalLOD::Body::LOWRES_SKIRT_MESHE, 0 );
+
+        node->SetOrderNumber( 1001 );
+    }
+
+
+    for( int i = 0; i < 6; i++ )
+    {
+        SphericalLOD::FaceDrawingNode* node = m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, m_planet_atmosphere_binder[i], i, DrawSpace::SphericalLOD::Body::LOWRES_MESHE, 1 );
+
+        node->SetOrderNumber( 1000 );
     }
 
 
@@ -738,7 +803,6 @@ void dsAppClient::init_ship( void )
     m_ship_drawable->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
 
     
-
     m_ship_drawable_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "rocket" ) );
     m_ship_drawable_node->SetContent( m_ship_drawable );
     

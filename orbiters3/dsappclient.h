@@ -103,6 +103,15 @@ public:
 
 };
 
+class PlanetAtmosphereBinder : public PlanetDetailsBinder
+{
+protected:
+
+public:
+
+    PlanetAtmosphereBinder( void );
+    virtual void Bind( void );
+};
 
 
 class dsAppClient : public DrawSpace::App
@@ -195,6 +204,9 @@ protected:
     PlanetClimateBinder*                                                m_planet_climate_binder[6];
 
     PlanetDetailsBinder*                                                m_planet_detail_binder[6];
+
+
+    PlanetAtmosphereBinder*                                             m_planet_atmosphere_binder[6];
 
 
 
