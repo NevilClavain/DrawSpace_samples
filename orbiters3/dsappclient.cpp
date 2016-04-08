@@ -216,15 +216,20 @@ void PlanetDetailsBinder::Update( void )
     }
 }
 
-
+#define OPTICALLENGTHLOOKUPTABLE_SIZE		128
 
 PlanetAtmosphereBinder::PlanetAtmosphereBinder( void )
 {
-    m_lookuptable = new Texture;
-    m_lookuptable->SetPurpose( DrawSpace::Core::Texture::PURPOSE_FLOAT32VECTOR );
-    m_lookuptable->SetFormat( 128, 128, 16 );
+    m_lookuptable_texture = new Texture;
+    m_lookuptable_texture->SetPurpose( DrawSpace::Core::Texture::PURPOSE_FLOAT32VECTOR );
+    m_lookuptable_texture->SetFormat( OPTICALLENGTHLOOKUPTABLE_SIZE, OPTICALLENGTHLOOKUPTABLE_SIZE, 16 );
 
-    SetVertexTexture( m_lookuptable, 0 );
+    SetVertexTexture( m_lookuptable_texture, 0 );
+
+    m_InnerRadius = PLANET_RAY * 1000.0;
+    m_OuterRadius = ( PLANET_RAY + 100.0 ) * 1000.0;
+
+    m_lookuptable = new dsreal[OPTICALLENGTHLOOKUPTABLE_SIZE * OPTICALLENGTHLOOKUPTABLE_SIZE * 4];
 }
 
 void PlanetAtmosphereBinder::Bind( void )
@@ -233,27 +238,116 @@ void PlanetAtmosphereBinder::Bind( void )
 
     // ajout de params specifiques ici...
 
-    float* color = (float*)m_texture_content;
 
-    for( int i = 0; i < 128 * 128; i++ )
-    {
-        *color = 1.0; color++;
-        *color = 1.0; color++;
-        *color = 1.0; color++;
-        *color = 1.0; color++;
-    }
 
-    m_lookuptable->UpdateTextureContent();
+
+    
 }
 
-void PlanetAtmosphereBinder::InitLookupTable( void )
+void PlanetAtmosphereBinder::InitLookupTable( dsreal p_RayleighScaleHeight, dsreal p_MieScaleHeight )
 {
-    m_lookuptable->AllocTextureContent();
+   
+	long nSamples = 50;
+	dsreal scale = 1.0 / ( m_OuterRadius - m_InnerRadius );
+	long index = 0;
+	for( long indexAngle = 0; indexAngle < OPTICALLENGTHLOOKUPTABLE_SIZE; indexAngle++ )
+	{
+		dsreal localCos = 1.0 - ( ( 2.0 * indexAngle ) / (dsreal)OPTICALLENGTHLOOKUPTABLE_SIZE );
+		dsreal angle = acos( localCos );
+
+		Vector vRay( sin( angle ), cos( angle ), 0.0, 0.0 );
+
+		for( long indexHeight = 0; indexHeight < OPTICALLENGTHLOOKUPTABLE_SIZE; indexHeight++ )
+		{
+			dsreal localHeight = m_InnerRadius + ( ( m_OuterRadius - m_InnerRadius ) * indexHeight) / (dsreal)OPTICALLENGTHLOOKUPTABLE_SIZE;
+
+			Vector vPos( 0.0, localHeight, 0.0, 0.0 );
+
+			dsreal B = 2.0 * ( vPos * vRay );
+
+			dsreal Bsq = B * B;
+			dsreal Cpart = (vPos * vPos);
+			dsreal C = Cpart - m_InnerRadius * m_InnerRadius;
+			dsreal fDet = Bsq - 4.0 * C;
+
+			bool visible = ( fDet < 0 || ( 0.5 * (- B - sqrt( fDet )) <= 0 ) && ( 0.5 * ( -B + sqrt( fDet ) ) <= 0 ) );
+
+			dsreal rayleighDensityRatio;
+			dsreal mieDensityRatio;
+
+			if( visible )
+			{
+				rayleighDensityRatio = exp( -( localHeight - m_InnerRadius ) * scale / p_RayleighScaleHeight );
+				mieDensityRatio = expf( -( localHeight - m_InnerRadius ) * scale / p_MieScaleHeight );
+			}
+			else
+			{
+                
+				rayleighDensityRatio = m_lookuptable[index - OPTICALLENGTHLOOKUPTABLE_SIZE * 4] * 0.75;
+				mieDensityRatio = m_lookuptable[index + 2 - OPTICALLENGTHLOOKUPTABLE_SIZE * 4] * 0.75;
+
+			}
+
+			C = Cpart - m_OuterRadius * m_OuterRadius;
+			fDet = Bsq - 4.0 * C;
+			dsreal fFar = 0.5 * ( -B + sqrt( fDet ) );
+
+
+			dsreal sampleLength = fFar / nSamples;
+			dsreal scaledLength = sampleLength * scale;
+
+			Vector vSampleRay = vRay;
+			vSampleRay.Scale( sampleLength );
+
+			vPos[0] += vSampleRay[0] * 0.5;
+			vPos[1] += vSampleRay[1] * 0.5;
+			vPos[2] += vSampleRay[2] * 0.5;
+
+			dsreal rayleighDepth = 0;
+			dsreal mieDepth = 0;
+
+			for(int i = 0; i < nSamples; i++ )
+			{
+				dsreal height = vPos.Length();
+				dsreal altitude = ( height - m_InnerRadius ) * scale;
+				altitude = DrawSpace::Utils::Maths::Max( altitude, 0.0 );
+
+				rayleighDepth += expf( -altitude / p_RayleighScaleHeight );
+				mieDepth += expf( -altitude / p_MieScaleHeight );
+				
+				vPos[0] += vSampleRay[0];
+				vPos[1] += vSampleRay[1];
+				vPos[2] += vSampleRay[2];
+			}
+
+			rayleighDepth *= scaledLength;
+			mieDepth *= scaledLength;
+
+            
+			m_lookuptable[index++] = rayleighDensityRatio;
+			m_lookuptable[index++] = rayleighDepth;
+			m_lookuptable[index++] = mieDensityRatio;
+			m_lookuptable[index++] = mieDepth;            
+		}
+	}
+   
     
-    m_texture_content = m_lookuptable->GetTextureContentPtr();
 
 
-    _asm nop
+    m_lookuptable_texture->AllocTextureContent();
+    
+    m_texture_content = m_lookuptable_texture->GetTextureContentPtr();
+ 
+    float* val = (float*)m_texture_content;
+
+    for( size_t i = 0; i < OPTICALLENGTHLOOKUPTABLE_SIZE * OPTICALLENGTHLOOKUPTABLE_SIZE * 4; i++ )
+    {
+        dsreal ltval = m_lookuptable[i];
+        *val = ltval;
+        val++;
+    }
+
+    m_lookuptable_texture->UpdateTextureContent();
 }
 
 
@@ -1214,7 +1308,7 @@ void dsAppClient::OnRenderFrame( void )
 
                 for( int i = 0; i < 6; i++ )
                 {
-                    m_planet_atmosphere_binder[i]->InitLookupTable();
+                    m_planet_atmosphere_binder[i]->InitLookupTable( 0.25, 0.1 );
                 }
                 break;
 
