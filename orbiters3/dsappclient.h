@@ -112,6 +112,10 @@ protected:
     dsreal                              m_OuterRadius;
     dsreal                              m_InnerRadius;
 
+    int                                 m_opticallookuptable_size;
+
+    dsreal                              m_lightpower;
+
 public:
 
     PlanetAtmosphereBinder( void );
