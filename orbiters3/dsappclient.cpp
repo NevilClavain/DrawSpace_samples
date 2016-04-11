@@ -233,6 +233,7 @@ PlanetAtmosphereBinder::PlanetAtmosphereBinder( void )
     m_InnerRadius = PLANET_RAY * 1000.0;
     m_OuterRadius = ( PLANET_RAY + 100.0 ) * 1000.0;
 
+
     m_lookuptable = new dsreal[m_opticallookuptable_size * m_opticallookuptable_size * 4];
 }
 
@@ -688,8 +689,8 @@ void dsAppClient::init_planet( void )
     planet_pshader->LoadFromFile();
 
     
-    Shader* planet_atmo_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere.vso", true ) );
-    Shader* planet_atmo_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere.pso", true ) );
+    Shader* planet_atmo_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere2.vso", true ) );
+    Shader* planet_atmo_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere2.pso", true ) );
     
     planet_atmo_vshader->LoadFromFile();
     planet_atmo_pshader->LoadFromFile();
