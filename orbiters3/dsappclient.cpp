@@ -230,8 +230,8 @@ PlanetAtmosphereBinder::PlanetAtmosphereBinder( void )
 
     SetVertexTexture( m_lookuptable_texture, 0 );
 
-    m_InnerRadius = 10.0; //PLANET_RAY * 1000.0;
-    m_OuterRadius = 10.25; //( PLANET_RAY + 100.0 ) * 1000.0;
+    m_InnerRadius = 1000000.0; //PLANET_RAY * 1000.0;
+    m_OuterRadius = 1250000.0; //( PLANET_RAY + 100.0 ) * 1000.0;
 
 
     m_lookuptable = new dsreal[m_opticallookuptable_size * m_opticallookuptable_size * 4];
@@ -810,7 +810,7 @@ void dsAppClient::init_planet( void )
     planet_atmosphere.enable_datatextures = false;
     planet_atmosphere.enable_lod = false;
     planet_atmosphere.min_lodlevel = 0;
-    planet_atmosphere.ray = PLANET_RAY + 100.0;
+    planet_atmosphere.ray = PLANET_RAY + 140.0;
 
     for( int i = 0; i < 6; i++ )
     {
@@ -840,17 +840,24 @@ void dsAppClient::init_planet( void )
         SphericalLOD::FaceDrawingNode* node = m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, m_planet_atmosphere_binder[i], i, DrawSpace::SphericalLOD::Body::LOWRES_MESHE, 1 );
 
         node->SetOrderNumber( 1000 );
+        //node->SetOrderNumber( 1002 );
     }
 
-
+    // TEMPORAIRE desactivation orbite
+    
     m_planet->SetOrbitDuration( 0.333 );
-    m_planet->SetRevolutionTiltAngle( 25.0 );
+    //m_planet->SetRevolutionTiltAngle( 25.0 );
+    m_planet->SetRevolutionTiltAngle( 0.0 );
+    /*
     m_planet->SetRevolutionDuration( 1.0 );
-
+    */
 
 
     m_planet_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Planetoid::Body>, SceneNode<DrawSpace::Planetoid::Body>( "planet01" ) );
     m_planet_node->SetContent( m_planet );
+
+    // TEMPORAIRE desactivation orbite
+    m_scenenodegraph.AddNode( m_planet_node );
 
     m_scenenodegraph.RegisterNode( m_planet_node );
 
@@ -866,7 +873,8 @@ void dsAppClient::init_planet( void )
     m_scenenodegraph.AddNode( m_planet_orbit_node );
     m_scenenodegraph.RegisterNode( m_planet_orbit_node );
 
-    m_planet_node->LinkTo( m_planet_orbit_node );
+    // TEMPORAIRE desactivation orbite
+    //m_planet_node->LinkTo( m_planet_orbit_node );
 
     m_building_collider->SetReferentOrbiter( m_planet );
     m_socle_collider->SetReferentOrbiter( m_planet );
@@ -931,8 +939,10 @@ void dsAppClient::init_ship( void )
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285 / 2.0, 21.4704 / 2.0, 81.911 / 2.0, 1.0 );
     
-    //cube_params.initial_attitude.Translation( 265000000.0, 0.0, 0.0 );
-    cube_params.initial_attitude.Translation( 269000000.0, 0.0, 59000000.0 );
+    //cube_params.initial_attitude.Translation( 269000000.0, 0.0, 59000000.0 );
+
+    // TEMPORAIRE desactivation orbite
+    cube_params.initial_attitude.Translation( 0.0, 0.0, 59000000.0 );
 
     m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, cube_params ) );
    
@@ -1088,11 +1098,17 @@ void dsAppClient::init_calendar( void )
 {
     m_calendar = _DRAWSPACE_NEW_( Calendar, Calendar( 0, &m_timer ) );
 
+    
+    
     m_calendar->RegisterWorld( &m_world );
+    
     m_calendar->RegisterWorld( m_planet->GetWorld() );
-
+    
+    // TEMPORAIRE desactivation orbite
+    /*
     m_calendar->RegisterOrbit( m_planet_orbit );
     m_calendar->RegisterOrbiter( m_planet );
+    */
 }
 
 void dsAppClient::init_planet_noise( void )
