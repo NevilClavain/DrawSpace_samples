@@ -230,8 +230,8 @@ PlanetAtmosphereBinder::PlanetAtmosphereBinder( void )
 
     SetVertexTexture( m_lookuptable_texture, 0 );
 
-    m_InnerRadius = PLANET_RAY * 1000.0;
-    m_OuterRadius = ( PLANET_RAY + 100.0 ) * 1000.0;
+    m_InnerRadius = 10.0; //PLANET_RAY * 1000.0;
+    m_OuterRadius = 10.25; //( PLANET_RAY + 100.0 ) * 1000.0;
 
 
     m_lookuptable = new dsreal[m_opticallookuptable_size * m_opticallookuptable_size * 4];
