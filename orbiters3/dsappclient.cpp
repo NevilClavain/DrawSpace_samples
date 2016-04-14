@@ -818,7 +818,7 @@ void dsAppClient::init_planet( void )
     planet_atmosphere.enable_datatextures = false;
     planet_atmosphere.enable_lod = false;
     planet_atmosphere.min_lodlevel = 0;
-    planet_atmosphere.ray = PLANET_RAY + 110.0;
+    planet_atmosphere.ray = PLANET_RAY + 85.0;
 
     for( int i = 0; i < 6; i++ )
     {
