@@ -763,6 +763,12 @@ void dsAppClient::init_planet( void )
     atmo_fx->AddShader( planet_atmo_vshader );
     atmo_fx->AddShader( planet_atmo_pshader );
 
+    atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );
+    atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
+
     atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "ccw" ) );
     //atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
     atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
@@ -771,6 +777,8 @@ void dsAppClient::init_planet( void )
     atmo_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
     //atmo_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
     atmo_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+    atmo_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
 
 
     for( int i = 0; i < 6; i++ )
@@ -810,7 +818,7 @@ void dsAppClient::init_planet( void )
     planet_atmosphere.enable_datatextures = false;
     planet_atmosphere.enable_lod = false;
     planet_atmosphere.min_lodlevel = 0;
-    planet_atmosphere.ray = PLANET_RAY + 140.0;
+    planet_atmosphere.ray = PLANET_RAY + 110.0;
 
     for( int i = 0; i < 6; i++ )
     {
@@ -843,21 +851,14 @@ void dsAppClient::init_planet( void )
         //node->SetOrderNumber( 1002 );
     }
 
-    // TEMPORAIRE desactivation orbite
     
     m_planet->SetOrbitDuration( 0.333 );
-    //m_planet->SetRevolutionTiltAngle( 25.0 );
-    m_planet->SetRevolutionTiltAngle( 0.0 );
-    /*
+    m_planet->SetRevolutionTiltAngle( 25.0 );    
     m_planet->SetRevolutionDuration( 1.0 );
-    */
 
 
     m_planet_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Planetoid::Body>, SceneNode<DrawSpace::Planetoid::Body>( "planet01" ) );
     m_planet_node->SetContent( m_planet );
-
-    // TEMPORAIRE desactivation orbite
-    m_scenenodegraph.AddNode( m_planet_node );
 
     m_scenenodegraph.RegisterNode( m_planet_node );
 
@@ -873,8 +874,7 @@ void dsAppClient::init_planet( void )
     m_scenenodegraph.AddNode( m_planet_orbit_node );
     m_scenenodegraph.RegisterNode( m_planet_orbit_node );
 
-    // TEMPORAIRE desactivation orbite
-    //m_planet_node->LinkTo( m_planet_orbit_node );
+    m_planet_node->LinkTo( m_planet_orbit_node );
 
     m_building_collider->SetReferentOrbiter( m_planet );
     m_socle_collider->SetReferentOrbiter( m_planet );
@@ -939,10 +939,8 @@ void dsAppClient::init_ship( void )
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285 / 2.0, 21.4704 / 2.0, 81.911 / 2.0, 1.0 );
     
-    //cube_params.initial_attitude.Translation( 269000000.0, 0.0, 59000000.0 );
+    cube_params.initial_attitude.Translation( 269000000.0, 0.0, 59000000.0 );
 
-    // TEMPORAIRE desactivation orbite
-    cube_params.initial_attitude.Translation( 0.0, 0.0, 59000000.0 );
 
     m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, cube_params ) );
    
@@ -1104,16 +1102,12 @@ void dsAppClient::init_calendar( void )
     
     m_calendar->RegisterWorld( m_planet->GetWorld() );
     
-    // TEMPORAIRE desactivation orbite
-    /*
     m_calendar->RegisterOrbit( m_planet_orbit );
     m_calendar->RegisterOrbiter( m_planet );
-    */
 }
 
 void dsAppClient::init_planet_noise( void )
 {    
-    //m_planet->InitNoisingTextures();
 }
 
 
