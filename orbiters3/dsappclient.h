@@ -104,16 +104,6 @@ class PlanetAtmosphereBinder : public PlanetDetailsBinder
 {
 protected:
 
-    dsreal*	                            m_lookuptable;
-
-    DrawSpace::Core::Texture*           m_lookuptable_texture;
-    void*                               m_texture_content;
-
-    dsreal                              m_OuterRadius;
-    dsreal                              m_InnerRadius;
-
-    int                                 m_opticallookuptable_size;
-
     dsreal                              m_lightpower;
 
 public:
@@ -122,7 +112,6 @@ public:
 
     virtual void Bind( void );
 
-    void InitLookupTable( dsreal p_RayleighScaleHeight, dsreal p_MieScaleHeight );
 };
 
 
