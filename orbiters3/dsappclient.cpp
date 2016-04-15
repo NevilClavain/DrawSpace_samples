@@ -134,7 +134,7 @@ m_planet_node( NULL )
     m_lights[0].m_color[2] = 0.99;
     m_lights[0].m_color[3] = 1.0;
     m_lights[0].m_dir[0] = -1.0;
-    m_lights[0].m_dir[1] = 0.0;
+    m_lights[0].m_dir[1] = 0.3;
     m_lights[0].m_dir[2] = 0.0;
     m_lights[0].m_dir[3] = 1.0;
 
@@ -222,6 +222,15 @@ PlanetAtmosphereBinder::PlanetAtmosphereBinder( void )
 {
     m_lightpower = 9.0;
 
+    m_lights[0].m_enable = true;
+    m_lights[0].m_color[0] = 1.0;
+    m_lights[0].m_color[1] = 0.99;
+    m_lights[0].m_color[2] = 0.99;
+    m_lights[0].m_color[3] = 1.0;
+    m_lights[0].m_dir[0] = -1.0;
+    m_lights[0].m_dir[1] = 0.3;
+    m_lights[0].m_dir[2] = 0.0;
+    m_lights[0].m_dir[3] = 1.0;
 }
 
 void PlanetAtmosphereBinder::Bind( void )
@@ -233,7 +242,10 @@ void PlanetAtmosphereBinder::Bind( void )
     Vector atmo_scattering_params( m_lightpower, 0.0, 0.0, 0.0 );
 
     m_renderer->SetFxShaderParams( 0, 30, atmo_scattering_params );
-    
+
+    m_renderer->SetFxShaderParams( 1, 9, m_lights[0].m_local_dir );
+    m_renderer->SetFxShaderParams( 1, 10, m_lights[0].m_dir );
+    m_renderer->SetFxShaderParams( 1, 11, m_lights[1].m_color );    
 }
 
 
