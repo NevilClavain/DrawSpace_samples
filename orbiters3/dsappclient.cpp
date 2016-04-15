@@ -138,6 +138,8 @@ m_planet_node( NULL )
     m_lights[0].m_dir[2] = 0.0;
     m_lights[0].m_dir[3] = 1.0;
 
+    m_lights[0].m_dir.Normalize();
+
     m_lights[1].m_enable = false;
     m_lights[1].m_color[0] = 1.0;
     m_lights[1].m_color[1] = 0.0;
@@ -148,6 +150,8 @@ m_planet_node( NULL )
     m_lights[1].m_dir[2] = 0.0;
     m_lights[1].m_dir[3] = 1.0;
 
+    m_lights[1].m_dir.Normalize();
+
     m_lights[2].m_enable = false;
     m_lights[2].m_color[0] = 1.0;
     m_lights[2].m_color[1] = 1.0;
@@ -157,6 +161,8 @@ m_planet_node( NULL )
     m_lights[2].m_dir[1] = -1.0;
     m_lights[2].m_dir[2] = 0.0;
     m_lights[2].m_dir[3] = 1.0;
+
+    m_lights[2].m_dir.Normalize();
 
     m_ambient = false;
     m_ambient_color[0] = 0.1;
@@ -212,6 +218,8 @@ void PlanetDetailsBinder::Update( void )
         if( m_lights[i].m_enable )
         {
             planet_final_transform.Transform( &m_lights[i].m_dir, &m_lights[i].m_local_dir );
+
+            m_lights[i].m_local_dir.Normalize();
         }
     }
 }
@@ -231,6 +239,8 @@ PlanetAtmosphereBinder::PlanetAtmosphereBinder( void )
     m_lights[0].m_dir[1] = 0.3;
     m_lights[0].m_dir[2] = 0.0;
     m_lights[0].m_dir[3] = 1.0;
+
+    m_lights[0].m_dir.Normalize();
 }
 
 void PlanetAtmosphereBinder::Bind( void )
@@ -709,7 +719,7 @@ void dsAppClient::init_planet( void )
     planet_atmosphere.enable_datatextures = false;
     planet_atmosphere.enable_lod = false;
     planet_atmosphere.min_lodlevel = 0;
-    planet_atmosphere.ray = PLANET_RAY + 85.0;
+    planet_atmosphere.ray = PLANET_RAY + 150.0; //85.0;
 
     for( int i = 0; i < 6; i++ )
     {
@@ -736,7 +746,7 @@ void dsAppClient::init_planet( void )
 
     for( int i = 0; i < 6; i++ )
     {
-        SphericalLOD::FaceDrawingNode* node = m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, m_planet_atmosphere_binder[i], i, DrawSpace::SphericalLOD::Body::LOWRES_MESHE, 1 );
+        SphericalLOD::FaceDrawingNode* node = m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, m_planet_atmosphere_binder[i], i, /*DrawSpace::SphericalLOD::Body::LOWRES_MESHE*/DrawSpace::SphericalLOD::Body::HIRES_MESHE, 1 );
 
         node->SetOrderNumber( 1000 );
         //node->SetOrderNumber( 1002 );
