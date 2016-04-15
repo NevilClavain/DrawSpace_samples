@@ -580,8 +580,8 @@ void dsAppClient::init_planet( void )
     planet_pshader->LoadFromFile();
 
     
-    Shader* planet_atmo_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere2.vso", true ) );
-    Shader* planet_atmo_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere2.pso", true ) );
+    Shader* planet_atmo_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere.vso", true ) );
+    Shader* planet_atmo_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere.pso", true ) );
     
     planet_atmo_vshader->LoadFromFile();
     planet_atmo_pshader->LoadFromFile();
