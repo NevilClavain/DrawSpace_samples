@@ -134,7 +134,7 @@ m_planet_node( NULL )
     m_lights[0].m_color[2] = 0.99;
     m_lights[0].m_color[3] = 1.0;
     m_lights[0].m_dir[0] = -1.0;
-    m_lights[0].m_dir[1] = 0.3;
+    m_lights[0].m_dir[1] = 0.0;
     m_lights[0].m_dir[2] = 0.0;
     m_lights[0].m_dir[3] = 1.0;
 
@@ -236,7 +236,7 @@ PlanetAtmosphereBinder::PlanetAtmosphereBinder( void )
     m_lights[0].m_color[2] = 0.99;
     m_lights[0].m_color[3] = 1.0;
     m_lights[0].m_dir[0] = -1.0;
-    m_lights[0].m_dir[1] = 0.3;
+    m_lights[0].m_dir[1] = 0.0;
     m_lights[0].m_dir[2] = 0.0;
     m_lights[0].m_dir[3] = 1.0;
 
@@ -668,6 +668,7 @@ void dsAppClient::init_planet( void )
     atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
     atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
     atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );
+    //atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one" ) );
     atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
 
     atmo_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "ccw" ) );
@@ -719,7 +720,7 @@ void dsAppClient::init_planet( void )
     planet_atmosphere.enable_datatextures = false;
     planet_atmosphere.enable_lod = false;
     planet_atmosphere.min_lodlevel = 0;
-    planet_atmosphere.ray = PLANET_RAY + 150.0; //85.0;
+    planet_atmosphere.ray = PLANET_RAY + 85.0;
 
     for( int i = 0; i < 6; i++ )
     {
