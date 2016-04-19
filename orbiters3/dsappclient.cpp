@@ -48,9 +48,9 @@ _DECLARE_DS_LOGGER( logger, "AppClient", DrawSpace::Logger::Configuration::GetIn
 MultiFractalBinder::MultiFractalBinder( void ) :
 m_plains_amplitude( 800.0 ),
 m_mountains_amplitude( 2200.0 ),
-m_vertical_offset( -200.0 ),
-m_plains_seed1( 1025.0 ),
-m_plains_seed2( 777.0 ),
+m_vertical_offset( 80.0 ),
+m_plains_seed1( 18334.0 ),
+m_plains_seed2( 1770.0 ),
 m_mix_seed1( 635.0 ),
 m_mix_seed2( 82.0 )
 {
@@ -755,7 +755,7 @@ void dsAppClient::init_planet( void )
 
     
     m_planet->SetOrbitDuration( 0.333 );
-    m_planet->SetRevolutionTiltAngle( 25.0 );    
+    m_planet->SetRevolutionTiltAngle( 8.0 );    
     m_planet->SetRevolutionDuration( 1.0 );
 
 
