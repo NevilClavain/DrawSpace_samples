@@ -1132,6 +1132,23 @@ void dsAppClient::render_universe( void )
         }
         */
     }
+    else
+    {
+        bool hotstate = m_planet->GetFragment( m_ship, 0 )->GetHotState();
+        if( hotstate )
+        {
+            dsreal alt = m_planet->GetFragment( m_ship, 0 )->GetPlanetBody()->GetHotPointAltitud();
+
+            if( alt > 10000.0 )
+            {
+                renderer->DrawText( 0, 255, 0, 10, 70, "Altitude = %.3f km", alt / 1000.0 );
+            }
+            else
+            {
+                renderer->DrawText( 0, 255, 0, 10, 70, "Altitude = %.1f m", alt );
+            }
+        }    
+    }
   
     renderer->FlipScreen();
 
