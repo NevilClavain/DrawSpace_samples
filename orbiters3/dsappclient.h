@@ -104,7 +104,6 @@ class PlanetAtmosphereBinder : public PlanetDetailsBinder
 {
 protected:
 
-    dsreal                              m_power;
     dsreal                              m_innerRadius;
     dsreal                              m_outerRadius;
     DrawSpace::Utils::Vector            m_waveLength;
@@ -112,10 +111,16 @@ protected:
     dsreal                              m_km;
     dsreal                              m_scaleDepth;
 
+    dsreal                              m_skyfromspace_ESun;
+    dsreal                              m_skyfromatmo_ESun;
+    dsreal                              m_groundfromspace_ESun;
+    dsreal                              m_groundfromatmo_ESun;
+
     DrawSpace::Utils::Vector            m_atmo_scattering_flags0;
     DrawSpace::Utils::Vector            m_atmo_scattering_flags1;
     DrawSpace::Utils::Vector            m_atmo_scattering_flags2;
     DrawSpace::Utils::Vector            m_atmo_scattering_flags3;
+    DrawSpace::Utils::Vector            m_atmo_scattering_flags4;
 
 public:
 
