@@ -104,11 +104,22 @@ class PlanetAtmosphereBinder : public PlanetDetailsBinder
 {
 protected:
 
-    dsreal                              m_lightpower;
+    dsreal                              m_power;
+    dsreal                              m_innerRadius;
+    dsreal                              m_outerRadius;
+    DrawSpace::Utils::Vector            m_waveLength;
+    dsreal                              m_kr;
+    dsreal                              m_km;
+    dsreal                              m_scaleDepth;
+
+    DrawSpace::Utils::Vector            m_atmo_scattering_flags0;
+    DrawSpace::Utils::Vector            m_atmo_scattering_flags1;
+    DrawSpace::Utils::Vector            m_atmo_scattering_flags2;
+    DrawSpace::Utils::Vector            m_atmo_scattering_flags3;
 
 public:
 
-    PlanetAtmosphereBinder( void );
+    PlanetAtmosphereBinder( dsreal p_planetRay, dsreal p_atmoThickness );
 
     virtual void Bind( void );
 
