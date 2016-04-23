@@ -121,6 +121,7 @@ protected:
     DrawSpace::Utils::Vector            m_atmo_scattering_flags2;
     DrawSpace::Utils::Vector            m_atmo_scattering_flags3;
     DrawSpace::Utils::Vector            m_atmo_scattering_flags4;
+    DrawSpace::Utils::Vector            m_atmo_scattering_flags5;
 
 public:
 

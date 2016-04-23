@@ -228,7 +228,7 @@ void PlanetDetailsBinder::Update( void )
 
 PlanetAtmosphereBinder::PlanetAtmosphereBinder( dsreal p_planetRay, dsreal p_atmoThickness )
 {
-    m_skyfromspace_ESun = 9.0;
+    m_skyfromspace_ESun = 8.7; //9.0;
     m_skyfromatmo_ESun = 70.0; //50.0;
     m_groundfromspace_ESun = 24.0;
     m_groundfromatmo_ESun = 12.0;
@@ -267,6 +267,9 @@ PlanetAtmosphereBinder::PlanetAtmosphereBinder( dsreal p_planetRay, dsreal p_atm
     m_atmo_scattering_flags4[2] = m_groundfromspace_ESun;
     m_atmo_scattering_flags4[3] = m_groundfromatmo_ESun;
 
+    m_atmo_scattering_flags5[0] = 220000.0; // altitude limite de transition entre skyfromspace_atmo_scattering et skyfromatmo_atmo_scattering
+    m_atmo_scattering_flags5[1] = 285000.0; // alitude limite pour prise en compte facteur altitude camera pour le calcul de l'alpha
+
     m_lights[0].m_enable = true;
     m_lights[0].m_color[0] = 1.0;
     m_lights[0].m_color[1] = 0.99;
@@ -295,6 +298,7 @@ void PlanetAtmosphereBinder::Bind( void )
     m_renderer->SetFxShaderParams( 1, 20, m_atmo_scattering_flags2 );   
     m_renderer->SetFxShaderParams( 1, 21, m_atmo_scattering_flags3 );
     m_renderer->SetFxShaderParams( 1, 22, m_atmo_scattering_flags4 );
+    m_renderer->SetFxShaderParams( 1, 23, m_atmo_scattering_flags5 );
 
     m_renderer->SetFxShaderParams( 0, 32, m_atmo_scattering_flags0 );
     m_renderer->SetFxShaderParams( 0, 33, m_atmo_scattering_flags1 );
