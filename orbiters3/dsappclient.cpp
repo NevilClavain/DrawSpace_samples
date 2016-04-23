@@ -124,9 +124,48 @@ void PlanetClimateBinder::Unbind( void )
 
 
 
-PlanetDetailsBinder::PlanetDetailsBinder( void ) :
+PlanetDetailsBinder::PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness ) :
 m_planet_node( NULL )
 {
+
+    m_skyfromspace_ESun = 8.7; //9.0;
+    m_skyfromatmo_ESun = 70.0; //50.0;
+    m_groundfromspace_ESun = 24.0;
+    m_groundfromatmo_ESun = 12.0;
+
+    m_innerRadius = p_planetRay;
+    m_outerRadius = p_planetRay + p_atmoThickness;
+
+    m_waveLength[0] = 0.650;
+    m_waveLength[1] = 0.570;
+    m_waveLength[2] = 0.475;
+    m_kr = 0.0025;
+    m_km = 0.0010;
+    m_scaleDepth = 0.25;
+
+    m_atmo_scattering_flags0[0] = m_outerRadius;
+    m_atmo_scattering_flags0[1] = m_innerRadius;
+    m_atmo_scattering_flags0[2] = m_outerRadius * m_outerRadius;
+    m_atmo_scattering_flags0[3] = m_innerRadius * m_innerRadius;
+
+    m_atmo_scattering_flags1[0] = m_scaleDepth;
+    m_atmo_scattering_flags1[1] = 1.0 / m_scaleDepth;
+    m_atmo_scattering_flags1[2] = 1.0 / ( m_outerRadius - m_innerRadius );
+    m_atmo_scattering_flags1[3] = m_atmo_scattering_flags1[2] / m_scaleDepth;
+
+    m_atmo_scattering_flags2[0] = 1.0 / pow( m_waveLength[0], 4.0 );
+    m_atmo_scattering_flags2[1] = 1.0 / pow( m_waveLength[1], 4.0 );
+    m_atmo_scattering_flags2[2] = 1.0 / pow( m_waveLength[2], 4.0 );
+
+    m_atmo_scattering_flags3[0] = m_kr;
+    m_atmo_scattering_flags3[1] = m_km;
+    m_atmo_scattering_flags3[2] = 4.0 * m_kr * 3.1415927;
+    m_atmo_scattering_flags3[3] = 4.0 * m_km * 3.1415927;
+
+    m_atmo_scattering_flags4[0] = m_skyfromspace_ESun;
+    m_atmo_scattering_flags4[1] = m_skyfromatmo_ESun;
+    m_atmo_scattering_flags4[2] = m_groundfromspace_ESun;
+    m_atmo_scattering_flags4[3] = m_groundfromatmo_ESun;
 
     m_lights[0].m_enable = true;
     m_lights[0].m_color[0] = 1.0;
@@ -190,6 +229,13 @@ void PlanetDetailsBinder::Bind( void )
     m_renderer->SetFxShaderParams( 1, 12, m_lights[1].m_color );
     m_renderer->SetFxShaderParams( 1, 13, m_lights[2].m_local_dir );
     m_renderer->SetFxShaderParams( 1, 14, m_lights[2].m_color );
+
+    m_renderer->SetFxShaderParams( 0, 32, m_atmo_scattering_flags0 );
+    m_renderer->SetFxShaderParams( 0, 33, m_atmo_scattering_flags1 );
+    m_renderer->SetFxShaderParams( 0, 34, m_atmo_scattering_flags2 );   
+    m_renderer->SetFxShaderParams( 0, 35, m_atmo_scattering_flags3 );
+    m_renderer->SetFxShaderParams( 0, 36, m_atmo_scattering_flags4 );
+
     
     MultiFractalBinder::Bind();
 }
@@ -226,47 +272,8 @@ void PlanetDetailsBinder::Update( void )
 
 
 
-PlanetAtmosphereBinder::PlanetAtmosphereBinder( dsreal p_planetRay, dsreal p_atmoThickness )
+PlanetAtmosphereBinder::PlanetAtmosphereBinder( dsreal p_planetRay, dsreal p_atmoThickness ) : PlanetDetailsBinder( p_planetRay, p_atmoThickness )
 {
-    m_skyfromspace_ESun = 8.7; //9.0;
-    m_skyfromatmo_ESun = 70.0; //50.0;
-    m_groundfromspace_ESun = 24.0;
-    m_groundfromatmo_ESun = 12.0;
-
-    m_innerRadius = p_planetRay;
-    m_outerRadius = p_planetRay + p_atmoThickness;
-
-    m_waveLength[0] = 0.650;
-    m_waveLength[1] = 0.570;
-    m_waveLength[2] = 0.475;
-    m_kr = 0.0025;
-    m_km = 0.0010;
-    m_scaleDepth = 0.25;
-
-    m_atmo_scattering_flags0[0] = m_outerRadius;
-    m_atmo_scattering_flags0[1] = m_innerRadius;
-    m_atmo_scattering_flags0[2] = m_outerRadius * m_outerRadius;
-    m_atmo_scattering_flags0[3] = m_innerRadius * m_innerRadius;
-
-    m_atmo_scattering_flags1[0] = m_scaleDepth;
-    m_atmo_scattering_flags1[1] = 1.0 / m_scaleDepth;
-    m_atmo_scattering_flags1[2] = 1.0 / ( m_outerRadius - m_innerRadius );
-    m_atmo_scattering_flags1[3] = m_atmo_scattering_flags1[2] / m_scaleDepth;
-
-    m_atmo_scattering_flags2[0] = 1.0 / pow( m_waveLength[0], 4.0 );
-    m_atmo_scattering_flags2[1] = 1.0 / pow( m_waveLength[1], 4.0 );
-    m_atmo_scattering_flags2[2] = 1.0 / pow( m_waveLength[2], 4.0 );
-
-    m_atmo_scattering_flags3[0] = m_kr;
-    m_atmo_scattering_flags3[1] = m_km;
-    m_atmo_scattering_flags3[2] = 4.0 * m_kr * 3.1415927;
-    m_atmo_scattering_flags3[3] = 4.0 * m_km * 3.1415927;
-
-    m_atmo_scattering_flags4[0] = m_skyfromspace_ESun;
-    m_atmo_scattering_flags4[1] = m_skyfromatmo_ESun;
-    m_atmo_scattering_flags4[2] = m_groundfromspace_ESun;
-    m_atmo_scattering_flags4[3] = m_groundfromatmo_ESun;
-
     m_atmo_scattering_flags5[0] = 220000.0; // altitude limite de transition entre skyfromspace_atmo_scattering et skyfromatmo_atmo_scattering
     m_atmo_scattering_flags5[1] = 285000.0; // alitude limite pour prise en compte facteur altitude camera pour le calcul de l'alpha
 
@@ -287,7 +294,6 @@ void PlanetAtmosphereBinder::Bind( void )
 {
     PlanetDetailsBinder::Bind();
 
-    // ajout de params specifiques ici...
   
     m_renderer->SetFxShaderParams( 1, 9, m_lights[0].m_local_dir );
     m_renderer->SetFxShaderParams( 1, 10, m_lights[0].m_dir );
@@ -299,13 +305,6 @@ void PlanetAtmosphereBinder::Bind( void )
     m_renderer->SetFxShaderParams( 1, 21, m_atmo_scattering_flags3 );
     m_renderer->SetFxShaderParams( 1, 22, m_atmo_scattering_flags4 );
     m_renderer->SetFxShaderParams( 1, 23, m_atmo_scattering_flags5 );
-
-    m_renderer->SetFxShaderParams( 0, 32, m_atmo_scattering_flags0 );
-    m_renderer->SetFxShaderParams( 0, 33, m_atmo_scattering_flags1 );
-    m_renderer->SetFxShaderParams( 0, 34, m_atmo_scattering_flags2 );   
-    m_renderer->SetFxShaderParams( 0, 35, m_atmo_scattering_flags3 );
-    m_renderer->SetFxShaderParams( 0, 36, m_atmo_scattering_flags4 );
-
 }
 
 
@@ -616,7 +615,7 @@ void dsAppClient::init_planet( void )
     {
         m_planet_collisions_binder[i] = new MultiFractalBinder;
         m_planet_climate_binder[i] = new PlanetClimateBinder;
-        m_planet_detail_binder[i] = new PlanetDetailsBinder;
+        m_planet_detail_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
 
         m_planet_atmosphere_binder[i] = new PlanetAtmosphereBinder( PLANET_RAY * 1000.0, 85000.0 );
     }

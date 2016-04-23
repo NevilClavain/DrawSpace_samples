@@ -81,29 +81,6 @@ class PlanetDetailsBinder : public MultiFractalBinder
 {
 protected:
 
-    DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* m_planet_node;
-
-    bool                                                    m_ambient;
-    DrawSpace::Utils::Vector                                m_ambient_color;
-
-    PlanetLight                                             m_lights[3];
-
-public:
-
-    PlanetDetailsBinder( void );
-
-    virtual void Bind( void );
-    virtual void Unbind( void );
-
-    void SetPlanetNode( DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* p_planet_node );
-    void Update( void );
-
-};
-
-class PlanetAtmosphereBinder : public PlanetDetailsBinder
-{
-protected:
-
     dsreal                              m_innerRadius;
     dsreal                              m_outerRadius;
     DrawSpace::Utils::Vector            m_waveLength;
@@ -122,6 +99,29 @@ protected:
     DrawSpace::Utils::Vector            m_atmo_scattering_flags3;
     DrawSpace::Utils::Vector            m_atmo_scattering_flags4;
     DrawSpace::Utils::Vector            m_atmo_scattering_flags5;
+
+
+    DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* m_planet_node;
+
+    bool                                                    m_ambient;
+    DrawSpace::Utils::Vector                                m_ambient_color;
+
+    PlanetLight                                             m_lights[3];
+
+public:
+
+    PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness );
+
+    virtual void Bind( void );
+    virtual void Unbind( void );
+
+    void SetPlanetNode( DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* p_planet_node );
+    void Update( void );
+
+};
+
+class PlanetAtmosphereBinder : public PlanetDetailsBinder
+{
 
 public:
 
