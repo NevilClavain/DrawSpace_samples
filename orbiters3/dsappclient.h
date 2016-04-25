@@ -99,6 +99,7 @@ protected:
     DrawSpace::Utils::Vector            m_atmo_scattering_flags3;
     DrawSpace::Utils::Vector            m_atmo_scattering_flags4;
     DrawSpace::Utils::Vector            m_atmo_scattering_flags5;
+    DrawSpace::Utils::Vector            m_atmo_scattering_flags6;
 
 
     DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* m_planet_node;
@@ -117,17 +118,6 @@ public:
 
     void SetPlanetNode( DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* p_planet_node );
     void Update( void );
-
-};
-
-class PlanetAtmosphereBinder : public PlanetDetailsBinder
-{
-
-public:
-
-    PlanetAtmosphereBinder( dsreal p_planetRay, dsreal p_atmoThickness );
-
-    virtual void Bind( void );
 
 };
 
@@ -224,7 +214,7 @@ protected:
     PlanetDetailsBinder*                                                m_planet_detail_binder[6];
 
 
-    PlanetAtmosphereBinder*                                             m_planet_atmosphere_binder[6];
+    PlanetDetailsBinder*                                                m_planet_atmosphere_binder[6];
 
 
 

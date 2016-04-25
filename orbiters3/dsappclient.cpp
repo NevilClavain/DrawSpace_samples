@@ -171,6 +171,9 @@ m_planet_node( NULL )
     m_atmo_scattering_flags5[1] = 30000.0; // alitude debut d'apparition du fog "sol"
     m_atmo_scattering_flags5[2] = 0.000032; // intensite fog "sol"
 
+    m_atmo_scattering_flags6[0] = 220000.0; // altitude limite de transition entre skyfromspace_atmo_scattering et skyfromatmo_atmo_scattering
+    m_atmo_scattering_flags6[1] = 285000.0; // alitude limite pour prise en compte facteur altitude camera pour le calcul de l'alpha
+
 
     m_lights[0].m_enable = true;
     m_lights[0].m_color[0] = 1.0;
@@ -221,10 +224,10 @@ void PlanetDetailsBinder::Bind( void )
 
     Vector flags6( 16.0, 1.095, 1.0040, 0.0 );
     
-    Vector flags7;
-    flags7[0] = ( m_ambient ? 1.0 : 0.0 );
-    flags7[1] = ( m_lights[0].m_enable ? 1.0 : 0.0 );
-    flags7[2] = ( m_lights[1].m_enable ? 1.0 : 0.0 );
+    Vector flags_lights;
+    flags_lights[0] = ( m_ambient ? 1.0 : 0.0 );
+    flags_lights[1] = ( m_lights[0].m_enable ? 1.0 : 0.0 );
+    flags_lights[2] = ( m_lights[1].m_enable ? 1.0 : 0.0 );
 
 
 
@@ -234,21 +237,22 @@ void PlanetDetailsBinder::Bind( void )
     m_renderer->SetFxShaderParams( 0, 35, m_atmo_scattering_flags3 );
     m_renderer->SetFxShaderParams( 0, 36, m_atmo_scattering_flags4 );
     m_renderer->SetFxShaderParams( 0, 37, m_atmo_scattering_flags5 );
+    m_renderer->SetFxShaderParams( 0, 38, m_atmo_scattering_flags6 );
 
-    m_renderer->SetFxShaderParams( 0, 38, flags7 );
-    m_renderer->SetFxShaderParams( 0, 39, m_ambient_color );
+    m_renderer->SetFxShaderParams( 0, 40, flags_lights );
+    m_renderer->SetFxShaderParams( 0, 41, m_ambient_color );
 
-    m_renderer->SetFxShaderParams( 0, 40, m_lights[0].m_local_dir );
-    m_renderer->SetFxShaderParams( 0, 41, m_lights[0].m_dir );
-    m_renderer->SetFxShaderParams( 0, 42, m_lights[0].m_color );   
+    m_renderer->SetFxShaderParams( 0, 42, m_lights[0].m_local_dir );
+    m_renderer->SetFxShaderParams( 0, 43, m_lights[0].m_dir );
+    m_renderer->SetFxShaderParams( 0, 44, m_lights[0].m_color );   
 
-    m_renderer->SetFxShaderParams( 0, 43, m_lights[1].m_local_dir );
-    m_renderer->SetFxShaderParams( 0, 44, m_lights[1].m_dir );
-    m_renderer->SetFxShaderParams( 0, 45, m_lights[1].m_color );   
+    m_renderer->SetFxShaderParams( 0, 45, m_lights[1].m_local_dir );
+    m_renderer->SetFxShaderParams( 0, 46, m_lights[1].m_dir );
+    m_renderer->SetFxShaderParams( 0, 47, m_lights[1].m_color );   
 
-    m_renderer->SetFxShaderParams( 0, 46, m_lights[2].m_local_dir );
-    m_renderer->SetFxShaderParams( 0, 47, m_lights[2].m_dir );
-    m_renderer->SetFxShaderParams( 0, 48, m_lights[2].m_color );   
+    m_renderer->SetFxShaderParams( 0, 48, m_lights[2].m_local_dir );
+    m_renderer->SetFxShaderParams( 0, 49, m_lights[2].m_dir );
+    m_renderer->SetFxShaderParams( 0, 50, m_lights[2].m_color );   
 
 
 
@@ -256,7 +260,7 @@ void PlanetDetailsBinder::Bind( void )
 
     m_renderer->SetFxShaderParams( 1, 6, flags6 );
 
-    m_renderer->SetFxShaderParams( 1, 7, flags7 );
+    m_renderer->SetFxShaderParams( 1, 7, flags_lights );
     m_renderer->SetFxShaderParams( 1, 8, m_ambient_color );
 
     m_renderer->SetFxShaderParams( 1, 9, m_lights[0].m_local_dir );
@@ -269,7 +273,16 @@ void PlanetDetailsBinder::Bind( void )
 
     m_renderer->SetFxShaderParams( 1, 15, m_lights[2].m_local_dir );
     m_renderer->SetFxShaderParams( 1, 16, m_lights[2].m_dir );
-    m_renderer->SetFxShaderParams( 1, 17, m_lights[2].m_color );   
+    m_renderer->SetFxShaderParams( 1, 17, m_lights[2].m_color );  
+
+    m_renderer->SetFxShaderParams( 1, 18, m_atmo_scattering_flags0 );
+    m_renderer->SetFxShaderParams( 1, 19, m_atmo_scattering_flags1 );
+    m_renderer->SetFxShaderParams( 1, 20, m_atmo_scattering_flags2 );   
+    m_renderer->SetFxShaderParams( 1, 21, m_atmo_scattering_flags3 );
+    m_renderer->SetFxShaderParams( 1, 22, m_atmo_scattering_flags4 );
+    m_renderer->SetFxShaderParams( 1, 23, m_atmo_scattering_flags5 );
+    m_renderer->SetFxShaderParams( 1, 24, m_atmo_scattering_flags6 );
+
     
     MultiFractalBinder::Bind();
 }
@@ -304,26 +317,6 @@ void PlanetDetailsBinder::Update( void )
     }
 }
 
-
-
-PlanetAtmosphereBinder::PlanetAtmosphereBinder( dsreal p_planetRay, dsreal p_atmoThickness ) : PlanetDetailsBinder( p_planetRay, p_atmoThickness )
-{
-    m_atmo_scattering_flags5[0] = 220000.0; // altitude limite de transition entre skyfromspace_atmo_scattering et skyfromatmo_atmo_scattering
-    m_atmo_scattering_flags5[1] = 285000.0; // alitude limite pour prise en compte facteur altitude camera pour le calcul de l'alpha
-
-}
-
-void PlanetAtmosphereBinder::Bind( void )
-{
-    PlanetDetailsBinder::Bind();
-
-    m_renderer->SetFxShaderParams( 1, 18, m_atmo_scattering_flags0 );
-    m_renderer->SetFxShaderParams( 1, 19, m_atmo_scattering_flags1 );
-    m_renderer->SetFxShaderParams( 1, 20, m_atmo_scattering_flags2 );   
-    m_renderer->SetFxShaderParams( 1, 21, m_atmo_scattering_flags3 );
-    m_renderer->SetFxShaderParams( 1, 22, m_atmo_scattering_flags4 );
-    m_renderer->SetFxShaderParams( 1, 23, m_atmo_scattering_flags5 );
-}
 
 
 dsAppClient::dsAppClient( void ) : 
@@ -635,7 +628,7 @@ void dsAppClient::init_planet( void )
         m_planet_climate_binder[i] = new PlanetClimateBinder;
         m_planet_detail_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
 
-        m_planet_atmosphere_binder[i] = new PlanetAtmosphereBinder( PLANET_RAY * 1000.0, 85000.0 );
+        m_planet_atmosphere_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
     }
 
     Shader* hm_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planethm.vso", true ) );
@@ -811,7 +804,7 @@ void dsAppClient::init_planet( void )
 
     for( int i = 0; i < 6; i++ )
     {
-        SphericalLOD::FaceDrawingNode* node = m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, m_planet_atmosphere_binder[i], i, /*DrawSpace::SphericalLOD::Body::LOWRES_MESHE*/DrawSpace::SphericalLOD::Body::HIRES_MESHE, 1 );
+        SphericalLOD::FaceDrawingNode* node = m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, m_planet_atmosphere_binder[i], i, DrawSpace::SphericalLOD::Body::HIRES_MESHE, 1 );
 
         node->SetOrderNumber( 1000 );
         //node->SetOrderNumber( 1002 );
