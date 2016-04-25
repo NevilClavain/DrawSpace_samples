@@ -218,6 +218,7 @@ m_planet_node( NULL )
 
 void PlanetDetailsBinder::Bind( void )
 {
+
     Vector flags6( 16.0, 1.095, 1.0040, 0.0 );
     
     Vector flags7;
@@ -225,15 +226,7 @@ void PlanetDetailsBinder::Bind( void )
     flags7[1] = ( m_lights[0].m_enable ? 1.0 : 0.0 );
     flags7[2] = ( m_lights[1].m_enable ? 1.0 : 0.0 );
 
-    m_renderer->SetFxShaderParams( 1, 6, flags6 );
-    m_renderer->SetFxShaderParams( 1, 7, flags7 );
-    m_renderer->SetFxShaderParams( 1, 8, m_ambient_color );
-    m_renderer->SetFxShaderParams( 1, 9, m_lights[0].m_local_dir );
-    m_renderer->SetFxShaderParams( 1, 10, m_lights[0].m_color );
-    m_renderer->SetFxShaderParams( 1, 11, m_lights[1].m_local_dir );
-    m_renderer->SetFxShaderParams( 1, 12, m_lights[1].m_color );
-    m_renderer->SetFxShaderParams( 1, 13, m_lights[2].m_local_dir );
-    m_renderer->SetFxShaderParams( 1, 14, m_lights[2].m_color );
+
 
     m_renderer->SetFxShaderParams( 0, 32, m_atmo_scattering_flags0 );
     m_renderer->SetFxShaderParams( 0, 33, m_atmo_scattering_flags1 );
@@ -242,6 +235,41 @@ void PlanetDetailsBinder::Bind( void )
     m_renderer->SetFxShaderParams( 0, 36, m_atmo_scattering_flags4 );
     m_renderer->SetFxShaderParams( 0, 37, m_atmo_scattering_flags5 );
 
+    m_renderer->SetFxShaderParams( 0, 38, flags7 );
+    m_renderer->SetFxShaderParams( 0, 39, m_ambient_color );
+
+    m_renderer->SetFxShaderParams( 0, 40, m_lights[0].m_local_dir );
+    m_renderer->SetFxShaderParams( 0, 41, m_lights[0].m_dir );
+    m_renderer->SetFxShaderParams( 0, 42, m_lights[0].m_color );   
+
+    m_renderer->SetFxShaderParams( 0, 43, m_lights[1].m_local_dir );
+    m_renderer->SetFxShaderParams( 0, 44, m_lights[1].m_dir );
+    m_renderer->SetFxShaderParams( 0, 45, m_lights[1].m_color );   
+
+    m_renderer->SetFxShaderParams( 0, 46, m_lights[2].m_local_dir );
+    m_renderer->SetFxShaderParams( 0, 47, m_lights[2].m_dir );
+    m_renderer->SetFxShaderParams( 0, 48, m_lights[2].m_color );   
+
+
+
+
+
+    m_renderer->SetFxShaderParams( 1, 6, flags6 );
+
+    m_renderer->SetFxShaderParams( 1, 7, flags7 );
+    m_renderer->SetFxShaderParams( 1, 8, m_ambient_color );
+
+    m_renderer->SetFxShaderParams( 1, 9, m_lights[0].m_local_dir );
+    m_renderer->SetFxShaderParams( 1, 10, m_lights[0].m_dir );
+    m_renderer->SetFxShaderParams( 1, 11, m_lights[0].m_color );   
+
+    m_renderer->SetFxShaderParams( 1, 12, m_lights[1].m_local_dir );
+    m_renderer->SetFxShaderParams( 1, 13, m_lights[1].m_dir );
+    m_renderer->SetFxShaderParams( 1, 14, m_lights[1].m_color );   
+
+    m_renderer->SetFxShaderParams( 1, 15, m_lights[2].m_local_dir );
+    m_renderer->SetFxShaderParams( 1, 16, m_lights[2].m_dir );
+    m_renderer->SetFxShaderParams( 1, 17, m_lights[2].m_color );   
     
     MultiFractalBinder::Bind();
 }
@@ -283,28 +311,12 @@ PlanetAtmosphereBinder::PlanetAtmosphereBinder( dsreal p_planetRay, dsreal p_atm
     m_atmo_scattering_flags5[0] = 220000.0; // altitude limite de transition entre skyfromspace_atmo_scattering et skyfromatmo_atmo_scattering
     m_atmo_scattering_flags5[1] = 285000.0; // alitude limite pour prise en compte facteur altitude camera pour le calcul de l'alpha
 
-    m_lights[0].m_enable = true;
-    m_lights[0].m_color[0] = 1.0;
-    m_lights[0].m_color[1] = 0.99;
-    m_lights[0].m_color[2] = 0.99;
-    m_lights[0].m_color[3] = 1.0;
-    m_lights[0].m_dir[0] = -1.0;
-    m_lights[0].m_dir[1] = 0.0;
-    m_lights[0].m_dir[2] = 0.0;
-    m_lights[0].m_dir[3] = 1.0;
-
-    m_lights[0].m_dir.Normalize();
 }
 
 void PlanetAtmosphereBinder::Bind( void )
 {
     PlanetDetailsBinder::Bind();
 
-  
-    m_renderer->SetFxShaderParams( 1, 9, m_lights[0].m_local_dir );
-    m_renderer->SetFxShaderParams( 1, 10, m_lights[0].m_dir );
-    m_renderer->SetFxShaderParams( 1, 11, m_lights[1].m_color );   
-    
     m_renderer->SetFxShaderParams( 1, 18, m_atmo_scattering_flags0 );
     m_renderer->SetFxShaderParams( 1, 19, m_atmo_scattering_flags1 );
     m_renderer->SetFxShaderParams( 1, 20, m_atmo_scattering_flags2 );   
