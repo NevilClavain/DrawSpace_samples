@@ -167,6 +167,11 @@ m_planet_node( NULL )
     m_atmo_scattering_flags4[2] = m_groundfromspace_ESun;
     m_atmo_scattering_flags4[3] = m_groundfromatmo_ESun;
 
+    m_atmo_scattering_flags5[0] = 215000.0; // altitude limite de transition entre groundfromspace_atmo_scattering et groundfromatmo_atmo_scattering
+    m_atmo_scattering_flags5[1] = 30000.0; // alitude debut d'apparition du fog "sol"
+    m_atmo_scattering_flags5[2] = 0.000032; // intensite fog "sol"
+
+
     m_lights[0].m_enable = true;
     m_lights[0].m_color[0] = 1.0;
     m_lights[0].m_color[1] = 0.99;
@@ -235,6 +240,7 @@ void PlanetDetailsBinder::Bind( void )
     m_renderer->SetFxShaderParams( 0, 34, m_atmo_scattering_flags2 );   
     m_renderer->SetFxShaderParams( 0, 35, m_atmo_scattering_flags3 );
     m_renderer->SetFxShaderParams( 0, 36, m_atmo_scattering_flags4 );
+    m_renderer->SetFxShaderParams( 0, 37, m_atmo_scattering_flags5 );
 
     
     MultiFractalBinder::Bind();
