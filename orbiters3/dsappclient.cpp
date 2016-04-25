@@ -167,12 +167,16 @@ m_planet_node( NULL )
     m_atmo_scattering_flags4[2] = m_groundfromspace_ESun;
     m_atmo_scattering_flags4[3] = m_groundfromatmo_ESun;
 
-    m_atmo_scattering_flags5[0] = 215000.0; // altitude limite de transition entre groundfromspace_atmo_scattering et groundfromatmo_atmo_scattering
-    m_atmo_scattering_flags5[1] = 30000.0; // alitude debut d'apparition du fog "sol"
+    m_atmo_scattering_flags5[0] = 215000.0; // altitude limite de transition entre xxxfromspace_atmo_scattering et xxxfromatmo_atmo_scattering
+    m_atmo_scattering_flags5[1] = 30000.0; // altitude debut d'apparition du fog "sol"
     m_atmo_scattering_flags5[2] = 0.000032; // intensite fog "sol"
+    m_atmo_scattering_flags5[3] = 285000.0; // alitude limite pour prise en compte facteur altitude camera pour le calcul de l'alpha
 
-    m_atmo_scattering_flags6[0] = 220000.0; // altitude limite de transition entre skyfromspace_atmo_scattering et skyfromatmo_atmo_scattering
-    m_atmo_scattering_flags6[1] = 285000.0; // alitude limite pour prise en compte facteur altitude camera pour le calcul de l'alpha
+    // couleurs fog "sol"    
+    m_atmo_scattering_flags6[0] = 0.45;
+    m_atmo_scattering_flags6[1] = 0.63;
+    m_atmo_scattering_flags6[2] = 0.78;
+    m_atmo_scattering_flags6[3] = 1.0;
 
 
     m_lights[0].m_enable = true;
