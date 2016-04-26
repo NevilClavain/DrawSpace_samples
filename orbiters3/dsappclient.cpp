@@ -193,8 +193,8 @@ m_planet_node( NULL )
 
     m_lights[1].m_enable = false;
     m_lights[1].m_color[0] = 1.0;
-    m_lights[1].m_color[1] = 0.0;
-    m_lights[1].m_color[2] = 0.0;
+    m_lights[1].m_color[1] = 0.9;
+    m_lights[1].m_color[2] = 0.9;
     m_lights[1].m_color[3] = 1.0;
     m_lights[1].m_dir[0] = 0.0;
     m_lights[1].m_dir[1] = 1.0;
@@ -232,7 +232,7 @@ void PlanetDetailsBinder::Bind( void )
     flags_lights[0] = ( m_ambient ? 1.0 : 0.0 );
     flags_lights[1] = ( m_lights[0].m_enable ? 1.0 : 0.0 );
     flags_lights[2] = ( m_lights[1].m_enable ? 1.0 : 0.0 );
-
+    flags_lights[3] = ( m_lights[2].m_enable ? 1.0 : 0.0 );
 
 
     m_renderer->SetFxShaderParams( 0, 32, m_atmo_scattering_flags0 );
