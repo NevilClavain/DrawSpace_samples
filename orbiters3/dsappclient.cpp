@@ -179,7 +179,7 @@ m_planet_node( NULL )
     m_atmo_scattering_flags6[3] = 1.0;
 
 
-    m_lights[0].m_enable = false;
+    m_lights[0].m_enable = true;
     m_lights[0].m_color[0] = 1.0;
     m_lights[0].m_color[1] = 0.99;
     m_lights[0].m_color[2] = 0.99;
@@ -196,14 +196,14 @@ m_planet_node( NULL )
     m_lights[1].m_color[1] = 0.9;
     m_lights[1].m_color[2] = 0.9;
     m_lights[1].m_color[3] = 1.0;
-    m_lights[1].m_dir[0] = 0.0;
-    m_lights[1].m_dir[1] = 1.0;
+    m_lights[1].m_dir[0] = -1.0;
+    m_lights[1].m_dir[1] = 0.2;
     m_lights[1].m_dir[2] = 0.0;
     m_lights[1].m_dir[3] = 1.0;
 
     m_lights[1].m_dir.Normalize();
 
-    m_lights[2].m_enable = true;
+    m_lights[2].m_enable = false;
     m_lights[2].m_color[0] = 1.0;
     m_lights[2].m_color[1] = 0.5;
     m_lights[2].m_color[2] = 0.5;
