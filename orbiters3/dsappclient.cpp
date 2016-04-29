@@ -47,8 +47,8 @@ _DECLARE_DS_LOGGER( logger, "AppClient", DrawSpace::Logger::Configuration::GetIn
 
 MultiFractalBinder::MultiFractalBinder( void ) :
 m_plains_amplitude( 800.0 ),
-m_mountains_amplitude( 2200.0 ),
-m_vertical_offset( 80.0 ),
+m_mountains_amplitude( /*2200.0*/ 5800.0 ),
+m_vertical_offset( 20.0 ),
 m_plains_seed1( 18334.0 ),
 m_plains_seed2( 1770.0 ),
 m_mix_seed1( 635.0 ),
@@ -89,9 +89,14 @@ void PlanetClimateBinder::Bind( void )
 {
     // planete temperee
     
+    /*
     Vector thparams( 300.0, 600.0, 6.4, 25.0 );
     Vector thparams2( 0.48, 0.75, 0.45, 0.55 );
-    
+    */
+    Vector thparams( 120.0, 220.0, 6.4, 25.0 );
+    Vector thparams2( 0.48, 0.75, 0.45, 0.55 );
+
+
 
     // planete chaude et peu humide (aride) : desertique
     //Vector thparams( 0.0, 10.0, 6.4, 25.0 );
@@ -1520,22 +1525,6 @@ void dsAppClient::OnKeyPulse( long p_key )
             m_calendar->SetTimeFactor( Calendar::SEC_1DAY_TIME );
             break;
 
-
-
-        case VK_F8:
-
-            if( !m_show_patch_render )
-            {
-                m_show_patch_render = true;
-                m_finalpass2->GetViewportQuad()->SetDrawingState( true );
-            }
-            else
-            {
-                m_show_patch_render = false;
-                m_finalpass2->GetViewportQuad()->SetDrawingState( false );
-            }
-
-            break;
 
         case VK_F9:
 
