@@ -34,6 +34,7 @@ public:
     dsreal                                  m_plains_amplitude;
     dsreal                                  m_mountains_amplitude;
     dsreal                                  m_vertical_offset;
+    dsreal                                  m_mountains_offset;
 
     dsreal                                  m_plains_seed1;
     dsreal                                  m_plains_seed2;

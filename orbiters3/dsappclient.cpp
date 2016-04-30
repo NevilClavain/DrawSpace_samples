@@ -47,8 +47,9 @@ _DECLARE_DS_LOGGER( logger, "AppClient", DrawSpace::Logger::Configuration::GetIn
 
 MultiFractalBinder::MultiFractalBinder( void ) :
 m_plains_amplitude( 800.0 ),
-m_mountains_amplitude( /*2200.0*/ 5800.0 ),
+m_mountains_amplitude( 6000.0 ),
 m_vertical_offset( 20.0 ),
+m_mountains_offset( -2200.0 ),
 m_plains_seed1( 18334.0 ),
 m_plains_seed2( 1770.0 ),
 m_mix_seed1( 635.0 ),
@@ -65,6 +66,7 @@ void MultiFractalBinder::Bind( void )
     landscape_control[0] = m_plains_amplitude;
     landscape_control[1] = m_mountains_amplitude;
     landscape_control[2] = m_vertical_offset;
+    landscape_control[3] = m_mountains_offset;
 
     seeds[0] = m_plains_seed1;
     seeds[1] = m_plains_seed2;
@@ -189,9 +191,9 @@ m_planet_node( NULL )
     m_lights[0].m_color[1] = 0.99;
     m_lights[0].m_color[2] = 0.99;
     m_lights[0].m_color[3] = 1.0;
-    m_lights[0].m_dir[0] = -1.0;
+    m_lights[0].m_dir[0] = 0.0;
     m_lights[0].m_dir[1] = 0.0;
-    m_lights[0].m_dir[2] = 0.0;
+    m_lights[0].m_dir[2] = -1.0;
     m_lights[0].m_dir[3] = 1.0;
 
     m_lights[0].m_dir.Normalize();
