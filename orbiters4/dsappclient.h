@@ -83,6 +83,26 @@ class PlanetDetailsBinder : public MultiFractalBinder
 {
 protected:
 
+    dsreal                              m_innerRadius;
+    dsreal                              m_outerRadius;
+    DrawSpace::Utils::Vector            m_waveLength;
+    dsreal                              m_kr;
+    dsreal                              m_km;
+    dsreal                              m_scaleDepth;
+
+    dsreal                              m_skyfromspace_ESun;
+    dsreal                              m_skyfromatmo_ESun;
+    dsreal                              m_groundfromspace_ESun;
+    dsreal                              m_groundfromatmo_ESun;
+
+    DrawSpace::Utils::Vector            m_atmo_scattering_flags0;
+    DrawSpace::Utils::Vector            m_atmo_scattering_flags1;
+    DrawSpace::Utils::Vector            m_atmo_scattering_flags2;
+    DrawSpace::Utils::Vector            m_atmo_scattering_flags3;
+    DrawSpace::Utils::Vector            m_atmo_scattering_flags4;
+    DrawSpace::Utils::Vector            m_atmo_scattering_flags5;
+    DrawSpace::Utils::Vector            m_atmo_scattering_flags6;
+
     DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* m_planet_node;
 
     bool                                                    m_ambient;
@@ -92,7 +112,7 @@ protected:
 
 public:
 
-    PlanetDetailsBinder( void );
+    PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness );
 
     virtual void Initialise( void );
     virtual void Bind( void );
@@ -193,6 +213,7 @@ protected:
     MultiFractalBinder*                                                 m_planet_collisions_binder[6];
     PlanetClimateBinder*                                                m_planet_climate_binder[6];
     PlanetDetailsBinder*                                                m_planet_detail_binder[6];
+    PlanetDetailsBinder*                                                m_planet_atmosphere_binder[6];
 
 
 

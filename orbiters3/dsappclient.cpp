@@ -265,10 +265,6 @@ void PlanetDetailsBinder::Bind( void )
     m_renderer->SetFxShaderParams( 0, 49, m_lights[2].m_dir );
     m_renderer->SetFxShaderParams( 0, 50, m_lights[2].m_color );   
 
-
-
-
-
     m_renderer->SetFxShaderParams( 1, 6, flags6 );
 
     m_renderer->SetFxShaderParams( 1, 7, flags_lights );
@@ -755,6 +751,9 @@ void dsAppClient::init_planet( void )
     {
         m_planet_atmosphere_binder[i]->SetFx( atmo_fx );
     }
+
+
+
 
 
 
