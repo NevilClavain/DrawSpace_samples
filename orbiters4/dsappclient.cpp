@@ -48,7 +48,7 @@ _DECLARE_DS_LOGGER( logger, "AppClient", DrawSpace::Logger::Configuration::GetIn
 MultiFractalBinder::MultiFractalBinder( void ) :
 m_uvnoise_seed1( 671.0 ),
 m_uvnoise_seed2( 8444.0 ),
-m_mountains_amplitude( 1100.0 ),
+m_mountains_amplitude( 1300.0 ),
 m_plains_amplitude( 3000.0 ),
 m_vertical_offset( 0.0 ),
 m_uvnoise_weight( 0.0025 )
