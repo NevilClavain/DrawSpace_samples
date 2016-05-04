@@ -677,6 +677,9 @@ void dsAppClient::init_planet( void )
     Texture* texture_th_splatting = _DRAWSPACE_NEW_( Texture, Texture( "earth_th_splatting_16.jpg" ) );
     texture_th_splatting->LoadFromFile();
 
+    Texture* texture_bump_water = _DRAWSPACE_NEW_( Texture, Texture( "water.png" ) );
+    texture_bump_water->LoadFromFile();
+
     SphericalLOD::Config config;
 
     config.m_lod0base = 19000.0;
@@ -725,6 +728,7 @@ void dsAppClient::init_planet( void )
         m_planet_detail_binder[i]->SetFx( main_fx );
         m_planet_detail_binder[i]->SetTexture( texture_th_pixels, 1 );
         m_planet_detail_binder[i]->SetTexture( texture_th_splatting, 2 );
+        m_planet_detail_binder[i]->SetTexture( texture_bump_water, 3 );
     }
 
 
