@@ -191,9 +191,9 @@ m_planet_node( NULL )
     m_lights[0].m_color[1] = 0.99;
     m_lights[0].m_color[2] = 0.99;
     m_lights[0].m_color[3] = 1.0;
-    m_lights[0].m_dir[0] = 0.0;
+    m_lights[0].m_dir[0] = -1.0;
     m_lights[0].m_dir[1] = 0.0;
-    m_lights[0].m_dir[2] = -1.0;
+    m_lights[0].m_dir[2] = 0.0;
     m_lights[0].m_dir[3] = 1.0;
 
     m_lights[0].m_dir.Normalize();
@@ -290,6 +290,9 @@ void PlanetDetailsBinder::Bind( void )
     m_renderer->SetFxShaderParams( 1, 23, m_atmo_scattering_flags5 );
     m_renderer->SetFxShaderParams( 1, 24, m_atmo_scattering_flags6 );
 
+    m_planet_final_transform_rots.Transpose(); // faire comme dans le plugin
+    m_renderer->SetFxShaderMatrix( 1, 25, m_planet_final_transform_rots );
+
     
     MultiFractalBinder::Bind();
 }
@@ -311,6 +314,8 @@ void PlanetDetailsBinder::Update( void )
     m_planet_node->GetFinalTransform( planet_final_transform );
 
     planet_final_transform.ClearTranslation();
+    m_planet_final_transform_rots = planet_final_transform;
+
     planet_final_transform.Transpose();
 
     for( long i = 0; i < 3; i++ )

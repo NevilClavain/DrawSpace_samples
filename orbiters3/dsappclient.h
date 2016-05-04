@@ -110,6 +110,8 @@ protected:
 
     PlanetLight                                             m_lights[3];
 
+    DrawSpace::Utils::Matrix                                m_planet_final_transform_rots;
+
 public:
 
     PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness );
