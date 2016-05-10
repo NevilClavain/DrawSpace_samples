@@ -112,6 +112,8 @@ protected:
 
     DrawSpace::Utils::Matrix                                m_planet_final_transform_rots;
 
+    dsreal                                                  m_water_anim;
+
 public:
 
     PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness );
@@ -122,6 +124,10 @@ public:
     void SetPlanetNode( DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* p_planet_node );
     void Update( void );
 
+    void SetWaterAnim( dsreal p_value )
+    {
+        m_water_anim = p_value;
+    }
 };
 
 
@@ -130,6 +136,8 @@ class dsAppClient : public DrawSpace::App
 protected:
 
     typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Gui::Widget*>   WidgetEventHandler;
+
+    typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Utils::Timer*> WaterTimer;
 
 
     static dsAppClient*                         m_instance;
@@ -262,6 +270,12 @@ protected:
 
     int                                         m_init_count;
 
+    float                                       m_water_anim;
+    bool                                        m_water_anim_inc;
+    DrawSpace::Utils::Timer                     m_water_timer;
+    WaterTimer*                                 m_water_timercb;
+    
+
     void init_planet_meshes( void );
     void init_assets_loaders( void );
     void init_passes( void );
@@ -282,6 +296,8 @@ protected:
     void print_init_trace( const dsstring& p_string );
 
     void on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget );
+
+    void on_water_timer( DrawSpace::Utils::Timer* p_timer );
 
 
     dsAppClient( void );

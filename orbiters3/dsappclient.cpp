@@ -293,6 +293,10 @@ void PlanetDetailsBinder::Bind( void )
     m_planet_final_transform_rots.Transpose(); // faire comme dans le plugin
     m_renderer->SetFxShaderMatrix( 1, 25, m_planet_final_transform_rots );
 
+    DrawSpace::Utils::Vector wa( m_water_anim, 0.0, 0.0, 0.0 );
+
+    m_renderer->SetFxShaderParams( 1, 29, wa );
+
     
     MultiFractalBinder::Bind();
 }
@@ -340,11 +344,21 @@ m_curr_camera( NULL ),
 m_show_patch_render( false ),
 m_ready( false ),
 m_init_count( 0 ),
-m_showinfos( true )
+m_showinfos( true ),
+m_water_anim( 0.0 ),
+m_water_anim_inc( true )
 {    
     _INIT_LOGGER( "logorbiters3.conf" )  
     m_w_title = "orbiters 3 test";
     m_mouseleftbuttondown_eventhandler = _DRAWSPACE_NEW_( WidgetEventHandler, WidgetEventHandler( this, &dsAppClient::on_mouseleftbuttondown ) );
+
+    m_water_timercb = _DRAWSPACE_NEW_( WaterTimer, WaterTimer( this, &dsAppClient::on_water_timer ) );
+    m_water_timer.SetHandler( m_water_timercb );
+
+    m_water_timer.SetPeriod( 1 );
+
+    m_timer.RegisterTimer( &m_water_timer );
+
 }
 
 dsAppClient::~dsAppClient( void )
@@ -1334,6 +1348,8 @@ void dsAppClient::OnRenderFrame( void )
                 //m_calendar->Startup( 162682566 );
                 m_calendar->Startup( 0 );
                 m_ready = true;
+
+                m_water_timer.SetState( true );
                 break;        
         }
 
@@ -1596,4 +1612,31 @@ void dsAppClient::OnAppEvent( WPARAM p_wParam, LPARAM p_lParam )
 void dsAppClient::on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget )
 {
 
+}
+
+void dsAppClient::on_water_timer( DrawSpace::Utils::Timer* p_timer )
+{
+    if( m_water_anim_inc )
+    {
+        m_water_anim += 0.02;
+
+        if( m_water_anim > 1.0)
+        {
+            m_water_anim_inc = false;
+        }
+    }
+    else
+    {
+        m_water_anim -= 0.02;
+
+        if( m_water_anim <= 0.0)
+        {
+            m_water_anim_inc = true;
+        }    
+    }
+
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_detail_binder[i]->SetWaterAnim( m_water_anim ); 
+    }
 }
