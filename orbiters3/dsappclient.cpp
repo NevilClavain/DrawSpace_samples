@@ -697,7 +697,7 @@ void dsAppClient::init_planet( void )
     SphericalLOD::Config config;
 
     config.m_lod0base = 19000.0;
-    config.m_ground_fragment = 0;
+    config.m_ground_layer = 0;
 
     Fx* collisions_fx = new Fx;
     collisions_fx->AddShader( hm_vshader );
@@ -790,7 +790,7 @@ void dsAppClient::init_planet( void )
     }
 
     
-    SphericalLOD::Config::FragmentDescriptor planet_surface;
+    SphericalLOD::Config::LayerDescriptor planet_surface;
     planet_surface.enable_collisions = true;
     planet_surface.enable_datatextures = true;
     planet_surface.enable_lod = true;
@@ -802,10 +802,10 @@ void dsAppClient::init_planet( void )
         planet_surface.patchTexturesBinder[i] = m_planet_climate_binder[i];
     }
 
-    config.m_fragments_descr.push_back( planet_surface );
+    config.m_layers_descr.push_back( planet_surface );
 
 
-    SphericalLOD::Config::FragmentDescriptor planet_atmosphere;
+    SphericalLOD::Config::LayerDescriptor planet_atmosphere;
     planet_atmosphere.enable_collisions = false;
     planet_atmosphere.enable_datatextures = false;
     planet_atmosphere.enable_lod = false;
@@ -818,7 +818,7 @@ void dsAppClient::init_planet( void )
         planet_atmosphere.patchTexturesBinder[i] = NULL;
     }
 
-    config.m_fragments_descr.push_back( planet_atmosphere );
+    config.m_layers_descr.push_back( planet_atmosphere );
 
 
 
