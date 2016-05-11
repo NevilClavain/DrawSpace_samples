@@ -299,7 +299,7 @@ void PlanetDetailsBinder::Unbind( void )
     MultiFractalBinder::Unbind();
 }
 
-void PlanetDetailsBinder::SetPlanetNode( DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* p_planet_node )
+void PlanetDetailsBinder::SetPlanetNode( DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node )
 {
     m_planet_node = p_planet_node;
 }
@@ -843,7 +843,7 @@ void dsAppClient::init_planet( void )
     config.m_layers_descr.push_back( planet_atmosphere );
 
 
-    m_planet = _DRAWSPACE_NEW_( DrawSpace::Planetoid::Body, DrawSpace::Planetoid::Body( "planet01", PLANET_RAY, &m_timer, config ) );
+    m_planet = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::Root, DrawSpace::SphericalLOD::Root( "planet01", PLANET_RAY, &m_timer, config ) );
     
     for( int i = 0; i < 6; i++ )
     {
@@ -867,7 +867,7 @@ void dsAppClient::init_planet( void )
 
 
 
-    m_planet_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Planetoid::Body>, SceneNode<DrawSpace::Planetoid::Body>( "planet01" ) );
+    m_planet_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::SphericalLOD::Root>, SceneNode<DrawSpace::SphericalLOD::Root>( "planet01" ) );
     m_planet_node->SetContent( m_planet );
 
     m_scenenodegraph.RegisterNode( m_planet_node );

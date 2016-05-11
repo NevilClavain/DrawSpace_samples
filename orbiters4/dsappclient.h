@@ -103,7 +103,7 @@ protected:
     DrawSpace::Utils::Vector            m_atmo_scattering_flags5;
     DrawSpace::Utils::Vector            m_atmo_scattering_flags6;
 
-    DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* m_planet_node;
+    DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* m_planet_node;
 
     bool                                                    m_ambient;
     DrawSpace::Utils::Vector                                m_ambient_color;
@@ -118,7 +118,7 @@ public:
     virtual void Bind( void );
     virtual void Unbind( void );
 
-    void SetPlanetNode( DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>* p_planet_node );
+    void SetPlanetNode( DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node );
     void Update( void );
 
 };
@@ -205,8 +205,8 @@ protected:
     DrawSpace::Dynamics::Orbit*                                         m_planet_orbit;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Orbit>*             m_planet_orbit_node;
     
-    DrawSpace::Planetoid::Body*                                         m_planet;
-    DrawSpace::Core::SceneNode<DrawSpace::Planetoid::Body>*             m_planet_node;
+    DrawSpace::SphericalLOD::Root*                                      m_planet;
+    DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>*          m_planet_node;
 
     
 
