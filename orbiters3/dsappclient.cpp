@@ -295,7 +295,7 @@ void PlanetDetailsBinder::Bind( void )
 
     DrawSpace::Utils::Vector wa( m_water_anim, 0.0, 0.0, 0.0 );
 
-    m_renderer->SetFxShaderParams( 1, 29, wa );
+    //m_renderer->SetFxShaderParams( 1, 29, wa );
 
     
     MultiFractalBinder::Bind();
@@ -724,22 +724,24 @@ void dsAppClient::init_planet( void )
 
 
 
-    Fx* main_fx = new Fx;
+    m_details_fx = new Fx;
 
-    main_fx->AddShader( planet_vshader );
-    main_fx->AddShader( planet_pshader );
+    m_details_fx->AddShader( planet_vshader );
+    m_details_fx->AddShader( planet_pshader );
 
-    //main_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
-    main_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-    main_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    main_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-    main_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    //main_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+
+    m_details_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_details_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    //m_details_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
+
+    m_details_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_details_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    //m_details_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
 
 
     for( int i = 0; i < 6; i++ )
     {
-        m_planet_detail_binder[i]->SetFx( main_fx );
+        m_planet_detail_binder[i]->SetFx( m_details_fx );
         m_planet_detail_binder[i]->SetTexture( texture_th_pixels, 1 );
         m_planet_detail_binder[i]->SetTexture( texture_th_splatting, 2 );
         m_planet_detail_binder[i]->SetTexture( texture_bump_water, 3 );
@@ -1154,6 +1156,22 @@ void dsAppClient::render_universe( void )
     m_finalpass2->GetRenderingQueue()->Draw();
 
 
+    dsreal rel_alt;
+    m_planet->GetInertBodyRelativeAltitude( m_ship, rel_alt );
+
+    // activer Z buffering seulement si on est pres de la surface
+    
+    if( rel_alt < 1.007 )
+    {
+        m_details_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    }
+    else
+    {
+        m_details_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    }
+    
+
+
     long current_fps = m_timer.GetFPS();
     renderer->DrawText( 0, 255, 0, 10, 35, "%d fps", current_fps );
 
@@ -1188,8 +1206,7 @@ void dsAppClient::render_universe( void )
         
         }
 
-        dsreal rel_alt;
-        m_planet->GetInertBodyRelativeAltitude( m_ship, rel_alt );
+
         renderer->DrawText( 0, 255, 0, 10, 220, "relative_alt = %f", rel_alt );
 
 

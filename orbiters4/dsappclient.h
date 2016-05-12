@@ -199,7 +199,7 @@ protected:
     DrawSpace::Dynamics::Calendar*              m_calendar;
 
 
-    
+    DrawSpace::Core::Fx*                                   m_details_fx;
 
 
     DrawSpace::Dynamics::Orbit*                                         m_planet_orbit;
