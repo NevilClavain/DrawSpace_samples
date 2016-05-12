@@ -826,7 +826,7 @@ void dsAppClient::init_planet( void )
 
 
 
-
+/*
     for( int i = 0; i < 6; i++ )
     {
         SphericalLOD::FaceDrawingNode* node = m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, m_planet_detail_binder[i], i, DrawSpace::SphericalLOD::Body::LOWRES_SKIRT_MESHE, 0 );
@@ -840,8 +840,21 @@ void dsAppClient::init_planet( void )
         SphericalLOD::FaceDrawingNode* node = m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, m_planet_atmosphere_binder[i], i, DrawSpace::SphericalLOD::Body::HIRES_MESHE, 1 );
 
         node->SetOrderNumber( 1000 );
-        //node->SetOrderNumber( 1002 );
     }
+*/
+
+
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_detail_binder[i], i, DrawSpace::SphericalLOD::Body::LOWRES_SKIRT_MESHE, 0, 2000 );
+    }
+
+
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_atmosphere_binder[i], i, DrawSpace::SphericalLOD::Body::HIRES_MESHE, 1, 1000 );
+    }
+
 
     
     m_planet->SetOrbitDuration( 0.333 );
