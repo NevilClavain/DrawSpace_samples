@@ -1161,7 +1161,7 @@ void dsAppClient::render_universe( void )
 
     // activer Z buffering seulement si on est pres de la surface
     
-    if( rel_alt < 1.02 )
+    if( rel_alt < 1.009 )
     {
         m_details_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
     }
