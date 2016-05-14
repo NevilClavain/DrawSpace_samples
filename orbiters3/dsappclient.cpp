@@ -655,6 +655,8 @@ void dsAppClient::init_planet( void )
         m_planet_detail_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
 
         m_planet_atmosphere_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
+
+        m_planet_clouds_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
     }
 
     Shader* hm_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planethm.vso", true ) );
@@ -683,16 +685,26 @@ void dsAppClient::init_planet( void )
     planet_atmo_pshader->LoadFromFile();
 
 
+    Shader* planet_clouds_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_clouds.vso", true ) );
+    Shader* planet_clouds_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_clouds.pso", true ) );
+    
+    planet_clouds_vshader->LoadFromFile();
+    planet_clouds_pshader->LoadFromFile();
+
+
 
     Texture* texture_th_pixels = _DRAWSPACE_NEW_( Texture, Texture( "earth_th_pixels_16.jpg" ) );
     texture_th_pixels->LoadFromFile();
-
 
     Texture* texture_th_splatting = _DRAWSPACE_NEW_( Texture, Texture( "earth_th_splatting_16.jpg" ) );
     texture_th_splatting->LoadFromFile();
 
     Texture* texture_bump_water = _DRAWSPACE_NEW_( Texture, Texture( "water.png" ) );
     texture_bump_water->LoadFromFile();
+
+    Texture* texture_clouds = _DRAWSPACE_NEW_( Texture, Texture( "storm_clouds_8k.jpg" ) );
+    //Texture* texture_clouds = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
+    texture_clouds->LoadFromFile();
 
     SphericalLOD::Config config;
 
@@ -782,6 +794,35 @@ void dsAppClient::init_planet( void )
 
 
 
+    Fx* clouds_fx = new Fx;
+
+    clouds_fx->AddShader( planet_clouds_vshader );
+    clouds_fx->AddShader( planet_clouds_pshader );
+    
+    clouds_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    clouds_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    clouds_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    clouds_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );
+    
+    clouds_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
+    
+
+    //clouds_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "none" ) );
+    clouds_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    clouds_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+
+    clouds_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    clouds_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    //clouds_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+    clouds_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+
+
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_clouds_binder[i]->SetFx( clouds_fx );
+        m_planet_clouds_binder[i]->SetTexture( texture_clouds, 0 );
+    }
 
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -791,6 +832,9 @@ void dsAppClient::init_planet( void )
         m_planet_collisions_binder[i]->SetRenderer( renderer );
         m_planet_detail_binder[i]->SetRenderer( renderer );
         m_planet_climate_binder[i]->SetRenderer( renderer );
+
+        m_planet_atmosphere_binder[i]->SetRenderer( renderer );
+        m_planet_clouds_binder[i]->SetRenderer( renderer );
     }
 
     
@@ -825,27 +869,26 @@ void dsAppClient::init_planet( void )
     config.m_layers_descr.push_back( planet_atmosphere );
 
 
+    SphericalLOD::Config::LayerDescriptor planet_clouds;
+    planet_clouds.enable_collisions = false;
+    planet_clouds.enable_datatextures = false;
+    planet_clouds.enable_lod = false;
+    planet_clouds.min_lodlevel = 0;
+    planet_clouds.ray = PLANET_RAY + 18.0;
+
+    for( int i = 0; i < 6; i++ )
+    {
+        planet_clouds.groundCollisionsBinder[i] = NULL;
+        planet_clouds.patchTexturesBinder[i] = NULL;
+    }
+
+    config.m_layers_descr.push_back( planet_clouds );
+
+
 
     m_planet = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::Root, DrawSpace::SphericalLOD::Root( "planet01", PLANET_RAY, &m_timer, config ) );
 
 
-
-/*
-    for( int i = 0; i < 6; i++ )
-    {
-        SphericalLOD::FaceDrawingNode* node = m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, m_planet_detail_binder[i], i, DrawSpace::SphericalLOD::Body::LOWRES_SKIRT_MESHE, 0 );
-
-        node->SetOrderNumber( 1001 );
-    }
-
-
-    for( int i = 0; i < 6; i++ )
-    {
-        SphericalLOD::FaceDrawingNode* node = m_planet->RegisterSinglePlanetBodyPassSlot( m_texturepass, m_planet_atmosphere_binder[i], i, DrawSpace::SphericalLOD::Body::HIRES_MESHE, 1 );
-
-        node->SetOrderNumber( 1000 );
-    }
-*/
 
 
     for( int i = 0; i < 6; i++ )
@@ -860,6 +903,13 @@ void dsAppClient::init_planet( void )
     }
 
 
+    
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_clouds_binder[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 3000 );
+    }
+    
+    
     
     m_planet->SetOrbitDuration( 0.333 );
     m_planet->SetRevolutionTiltAngle( 8.0 );    
@@ -896,6 +946,8 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet_detail_binder[i]->SetPlanetNode( m_planet_node );
+        m_planet_atmosphere_binder[i]->SetPlanetNode( m_planet_node );
+        m_planet_clouds_binder[i]->SetPlanetNode( m_planet_node );
     }
 
     ////////////////////////
@@ -1129,6 +1181,8 @@ void dsAppClient::render_universe( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet_detail_binder[i]->Update();
+        m_planet_atmosphere_binder[i]->Update();
+        m_planet_clouds_binder[i]->Update();
     }
 
     m_text_widget->SetVirtualTranslation( 100, 75 );

@@ -227,6 +227,8 @@ protected:
 
     PlanetDetailsBinder*                                                m_planet_atmosphere_binder[6];
 
+    PlanetDetailsBinder*                                                m_planet_clouds_binder[6];
+
 
 
     DrawSpace::Dynamics::Rocket*                m_ship;

@@ -751,6 +751,9 @@ void dsAppClient::init_planet( void )
     m_details_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "none" ) );
     //m_details_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
 
+
+    m_details_fx->SetRenderStateUniqueQueueID( "planet01" ); // parce qu'on va updater le renderstate ENABLEZBUFFER pendant le rendu
+
     for( int i = 0; i < 6; i++ )
     {
         m_planet_detail_binder[i]->SetFx( m_details_fx );
