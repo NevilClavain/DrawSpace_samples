@@ -91,10 +91,7 @@ void PlanetClimateBinder::Bind( void )
 {
     // planete temperee
     
-    /*
-    Vector thparams( 300.0, 600.0, 6.4, 25.0 );
-    Vector thparams2( 0.48, 0.75, 0.45, 0.55 );
-    */
+
     Vector thparams( 120.0, 220.0, 6.4, 25.0 );
     Vector thparams2( 0.48, 0.75, 0.45, 0.55 );
 
