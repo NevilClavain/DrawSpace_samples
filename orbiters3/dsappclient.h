@@ -208,6 +208,7 @@ protected:
 
 
     DrawSpace::Core::Fx*                                   m_details_fx;
+    DrawSpace::Core::Fx*                                   m_clouds_fx;
 
 
     DrawSpace::Dynamics::Orbit*                                         m_planet_orbit;
