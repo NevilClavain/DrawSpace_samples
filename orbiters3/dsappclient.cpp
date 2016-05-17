@@ -297,9 +297,9 @@ void PlanetDetailsBinder::Bind( void )
                     
     m_clouds_texture->GetFormat( clouds_texture_w, clouds_texture_h, clouds_texture_bpp );
 
-    Vector clouds_texture_format( clouds_texture_w, clouds_texture_h, 0.0, 0.0 );
+    Vector clouds_texture_infos( clouds_texture_w, clouds_texture_h, 67.0, 0.0 );
 
-    m_renderer->SetFxShaderParams( 1, 29, clouds_texture_format );
+    m_renderer->SetFxShaderParams( 1, 29, clouds_texture_infos );
 
     
     MultiFractalBinder::Bind();
