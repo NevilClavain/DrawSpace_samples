@@ -134,6 +134,8 @@ protected:
 
     static dsAppClient*                         m_instance;
 
+    DrawSpace::Interface::Renderer::DeviceDescr m_deviceDescr;
+
     DrawSpace::Core::SceneNodeGraph             m_scenenodegraph;
 
     bool                                        m_showinfos;

@@ -1236,7 +1236,7 @@ void dsAppClient::render_universe( void )
         renderer->DrawText( 0, 255, 0, 10, 250, "working set size = %d", pmc.WorkingSetSize );
         renderer->DrawText( 0, 255, 0, 10, 280, "subpasses stack size = %d", m_planet->GetSingleShotSubPassesStackSize() );
 
-
+        renderer->DrawText( 0, 255, 0, 900, 30, "%s", m_deviceDescr.description.c_str() );
     
         /*
         if( current_patch )
@@ -1377,6 +1377,9 @@ void dsAppClient::OnRenderFrame( void )
                 //m_calendar->Startup( 162682566 );
                 m_calendar->Startup( 0 );
                 m_ready = true;
+
+                renderer->GetDeviceDescr( m_deviceDescr );
+
                 break;        
         }
 
