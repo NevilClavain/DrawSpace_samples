@@ -290,9 +290,16 @@ void PlanetDetailsBinder::Bind( void )
     m_planet_final_transform_rots.Transpose(); // faire comme dans le plugin
     m_renderer->SetFxShaderMatrix( 1, 25, m_planet_final_transform_rots );
 
-    DrawSpace::Utils::Vector wa( m_water_anim, 0.0, 0.0, 0.0 );
 
-    //m_renderer->SetFxShaderParams( 1, 29, wa );
+    long clouds_texture_w;
+    long clouds_texture_h;
+    long clouds_texture_bpp;
+                    
+    m_clouds_texture->GetFormat( clouds_texture_w, clouds_texture_h, clouds_texture_bpp );
+
+    Vector clouds_texture_format( clouds_texture_w, clouds_texture_h, 0.0, 0.0 );
+
+    m_renderer->SetFxShaderParams( 1, 29, clouds_texture_format );
 
     
     MultiFractalBinder::Bind();
@@ -306,6 +313,11 @@ void PlanetDetailsBinder::Unbind( void )
 void PlanetDetailsBinder::SetPlanetNode( DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node )
 {
     m_planet_node = p_planet_node;
+}
+
+void PlanetDetailsBinder::SetCloudsTexture( DrawSpace::Core::Texture* p_texture )
+{
+    m_clouds_texture = p_texture;
 }
 
 void PlanetDetailsBinder::Update( void )
@@ -700,8 +712,9 @@ void dsAppClient::init_planet( void )
     texture_bump_water->LoadFromFile();
 
     Texture* texture_clouds = _DRAWSPACE_NEW_( Texture, Texture( "storm_clouds_8k.jpg" ) );
-    //Texture* texture_clouds = _DRAWSPACE_NEW_( Texture, Texture( "map.jpg" ) );
     texture_clouds->LoadFromFile();
+
+
 
     SphericalLOD::Config config;
 
@@ -837,6 +850,8 @@ void dsAppClient::init_planet( void )
     }
 
     
+
+    
     SphericalLOD::Config::LayerDescriptor planet_surface;
     planet_surface.enable_collisions = true;
     planet_surface.enable_datatextures = true;
@@ -945,8 +960,13 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet_detail_binder[i]->SetPlanetNode( m_planet_node );
+        m_planet_detail_binder[i]->SetCloudsTexture( texture_clouds );
+
         m_planet_atmosphere_binder[i]->SetPlanetNode( m_planet_node );
+        m_planet_atmosphere_binder[i]->SetCloudsTexture( texture_clouds );
+
         m_planet_clouds_binder[i]->SetPlanetNode( m_planet_node );
+        m_planet_clouds_binder[i]->SetCloudsTexture( texture_clouds );
     }
 
     ////////////////////////
@@ -1420,8 +1440,10 @@ void dsAppClient::OnRenderFrame( void )
                 break;
 
             case 12:
-                print_init_trace( "rendering queues update..." );
-                init_rendering_queues();
+                {
+                    print_init_trace( "rendering queues update..." );
+                    init_rendering_queues();
+                }
                 break;
 
             case 13:

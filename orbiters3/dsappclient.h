@@ -114,6 +114,10 @@ protected:
 
     dsreal                                                  m_water_anim;
 
+
+    DrawSpace::Core::Texture*                               m_clouds_texture;
+
+
 public:
 
     PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness );
@@ -122,6 +126,8 @@ public:
     virtual void Unbind( void );
 
     void SetPlanetNode( DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node );
+    void SetCloudsTexture( DrawSpace::Core::Texture* p_texture );
+
     void Update( void );
 
     void SetWaterAnim( dsreal p_value )
@@ -229,7 +235,6 @@ protected:
     PlanetDetailsBinder*                                                m_planet_atmosphere_binder[6];
 
     PlanetDetailsBinder*                                                m_planet_clouds_binder[6];
-
 
 
     DrawSpace::Dynamics::Rocket*                m_ship;
