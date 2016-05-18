@@ -156,6 +156,7 @@ protected:
 
 
     DrawSpace::IntermediatePass*                m_texturepass;
+    DrawSpace::IntermediatePass*                m_occlusionpass;
     DrawSpace::FinalPass*                       m_finalpass;
     DrawSpace::FinalPass*                       m_finalpass2;
 
@@ -239,6 +240,9 @@ protected:
     PlanetDetailsBinder*                                                m_planet_clouds_binder[6];
 
 
+    DrawSpace::SphericalLOD::Binder*                                    m_planet_occlusion_binder[6];
+
+
     DrawSpace::Chunk*                                                   m_star_impostor;
     DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_star_impostor_node;
 
@@ -273,7 +277,7 @@ protected:
     DrawSpace::Gui::TextWidget*                 m_text_widget_2;
 
 
-    bool                                        m_show_patch_render;
+    bool                                        m_final_pass_2;
 
 
     DrawSpace::SystemMouseInputProvider         m_mouse_input;

@@ -350,7 +350,7 @@ m_mouserb( false ),
 m_speed( 0.0 ), 
 m_speed_speed( 5.0 ),
 m_curr_camera( NULL ),
-m_show_patch_render( false ),
+m_final_pass_2( false ),
 m_ready( false ),
 m_init_count( 0 ),
 m_showinfos( true ),
@@ -410,6 +410,15 @@ void dsAppClient::init_passes( void )
     m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 255 );
 
 
+
+    m_occlusionpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "occlusion_pass" ) );
+    m_occlusionpass->Initialize();
+
+    m_occlusionpass->GetRenderingQueue()->EnableDepthClearing( true );
+    m_occlusionpass->GetRenderingQueue()->EnableTargetClearing( true );
+    m_occlusionpass->GetRenderingQueue()->SetTargetClearingColor( 50, 0, 0, 255 );
+
+
     //////////////////////////////////////////////////////////////
         
     m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
@@ -436,6 +445,7 @@ void dsAppClient::init_passes( void )
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
+    m_finalpass2->GetViewportQuad()->SetTexture( m_occlusionpass->GetTargetTexture(), 0 );
     m_finalpass2->GetViewportQuad()->SetDrawingState( false );
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -666,6 +676,8 @@ void dsAppClient::init_planet( void )
         m_planet_atmosphere_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
 
         m_planet_clouds_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
+
+        //m_planet_occlusion_binder[i] = new DrawSpace::SphericalLOD::Binder();
     }
 
     Shader* hm_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planethm.vso", true ) );
@@ -1243,6 +1255,7 @@ void dsAppClient::init_rendering_queues( void )
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_finalpass2->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
+    m_occlusionpass->GetRenderingQueue()->UpdateOutputQueue();
 }
 
 void dsAppClient::init_calendar( void )
@@ -1296,6 +1309,7 @@ void dsAppClient::render_universe( void )
     m_planet->DrawSubPasses();
 
     m_texturepass->GetRenderingQueue()->Draw();
+    m_occlusionpass->GetRenderingQueue()->Draw();
 
     //m_text_widget->Draw();  // pour ne plus afficher le reticule
 
@@ -1748,6 +1762,20 @@ void dsAppClient::OnKeyPulse( long p_key )
         case VK_F6:
 
             m_calendar->SetTimeFactor( Calendar::SEC_1DAY_TIME );
+            break;
+
+        case VK_F8:
+
+            if( !m_final_pass_2)
+            {
+                m_final_pass_2 = true;
+            }
+            else
+            {
+                m_final_pass_2 = false;
+            }
+
+            m_finalpass2->GetViewportQuad()->SetDrawingState( m_final_pass_2 );
             break;
 
 
