@@ -239,6 +239,10 @@ protected:
     PlanetDetailsBinder*                                                m_planet_clouds_binder[6];
 
 
+    DrawSpace::Chunk*                                                   m_star_impostor;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_star_impostor_node;
+
+
     DrawSpace::Dynamics::Rocket*                m_ship;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Rocket>*                    m_ship_node;
     
@@ -294,6 +298,7 @@ protected:
     void init_buildings( void );
     void init_planet( void );
     void init_ship( void );
+    void init_star_impostor( void );
     void init_cameras( void );
     void init_reticle( void );
     void init_text_assets( void );

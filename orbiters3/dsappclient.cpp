@@ -972,6 +972,79 @@ void dsAppClient::init_planet( void )
     ////////////////////////
 }
 
+void dsAppClient::init_star_impostor( void )
+{
+    ImpostorsDisplayList idl;
+    ImpostorsDisplayListEntry idle;
+
+
+    m_star_impostor = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+    m_star_impostor->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
+
+    idle.width_scale = 45000000.0;
+    idle.height_scale = 45000000.0;
+
+    idle.u1 = 0.0;
+    idle.v1 = 0.0;
+    idle.u2 = 1.0;
+    idle.v2 = 0.0;
+    idle.u3 = 1.0;
+    idle.v3 = 1.0;
+    idle.u4 = 0.0;
+    idle.v4 = 1.0;
+
+    idle.localpos[0] = 0.0;
+    idle.localpos[1] = 0.0;
+    idle.localpos[2] = 0.0;
+    
+    idl.push_back( idle );
+
+
+    
+    m_star_impostor->SetImpostorsDisplayList( idl );
+    m_star_impostor->ImpostorsInit();
+
+    m_star_impostor->RegisterPassSlot( m_texturepass );
+
+    m_star_impostor->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_star_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "screenimpostor.vsh", false ) ) );
+    m_star_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "screenimpostor.psh", false ) ) );
+    m_star_impostor->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_star_impostor->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_star_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_star_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    m_star_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    m_star_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one" ) );
+    m_star_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
+
+    m_star_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+
+    m_star_impostor->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "star_far.bmp" ) ), 0 );
+    m_star_impostor->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+
+    m_star_impostor->GetNodeFromPass( m_texturepass )->SetOrderNumber( 100 );
+
+
+    m_star_impostor->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "globalscale", 24 );
+    m_star_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "globalscale", Vector( 1.0, 1.0, 0.0, 0.0 ) );
+
+    m_star_impostor->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "flags", 0 );
+    m_star_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags", Vector( 0.0, 0.0, 0.0, 0.0 ) );
+
+    m_star_impostor->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "color", 1 );
+    m_star_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 1.0 ) );
+
+
+    m_star_impostor_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "impostor0" ) );
+
+    m_star_impostor_node->SetContent( m_star_impostor );
+
+    m_scenenodegraph.AddNode( m_star_impostor_node );
+    m_scenenodegraph.RegisterNode( m_star_impostor_node );
+
+}
 
 void dsAppClient::init_ship( void )
 {
@@ -1425,41 +1498,46 @@ void dsAppClient::OnRenderFrame( void )
                 break;
 
             case 9:
+                print_init_trace( "star impostor initialisation..." );
+                init_star_impostor();
+                break;
+
+            case 10:
                 print_init_trace( "cameras initialisation..." );
                 init_cameras();
                 break;
 
-            case 10:
+            case 11:
                 print_init_trace( "reticle creation..." );
                 init_reticle();
                 break;
 
-            case 11:
+            case 12:
                 print_init_trace( "text display assets creation..." );
                 init_text_assets();
                 break;
 
-            case 12:
+            case 13:
                 {
                     print_init_trace( "rendering queues update..." );
                     init_rendering_queues();
                 }
                 break;
 
-            case 13:
+            case 14:
                 //print_init_trace( "planet atmosphere data initialisation..." );
                 break;
 
-            case 14:                
+            case 15:                
                 init_planet_noise();
                 break;
 
-            case 15:
+            case 16:
                 print_init_trace( "calendar initialisation..." );
                 init_calendar();
                 break;
 
-            case 16:
+            case 17:
                 print_init_trace( "launching simulation..." );
                 m_mouse_circularmode = true;
                 m_scenenodegraph.SetCurrentCamera( "camera3" );
