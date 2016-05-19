@@ -326,8 +326,20 @@ void PlanetDetailsBinder::Update( void )
 
     m_planet_node->GetFinalTransform( planet_final_transform );
 
+    Vector planet_pos;
+    planet_pos[0] = -planet_final_transform( 3, 0 );
+    planet_pos[1] = -planet_final_transform( 3, 1 );
+    planet_pos[2] = -planet_final_transform( 3, 2 );
+    planet_pos[3] = 1.0;
+
+    planet_pos.Normalize();
+
+    m_lights[0].m_dir = planet_pos;
+
     planet_final_transform.ClearTranslation();
     m_planet_final_transform_rots = planet_final_transform;
+
+
 
     planet_final_transform.Transpose();
 
@@ -414,9 +426,31 @@ void dsAppClient::init_passes( void )
     m_occlusionpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "occlusion_pass" ) );
     m_occlusionpass->Initialize();
 
-    m_occlusionpass->GetRenderingQueue()->EnableDepthClearing( true );
+    m_occlusionpass->GetRenderingQueue()->EnableDepthClearing( false );
     m_occlusionpass->GetRenderingQueue()->EnableTargetClearing( true );
-    m_occlusionpass->GetRenderingQueue()->SetTargetClearingColor( 50, 0, 0, 255 );
+    m_occlusionpass->GetRenderingQueue()->SetTargetClearingColor( 255, 255, 255, 255 );
+
+
+
+
+    m_zoompass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "zoom_pass" ) );
+    m_zoompass->SetTargetDimsFromRenderer( false );
+    m_zoompass->SetTargetDims( 32, 32 );
+    m_zoompass->Initialize();
+    m_zoompass->CreateViewportQuad();
+    
+
+    m_zoompass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_zoompass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "zoom.vsh", false ) ) );
+    m_zoompass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "zoom.psh", false ) ) );
+    m_zoompass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_zoompass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+
+
+    m_zoompass->GetViewportQuad()->SetTexture( m_occlusionpass->GetTargetTexture(), 0 );
+
+    m_zoompass->GetViewportQuad()->AddShaderParameter( 0, "zoom_area", 24 );
+    m_zoompass->GetViewportQuad()->SetShaderRealVector( "zoom_area", Vector( 0.0025, 0.0, 0.0, 0.0 ) );
 
 
     //////////////////////////////////////////////////////////////
@@ -445,7 +479,7 @@ void dsAppClient::init_passes( void )
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    m_finalpass2->GetViewportQuad()->SetTexture( m_occlusionpass->GetTargetTexture(), 0 );
+    m_finalpass2->GetViewportQuad()->SetTexture( m_zoompass->GetTargetTexture(), 0 );
     m_finalpass2->GetViewportQuad()->SetDrawingState( false );
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -677,7 +711,7 @@ void dsAppClient::init_planet( void )
 
         m_planet_clouds_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
 
-        //m_planet_occlusion_binder[i] = new DrawSpace::SphericalLOD::Binder();
+        m_planet_occlusion_binder[i] = new DrawSpace::SphericalLOD::Binder();
     }
 
     Shader* hm_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planethm.vso", true ) );
@@ -712,6 +746,12 @@ void dsAppClient::init_planet( void )
     planet_clouds_vshader->LoadFromFile();
     planet_clouds_pshader->LoadFromFile();
 
+
+    Shader* planet_occ_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_occlusion.vso", true ) );
+    Shader* planet_occ_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_occlusion.pso", true ) );
+    
+    planet_occ_vshader->LoadFromFile();
+    planet_occ_pshader->LoadFromFile();
 
 
     Texture* texture_th_pixels = _DRAWSPACE_NEW_( Texture, Texture( "earth_th_pixels_16.jpg" ) );
@@ -849,6 +889,25 @@ void dsAppClient::init_planet( void )
     }
 
 
+
+    Fx* occ_fx = new Fx;
+
+    occ_fx->AddShader( planet_occ_vshader );
+    occ_fx->AddShader( planet_occ_pshader );
+
+    occ_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    //occ_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
+
+    occ_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    //occ_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_occlusion_binder[i]->SetFx( occ_fx );
+    }
+
+
+
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
     for( int i = 0; i < 6; i++ )
@@ -859,6 +918,8 @@ void dsAppClient::init_planet( void )
 
         m_planet_atmosphere_binder[i]->SetRenderer( renderer );
         m_planet_clouds_binder[i]->SetRenderer( renderer );
+
+        m_planet_occlusion_binder[i]->SetRenderer( renderer );
     }
 
     
@@ -912,6 +973,9 @@ void dsAppClient::init_planet( void )
 
 
 
+
+
+
     m_planet = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::Root, DrawSpace::SphericalLOD::Root( "planet01", PLANET_RAY, &m_timer, config ) );
 
 
@@ -920,6 +984,7 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_detail_binder[i], i, DrawSpace::SphericalLOD::Body::LOWRES_SKIRT_MESHE, 0, 2000 );
+        m_planet->RegisterSinglePassSlot( m_occlusionpass, m_planet_occlusion_binder[i], i, DrawSpace::SphericalLOD::Body::LOWRES_SKIRT_MESHE, 0, 1000 );
     }
 
 
@@ -994,8 +1059,8 @@ void dsAppClient::init_star_impostor( void )
     m_star_impostor->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
 
-    idle.width_scale = 45000000.0;
-    idle.height_scale = 45000000.0;
+    idle.width_scale = 55000000.0;
+    idle.height_scale = 55000000.0;
 
     idle.u1 = 0.0;
     idle.v1 = 0.0;
@@ -1036,7 +1101,7 @@ void dsAppClient::init_star_impostor( void )
     m_star_impostor->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "star_far.bmp" ) ), 0 );
     m_star_impostor->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
 
-    m_star_impostor->GetNodeFromPass( m_texturepass )->SetOrderNumber( 100 );
+    m_star_impostor->GetNodeFromPass( m_texturepass )->SetOrderNumber( 6000 );
 
 
     m_star_impostor->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "globalscale", 24 );
@@ -1146,6 +1211,19 @@ void dsAppClient::init_cameras( void )
     m_camera3_node->LinkTo( m_circmvt_node );
 
     m_circmvt_node->LinkTo( m_ship_node );
+
+
+    m_camera_occ = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
+
+    
+    m_camera_occ_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera_occ" ) );
+    m_camera_occ_node->SetContent( m_camera_occ );
+    m_scenenodegraph.RegisterNode( m_camera_occ_node );
+
+    m_camera_occ_node->LinkTo( m_camera3_node );
+
+
+    m_camera_occ->Lock( m_star_impostor_node );
 }
 
 void dsAppClient::init_reticle( void )
@@ -1256,6 +1334,10 @@ void dsAppClient::init_rendering_queues( void )
     m_finalpass2->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     m_occlusionpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_zoompass->GetRenderingQueue()->UpdateOutputQueue();
+
+    m_zoompass->GetTargetTexture()->AllocTextureContent();
+    m_zoom_texture_content = m_zoompass->GetTargetTexture()->GetTextureContentPtr();
 }
 
 void dsAppClient::init_calendar( void )
@@ -1308,14 +1390,42 @@ void dsAppClient::render_universe( void )
 
     m_planet->DrawSubPasses();
 
+    m_scenenodegraph.SetCurrentCamera( m_curr_camera_name );
     m_texturepass->GetRenderingQueue()->Draw();
+    m_scenenodegraph.SetCurrentCamera( "camera_occ" );
     m_occlusionpass->GetRenderingQueue()->Draw();
+    
+    m_zoompass->GetRenderingQueue()->Draw();
 
     //m_text_widget->Draw();  // pour ne plus afficher le reticule
 
     m_finalpass->GetRenderingQueue()->Draw();
 
     m_finalpass2->GetRenderingQueue()->Draw();
+
+
+    m_zoompass->GetTargetTexture()->CopyTextureContent();
+
+
+    unsigned char* color_ptr = (unsigned char*)m_zoom_texture_content;
+
+    int occlusion_count = 0;
+    for( long i = 0; i < 32 * 32; i++ )
+    {
+        if( *color_ptr == 255 )
+        {
+            occlusion_count++;
+        }
+
+        color_ptr += 4;
+    }
+
+    float scale = (float)occlusion_count / (float)( 32 * 32 );
+
+    m_star_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "globalscale", Vector( scale, scale, 0.0, 0.0 ) );
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     dsreal rel_alt;
@@ -1554,8 +1664,10 @@ void dsAppClient::OnRenderFrame( void )
             case 17:
                 print_init_trace( "launching simulation..." );
                 m_mouse_circularmode = true;
-                m_scenenodegraph.SetCurrentCamera( "camera3" );
-                m_curr_camera = m_camera3;   
+                //m_scenenodegraph.SetCurrentCamera( "camera3" );
+                m_curr_camera = m_camera3; 
+                m_curr_camera_name = "camera3";
+                m_scenenodegraph.SetCurrentCamera( m_curr_camera_name );
                 //m_calendar->Startup( 162682566 );
                 m_calendar->Startup( 0 );
                 m_ready = true;

@@ -157,6 +157,10 @@ protected:
 
     DrawSpace::IntermediatePass*                m_texturepass;
     DrawSpace::IntermediatePass*                m_occlusionpass;
+    DrawSpace::IntermediatePass*                m_zoompass;
+
+    void*                                       m_zoom_texture_content;
+
     DrawSpace::FinalPass*                       m_finalpass;
     DrawSpace::FinalPass*                       m_finalpass2;
 
@@ -198,6 +202,11 @@ protected:
 
 
     DrawSpace::Dynamics::CameraPoint*           m_curr_camera;
+    dsstring                                    m_curr_camera_name;
+
+
+    DrawSpace::Dynamics::CameraPoint*                                       m_camera_occ;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*           m_camera_occ_node;
 
 
     
