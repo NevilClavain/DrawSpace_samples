@@ -255,6 +255,9 @@ protected:
     DrawSpace::Chunk*                                                   m_star_impostor;
     DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_star_impostor_node;
 
+    DrawSpace::Chunk*                                                   m_starhalo_impostor;
+    DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_starhalo_impostor_node;
+
 
     DrawSpace::Dynamics::Rocket*                m_ship;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Rocket>*                    m_ship_node;

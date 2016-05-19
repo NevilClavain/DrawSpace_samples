@@ -1118,13 +1118,83 @@ void dsAppClient::init_star_impostor( void )
     m_star_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 1.0 ) );
 
 
-    m_star_impostor_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "impostor0" ) );
+    m_star_impostor_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "star_impostor" ) );
 
     m_star_impostor_node->SetContent( m_star_impostor );
 
     m_scenenodegraph.AddNode( m_star_impostor_node );
     m_scenenodegraph.RegisterNode( m_star_impostor_node );
 
+
+    idl.clear();
+
+
+    m_starhalo_impostor = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
+    m_starhalo_impostor->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
+
+    idle.width_scale =  125000000.0;
+    idle.height_scale = 85000000.0;
+
+    idle.u1 = 0.0;
+    idle.v1 = 0.0;
+    idle.u2 = 1.0;
+    idle.v2 = 0.0;
+    idle.u3 = 1.0;
+    idle.v3 = 1.0;
+    idle.u4 = 0.0;
+    idle.v4 = 1.0;
+
+    idle.localpos[0] = 0.0;
+    idle.localpos[1] = 0.0;
+    idle.localpos[2] = 0.0;
+    
+    idl.push_back( idle );
+
+
+    
+    m_starhalo_impostor->SetImpostorsDisplayList( idl );
+    m_starhalo_impostor->ImpostorsInit();
+
+    m_starhalo_impostor->RegisterPassSlot( m_texturepass );
+
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "screenimpostor.vsh", false ) ) );
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "screenimpostor.psh", false ) ) );
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one" ) );
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
+
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "ray.png" ) ), 0 );
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->SetOrderNumber( 6001 );
+
+
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "globalscale", 24 );
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "globalscale", Vector( 1.0, 1.0, 0.0, 0.0 ) );
+
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "flags", 0 );
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags", Vector( 0.0, 0.0, 0.0, 0.0 ) );
+
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "color", 1 );
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 1.0 ) );
+
+
+    m_starhalo_impostor_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "starhalo_impostor" ) );
+
+    m_starhalo_impostor_node->SetContent( m_starhalo_impostor );
+
+    //m_scenenodegraph.AddNode( m_starhalo_impostor_node );
+    m_scenenodegraph.RegisterNode( m_starhalo_impostor_node );
+    m_starhalo_impostor_node->LinkTo( m_star_impostor_node );
 }
 
 void dsAppClient::init_ship( void )
@@ -1427,6 +1497,7 @@ void dsAppClient::render_universe( void )
     float scale = (float)occlusion_count / (float)( 32 * 32 );
 
     m_star_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "globalscale", Vector( scale, scale, 0.0, 0.0 ) );
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "globalscale", Vector( scale, scale, 0.0, 0.0 ) );
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
