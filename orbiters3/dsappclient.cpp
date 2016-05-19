@@ -479,11 +479,15 @@ void dsAppClient::init_passes( void )
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    m_finalpass2->GetViewportQuad()->SetTexture( m_zoompass->GetTargetTexture(), 0 );
+    //m_finalpass2->GetViewportQuad()->SetTexture( m_zoompass->GetTargetTexture(), 0 );
     m_finalpass2->GetViewportQuad()->SetDrawingState( false );
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
     renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+    // si zoompass n'est pas connectee a une finalpass
+    void* data;
+    renderer->CreateTexture( m_zoompass->GetTargetTexture(), &data );
 
 }
 
