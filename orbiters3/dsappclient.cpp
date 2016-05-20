@@ -1243,7 +1243,8 @@ void dsAppClient::init_ship( void )
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285 / 2.0, 21.4704 / 2.0, 81.911 / 2.0, 1.0 );
     
-    cube_params.initial_attitude.Translation( 269000000.0, 0.0, 59000000.0 );
+    //cube_params.initial_attitude.Translation( 269000000.0, 0.0, 59000000.0 );
+    cube_params.initial_attitude.Translation( 369000000.0, 0.0, 0 );
 
 
     m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, cube_params ) );
@@ -1459,6 +1460,9 @@ void dsAppClient::render_universe( void )
 
     //////////////////////////////////////////////////////////////
 
+    dsreal rel_alt;
+    m_planet->GetInertBodyRelativeAltitude( m_ship, rel_alt );
+
 
     //DrawSpace::SphericalLOD::Patch* current_patch = m_planet->GetFragment( 0 )->GetCurrentPatch();
 
@@ -1480,6 +1484,9 @@ void dsAppClient::render_universe( void )
 
     m_zoompass->GetTargetTexture()->CopyTextureContent();
 
+    float star_alpha_occlusion;
+    float star_alpha_altitude = 1.0;
+
 
     unsigned char* color_ptr = (unsigned char*)m_zoom_texture_content;
 
@@ -1496,15 +1503,24 @@ void dsAppClient::render_universe( void )
 
     float scale = (float)occlusion_count / (float)( 32 * 32 );
 
+    star_alpha_occlusion = scale;
+
+
+    star_alpha_altitude = Utils::Maths::Clamp( 0.0, 1.0, ( 1.0 / 0.005 ) * ( rel_alt - 1.005 ) );
+
+
     m_star_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "globalscale", Vector( scale, scale, 0.0, 0.0 ) );
     m_starhalo_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "globalscale", Vector( scale, scale, 0.0, 0.0 ) );
+
+    m_star_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, star_alpha_occlusion * star_alpha_altitude ) );
+    m_starhalo_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, star_alpha_occlusion * star_alpha_altitude ) );
+
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    dsreal rel_alt;
-    m_planet->GetInertBodyRelativeAltitude( m_ship, rel_alt );
+
 
     dsreal alt = m_planet->GetLayer( m_ship, 0 )->GetPlanetBody()->GetHotPointAltitud();
 
