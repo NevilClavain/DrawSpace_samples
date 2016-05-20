@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "orbiters3", "orbiters3\orbi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "orbiters4", "orbiters4\orbiters4.vcxproj", "{D7BFA768-68DA-4D95-8E22-80BE9F9D768D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "water", "water\water.vcxproj", "{7DE47F0B-9E19-41DA-BCA0-06B5CEB7BC02}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -57,6 +59,10 @@ Global
 		{D7BFA768-68DA-4D95-8E22-80BE9F9D768D}.Debug|Win32.Build.0 = Debug|Win32
 		{D7BFA768-68DA-4D95-8E22-80BE9F9D768D}.Release|Win32.ActiveCfg = Release|Win32
 		{D7BFA768-68DA-4D95-8E22-80BE9F9D768D}.Release|Win32.Build.0 = Release|Win32
+		{7DE47F0B-9E19-41DA-BCA0-06B5CEB7BC02}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7DE47F0B-9E19-41DA-BCA0-06B5CEB7BC02}.Debug|Win32.Build.0 = Debug|Win32
+		{7DE47F0B-9E19-41DA-BCA0-06B5CEB7BC02}.Release|Win32.ActiveCfg = Release|Win32
+		{7DE47F0B-9E19-41DA-BCA0-06B5CEB7BC02}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
