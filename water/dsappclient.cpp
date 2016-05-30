@@ -32,7 +32,8 @@ dsAppClient* dsAppClient::m_instance = NULL;
 
 
 
-dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_draw_cube2( true ), m_fpsmove( true )
+dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_draw_cube2( true ), m_fpsmove( true ),
+m_final_pass_2( false )
 {    
     _INIT_LOGGER( "logwater.conf" )  
     m_w_title = "water test";
@@ -52,10 +53,11 @@ void dsAppClient::OnRenderFrame( void )
     m_scenenodegraph.ComputeTransformations( m_timer );
 
     m_texturepass->GetRenderingQueue()->Draw();
-
-    
+    m_texturemirrorpass->GetRenderingQueue()->Draw();
+    m_maskpass->GetRenderingQueue()->Draw();
 
     m_finalpass->GetRenderingQueue()->Draw();
+    m_finalpass2->GetRenderingQueue()->Draw();
 
 
     renderer->DrawText( 255, 0, 0, 10, 20, "%d fps", m_timer.GetFPS() );
@@ -79,8 +81,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_texturepass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texture_pass" ) );
 
-    //m_texturepass->SetTargetDimsFromRenderer( false );
-    //m_texturepass->SetTargetDims( 64, 64 );
     m_texturepass->Initialize();
     
 
@@ -89,6 +89,26 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->GetRenderingQueue()->SetTargetClearingColor( 145, 230, 230, 255 );
 
     
+
+    m_texturemirrorpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texturemirror_pass" ) );
+
+    m_texturemirrorpass->Initialize();
+    
+
+    m_texturemirrorpass->GetRenderingQueue()->EnableDepthClearing( true );
+    m_texturemirrorpass->GetRenderingQueue()->EnableTargetClearing( true );
+    m_texturemirrorpass->GetRenderingQueue()->SetTargetClearingColor( 145, 230, 230, 255 );
+
+
+
+    m_maskpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "mask_pass" ) );
+
+    m_maskpass->Initialize();
+    
+
+    m_maskpass->GetRenderingQueue()->EnableDepthClearing( true );
+    m_maskpass->GetRenderingQueue()->EnableTargetClearing( true );
+    m_maskpass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 0 );
 
     //////////////////////////////////////////////////////////////
 
@@ -106,7 +126,21 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
         
 
+
+    m_finalpass2 = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass2" ) );
+    m_finalpass2->Initialize();
+    m_finalpass2->CreateViewportQuad();
+    m_finalpass2->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_finalpass2->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
+    m_finalpass2->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
+
+    m_finalpass2->GetViewportQuad()->SetTexture( m_maskpass->GetTargetTexture(), 0 );
+
+
+
     ///////////////////////////////////////////////////////////////
 
 
@@ -116,6 +150,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
     m_chunk->RegisterPassSlot( m_texturepass );
+    m_chunk->RegisterPassSlot( m_texturemirrorpass );
 
 
     //status = DrawSpace::Utils::LoadMesheImportPlugin( "ac3dmeshe", "ac3dmeshe_plugin" );
@@ -140,6 +175,23 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
     m_chunk->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
 
+
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture_mirror.vsh", false ) ) );
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture_mirror.psh", false ) ) );
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "ccw" ) );
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->GetTexture( 0 )->LoadFromFile();
+
     
     m_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "chunk" ) );
     m_chunk_node->SetContent( m_chunk );
@@ -156,7 +208,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_ground->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
-    m_ground->RegisterPassSlot( m_texturepass );
+    m_ground->RegisterPassSlot( m_maskpass );
 
     
     m_ground->GetMeshe()->SetImporter( m_meshe_import );
@@ -164,21 +216,27 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->GetMeshe()->LoadFromFile( "grid.ac", 0 );
 
 
-    m_ground->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_ground->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_ground->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-    m_ground->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_ground->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
+    m_ground->GetNodeFromPass( m_maskpass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_ground->GetNodeFromPass( m_maskpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "color.vsh", false ) ) );
+    m_ground->GetNodeFromPass( m_maskpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "color.psh", false ) ) );
+    m_ground->GetNodeFromPass( m_maskpass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_ground->GetNodeFromPass( m_maskpass )->GetFx()->GetShader( 1 )->LoadFromFile();
 
-    m_ground->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-    m_ground->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    m_ground->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-    m_ground->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_ground->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+    m_ground->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_ground->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_ground->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_ground->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_ground->GetNodeFromPass( m_maskpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
 
 
-    m_ground->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "ground.bmp" ) ), 0 );
-    m_ground->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+    m_ground->GetNodeFromPass( m_maskpass )->AddShaderParameter( 1, "color", 0 );
+    m_ground->GetNodeFromPass( m_maskpass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, 1.0 ) );
 
+
+
+    m_ground->GetNodeFromPass( m_maskpass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "ground.bmp" ) ), 0 );
+    m_ground->GetNodeFromPass( m_maskpass )->GetTexture( 0 )->LoadFromFile();
 
     m_ground_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "ground" ) );
     m_ground_node->SetContent( m_ground );
@@ -189,11 +247,6 @@ bool dsAppClient::OnIdleAppInit( void )
 
     /////////////////////////////////////////////////////////////////
 
-    //status = DrawSpace::Utils::LoadFontImportPlugin( "cbfgfont", "cbfgfont_plugin" );
-    //m_font_import = DrawSpace::Utils::InstanciateFontImportFromPlugin( "cbfgfont_plugin" );
-
-
-    ///////////////////////////////////////////////////////////////
 
 
     m_camera = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
@@ -275,6 +328,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_cube2->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
     m_cube2->RegisterPassSlot( m_texturepass );
+    m_cube2->RegisterPassSlot( m_texturemirrorpass );
 
 
         
@@ -295,6 +349,23 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_cube2->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "saturnmap.jpg" ) ), 0 );
     m_cube2->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+
+
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture_mirror.vsh", false ) ) );
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture_mirror.psh", false ) ) );
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "ccw" ) );
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "saturnmap.jpg" ) ), 0 );
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->GetTexture( 0 )->LoadFromFile();
 
     
     m_cube2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "cube2" ) );
@@ -352,7 +423,13 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
+    m_texturemirrorpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_maskpass->GetRenderingQueue()->UpdateOutputQueue();
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_finalpass2->GetRenderingQueue()->UpdateOutputQueue();
+
+
+    m_finalpass2->GetViewportQuad()->SetDrawingState( false );
 
 
     return true;
@@ -420,7 +497,20 @@ void dsAppClient::OnKeyPulse( long p_key )
 {
     switch( p_key )
     {
-        case VK_F1:
+
+
+        case VK_F8:
+
+            if( !m_final_pass_2)
+            {
+                m_final_pass_2 = true;
+            }
+            else
+            {
+                m_final_pass_2 = false;
+            }
+
+            m_finalpass2->GetViewportQuad()->SetDrawingState( m_final_pass_2 );
             break;
 
     }

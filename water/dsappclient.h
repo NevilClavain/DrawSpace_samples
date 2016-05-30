@@ -36,7 +36,13 @@ protected:
     DrawSpace::Core::SceneNodeGraph                                     m_scenenodegraph;
 
     DrawSpace::FinalPass*                                               m_finalpass;
+    DrawSpace::FinalPass*                                               m_finalpass2;
     DrawSpace::IntermediatePass*                                        m_texturepass;
+    DrawSpace::IntermediatePass*                                        m_texturemirrorpass;
+    DrawSpace::IntermediatePass*                                        m_maskpass;
+
+
+    bool                                                                m_final_pass_2;
 
 
     DrawSpace::Utils::TimeManager                                       m_timer;
