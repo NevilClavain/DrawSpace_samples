@@ -279,6 +279,8 @@ protected:
     DrawSpace::Dynamics::Collider*              m_socle_collider;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Collider>*                    m_socle_collider_node;
 
+    dsstring                                    m_timefactor;
+
 
 
     ///////////////////////////////////////////////////////////

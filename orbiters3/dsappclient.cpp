@@ -367,7 +367,8 @@ m_ready( false ),
 m_init_count( 0 ),
 m_showinfos( true ),
 m_water_anim( 0.0 ),
-m_water_anim_inc( true )
+m_water_anim_inc( true ),
+m_timefactor( "x1" )
 {    
     _INIT_LOGGER( "logorbiters3.conf" )  
     m_w_title = "orbiters 3 test";
@@ -1552,6 +1553,8 @@ void dsAppClient::render_universe( void )
     long current_fps = m_timer.GetFPS();
     renderer->DrawText( 0, 255, 0, 10, 35, "%d fps", current_fps );
 
+    dsreal speed = m_ship->GetLinearSpeedMagnitude();
+
     if( m_showinfos )
     {
         dsstring date;
@@ -1561,7 +1564,7 @@ void dsAppClient::render_universe( void )
     
 
 
-        dsreal speed = m_ship->GetLinearSpeedMagnitude();
+        
 
         renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h ( %.1f m/s) - aspeed = %.1f", speed * 3.6, speed, m_ship->GetAngularSpeedMagnitude() );
 
@@ -1637,12 +1640,18 @@ void dsAppClient::render_universe( void )
             if( alt > 10000.0 )
             {
                 renderer->DrawText( 0, 255, 0, 10, 70, "Altitude = %.3f km", alt / 1000.0 );
+
+                
             }
             else
             {
                 renderer->DrawText( 0, 255, 0, 10, 70, "Altitude = %.1f m", alt );
             }
-        }    
+        }
+
+        renderer->DrawText( 0, 255, 0, 10, 130, "time factor = %s", m_timefactor.c_str() );
+
+        renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h", speed * 3.6 );
     }
   
     renderer->FlipScreen();
@@ -1821,6 +1830,7 @@ void dsAppClient::OnKeyPress( long p_key )
             m_ship->ApplyUpPitch( 50000.0 );
 
             m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+            m_timefactor = "x1";
             break;
 
         case 'C':
@@ -1828,6 +1838,7 @@ void dsAppClient::OnKeyPress( long p_key )
             m_ship->ApplyDownPitch( 50000.0 );
 
             m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+            m_timefactor = "x1";
             break;
 
         case 'S':
@@ -1835,6 +1846,7 @@ void dsAppClient::OnKeyPress( long p_key )
             m_ship->ApplyLeftYaw( 50000.0 );
 
             m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+            m_timefactor = "x1";
             break;
 
         case 'F':
@@ -1842,6 +1854,7 @@ void dsAppClient::OnKeyPress( long p_key )
             m_ship->ApplyRightYaw( 50000.0 );
 
             m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+            m_timefactor = "x1";
             break;
 
 
@@ -1850,6 +1863,7 @@ void dsAppClient::OnKeyPress( long p_key )
             m_ship->ApplyLeftRoll( 50000.0 );
 
             m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+            m_timefactor = "x1";
             break;
 
         case 'R':
@@ -1857,6 +1871,7 @@ void dsAppClient::OnKeyPress( long p_key )
             m_ship->ApplyRightRoll( 50000.0 );
 
             m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+            m_timefactor = "x1";
             break;
 
 
@@ -1939,32 +1954,38 @@ void dsAppClient::OnKeyPulse( long p_key )
         case VK_F1:
 
             m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+            m_timefactor = "x1";
             break;
 
         case VK_F2:
 
             m_calendar->SetTimeFactor( Calendar::MUL2_TIME );
+            m_timefactor = "x2";
             break;
 
         case VK_F3:
 
             m_calendar->SetTimeFactor( Calendar::MUL10_TIME );
+            m_timefactor = "x10";
             break;
 
         case VK_F4:
 
             m_calendar->SetTimeFactor( Calendar::MUL100_TIME );
+            m_timefactor = "x100";
             break;
 
         case VK_F5:
 
             m_calendar->SetTimeFactor( Calendar::SEC_1HOUR_TIME );
+            m_timefactor = "x3600";
             break;
 
 
         case VK_F6:
 
             m_calendar->SetTimeFactor( Calendar::SEC_1DAY_TIME );
+            m_timefactor = "x86400";
             break;
 
         case VK_F8:
