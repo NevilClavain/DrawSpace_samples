@@ -39,7 +39,6 @@ protected:
     DrawSpace::FinalPass*                                               m_finalpass2;
     DrawSpace::IntermediatePass*                                        m_texturepass;
     DrawSpace::IntermediatePass*                                        m_texturemirrorpass;
-    DrawSpace::IntermediatePass*                                        m_maskpass;
 
 
     bool                                                                m_final_pass_2;
