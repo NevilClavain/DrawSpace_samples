@@ -39,6 +39,7 @@ protected:
     DrawSpace::FinalPass*                                               m_finalpass2;
     DrawSpace::IntermediatePass*                                        m_texturepass;
     DrawSpace::IntermediatePass*                                        m_texturemirrorpass;
+    DrawSpace::IntermediatePass*                                        m_bumppass;
 
 
     bool                                                                m_final_pass_2;
@@ -72,6 +73,8 @@ protected:
     DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_ground_node;
 
 
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_ground_transfo_node;
+
 
     DrawSpace::Dynamics::World                                          m_world;
     
@@ -94,6 +97,11 @@ protected:
     DrawSpace::Dynamics::Collider*                                      m_cube2_collider;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::Collider>*          m_cube2_colider_node;
 
+
+    DrawSpace::Spacebox*                                                m_spacebox;
+    DrawSpace::Core::SceneNode<DrawSpace::Spacebox>*                    m_spacebox_node;
+
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_spacebox_transfo_node;
 
 
     dsstring                                                            m_current_camera;

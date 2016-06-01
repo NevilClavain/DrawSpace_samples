@@ -52,8 +52,10 @@ void dsAppClient::OnRenderFrame( void )
 
     m_scenenodegraph.ComputeTransformations( m_timer );
 
+
     m_texturepass->GetRenderingQueue()->Draw();
     m_texturemirrorpass->GetRenderingQueue()->Draw();
+    m_bumppass->GetRenderingQueue()->Draw();
 
     m_finalpass->GetRenderingQueue()->Draw();
     m_finalpass2->GetRenderingQueue()->Draw();
@@ -93,11 +95,19 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_texturemirrorpass->Initialize();
     
-
     m_texturemirrorpass->GetRenderingQueue()->EnableDepthClearing( true );
     m_texturemirrorpass->GetRenderingQueue()->EnableTargetClearing( true );
     m_texturemirrorpass->GetRenderingQueue()->SetTargetClearingColor( 145, 230, 230, 255 );
 
+
+
+    m_bumppass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "bump_pass" ) );
+
+    m_bumppass->Initialize();
+    
+    m_bumppass->GetRenderingQueue()->EnableDepthClearing( true );
+    m_bumppass->GetRenderingQueue()->EnableTargetClearing( true );
+    m_bumppass->GetRenderingQueue()->SetTargetClearingColor( 255, 255, 255, 255 );
 
 
     //////////////////////////////////////////////////////////////
@@ -115,6 +125,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_finalpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
     m_finalpass->GetViewportQuad()->SetTexture( m_texturemirrorpass->GetTargetTexture(), 1 );
+    m_finalpass->GetViewportQuad()->SetTexture( m_bumppass->GetTargetTexture(), 2 );
         
 
 
@@ -128,7 +139,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    m_finalpass2->GetViewportQuad()->SetTexture( m_texturemirrorpass->GetTargetTexture(), 0 );
+    m_finalpass2->GetViewportQuad()->SetTexture( m_bumppass->GetTargetTexture(), 0 );
 
 
 
@@ -193,6 +204,113 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
 
+    ////////////////////////////////////////////////////////////////
+
+       
+    m_spacebox = _DRAWSPACE_NEW_( DrawSpace::Spacebox, DrawSpace::Spacebox );
+    m_spacebox->RegisterPassSlot( m_texturepass );
+
+    m_spacebox->RegisterPassSlot( m_texturemirrorpass );
+
+
+
+
+    DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, m_texturepass );
+    
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::FrontQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb0.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::FrontQuad )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::RearQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb2.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::RearQuad )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::TopQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb4.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::TopQuad )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::BottomQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb4.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::BottomQuad )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::LeftQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb3.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::LeftQuad )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::RightQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb1.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::RightQuad )->GetTexture( 0 )->LoadFromFile();
+
+
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::FrontQuad )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::RearQuad )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::TopQuad )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::BottomQuad )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::LeftQuad )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( m_texturepass, Spacebox::RightQuad )->SetOrderNumber( 200 );
+
+
+
+    //DrawSpace::Utils::BuildSpaceboxFx( m_spacebox, m_texturemirrorpass );
+    for( long i = 0; i < 6; i++ )
+    {
+
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture_mirror.vsh", false ) ) );
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture_mirror.psh", false ) ) );
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->GetFx()->GetShader( 0 )->LoadFromFile();
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "ccw" ) );
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    }   
+
+
+    
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::FrontQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb0.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::FrontQuad )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::RearQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb2.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::RearQuad )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::TopQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb4.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::TopQuad )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::BottomQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb4.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::BottomQuad )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::LeftQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb3.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::LeftQuad )->GetTexture( 0 )->LoadFromFile();
+
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::RightQuad )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "sb1.bmp" ) ), 0 );
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::RightQuad )->GetTexture( 0 )->LoadFromFile();
+
+
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::FrontQuad )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::RearQuad )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::TopQuad )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::BottomQuad )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::LeftQuad )->SetOrderNumber( 200 );
+    m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::RightQuad )->SetOrderNumber( 200 );
+
+    
+    m_spacebox_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Spacebox>, SceneNode<DrawSpace::Spacebox>( "spacebox" ) );
+    m_spacebox_node->SetContent( m_spacebox );
+
+    
+    m_scenenodegraph.RegisterNode( m_spacebox_node );
+
+
+    m_spacebox_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "spacebox_transfo" ) );
+    m_spacebox_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+    Matrix spacebox_scale;
+    spacebox_scale.Scale( 20.0, 20.0, 20.0 );
+    m_spacebox_transfo_node->GetContent()->PushMatrix( spacebox_scale );
+
+    m_scenenodegraph.AddNode( m_spacebox_transfo_node );
+    m_scenenodegraph.RegisterNode( m_spacebox_transfo_node );
+    m_spacebox_node->LinkTo( m_spacebox_transfo_node );
+
+
+
     ///////////////////////////////////////////////////////////////
 
     m_ground = _DRAWSPACE_NEW_( DrawSpace::Chunk, DrawSpace::Chunk );
@@ -200,6 +318,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
     m_ground->RegisterPassSlot( m_texturepass );
+    m_ground->RegisterPassSlot( m_bumppass );
 
     
     m_ground->GetMeshe()->SetImporter( m_meshe_import );
@@ -226,13 +345,41 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_ground->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "ground.bmp" ) ), 0 );
-    m_ground->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+    m_ground->GetNodeFromPass( m_bumppass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_ground->GetNodeFromPass( m_bumppass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "water_bump.vsh", false ) ) );
+    m_ground->GetNodeFromPass( m_bumppass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "water_bump.psh", false ) ) );
+    m_ground->GetNodeFromPass( m_bumppass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_ground->GetNodeFromPass( m_bumppass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_ground->GetNodeFromPass( m_bumppass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+    m_ground->GetNodeFromPass( m_bumppass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_ground->GetNodeFromPass( m_bumppass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_ground->GetNodeFromPass( m_bumppass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_ground->GetNodeFromPass( m_bumppass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_ground->GetNodeFromPass( m_bumppass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+    m_ground->GetNodeFromPass( m_bumppass )->AddShaderParameter( 1, "worldview", 0 );
+
+    m_ground->GetNodeFromPass( m_bumppass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "water2.png" ) ), 0 );
+    m_ground->GetNodeFromPass( m_bumppass )->GetTexture( 0 )->LoadFromFile();
 
     m_ground_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "ground" ) );
     m_ground_node->SetContent( m_ground );
 
     m_scenenodegraph.RegisterNode( m_ground_node );
+
+
+
+    m_ground_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "ground_scaling_transfo" ) );
+    m_ground_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+    Matrix ground_scale;
+    ground_scale.Scale( 0.4, 1.0, 0.4 );
+    m_ground_transfo_node->GetContent()->PushMatrix( ground_scale );
+
+    m_scenenodegraph.AddNode( m_ground_transfo_node );
+    m_scenenodegraph.RegisterNode( m_ground_transfo_node );
+    
+    m_ground_node->LinkTo( m_ground_transfo_node );
 
 
 
@@ -308,7 +455,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_scenenodegraph.AddNode( m_ground_body_node );
     m_scenenodegraph.RegisterNode( m_ground_body_node );
 
-    m_ground_node->LinkTo( m_ground_body_node );
+    //m_ground_node->LinkTo( m_ground_body_node );
 
 
 
@@ -388,7 +535,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    m_freemove.Init( Vector( 0.8, 2.0, 0.3, 1.0 ) );
+    m_freemove.Init( Vector( 0.8, 1.1, 0.3, 1.0 ) );
     m_freemove_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::FreeMovement>, SceneNode<DrawSpace::Core::FreeMovement>( "freemvt_node" ) );
     m_freemove_node->SetContent( &m_freemove );
 
@@ -415,6 +562,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturemirrorpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_bumppass->GetRenderingQueue()->UpdateOutputQueue();
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_finalpass2->GetRenderingQueue()->UpdateOutputQueue();
