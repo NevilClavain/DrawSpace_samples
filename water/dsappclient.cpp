@@ -103,6 +103,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_bumppass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "bump_pass" ) );
 
+    m_bumppass->SetRenderPurpose( Texture::RENDERPURPOSE_FLOATVECTOR );
+
     m_bumppass->Initialize();
     
     m_bumppass->GetRenderingQueue()->EnableDepthClearing( true );
@@ -139,7 +141,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    m_finalpass2->GetViewportQuad()->SetTexture( m_bumppass->GetTargetTexture(), 0 );
+    //m_finalpass2->GetViewportQuad()->SetTexture( m_bumppass->GetTargetTexture(), 0 );
 
 
 
@@ -373,7 +375,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "ground_scaling_transfo" ) );
     m_ground_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
     Matrix ground_scale;
-    ground_scale.Scale( 0.4, 1.0, 0.4 );
+    ground_scale.Scale( 0.15, 1.0, 0.15 );
     m_ground_transfo_node->GetContent()->PushMatrix( ground_scale );
 
     m_scenenodegraph.AddNode( m_ground_transfo_node );
@@ -591,7 +593,7 @@ void dsAppClient::OnKeyPress( long p_key )
 
             if( "camera" == m_current_camera )
             {
-                m_fpsmove.SetSpeed( 6.0 );
+                m_fpsmove.SetSpeed( 40.0 );
             }
             break;
 
@@ -599,7 +601,7 @@ void dsAppClient::OnKeyPress( long p_key )
 
             if( "camera" == m_current_camera )
             {
-                m_fpsmove.SetSpeed( -6.0 );
+                m_fpsmove.SetSpeed( -40.0 );
             }
             break;
 
