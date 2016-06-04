@@ -325,7 +325,7 @@ bool dsAppClient::OnIdleAppInit( void )
     
     m_ground->GetMeshe()->SetImporter( m_meshe_import );
 
-    m_ground->GetMeshe()->LoadFromFile( "grid.ac", 0 );
+    m_ground->GetMeshe()->LoadFromFile( "water.ac", 0 );
 
 
     m_ground->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
@@ -375,7 +375,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_ground_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "ground_scaling_transfo" ) );
     m_ground_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
     Matrix ground_scale;
-    ground_scale.Scale( 0.15, 1.0, 0.15 );
+    ground_scale.Scale( 0.45, 1.0, 0.45 );
     m_ground_transfo_node->GetContent()->PushMatrix( ground_scale );
 
     m_scenenodegraph.AddNode( m_ground_transfo_node );

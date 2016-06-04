@@ -1763,7 +1763,7 @@ void dsAppClient::OnRenderFrame( void )
 
             case 17:
                 print_init_trace( "launching simulation..." );
-                m_mouse_circularmode = true;
+                //m_mouse_circularmode = true;
                 //m_scenenodegraph.SetCurrentCamera( "camera3" );
                 m_curr_camera = m_camera3; 
                 m_curr_camera_name = "camera3";
