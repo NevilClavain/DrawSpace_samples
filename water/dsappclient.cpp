@@ -33,7 +33,9 @@ dsAppClient* dsAppClient::m_instance = NULL;
 
 
 dsAppClient::dsAppClient( void ) : m_mouselb( false ), m_mouserb( false ), m_draw_cube2( true ), m_fpsmove( true ),
-m_final_pass_2( false )
+m_final_pass_2( false ),
+m_waves( 0.0 ),
+m_waves_inc( true )
 {    
     _INIT_LOGGER( "logwater.conf" )  
     m_w_title = "water test";
@@ -52,7 +54,7 @@ void dsAppClient::OnRenderFrame( void )
 
     m_scenenodegraph.ComputeTransformations( m_timer );
 
-
+    m_wavespass->GetRenderingQueue()->Draw();
     m_texturepass->GetRenderingQueue()->Draw();
     m_texturemirrorpass->GetRenderingQueue()->Draw();
     m_bumppass->GetRenderingQueue()->Draw();
@@ -63,6 +65,7 @@ void dsAppClient::OnRenderFrame( void )
 
     renderer->DrawText( 255, 0, 0, 10, 20, "%d fps", m_timer.GetFPS() );
     renderer->DrawText( 255, 0, 0, 10, 40, "%s", m_current_camera.c_str() );
+    renderer->DrawText( 255, 0, 0, 10, 70, "%f", m_waves );
 
     renderer->FlipScreen();
 
@@ -70,7 +73,32 @@ void dsAppClient::OnRenderFrame( void )
     if( m_timer.IsReady() )
     {
         m_world.StepSimulation( m_timer.GetFPS(), 15 );
+
+        if( m_waves_inc )
+        {
+            if( m_waves < 200.0 )
+            {
+                m_timer.TranslationSpeedInc( &m_waves, 1.0 );
+            }
+            else
+            {
+                m_waves_inc = false;
+            }
+        }
+        else
+        {
+            if( m_waves > 0.0 )
+            {
+                m_timer.TranslationSpeedDec( &m_waves, 1.0 );
+            }
+            else
+            {
+                m_waves_inc = true;
+            }        
+        }
     }
+
+    m_wavespass->GetViewportQuad()->SetShaderRealVector( "waves", DrawSpace::Utils::Vector( m_waves, 0.0, 0.0, 0.0 ) );
 }
 
 bool dsAppClient::OnIdleAppInit( void )
@@ -112,6 +140,23 @@ bool dsAppClient::OnIdleAppInit( void )
     m_bumppass->GetRenderingQueue()->SetTargetClearingColor( 255, 255, 255, 255 );
 
 
+    m_wavespass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "waves_pass" ) );
+
+    m_wavespass->SetTargetDimsFromRenderer( false );
+    m_wavespass->SetTargetDims( 512, 512 );
+
+    m_wavespass->Initialize();
+    m_wavespass->CreateViewportQuad();
+    
+    m_wavespass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_wavespass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "water_waves.vso", true ) ) );
+    m_wavespass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "water_waves.pso", true ) ) );
+    m_wavespass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_wavespass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_wavespass->GetViewportQuad()->AddShaderParameter( 1, "waves", 0 );
+
+
     //////////////////////////////////////////////////////////////
 
     
@@ -141,7 +186,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    //m_finalpass2->GetViewportQuad()->SetTexture( m_bumppass->GetTargetTexture(), 0 );
+    m_finalpass2->GetViewportQuad()->SetTexture( m_wavespass->GetTargetTexture(), 0 );
 
 
 
@@ -362,8 +407,10 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_ground->GetNodeFromPass( m_bumppass )->AddShaderParameter( 1, "worldview", 0 );
 
-    m_ground->GetNodeFromPass( m_bumppass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "water2.png" ) ), 0 );
-    m_ground->GetNodeFromPass( m_bumppass )->GetTexture( 0 )->LoadFromFile();
+    //m_ground->GetNodeFromPass( m_bumppass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "water2.png" ) ), 0 );
+    //m_ground->GetNodeFromPass( m_bumppass )->GetTexture( 0 )->LoadFromFile();
+
+    m_ground->GetNodeFromPass( m_bumppass )->SetTexture( m_wavespass->GetTargetTexture(), 0 );
 
     m_ground_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "ground" ) );
     m_ground_node->SetContent( m_ground );
@@ -565,6 +612,7 @@ bool dsAppClient::OnIdleAppInit( void )
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturemirrorpass->GetRenderingQueue()->UpdateOutputQueue();
     m_bumppass->GetRenderingQueue()->UpdateOutputQueue();
+    m_wavespass->GetRenderingQueue()->UpdateOutputQueue();
 
     m_finalpass->GetRenderingQueue()->UpdateOutputQueue();
     m_finalpass2->GetRenderingQueue()->UpdateOutputQueue();
@@ -593,7 +641,7 @@ void dsAppClient::OnKeyPress( long p_key )
 
             if( "camera" == m_current_camera )
             {
-                m_fpsmove.SetSpeed( 40.0 );
+                m_fpsmove.SetSpeed( 20.0 );
             }
             break;
 
@@ -601,7 +649,7 @@ void dsAppClient::OnKeyPress( long p_key )
 
             if( "camera" == m_current_camera )
             {
-                m_fpsmove.SetSpeed( -40.0 );
+                m_fpsmove.SetSpeed( -20.0 );
             }
             break;
 

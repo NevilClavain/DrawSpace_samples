@@ -40,6 +40,7 @@ protected:
     DrawSpace::IntermediatePass*                                        m_texturepass;
     DrawSpace::IntermediatePass*                                        m_texturemirrorpass;
     DrawSpace::IntermediatePass*                                        m_bumppass;
+    DrawSpace::IntermediatePass*                                        m_wavespass;
 
 
     bool                                                                m_final_pass_2;
@@ -108,6 +109,9 @@ protected:
 
 
     bool                                                                m_draw_cube2;
+
+    dsreal                                                              m_waves;
+    bool                                                                m_waves_inc;
 
 
     dsAppClient( void );
