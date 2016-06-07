@@ -54,6 +54,48 @@ void dsAppClient::OnRenderFrame( void )
 
     m_scenenodegraph.ComputeTransformations( m_timer );
 
+    Matrix water_plane_mat;
+    Matrix water_plane_invmat;
+
+
+    Matrix sb_water_plane_mat;
+    Matrix sb_water_plane_invmat;
+
+    m_ground_transfo_node->GetFinalTransform( water_plane_mat );
+
+    water_plane_invmat = water_plane_mat;
+    water_plane_invmat.Inverse();
+
+    // cas particulier skybox
+    sb_water_plane_mat = water_plane_mat;
+    sb_water_plane_invmat = water_plane_invmat;
+
+    sb_water_plane_mat.ClearTranslation();
+    sb_water_plane_invmat.ClearTranslation();
+
+
+
+    water_plane_mat.Transpose(),
+    water_plane_invmat.Transpose();
+
+    sb_water_plane_mat.Transpose();
+    sb_water_plane_invmat.Transpose();
+
+
+
+    for( int i = 0; i < 6; i++ )
+    {
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->SetShaderRealMatrix( "reflector_mat", sb_water_plane_mat );
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->SetShaderRealMatrix( "reflector_invmat", sb_water_plane_invmat );
+    }
+
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealMatrix( "reflector_mat", water_plane_mat );
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealMatrix( "reflector_invmat", water_plane_invmat );
+
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealMatrix( "reflector_mat", water_plane_mat );
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealMatrix( "reflector_invmat", water_plane_invmat );
+
+
     m_wavespass->GetRenderingQueue()->Draw();
     m_texturepass->GetRenderingQueue()->Draw();
     m_texturemirrorpass->GetRenderingQueue()->Draw();
@@ -241,6 +283,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->GetNodeFromPass( m_texturemirrorpass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
     m_chunk->GetNodeFromPass( m_texturemirrorpass )->GetTexture( 0 )->LoadFromFile();
 
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "reflector_mat", 24 );
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "reflector_invmat", 28 );
     
     m_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "chunk" ) );
     m_chunk_node->SetContent( m_chunk );
@@ -338,6 +382,12 @@ bool dsAppClient::OnIdleAppInit( void )
     m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::LeftQuad )->SetOrderNumber( 200 );
     m_spacebox->GetNodeFromPass( m_texturemirrorpass, Spacebox::RightQuad )->SetOrderNumber( 200 );
 
+    for( int i = 0; i < 6; i++ )
+    {
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->AddShaderParameter( 0, "reflector_mat", 24 );
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->AddShaderParameter( 0, "reflector_invmat", 28 );
+    }
+
     
     m_spacebox_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Spacebox>, SceneNode<DrawSpace::Spacebox>( "spacebox" ) );
     m_spacebox_node->SetContent( m_spacebox );
@@ -421,9 +471,18 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_ground_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "ground_scaling_transfo" ) );
     m_ground_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
-    Matrix ground_scale;
-    ground_scale.Scale( 0.45, 1.0, 0.45 );
-    m_ground_transfo_node->GetContent()->PushMatrix( ground_scale );
+
+
+
+    Matrix ground_pos;
+    ground_pos.Translation( 0.0, -60.0, 0.0 );
+
+    Matrix ground_rot;
+    ground_rot.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Utils::Maths::DegToRad( 0 ) );
+
+    m_ground_transfo_node->GetContent()->PushMatrix( ground_pos );
+    m_ground_transfo_node->GetContent()->PushMatrix( ground_rot );
+
 
     m_scenenodegraph.AddNode( m_ground_transfo_node );
     m_scenenodegraph.RegisterNode( m_ground_transfo_node );
@@ -495,7 +554,7 @@ bool dsAppClient::OnIdleAppInit( void )
     ground_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
 
 
-    ground_params.initial_attitude.Translation( 0.0, 0.0, 0.0 );
+    ground_params.initial_attitude.Translation( 0.0, -60.0, 0.0 );
 
     m_ground_body = _DRAWSPACE_NEW_( DrawSpace::Dynamics::InertBody, DrawSpace::Dynamics::InertBody( &m_world, ground_params ) );
     m_ground_body_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::InertBody>, SceneNode<DrawSpace::Dynamics::InertBody>( "ground_body" ) );
@@ -553,6 +612,9 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_cube2->GetNodeFromPass( m_texturemirrorpass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "saturnmap.jpg" ) ), 0 );
     m_cube2->GetNodeFromPass( m_texturemirrorpass )->GetTexture( 0 )->LoadFromFile();
+
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "reflector_mat", 24 );
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "reflector_invmat", 28 );
 
     
     m_cube2_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "cube2" ) );
