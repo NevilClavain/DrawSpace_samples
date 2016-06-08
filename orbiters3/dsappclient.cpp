@@ -454,6 +454,18 @@ void dsAppClient::init_passes( void )
     m_zoompass->GetViewportQuad()->SetShaderRealVector( "zoom_area", Vector( 0.0025, 0.0, 0.0, 0.0 ) );
 
 
+
+
+
+    m_texturemirrorpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texturemirror_pass" ) );
+
+    m_texturemirrorpass->Initialize();
+    
+    m_texturemirrorpass->GetRenderingQueue()->EnableDepthClearing( true );
+    m_texturemirrorpass->GetRenderingQueue()->EnableTargetClearing( true );
+    m_texturemirrorpass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 255 );
+
+
     //////////////////////////////////////////////////////////////
         
     m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
@@ -461,8 +473,8 @@ void dsAppClient::init_passes( void )
     m_finalpass->CreateViewportQuad();
 
     m_finalpass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) ) ;
-    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_water.vso", true ) ) );
+    m_finalpass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_water.pso", true ) ) );
     m_finalpass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
     m_finalpass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
@@ -480,7 +492,7 @@ void dsAppClient::init_passes( void )
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    //m_finalpass2->GetViewportQuad()->SetTexture( m_zoompass->GetTargetTexture(), 0 );
+    m_finalpass2->GetViewportQuad()->SetTexture( m_texturemirrorpass->GetTargetTexture(), 0 );
     m_finalpass2->GetViewportQuad()->SetDrawingState( false );
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -996,6 +1008,7 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_atmosphere_binder[i], i, DrawSpace::SphericalLOD::Body::HIRES_MESHE, 1, 1000 );
+        m_planet->RegisterSinglePassSlot( m_texturemirrorpass, m_planet_atmosphere_binder[i], i, DrawSpace::SphericalLOD::Body::HIRES_MESHE, 1, 1000 );
     }
 
 
@@ -1003,6 +1016,7 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_clouds_binder[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 3000 );
+        m_planet->RegisterSinglePassSlot( m_texturemirrorpass, m_planet_clouds_binder[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 3000 );
     }
     
     
@@ -1415,6 +1429,7 @@ void dsAppClient::init_rendering_queues( void )
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     m_occlusionpass->GetRenderingQueue()->UpdateOutputQueue();
     m_zoompass->GetRenderingQueue()->UpdateOutputQueue();
+    m_texturemirrorpass->GetRenderingQueue()->UpdateOutputQueue();
 
     m_zoompass->GetTargetTexture()->AllocTextureContent();
     m_zoom_texture_content = m_zoompass->GetTargetTexture()->GetTextureContentPtr();
@@ -1475,10 +1490,13 @@ void dsAppClient::render_universe( void )
 
     m_scenenodegraph.SetCurrentCamera( m_curr_camera_name );
     m_texturepass->GetRenderingQueue()->Draw();
+    m_texturemirrorpass->GetRenderingQueue()->Draw();
+
     m_scenenodegraph.SetCurrentCamera( "camera_occ" );
-    m_occlusionpass->GetRenderingQueue()->Draw();
-    
+    m_occlusionpass->GetRenderingQueue()->Draw();    
     m_zoompass->GetRenderingQueue()->Draw();
+
+    
 
     //m_text_widget->Draw();  // pour ne plus afficher le reticule
 
