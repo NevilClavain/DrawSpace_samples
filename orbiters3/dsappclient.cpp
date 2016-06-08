@@ -365,7 +365,7 @@ m_curr_camera( NULL ),
 m_final_pass_2( false ),
 m_ready( false ),
 m_init_count( 0 ),
-m_showinfos( true ),
+m_showinfos( false ),
 m_water_anim( 0.0 ),
 m_water_anim_inc( true ),
 m_timefactor( "x1" )
@@ -1244,8 +1244,8 @@ void dsAppClient::init_ship( void )
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285 / 2.0, 21.4704 / 2.0, 81.911 / 2.0, 1.0 );
     
-    //cube_params.initial_attitude.Translation( 269000000.0, 0.0, 59000000.0 );
-    cube_params.initial_attitude.Translation( 369000000.0, 0.0, 0 );
+    cube_params.initial_attitude.Translation( 269000000.0, 0.0, 59000000.0 );
+    //cube_params.initial_attitude.Translation( 369000000.0, 0.0, 0 );
 
 
     m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, cube_params ) );
@@ -1257,6 +1257,10 @@ void dsAppClient::init_ship( void )
     m_scenenodegraph.RegisterNode( m_ship_node );
 
     m_ship_drawable_node->LinkTo( m_ship_node );
+
+
+
+    m_ship_drawable->SetDrawingState( m_texturepass, false );
 
     
     //////////////////////////////////////////////////////////////
