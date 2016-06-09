@@ -117,6 +117,8 @@ protected:
 
     DrawSpace::Core::Texture*                               m_clouds_texture;
 
+    bool                                                    m_mirror_mode;
+
 
 public:
 

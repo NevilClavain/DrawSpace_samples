@@ -132,6 +132,8 @@ PlanetDetailsBinder::PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThick
 m_planet_node( NULL )
 {
 
+    m_mirror_mode = false;
+
     m_skyfromspace_ESun = 8.7; //9.0;
     m_skyfromatmo_ESun = 70.0; //50.0;
     m_groundfromspace_ESun = 24.0;
@@ -260,7 +262,13 @@ void PlanetDetailsBinder::Bind( void )
 
     m_renderer->SetFxShaderParams( 0, 48, m_lights[2].m_local_dir );
     m_renderer->SetFxShaderParams( 0, 49, m_lights[2].m_dir );
-    m_renderer->SetFxShaderParams( 0, 50, m_lights[2].m_color );   
+    m_renderer->SetFxShaderParams( 0, 50, m_lights[2].m_color );
+
+    Vector mirror_flag;
+
+    mirror_flag[0] = ( m_mirror_mode ? 1.0 : 0.0 );
+
+    m_renderer->SetFxShaderParams( 0, 51, mirror_flag ); 
 
     m_renderer->SetFxShaderParams( 1, 6, flags6 );
 
