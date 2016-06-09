@@ -58,30 +58,22 @@ void dsAppClient::OnRenderFrame( void )
 
     m_ground_transfo_node->GetFinalTransform( water_plane_mat );
 
-    Matrix sb_water_plane_mat;
 
-    sb_water_plane_mat.Identity();
+    Vector reflectorPos( water_plane_mat( 3, 0 ), water_plane_mat( 3, 1 ), water_plane_mat( 3, 2 ), 1.0 );
+    Vector reflectorNormale( 0.0, 1.0, 0.0, 1.0 );
 
-    sb_water_plane_mat = water_plane_mat;
-    sb_water_plane_mat.ClearTranslation();
-
-
-
-    sb_water_plane_mat.Transpose();
-    water_plane_mat.Transpose();
-
-
-
-
+    
     for( int i = 0; i < 6; i++ )
     {
-        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->SetShaderRealMatrix( "reflector_mat", sb_water_plane_mat );
-
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->SetShaderRealVector( "reflector_normale", reflectorNormale );
     }
+    
 
-    m_chunk->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealMatrix( "reflector_mat", water_plane_mat );
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "reflector_pos", reflectorPos );
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "reflector_normale", reflectorNormale );
 
-    m_cube2->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealMatrix( "reflector_mat", water_plane_mat );
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "reflector_pos", reflectorPos );
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "reflector_normale", reflectorNormale );
 
 
 
@@ -272,7 +264,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_chunk->GetNodeFromPass( m_texturemirrorpass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
     m_chunk->GetNodeFromPass( m_texturemirrorpass )->GetTexture( 0 )->LoadFromFile();
 
-    m_chunk->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "reflector_mat", 24 );
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "reflector_pos", 24 );
+    m_chunk->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "reflector_normale", 25 );
 
     
     m_chunk_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "chunk" ) );
@@ -373,7 +366,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     for( int i = 0; i < 6; i++ )
     {
-        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->AddShaderParameter( 0, "reflector_mat", 24 );
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->AddShaderParameter( 0, "reflector_pos", 24 );
+        m_spacebox->GetNodeFromPass( m_texturemirrorpass, i )->AddShaderParameter( 0, "reflector_normale", 25 );
     }
 
     
@@ -463,7 +457,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     Matrix ground_pos;
-    ground_pos.Translation( 0.0, -5.0, 0.0 );
+    ground_pos.Translation( 5.0, -5.0, 0.0 );
 
     Matrix ground_rot;
     ground_rot.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Utils::Maths::DegToRad( 0 ) );
@@ -601,7 +595,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_cube2->GetNodeFromPass( m_texturemirrorpass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "saturnmap.jpg" ) ), 0 );
     m_cube2->GetNodeFromPass( m_texturemirrorpass )->GetTexture( 0 )->LoadFromFile();
 
-    m_cube2->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "reflector_mat", 24 );
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "reflector_pos", 24 );
+    m_cube2->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "reflector_normale", 25 );
 
 
     
