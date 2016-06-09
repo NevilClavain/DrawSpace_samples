@@ -270,6 +270,9 @@ void PlanetDetailsBinder::Bind( void )
 
     m_renderer->SetFxShaderParams( 0, 51, mirror_flag ); 
 
+    m_renderer->SetFxShaderParams( 0, 52, m_mirror_pos ); 
+    m_renderer->SetFxShaderParams( 0, 53, m_mirror_normal ); 
+
     m_renderer->SetFxShaderParams( 1, 6, flags6 );
 
     m_renderer->SetFxShaderParams( 1, 7, flags_lights );
@@ -733,6 +736,8 @@ void dsAppClient::init_planet( void )
         m_planet_detail_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
 
         m_planet_atmosphere_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
+        m_planet_atmosphere_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
+        m_planet_atmosphere_binder_mirror[i]->SetMirrorMode( true );
 
         m_planet_clouds_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
 
@@ -877,6 +882,7 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet_atmosphere_binder[i]->SetFx( atmo_fx );
+        m_planet_atmosphere_binder_mirror[i]->SetFx( atmo_fx );
     }
 
 
@@ -942,6 +948,7 @@ void dsAppClient::init_planet( void )
         m_planet_climate_binder[i]->SetRenderer( renderer );
 
         m_planet_atmosphere_binder[i]->SetRenderer( renderer );
+        m_planet_atmosphere_binder_mirror[i]->SetRenderer( renderer );
         m_planet_clouds_binder[i]->SetRenderer( renderer );
 
         m_planet_occlusion_binder[i]->SetRenderer( renderer );
@@ -1016,7 +1023,7 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_atmosphere_binder[i], i, DrawSpace::SphericalLOD::Body::HIRES_MESHE, 1, 1000 );
-        m_planet->RegisterSinglePassSlot( m_texturemirrorpass, m_planet_atmosphere_binder[i], i, DrawSpace::SphericalLOD::Body::HIRES_MESHE, 1, 1000 );
+        m_planet->RegisterSinglePassSlot( m_texturemirrorpass, m_planet_atmosphere_binder_mirror[i], i, DrawSpace::SphericalLOD::Body::HIRES_MESHE, 1, 1000 );
     }
 
 
@@ -1068,6 +1075,10 @@ void dsAppClient::init_planet( void )
 
         m_planet_atmosphere_binder[i]->SetPlanetNode( m_planet_node );
         m_planet_atmosphere_binder[i]->SetCloudsTexture( texture_clouds );
+
+        m_planet_atmosphere_binder_mirror[i]->SetPlanetNode( m_planet_node );
+        m_planet_atmosphere_binder_mirror[i]->SetCloudsTexture( texture_clouds );
+
 
         m_planet_clouds_binder[i]->SetPlanetNode( m_planet_node );
         m_planet_clouds_binder[i]->SetCloudsTexture( texture_clouds );
@@ -1472,7 +1483,12 @@ void dsAppClient::render_universe( void )
     {
         m_planet_detail_binder[i]->Update();
         m_planet_atmosphere_binder[i]->Update();
+        m_planet_atmosphere_binder_mirror[i]->Update();
         m_planet_clouds_binder[i]->Update();
+
+
+        m_planet_atmosphere_binder_mirror[i]->UpdateMirrorNormale( Vector( 0.0, 1.0, 0.0, 1.0 ) );
+        m_planet_atmosphere_binder_mirror[i]->UpdateMirrorPos( Vector( 0.0, 0.0, 0.0, 1.0 ) );
     }
 
     m_text_widget->SetVirtualTranslation( 100, 75 );
