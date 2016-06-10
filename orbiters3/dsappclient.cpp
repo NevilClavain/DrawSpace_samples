@@ -301,6 +301,10 @@ void PlanetDetailsBinder::Bind( void )
     m_planet_final_transform_rots.Transpose(); // faire comme dans le plugin
     m_renderer->SetFxShaderMatrix( 1, 25, m_planet_final_transform_rots );
 
+    m_renderer->SetFxShaderParams( 1, 29, mirror_flag ); 
+
+    m_renderer->SetFxShaderParams( 1, 30, m_mirror_pos ); 
+    m_renderer->SetFxShaderParams( 1, 31, m_mirror_normal ); 
 
     long clouds_texture_w;
     long clouds_texture_h;
@@ -345,7 +349,13 @@ void PlanetDetailsBinder::Update( void )
 
     planet_pos.Normalize();
 
-    m_lights[0].m_dir = planet_pos;
+    // TEMPORAIRE
+    //m_lights[0].m_dir = planet_pos;
+    m_lights[0].m_dir[0] = -1.0;
+    m_lights[0].m_dir[1] = 0.99;
+    m_lights[0].m_dir[2] = 0.0;
+
+    m_lights[0].m_dir.Normalize();
 
     planet_final_transform.ClearTranslation();
     m_planet_final_transform_rots = planet_final_transform;
@@ -1035,11 +1045,12 @@ void dsAppClient::init_planet( void )
     }
     
     
-    
+    // TEMPORAIRE
+    /*
     m_planet->SetOrbitDuration( 0.333 );
     m_planet->SetRevolutionTiltAngle( 8.0 );    
     m_planet->SetRevolutionDuration( 1.0 );
-
+    */
 
     m_planet_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::SphericalLOD::Root>, SceneNode<DrawSpace::SphericalLOD::Root>( "planet01" ) );
     m_planet_node->SetContent( m_planet );
@@ -1058,7 +1069,9 @@ void dsAppClient::init_planet( void )
     m_scenenodegraph.AddNode( m_planet_orbit_node );
     m_scenenodegraph.RegisterNode( m_planet_orbit_node );
 
-    m_planet_node->LinkTo( m_planet_orbit_node );
+    // TEMPORAIRE
+    //m_planet_node->LinkTo( m_planet_orbit_node );
+    m_scenenodegraph.AddNode( m_planet_node ); // TEMPORAIRE
 
     m_building_collider->SetReferentOrbiter( m_planet );
     m_socle_collider->SetReferentOrbiter( m_planet );
@@ -1226,7 +1239,6 @@ void dsAppClient::init_star_impostor( void )
 
     m_starhalo_impostor_node->SetContent( m_starhalo_impostor );
 
-    //m_scenenodegraph.AddNode( m_starhalo_impostor_node );
     m_scenenodegraph.RegisterNode( m_starhalo_impostor_node );
     m_starhalo_impostor_node->LinkTo( m_star_impostor_node );
 }
@@ -1277,8 +1289,9 @@ void dsAppClient::init_ship( void )
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285 / 2.0, 21.4704 / 2.0, 81.911 / 2.0, 1.0 );
     
-    cube_params.initial_attitude.Translation( 269000000.0, 0.0, 59000000.0 );
-    //cube_params.initial_attitude.Translation( 369000000.0, 0.0, 0 );
+    // TEMPORAIRE
+    //cube_params.initial_attitude.Translation( 269000000.0, 0.0, 59000000.0 );
+    cube_params.initial_attitude.Translation( 0.0, 0.0, 59000000 );
 
 
     m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, cube_params ) );
@@ -1335,8 +1348,8 @@ void dsAppClient::init_cameras( void )
 
     m_camera_occ_node->LinkTo( m_camera3_node );
 
-
-    m_camera_occ->Lock( m_star_impostor_node );
+    // TEMPORAIRE
+    //m_camera_occ->Lock( m_star_impostor_node );
 }
 
 void dsAppClient::init_reticle( void )
@@ -1488,7 +1501,9 @@ void dsAppClient::render_universe( void )
 
 
         m_planet_atmosphere_binder_mirror[i]->UpdateMirrorNormale( Vector( 0.0, 1.0, 0.0, 1.0 ) );
-        m_planet_atmosphere_binder_mirror[i]->UpdateMirrorPos( Vector( 0.0, 0.0, 0.0, 1.0 ) );
+        //m_planet_atmosphere_binder_mirror[i]->UpdateMirrorPos( Vector( 0.0, 0.0, 0.0, 1.0 ) );
+
+        m_planet_atmosphere_binder_mirror[i]->UpdateMirrorPos( Vector( 0.0, PLANET_RAY * 1000.0, 0.0, 1.0 ) );
     }
 
     m_text_widget->SetVirtualTranslation( 100, 75 );
@@ -1531,6 +1546,9 @@ void dsAppClient::render_universe( void )
 
     m_zoompass->GetTargetTexture()->CopyTextureContent();
 
+    // TEMPORAIRE
+    /*
+
     float star_alpha_occlusion;
     float star_alpha_altitude = 1.0;
 
@@ -1562,7 +1580,7 @@ void dsAppClient::render_universe( void )
     m_star_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, star_alpha_occlusion * star_alpha_altitude ) );
     m_starhalo_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, star_alpha_occlusion * star_alpha_altitude ) );
 
-
+    */
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1769,7 +1787,8 @@ void dsAppClient::OnRenderFrame( void )
 
             case 9:
                 print_init_trace( "star impostor initialisation..." );
-                init_star_impostor();
+                // TEMPORAIRE
+                //init_star_impostor();
                 break;
 
             case 10:
