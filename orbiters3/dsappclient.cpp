@@ -780,6 +780,13 @@ void dsAppClient::init_planet( void )
     planet_atmo_pshader->LoadFromFile();
 
 
+    Shader* planet_atmo_vshader2 = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere.vso", true ) );
+    Shader* planet_atmo_pshader2 = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere.pso", true ) );
+    
+    planet_atmo_vshader2->LoadFromFile();
+    planet_atmo_pshader2->LoadFromFile();
+
+
     Shader* planet_clouds_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_clouds.vso", true ) );
     Shader* planet_clouds_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_clouds.pso", true ) );
     
@@ -892,10 +899,38 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet_atmosphere_binder[i]->SetFx( atmo_fx );
-        m_planet_atmosphere_binder_mirror[i]->SetFx( atmo_fx );
     }
 
 
+    Fx* atmo_mirror_fx = new Fx;
+
+    atmo_mirror_fx->AddShader( planet_atmo_vshader2 );
+    atmo_mirror_fx->AddShader( planet_atmo_pshader2 );
+
+    atmo_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    
+    atmo_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    atmo_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    atmo_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    atmo_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );
+    atmo_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
+    
+    atmo_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+    //atmo_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
+    atmo_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+
+
+    atmo_mirror_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    atmo_mirror_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    //atmo_mirror_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+    atmo_mirror_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+    //atmo_mirror_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_atmosphere_binder_mirror[i]->SetFx( atmo_mirror_fx );
+    }
 
 
     m_clouds_fx = new Fx;
@@ -1041,7 +1076,7 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_clouds_binder[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 3000 );
-        m_planet->RegisterSinglePassSlot( m_texturemirrorpass, m_planet_clouds_binder[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 3000 );
+        //m_planet->RegisterSinglePassSlot( m_texturemirrorpass, m_planet_clouds_binder[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 3000 );
     }
     
     
