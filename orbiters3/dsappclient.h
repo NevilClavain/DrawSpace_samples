@@ -118,8 +118,6 @@ protected:
     DrawSpace::Core::Texture*                               m_clouds_texture;
 
     bool                                                    m_mirror_mode;
-    DrawSpace::Utils::Vector                                m_mirror_normal;
-    DrawSpace::Utils::Vector                                m_mirror_pos;
 
 
 public:
@@ -137,17 +135,6 @@ public:
     void SetMirrorMode( bool p_state )
     {
         m_mirror_mode = p_state;
-    }
-
-    void UpdateMirrorNormale( const DrawSpace::Utils::Vector& p_normale )
-    {
-        m_mirror_normal = p_normale;
-        m_mirror_normal.Normalize();
-    }
-
-    void UpdateMirrorPos( const DrawSpace::Utils::Vector& p_pos )
-    {
-        m_mirror_pos = p_pos;
     }
 
     void SetWaterAnim( dsreal p_value )
@@ -248,6 +235,7 @@ protected:
 
     DrawSpace::Core::Fx*                                   m_details_fx;
     DrawSpace::Core::Fx*                                   m_clouds_fx;
+    DrawSpace::Core::Fx*                                   m_clouds_mirror_fx;
 
 
     DrawSpace::Dynamics::Orbit*                                         m_planet_orbit;
@@ -266,10 +254,10 @@ protected:
 
 
     PlanetDetailsBinder*                                                m_planet_atmosphere_binder[6];
-
     PlanetDetailsBinder*                                                m_planet_atmosphere_binder_mirror[6];
 
     PlanetDetailsBinder*                                                m_planet_clouds_binder[6];
+    PlanetDetailsBinder*                                                m_planet_clouds_binder_mirror[6];
 
 
     DrawSpace::SphericalLOD::Binder*                                    m_planet_occlusion_binder[6];

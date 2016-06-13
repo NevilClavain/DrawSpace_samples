@@ -267,11 +267,9 @@ void PlanetDetailsBinder::Bind( void )
     Vector mirror_flag;
 
     mirror_flag[0] = ( m_mirror_mode ? 1.0 : 0.0 );
+    mirror_flag[1] = m_innerRadius;
 
     m_renderer->SetFxShaderParams( 0, 51, mirror_flag ); 
-
-    m_renderer->SetFxShaderParams( 0, 52, m_mirror_pos ); 
-    m_renderer->SetFxShaderParams( 0, 53, m_mirror_normal ); 
 
     m_renderer->SetFxShaderParams( 1, 6, flags6 );
 
@@ -300,11 +298,6 @@ void PlanetDetailsBinder::Bind( void )
 
     m_planet_final_transform_rots.Transpose(); // faire comme dans le plugin
     m_renderer->SetFxShaderMatrix( 1, 25, m_planet_final_transform_rots );
-
-    m_renderer->SetFxShaderParams( 1, 29, mirror_flag ); 
-
-    m_renderer->SetFxShaderParams( 1, 30, m_mirror_pos ); 
-    m_renderer->SetFxShaderParams( 1, 31, m_mirror_normal ); 
 
     long clouds_texture_w;
     long clouds_texture_h;
@@ -750,6 +743,9 @@ void dsAppClient::init_planet( void )
         m_planet_atmosphere_binder_mirror[i]->SetMirrorMode( true );
 
         m_planet_clouds_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
+        m_planet_clouds_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
+
+        m_planet_clouds_binder_mirror[i]->SetMirrorMode( true );
 
         m_planet_occlusion_binder[i] = new DrawSpace::SphericalLOD::Binder();
     }
@@ -966,6 +962,40 @@ void dsAppClient::init_planet( void )
 
 
 
+
+    m_clouds_mirror_fx = new Fx;
+
+    m_clouds_mirror_fx->AddShader( planet_clouds_vshader );
+    m_clouds_mirror_fx->AddShader( planet_clouds_pshader );
+
+    m_clouds_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_clouds_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+    m_clouds_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_clouds_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_clouds_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    m_clouds_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    m_clouds_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );    
+    m_clouds_mirror_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
+
+
+    m_clouds_mirror_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_clouds_mirror_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_clouds_mirror_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+    m_clouds_mirror_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+
+
+    //m_clouds_mirror_fx->SetRenderStateUniqueQueueID( "planet01_clouds" ); // parce qu'on va updater le renderstate ENABLEZBUFFER pendant le rendu
+
+
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_clouds_binder_mirror[i]->SetFx( m_clouds_mirror_fx );
+        m_planet_clouds_binder_mirror[i]->SetTexture( texture_clouds, 0 );
+    }
+
+
+
     Fx* occ_fx = new Fx;
 
     occ_fx->AddShader( planet_occ_vshader );
@@ -995,6 +1025,8 @@ void dsAppClient::init_planet( void )
         m_planet_atmosphere_binder[i]->SetRenderer( renderer );
         m_planet_atmosphere_binder_mirror[i]->SetRenderer( renderer );
         m_planet_clouds_binder[i]->SetRenderer( renderer );
+
+        m_planet_clouds_binder_mirror[i]->SetRenderer( renderer );
 
         m_planet_occlusion_binder[i]->SetRenderer( renderer );
     }
@@ -1076,7 +1108,7 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_clouds_binder[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 3000 );
-        //m_planet->RegisterSinglePassSlot( m_texturemirrorpass, m_planet_clouds_binder[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 3000 );
+        m_planet->RegisterSinglePassSlot( m_texturemirrorpass, m_planet_clouds_binder_mirror[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 3000 );
     }
     
     
@@ -1130,6 +1162,9 @@ void dsAppClient::init_planet( void )
 
         m_planet_clouds_binder[i]->SetPlanetNode( m_planet_node );
         m_planet_clouds_binder[i]->SetCloudsTexture( texture_clouds );
+
+        m_planet_clouds_binder_mirror[i]->SetPlanetNode( m_planet_node );
+        m_planet_clouds_binder_mirror[i]->SetCloudsTexture( texture_clouds );
     }
 
     ////////////////////////
@@ -1533,12 +1568,7 @@ void dsAppClient::render_universe( void )
         m_planet_atmosphere_binder[i]->Update();
         m_planet_atmosphere_binder_mirror[i]->Update();
         m_planet_clouds_binder[i]->Update();
-
-
-        m_planet_atmosphere_binder_mirror[i]->UpdateMirrorNormale( Vector( 0.0, 1.0, 0.0, 1.0 ) );
-        //m_planet_atmosphere_binder_mirror[i]->UpdateMirrorPos( Vector( 0.0, 0.0, 0.0, 1.0 ) );
-
-        m_planet_atmosphere_binder_mirror[i]->UpdateMirrorPos( Vector( 0.0, PLANET_RAY * 1000.0, 0.0, 1.0 ) );
+        m_planet_clouds_binder_mirror[i]->Update();
     }
 
     m_text_widget->SetVirtualTranslation( 100, 75 );
