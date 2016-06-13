@@ -480,6 +480,24 @@ void dsAppClient::init_passes( void )
     m_texturemirrorpass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 255 );
 
 
+
+    m_wavespass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "waves_pass" ) );
+
+    m_wavespass->SetTargetDimsFromRenderer( false );
+    m_wavespass->SetTargetDims( 512, 512 );
+
+    m_wavespass->Initialize();
+    m_wavespass->CreateViewportQuad();
+    
+    m_wavespass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_wavespass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "water_waves.vso", true ) ) );
+    m_wavespass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "water_waves.pso", true ) ) );
+    m_wavespass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_wavespass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_wavespass->GetViewportQuad()->AddShaderParameter( 1, "waves", 0 );
+
+
     //////////////////////////////////////////////////////////////
         
     m_finalpass = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass" ) );
@@ -507,7 +525,7 @@ void dsAppClient::init_passes( void )
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    m_finalpass2->GetViewportQuad()->SetTexture( m_texturemirrorpass->GetTargetTexture(), 0 );
+    m_finalpass2->GetViewportQuad()->SetTexture( m_wavespass->GetTargetTexture(), 0 );
     m_finalpass2->GetViewportQuad()->SetDrawingState( false );
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -1532,6 +1550,7 @@ void dsAppClient::init_rendering_queues( void )
     m_occlusionpass->GetRenderingQueue()->UpdateOutputQueue();
     m_zoompass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturemirrorpass->GetRenderingQueue()->UpdateOutputQueue();
+    m_wavespass->GetRenderingQueue()->UpdateOutputQueue();
 
     m_zoompass->GetTargetTexture()->AllocTextureContent();
     m_zoom_texture_content = m_zoompass->GetTargetTexture()->GetTextureContentPtr();
@@ -1589,6 +1608,8 @@ void dsAppClient::render_universe( void )
 
 
     //DrawSpace::SphericalLOD::Patch* current_patch = m_planet->GetFragment( 0 )->GetCurrentPatch();
+
+    m_wavespass->GetRenderingQueue()->Draw();
 
     m_planet->DrawSubPasses();
 

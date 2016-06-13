@@ -162,9 +162,11 @@ protected:
     bool                                        m_showinfos;
 
 
-    DrawSpace::IntermediatePass*                m_texturepass;
-    DrawSpace::IntermediatePass*                m_occlusionpass;
+    DrawSpace::IntermediatePass*                m_texturepass;    
     DrawSpace::IntermediatePass*                m_texturemirrorpass;
+    DrawSpace::IntermediatePass*                m_wavespass;
+
+    DrawSpace::IntermediatePass*                m_occlusionpass;
     DrawSpace::IntermediatePass*                m_zoompass;
 
     void*                                       m_zoom_texture_content;
