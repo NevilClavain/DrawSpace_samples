@@ -343,10 +343,10 @@ void PlanetDetailsBinder::Update( void )
     planet_pos.Normalize();
 
     // TEMPORAIRE
-    //m_lights[0].m_dir = planet_pos;
-    m_lights[0].m_dir[0] = -1.0;
-    m_lights[0].m_dir[1] = 0.99;
-    m_lights[0].m_dir[2] = 0.0;
+    m_lights[0].m_dir = planet_pos;
+    //m_lights[0].m_dir[0] = -1.0;
+    //m_lights[0].m_dir[1] = 0.99;
+    //m_lights[0].m_dir[2] = 0.0;
 
     m_lights[0].m_dir.Normalize();
 
@@ -1113,11 +1113,10 @@ void dsAppClient::init_planet( void )
     
     
     // TEMPORAIRE
-    /*
     m_planet->SetOrbitDuration( 0.333 );
     m_planet->SetRevolutionTiltAngle( 8.0 );    
     m_planet->SetRevolutionDuration( 1.0 );
-    */
+    
 
     m_planet_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::SphericalLOD::Root>, SceneNode<DrawSpace::SphericalLOD::Root>( "planet01" ) );
     m_planet_node->SetContent( m_planet );
@@ -1137,8 +1136,8 @@ void dsAppClient::init_planet( void )
     m_scenenodegraph.RegisterNode( m_planet_orbit_node );
 
     // TEMPORAIRE
-    //m_planet_node->LinkTo( m_planet_orbit_node );
-    m_scenenodegraph.AddNode( m_planet_node ); // TEMPORAIRE
+    m_planet_node->LinkTo( m_planet_orbit_node );
+    //m_scenenodegraph.AddNode( m_planet_node ); // TEMPORAIRE
 
     m_building_collider->SetReferentOrbiter( m_planet );
     m_socle_collider->SetReferentOrbiter( m_planet );
@@ -1360,8 +1359,8 @@ void dsAppClient::init_ship( void )
     cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285 / 2.0, 21.4704 / 2.0, 81.911 / 2.0, 1.0 );
     
     // TEMPORAIRE
-    //cube_params.initial_attitude.Translation( 269000000.0, 0.0, 59000000.0 );
-    cube_params.initial_attitude.Translation( 0.0, 0.0, 59000000 );
+    cube_params.initial_attitude.Translation( 269000000.0, 0.0, 59000000.0 );
+    //cube_params.initial_attitude.Translation( 0.0, 0.0, 59000000 );
 
 
     m_ship = _DRAWSPACE_NEW_( DrawSpace::Dynamics::Rocket, DrawSpace::Dynamics::Rocket( &m_world, cube_params ) );
@@ -1419,7 +1418,7 @@ void dsAppClient::init_cameras( void )
     m_camera_occ_node->LinkTo( m_camera3_node );
 
     // TEMPORAIRE
-    //m_camera_occ->Lock( m_star_impostor_node );
+    m_camera_occ->Lock( m_star_impostor_node );
 }
 
 void dsAppClient::init_reticle( void )
@@ -1612,8 +1611,7 @@ void dsAppClient::render_universe( void )
     m_zoompass->GetTargetTexture()->CopyTextureContent();
 
     // TEMPORAIRE
-    /*
-
+    
     float star_alpha_occlusion;
     float star_alpha_altitude = 1.0;
 
@@ -1645,7 +1643,7 @@ void dsAppClient::render_universe( void )
     m_star_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, star_alpha_occlusion * star_alpha_altitude ) );
     m_starhalo_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, star_alpha_occlusion * star_alpha_altitude ) );
 
-    */
+    
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1853,7 +1851,7 @@ void dsAppClient::OnRenderFrame( void )
             case 9:
                 print_init_trace( "star impostor initialisation..." );
                 // TEMPORAIRE
-                //init_star_impostor();
+                init_star_impostor();
                 break;
 
             case 10:
