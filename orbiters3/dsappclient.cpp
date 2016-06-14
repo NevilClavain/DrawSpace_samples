@@ -476,7 +476,8 @@ void dsAppClient::init_passes( void )
     m_wavespass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "waves_pass" ) );
 
     m_wavespass->SetTargetDimsFromRenderer( false );
-    m_wavespass->SetTargetDims( 512, 512 );
+    //m_wavespass->SetTargetDims( 512, 512 );
+    m_wavespass->SetTargetDims( 1024, 1024 );
 
     m_wavespass->Initialize();
     m_wavespass->CreateViewportQuad();
