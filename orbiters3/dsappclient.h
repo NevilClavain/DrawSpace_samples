@@ -165,6 +165,7 @@ protected:
     DrawSpace::IntermediatePass*                m_texturepass;    
     DrawSpace::IntermediatePass*                m_texturemirrorpass;
     DrawSpace::IntermediatePass*                m_wavespass;
+    DrawSpace::IntermediatePass*                m_waterbumppass;
 
     DrawSpace::IntermediatePass*                m_occlusionpass;
     DrawSpace::IntermediatePass*                m_zoompass;
@@ -261,6 +262,7 @@ protected:
     PlanetDetailsBinder*                                                m_planet_clouds_binder[6];
     PlanetDetailsBinder*                                                m_planet_clouds_binder_mirror[6];
 
+    DrawSpace::SphericalLOD::Binder*                                    m_planet_waterbump_binder[6];
 
     DrawSpace::SphericalLOD::Binder*                                    m_planet_occlusion_binder[6];
 
@@ -315,10 +317,8 @@ protected:
 
     int                                         m_init_count;
 
-    float                                       m_water_anim;
+    dsreal                                      m_water_anim;
     bool                                        m_water_anim_inc;
-    DrawSpace::Utils::Timer                     m_water_timer;
-    WaterTimer*                                 m_water_timercb;
     
 
     void init_planet_meshes( void );
@@ -342,8 +342,6 @@ protected:
     void print_init_trace( const dsstring& p_string );
 
     void on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget );
-
-    void on_water_timer( DrawSpace::Utils::Timer* p_timer );
 
 
     dsAppClient( void );

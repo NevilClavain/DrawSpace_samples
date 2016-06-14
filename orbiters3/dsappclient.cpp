@@ -387,14 +387,6 @@ m_timefactor( "x1" )
     _INIT_LOGGER( "logorbiters3.conf" )  
     m_w_title = "orbiters 3 test";
     m_mouseleftbuttondown_eventhandler = _DRAWSPACE_NEW_( WidgetEventHandler, WidgetEventHandler( this, &dsAppClient::on_mouseleftbuttondown ) );
-
-    m_water_timercb = _DRAWSPACE_NEW_( WaterTimer, WaterTimer( this, &dsAppClient::on_water_timer ) );
-    m_water_timer.SetHandler( m_water_timercb );
-
-    m_water_timer.SetPeriod( 1 );
-
-    m_timer.RegisterTimer( &m_water_timer );
-
 }
 
 dsAppClient::~dsAppClient( void )
@@ -490,12 +482,26 @@ void dsAppClient::init_passes( void )
     m_wavespass->CreateViewportQuad();
     
     m_wavespass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_wavespass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "water_waves.vso", true ) ) );
-    m_wavespass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "water_waves.pso", true ) ) );
+    m_wavespass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_water_waves.vso", true ) ) );
+    m_wavespass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_water_waves.pso", true ) ) );
     m_wavespass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
     m_wavespass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
 
     m_wavespass->GetViewportQuad()->AddShaderParameter( 1, "waves", 0 );
+
+
+
+
+
+    m_waterbumppass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "water_bump_pass" ) );
+
+    m_waterbumppass->SetRenderPurpose( Texture::RENDERPURPOSE_FLOATVECTOR );
+
+    m_waterbumppass->Initialize();
+    
+    m_waterbumppass->GetRenderingQueue()->EnableDepthClearing( true );
+    m_waterbumppass->GetRenderingQueue()->EnableTargetClearing( true );
+    m_waterbumppass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 255 );
 
 
     //////////////////////////////////////////////////////////////
@@ -513,6 +519,7 @@ void dsAppClient::init_passes( void )
 
     m_finalpass->GetViewportQuad()->SetTexture( m_texturepass->GetTargetTexture(), 0 );
     m_finalpass->GetViewportQuad()->SetTexture( m_texturemirrorpass->GetTargetTexture(), 1 );
+    m_finalpass->GetViewportQuad()->SetTexture( m_waterbumppass->GetTargetTexture(), 2 );
     
     m_finalpass2 = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass2" ) );
     m_finalpass2->Initialize();
@@ -525,7 +532,7 @@ void dsAppClient::init_passes( void )
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    m_finalpass2->GetViewportQuad()->SetTexture( m_wavespass->GetTargetTexture(), 0 );
+    m_finalpass2->GetViewportQuad()->SetTexture( m_wavespass->GetTargetTexture(), 0 );    
     m_finalpass2->GetViewportQuad()->SetDrawingState( false );
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -757,6 +764,8 @@ void dsAppClient::init_planet( void )
         m_planet_climate_binder[i] = new PlanetClimateBinder;
         m_planet_detail_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
 
+        m_planet_waterbump_binder[i] = new DrawSpace::SphericalLOD::Binder();
+
         m_planet_atmosphere_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
         m_planet_atmosphere_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
         m_planet_atmosphere_binder_mirror[i]->SetMirrorMode( true );
@@ -786,6 +795,17 @@ void dsAppClient::init_planet( void )
 
     planet_vshader->LoadFromFile();
     planet_pshader->LoadFromFile();
+
+
+
+
+    Shader* planet_water_bump_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_water_bump.vso", true ) );
+    Shader* planet_water_bump_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_water_bump.pso", true ) );
+
+    planet_water_bump_vshader->LoadFromFile();
+    planet_water_bump_pshader->LoadFromFile();
+
+
 
     
     Shader* planet_atmo_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_atmosphere.vso", true ) );
@@ -884,6 +904,32 @@ void dsAppClient::init_planet( void )
         m_planet_detail_binder[i]->SetTexture( texture_th_splatting, 2 );
         m_planet_detail_binder[i]->SetTexture( texture_bump_water, 3 );
     }
+
+
+
+    Fx* water_bump_fx = new Fx;
+
+
+    water_bump_fx->AddShader( planet_water_bump_vshader );
+    water_bump_fx->AddShader( planet_water_bump_pshader );
+
+
+    water_bump_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    water_bump_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    //water_bump_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
+
+    water_bump_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    water_bump_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    //water_bump_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
+
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_waterbump_binder[i]->SetFx( water_bump_fx );
+        m_planet_waterbump_binder[i]->SetTexture( m_wavespass->GetTargetTexture(), 3 );
+    }
+
+
+
 
 
     Fx* atmo_fx = new Fx;
@@ -1048,6 +1094,8 @@ void dsAppClient::init_planet( void )
         m_planet_clouds_binder_mirror[i]->SetRenderer( renderer );
 
         m_planet_occlusion_binder[i]->SetRenderer( renderer );
+
+        m_planet_waterbump_binder[i]->SetRenderer( renderer );
     }
 
     
@@ -1113,6 +1161,8 @@ void dsAppClient::init_planet( void )
     {
         m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_detail_binder[i], i, DrawSpace::SphericalLOD::Body::LOWRES_SKIRT_MESHE, 0, 2000 );
         m_planet->RegisterSinglePassSlot( m_occlusionpass, m_planet_occlusion_binder[i], i, DrawSpace::SphericalLOD::Body::LOWRES_SKIRT_MESHE, 0, 1000 );
+
+        m_planet->RegisterSinglePassSlot( m_waterbumppass, m_planet_waterbump_binder[i], i, DrawSpace::SphericalLOD::Body::LOWRES_SKIRT_MESHE, 0, 2000 );
     }
 
 
@@ -1183,6 +1233,7 @@ void dsAppClient::init_planet( void )
 
         m_planet_clouds_binder_mirror[i]->SetPlanetNode( m_planet_node );
         m_planet_clouds_binder_mirror[i]->SetCloudsTexture( texture_clouds );
+
     }
 
     ////////////////////////
@@ -1551,6 +1602,7 @@ void dsAppClient::init_rendering_queues( void )
     m_zoompass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturemirrorpass->GetRenderingQueue()->UpdateOutputQueue();
     m_wavespass->GetRenderingQueue()->UpdateOutputQueue();
+    m_waterbumppass->GetRenderingQueue()->UpdateOutputQueue();
 
     m_zoompass->GetTargetTexture()->AllocTextureContent();
     m_zoom_texture_content = m_zoompass->GetTargetTexture()->GetTextureContentPtr();
@@ -1588,6 +1640,7 @@ void dsAppClient::render_universe( void )
         m_planet_atmosphere_binder_mirror[i]->Update();
         m_planet_clouds_binder[i]->Update();
         m_planet_clouds_binder_mirror[i]->Update();
+
     }
 
     m_text_widget->SetVirtualTranslation( 100, 75 );
@@ -1614,12 +1667,17 @@ void dsAppClient::render_universe( void )
     m_planet->DrawSubPasses();
 
     m_scenenodegraph.SetCurrentCamera( m_curr_camera_name );
+
+    m_waterbumppass->GetRenderingQueue()->Draw();
     m_texturepass->GetRenderingQueue()->Draw();
     m_texturemirrorpass->GetRenderingQueue()->Draw();
+
 
     m_scenenodegraph.SetCurrentCamera( "camera_occ" );
     m_occlusionpass->GetRenderingQueue()->Draw();    
     m_zoompass->GetRenderingQueue()->Draw();
+
+    
 
     
 
@@ -1806,6 +1864,34 @@ void dsAppClient::render_universe( void )
     renderer->FlipScreen();
 
     m_calendar->Run();
+
+    if( m_timer.IsReady() )
+    {
+        if( m_water_anim_inc )
+        {
+            if( m_water_anim < 200.0 )
+            {
+                m_timer.TranslationSpeedInc( &m_water_anim, 1.0 );
+            }
+            else
+            {
+                m_water_anim_inc = false;
+            }
+        }
+        else
+        {
+            if( m_water_anim > 0.0 )
+            {
+                m_timer.TranslationSpeedDec( &m_water_anim, 1.0 );
+            }
+            else
+            {
+                m_water_anim_inc = true;
+            }        
+        }
+    }
+
+    m_wavespass->GetViewportQuad()->SetShaderRealVector( "waves", DrawSpace::Utils::Vector( m_water_anim, 0.0, 0.0, 0.0 ) );
 }
 
 void dsAppClient::print_init_trace( const dsstring& p_string )
@@ -1921,8 +2007,6 @@ void dsAppClient::OnRenderFrame( void )
                 //m_calendar->Startup( 162682566 );
                 m_calendar->Startup( 0 );
                 m_ready = true;
-
-                m_water_timer.SetState( true );
 
                 renderer->GetDeviceDescr( m_deviceDescr );
                 break;        
@@ -2213,31 +2297,4 @@ void dsAppClient::OnAppEvent( WPARAM p_wParam, LPARAM p_lParam )
 void dsAppClient::on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget )
 {
 
-}
-
-void dsAppClient::on_water_timer( DrawSpace::Utils::Timer* p_timer )
-{
-    if( m_water_anim_inc )
-    {
-        m_water_anim += 0.02;
-
-        if( m_water_anim > 1.0)
-        {
-            m_water_anim_inc = false;
-        }
-    }
-    else
-    {
-        m_water_anim -= 0.02;
-
-        if( m_water_anim <= 0.0)
-        {
-            m_water_anim_inc = true;
-        }    
-    }
-
-    for( int i = 0; i < 6; i++ )
-    {
-        m_planet_detail_binder[i]->SetWaterAnim( m_water_anim ); 
-    }
 }

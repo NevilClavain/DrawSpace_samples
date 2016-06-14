@@ -172,8 +172,8 @@ bool dsAppClient::OnIdleAppInit( void )
     m_wavespass->CreateViewportQuad();
     
     m_wavespass->GetViewportQuad()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_wavespass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "water_waves.vso", true ) ) );
-    m_wavespass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "water_waves.pso", true ) ) );
+    m_wavespass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_water_waves.vso", true ) ) );
+    m_wavespass->GetViewportQuad()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_water_waves.pso", true ) ) );
     m_wavespass->GetViewportQuad()->GetFx()->GetShader( 0 )->LoadFromFile();
     m_wavespass->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
 
