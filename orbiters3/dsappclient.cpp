@@ -33,6 +33,15 @@ using namespace DrawSpace::Gui;
 using namespace DrawSpace::Utils;
 using namespace DrawSpace::Dynamics;
 
+extern "C" {
+	// This is the quickest and easiest way to enable using the nVidia GPU on a Windows laptop with a dedicated nVidia GPU and Optimus tech.
+	// enable optimus!
+    __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+
+	// AMD have one too!!!
+	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+
 
 dsAppClient* dsAppClient::m_instance = NULL;
 
@@ -128,8 +137,9 @@ void PlanetClimateBinder::Unbind( void )
 
 
 
-PlanetDetailsBinder::PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness ) :
-m_planet_node( NULL )
+PlanetDetailsBinder::PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness, dsreal p_oceansDetailsAlt ) :
+m_planet_node( NULL ),
+m_ocean_details_alt( p_oceansDetailsAlt )
 {
 
     m_mirror_mode = false;
@@ -232,7 +242,7 @@ m_planet_node( NULL )
 void PlanetDetailsBinder::Bind( void )
 {
 
-    Vector flags6( 16.0, 1.095, 1.0040, 0.0 );
+    Vector flags6( 16.0, 1.095, 1.0040, m_ocean_details_alt );
     
     Vector flags_lights;
     flags_lights[0] = ( m_ambient ? 1.0 : 0.0 );
@@ -522,7 +532,9 @@ void dsAppClient::init_passes( void )
     m_finalpass->GetViewportQuad()->SetTexture( m_texturemirrorpass->GetTargetTexture(), 1 );
     m_finalpass->GetViewportQuad()->SetTexture( m_waterbumppass->GetTargetTexture(), 2 );
 
-    m_finalpass->GetViewportQuad()->AddShaderParameter( 1, "rel_alt", 0 );
+    m_finalpass->GetViewportQuad()->AddShaderParameter( 1, "flags", 0 );
+    m_finalpass->GetViewportQuad()->AddShaderParameter( 1, "color", 1 );
+    m_finalpass->GetViewportQuad()->SetShaderRealVector( "color", Vector( 0.80, 0.82, 0.9, 1.0 ) );
     
     m_finalpass2 = _DRAWSPACE_NEW_( FinalPass, FinalPass( "final_pass2" ) );
     m_finalpass2->Initialize();
@@ -535,7 +547,7 @@ void dsAppClient::init_passes( void )
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    m_finalpass2->GetViewportQuad()->SetTexture( m_wavespass->GetTargetTexture(), 0 );    
+    //m_finalpass2->GetViewportQuad()->SetTexture( m_wavespass->GetTargetTexture(), 0 );    
     m_finalpass2->GetViewportQuad()->SetDrawingState( false );
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -765,16 +777,16 @@ void dsAppClient::init_planet( void )
     {
         m_planet_collisions_binder[i] = new MultiFractalBinder;
         m_planet_climate_binder[i] = new PlanetClimateBinder;
-        m_planet_detail_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
+        m_planet_detail_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0, 1.0025 );
 
         m_planet_waterbump_binder[i] = new DrawSpace::SphericalLOD::Binder();
 
-        m_planet_atmosphere_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
-        m_planet_atmosphere_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
+        m_planet_atmosphere_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0, 1.0025 );
+        m_planet_atmosphere_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0, 1.0025 );
         m_planet_atmosphere_binder_mirror[i]->SetMirrorMode( true );
 
-        m_planet_clouds_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
-        m_planet_clouds_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
+        m_planet_clouds_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0, 1.0025 );
+        m_planet_clouds_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0, 1.0025 );
 
         m_planet_clouds_binder_mirror[i]->SetMirrorMode( true );
 
@@ -1662,7 +1674,7 @@ void dsAppClient::render_universe( void )
     dsreal rel_alt;
     m_planet->GetInertBodyRelativeAltitude( m_ship, rel_alt );
 
-    m_finalpass->GetViewportQuad()->SetShaderRealVector( "rel_alt", Vector( rel_alt, 0.0, 0.0, 0.0 ) );
+    m_finalpass->GetViewportQuad()->SetShaderRealVector( "flags", Vector( rel_alt, m_planet_detail_binder[0]->GetOceansDetailsAlt(), 0.0, 0.0 ) );
 
 
     //DrawSpace::SphericalLOD::Patch* current_patch = m_planet->GetFragment( 0 )->GetCurrentPatch();

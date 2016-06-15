@@ -119,10 +119,11 @@ protected:
 
     bool                                                    m_mirror_mode;
 
+    dsreal                                                  m_ocean_details_alt;
 
 public:
 
-    PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness );
+    PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness, dsreal p_oceansDetailsAlt );
 
     virtual void Bind( void );
     virtual void Unbind( void );
@@ -141,6 +142,8 @@ public:
     {
         m_water_anim = p_value;
     }
+
+    dsreal GetOceansDetailsAlt( void ) { return m_ocean_details_alt; };
 };
 
 
