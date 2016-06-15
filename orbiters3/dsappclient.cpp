@@ -137,9 +137,11 @@ void PlanetClimateBinder::Unbind( void )
 
 
 
-PlanetDetailsBinder::PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness, dsreal p_oceansDetailsAlt ) :
+PlanetDetailsBinder::PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness ) :
 m_planet_node( NULL ),
-m_ocean_details_alt( p_oceansDetailsAlt )
+m_ocean_details_alt( 1.0025 ),
+m_water_bump_texture_resol( 256 ),
+m_water_bump_factor( 1.0 )
 {
 
     m_mirror_mode = false;
@@ -309,6 +311,7 @@ void PlanetDetailsBinder::Bind( void )
     m_planet_final_transform_rots.Transpose(); // faire comme dans le plugin
     m_renderer->SetFxShaderMatrix( 1, 25, m_planet_final_transform_rots );
 
+
     long clouds_texture_w;
     long clouds_texture_h;
     long clouds_texture_bpp;
@@ -319,6 +322,9 @@ void PlanetDetailsBinder::Bind( void )
 
     m_renderer->SetFxShaderParams( 1, 29, clouds_texture_infos );
 
+
+    Vector water_bump_flag( m_water_bump_texture_resol, m_water_bump_factor, 0.0, 0.0 );
+    m_renderer->SetFxShaderParams( 1, 30, water_bump_flag );
     
     MultiFractalBinder::Bind();
 }
@@ -777,16 +783,16 @@ void dsAppClient::init_planet( void )
     {
         m_planet_collisions_binder[i] = new MultiFractalBinder;
         m_planet_climate_binder[i] = new PlanetClimateBinder;
-        m_planet_detail_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0, 1.0025 );
+        m_planet_detail_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
 
         m_planet_waterbump_binder[i] = new DrawSpace::SphericalLOD::Binder();
 
-        m_planet_atmosphere_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0, 1.0025 );
-        m_planet_atmosphere_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0, 1.0025 );
+        m_planet_atmosphere_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
+        m_planet_atmosphere_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
         m_planet_atmosphere_binder_mirror[i]->SetMirrorMode( true );
 
-        m_planet_clouds_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0, 1.0025 );
-        m_planet_clouds_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0, 1.0025 );
+        m_planet_clouds_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
+        m_planet_clouds_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
 
         m_planet_clouds_binder_mirror[i]->SetMirrorMode( true );
 
@@ -805,8 +811,8 @@ void dsAppClient::init_planet( void )
     colors_pshader->LoadFromFile();
 
     
-    Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.vso", true ) );
-    Shader* planet_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet2.pso", true ) );
+    Shader* planet_vshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_surface.vso", true ) );
+    Shader* planet_pshader = _DRAWSPACE_NEW_( Shader, Shader( "planet_surface.pso", true ) );
 
     planet_vshader->LoadFromFile();
     planet_pshader->LoadFromFile();
@@ -940,7 +946,7 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet_waterbump_binder[i]->SetFx( water_bump_fx );
-        m_planet_waterbump_binder[i]->SetTexture( m_wavespass->GetTargetTexture(), 3 );
+        m_planet_waterbump_binder[i]->SetTexture( m_wavespass->GetTargetTexture(), 1 );
     }
 
 

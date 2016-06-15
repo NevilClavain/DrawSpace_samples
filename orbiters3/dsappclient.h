@@ -120,10 +120,12 @@ protected:
     bool                                                    m_mirror_mode;
 
     dsreal                                                  m_ocean_details_alt;
+    int                                                     m_water_bump_texture_resol;
+    dsreal                                                  m_water_bump_factor;
 
 public:
 
-    PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness, dsreal p_oceansDetailsAlt );
+    PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness );
 
     virtual void Bind( void );
     virtual void Unbind( void );
