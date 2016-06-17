@@ -1267,7 +1267,7 @@ void dsAppClient::init_planet( void )
    
     m_clouds_ll_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>, DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>( "impostor2_ll" ) );
     m_clouds_ll_node->SetContent( new LongLatMovement() );
-    m_clouds_ll_node->GetContent()->Init( 270.0, 0.0, ( PLANET_RAY * 1000 ) + 3000.0, 0.0, 0.0 );
+    m_clouds_ll_node->GetContent()->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 3000.0, 0.0, 0.0 );
 
     m_scenenodegraph.RegisterNode( m_clouds_ll_node );
     m_clouds_ll_node->LinkTo( m_planet_node );
@@ -1297,8 +1297,8 @@ void dsAppClient::init_planet( void )
 
     
     m_clouds->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.vsh", false ) ) );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.psh", false ) ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.vso", true ) ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.pso", true ) ) );
     m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
     m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
 
