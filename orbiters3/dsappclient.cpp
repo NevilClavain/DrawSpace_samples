@@ -1258,6 +1258,98 @@ void dsAppClient::init_planet( void )
     }
 
     ////////////////////////
+
+
+    /// volumetric clouds
+
+
+   
+    m_clouds_ll_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>, DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>( "impostor2_ll" ) );
+    m_clouds_ll_node->SetContent( new LongLatMovement() );
+    m_clouds_ll_node->GetContent()->Init( 270.0, 0.0, ( PLANET_RAY * 1000 ) + 3000.0, 0.0, 0.0 );
+
+    m_scenenodegraph.RegisterNode( m_clouds_ll_node );
+    m_clouds_ll_node->LinkTo( m_planet_node );
+
+
+
+    m_clouds = _DRAWSPACE_NEW_( DrawSpace::Clouds, DrawSpace::Clouds );
+    m_clouds->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
+    m_clouds->EnableDetails( false );
+
+
+    /////////////////////////////////////////////////
+    m_clouds_procedural_rules = new DrawSpace::Procedural::RulesPackage( m_clouds->GetProceduralCallback() );
+
+    m_clouds_procedural_rules->InitializeSeedBase( 56645 );
+    m_clouds_procedural_rules->Run( "clouds.rules", " " );
+
+    m_clouds_procedural_rules->GetRootParser()->GetRules()->Apply();
+
+
+    m_clouds->ImpostorsInit();
+    
+
+
+    m_clouds->RegisterPassSlot( m_texturepass );
+
+    
+    m_clouds->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.vsh", false ) ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.psh", false ) ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
+    
+
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    
+
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+
+
+
+
+    m_clouds->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "clouds.bmp" ) ), 0 );
+    m_clouds->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+
+    
+    m_clouds->GetNodeFromPass( m_texturepass )->SetOrderNumber( 12000 );
+
+
+    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "flags_v", 24 );
+    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags_v", Vector( 0.5, 0.0, 0.0, 0.0 ) );
+
+    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "clouds_dims", 25 );
+    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "clouds_dims", Vector( 400, -200, 1.0, 0.8 ) );
+
+
+
+    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "flags", 0 );
+    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags", Vector( 0.5, 0.0, 0.0, 0.0 ) );
+
+    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "color", 1 );
+    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 0.99, 0.99, 0.99, 1.0 ) );
+
+
+    m_clouds_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Clouds>, SceneNode<DrawSpace::Clouds>( "clouds_1" ) );
+
+    m_clouds_node->SetContent( m_clouds );
+
+
+    m_scenenodegraph.RegisterNode( m_clouds_node );
+
+    m_clouds_node->LinkTo( m_clouds_ll_node );
+
 }
 
 void dsAppClient::init_star_impostor( void )
