@@ -272,6 +272,12 @@ protected:
     DrawSpace::SphericalLOD::Binder*                                    m_planet_occlusion_binder[6];
 
 
+    DrawSpace::Procedural::RulesPackage*                                m_clouds_procedural_rules;
+    DrawSpace::Clouds*                                                  m_clouds;
+    DrawSpace::Core::SceneNode<DrawSpace::Clouds>*                      m_clouds_node;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*       m_clouds_ll_node;
+
+
     DrawSpace::Chunk*                                                   m_star_impostor;
     DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_star_impostor_node;
 
