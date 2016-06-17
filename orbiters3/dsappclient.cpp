@@ -140,7 +140,7 @@ void PlanetClimateBinder::Unbind( void )
 
 PlanetDetailsBinder::PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness ) :
 m_planet_node( NULL ),
-m_ocean_details_alt( 1.0025 ),
+m_ocean_details_alt( 1.0010 ),
 m_water_bump_texture_resol( 256 ),
 m_water_bump_factor( 1.0 )
 {
