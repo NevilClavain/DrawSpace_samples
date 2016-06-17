@@ -25,6 +25,7 @@
 #include "Psapi.h"
 
 #define PLANET_RAY 6000.0
+#define PLANET_ATMO_THICKNESS 85.0
 
 using namespace DrawSpace;
 using namespace DrawSpace::Interface;
@@ -783,16 +784,16 @@ void dsAppClient::init_planet( void )
     {
         m_planet_collisions_binder[i] = new MultiFractalBinder;
         m_planet_climate_binder[i] = new PlanetClimateBinder;
-        m_planet_detail_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
+        m_planet_detail_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS * 1000.0 );
 
         m_planet_waterbump_binder[i] = new DrawSpace::SphericalLOD::Binder();
 
-        m_planet_atmosphere_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
-        m_planet_atmosphere_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
+        m_planet_atmosphere_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS * 1000.0 );
+        m_planet_atmosphere_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS * 1000.0 );
         m_planet_atmosphere_binder_mirror[i]->SetMirrorMode( true );
 
-        m_planet_clouds_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
-        m_planet_clouds_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, 85000.0 );
+        m_planet_clouds_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS * 1000.0 );
+        m_planet_clouds_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS * 1000.0 );
 
         m_planet_clouds_binder_mirror[i]->SetMirrorMode( true );
 
