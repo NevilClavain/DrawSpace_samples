@@ -1159,7 +1159,7 @@ void dsAppClient::init_planet( void )
     planet_clouds.enable_datatextures = false;
     planet_clouds.enable_lod = false;
     planet_clouds.min_lodlevel = 0;
-    planet_clouds.ray = PLANET_RAY + 18.0;
+    planet_clouds.ray = PLANET_RAY + 28.0;
 
     for( int i = 0; i < 6; i++ )
     {
@@ -1267,7 +1267,7 @@ void dsAppClient::init_planet( void )
    
     m_clouds_ll_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>, DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>( "impostor2_ll" ) );
     m_clouds_ll_node->SetContent( new LongLatMovement() );
-    m_clouds_ll_node->GetContent()->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 3000.0, 0.0, 0.0 );
+    m_clouds_ll_node->GetContent()->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 13000.0, 0.0, 0.0 );
 
     m_scenenodegraph.RegisterNode( m_clouds_ll_node );
     m_clouds_ll_node->LinkTo( m_planet_node );
@@ -1284,7 +1284,7 @@ void dsAppClient::init_planet( void )
     m_clouds_procedural_rules = new DrawSpace::Procedural::RulesPackage( m_clouds->GetProceduralCallback() );
 
     m_clouds_procedural_rules->InitializeSeedBase( 56645 );
-    m_clouds_procedural_rules->Run( "clouds.rules", " " );
+    m_clouds_procedural_rules->Run( "planet_clouds.rules", " " );
 
     m_clouds_procedural_rules->GetRootParser()->GetRules()->Apply();
 
@@ -1297,8 +1297,8 @@ void dsAppClient::init_planet( void )
 
     
     m_clouds->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.vso", true ) ) );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "spaceimpostor.pso", true ) ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.vso", true ) ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.pso", true ) ) );
     m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
     m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
 
@@ -1331,7 +1331,7 @@ void dsAppClient::init_planet( void )
     m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags_v", Vector( 0.5, 0.0, 0.0, 0.0 ) );
 
     m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "clouds_dims", 25 );
-    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "clouds_dims", Vector( 400, -200, 1.0, 0.8 ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "clouds_dims", Vector( 2500, -2500, 1.0, 0.65 ) );
 
 
 
@@ -1861,7 +1861,7 @@ void dsAppClient::render_universe( void )
         m_details_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     }
     
-    if( alt > 18000.0 || false == hotstate )
+    if( alt > 28000.0 || false == hotstate )
     {
         m_clouds_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
         m_clouds_fx->UpdateRenderStateIn( 1, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
