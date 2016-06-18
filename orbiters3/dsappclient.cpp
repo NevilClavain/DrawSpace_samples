@@ -34,15 +34,6 @@ using namespace DrawSpace::Gui;
 using namespace DrawSpace::Utils;
 using namespace DrawSpace::Dynamics;
 
-extern "C" {
-	// This is the quickest and easiest way to enable using the nVidia GPU on a Windows laptop with a dedicated nVidia GPU and Optimus tech.
-	// enable optimus!
-    __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-
-	// AMD have one too!!!
-	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
-}
-
 
 dsAppClient* dsAppClient::m_instance = NULL;
 
