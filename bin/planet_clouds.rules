@@ -69,7 +69,7 @@ repeat
 
      # UV texture coords
      vector 0.75 0.0 1.0 0.25
-     real 4400.0
+     real 6400.0
     end  
    end
 

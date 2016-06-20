@@ -1318,15 +1318,17 @@ void dsAppClient::init_planet( void )
     m_clouds->GetNodeFromPass( m_texturepass )->SetOrderNumber( 12000 );
 
 
-    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "flags_v", 24 );
-    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags_v", Vector( 0.5, 0.0, 0.0, 0.0 ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "flags", 24 );
+    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags", Vector( 0.0, PLANET_RAY * 1000.0, 0.0000015, 0.0 ) );
 
     m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "clouds_dims", 25 );
     m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "clouds_dims", Vector( 2500, -2500, 1.0, 0.65 ) );
 
+    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "view_pos", 26 );
 
-    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "color", 1 );
-    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 0.99, 0.99, 0.99, 1.0 ) );
+
+    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "fog_color", 0 );
+    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "fog_color", Vector( 0.45, 0.63, 0.78, 1.0 ) );
 
 
     m_clouds_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Clouds>, SceneNode<DrawSpace::Clouds>( "clouds_1" ) );
@@ -1830,7 +1832,9 @@ void dsAppClient::render_universe( void )
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+    Vector invariantPos;
+    m_planet->GetLayer( m_ship, 0 )->GetPlanetBody()->GetInvariantViewerPos( invariantPos );
+    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "view_pos", invariantPos );
 
 
     dsreal alt = m_planet->GetLayer( m_ship, 0 )->GetPlanetBody()->GetHotPointAltitud();
