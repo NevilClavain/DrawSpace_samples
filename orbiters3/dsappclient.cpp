@@ -180,7 +180,7 @@ m_water_bump_factor( 1.0 )
     m_atmo_scattering_flags5[0] = 215000.0; // altitude limite de transition entre xxxfromspace_atmo_scattering et xxxfromatmo_atmo_scattering
     m_atmo_scattering_flags5[1] = 30000.0; // altitude debut d'apparition du fog "sol"
     m_atmo_scattering_flags5[2] = 0.000032; // intensite fog "sol"
-    m_atmo_scattering_flags5[3] = 285000.0; // alitude limite pour prise en compte facteur altitude camera pour le calcul de l'alpha
+    m_atmo_scattering_flags5[3] = 285000.0; // altitude limite pour prise en compte facteur altitude camera pour le calcul de l'alpha
 
     // couleurs fog "sol"    
     m_atmo_scattering_flags6[0] = 0.45;
@@ -1324,10 +1324,6 @@ void dsAppClient::init_planet( void )
     m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "clouds_dims", 25 );
     m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "clouds_dims", Vector( 2500, -2500, 1.0, 0.65 ) );
 
-
-
-    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "flags", 0 );
-    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags", Vector( 0.5, 0.0, 0.0, 0.0 ) );
 
     m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "color", 1 );
     m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 0.99, 0.99, 0.99, 1.0 ) );
