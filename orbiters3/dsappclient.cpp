@@ -1333,6 +1333,8 @@ void dsAppClient::init_planet( void )
     m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "fog_color", 0 );
     m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "fog_color", Vector( 0.45, 0.63, 0.78, 1.0 ) );
 
+    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "ambient_lit", 1 );
+    
 
 
 
@@ -1382,7 +1384,7 @@ void dsAppClient::init_planet( void )
     m_clouds->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "fog_color", Vector( 0.45, 0.63, 0.78, 1.0 ) );
 
 
-
+    m_clouds->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 1, "ambient_lit", 1 );
 
 
 
@@ -1889,7 +1891,6 @@ void dsAppClient::render_universe( void )
 
     Vector invariantPos;
     m_planet->GetLayer( m_ship, 0 )->GetPlanetBody()->GetInvariantViewerPos( invariantPos );
-    //m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "view_pos", invariantPos );
     m_clouds->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "view_pos", invariantPos );
 
     Matrix planet_transf;
@@ -1902,9 +1903,28 @@ void dsAppClient::render_universe( void )
     planet_pos[2] = planet_transf( 3, 2 );
     planet_pos[3] = 1.0;
 
-    //m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "planet_pos", planet_pos );
     m_clouds->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "planet_pos", planet_pos );
 
+
+    ////////////////////////////////////////
+
+    // calcul lumiere ambiante pour les nuages volumetriques
+
+
+    invariantPos.Normalize();
+
+    PlanetLight l0 = m_planet_detail_binder[0]->GetLight( 0 );
+
+
+    Vector ambient_lit = l0.m_color;
+
+    ambient_lit.Scale( Utils::Maths::Clamp( 0.0, 1.0, l0.m_dir * invariantPos + 0.25 ) );  // produit scalaire plus un biais
+
+    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "ambient_lit", ambient_lit );
+    m_clouds->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "ambient_lit", ambient_lit );
+
+
+    ////////////////////////////////////////
 
     dsreal alt = m_planet->GetLayer( m_ship, 0 )->GetPlanetBody()->GetHotPointAltitud();
 
