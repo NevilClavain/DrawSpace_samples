@@ -1918,7 +1918,7 @@ void dsAppClient::render_universe( void )
 
     Vector ambient_lit = l0.m_color;
 
-    ambient_lit.Scale( Utils::Maths::Clamp( 0.0, 1.0, l0.m_dir * invariantPos + 0.25 ) );  // produit scalaire plus un biais
+    ambient_lit.Scale( Utils::Maths::Clamp( 0.0, 1.0, l0.m_dir * invariantPos + 0.35 ) );  // produit scalaire plus un biais
 
     m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "ambient_lit", ambient_lit );
     m_clouds->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "ambient_lit", ambient_lit );
