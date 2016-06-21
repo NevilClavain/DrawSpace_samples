@@ -24,8 +24,49 @@
 #include "dsappclient.h"
 #include "Psapi.h"
 
-#define PLANET_RAY 6000.0
-#define PLANET_ATMO_THICKNESS 85.0
+/*
+#define PLANET_RAY                          6000.0
+#define PLANET_ATMO_THICKNESS               85000.0
+#define ATMO_SCATTERING_SPACE_GROUND_LIMIT  215000.0
+#define FOG_ALT_LIMIT                       30000.0
+#define ATMO_SCATTERING_ALPHA_ALT_VIEWER    285000.0
+#define FLAT_CLOUDS_ALT                     28000.0
+#define VOLUMETRIC_CLOUDS_ALT               13000.0
+#define PLAINS_AMPLITUDE                    800.0
+#define MOUNTAINS_AMPLITUDE                 7000.0
+#define MOUNTAINS_OFFSET                    -2200.0
+#define VERTICAL_OFFSET                     20.0
+#define TEMP_DEC_PER_KM                     6.4
+#define BEACH_LIMIT                         25.0
+#define CLOUDS_PROCEDURALRULES_FILE         "planet_clouds.rules"
+#define CLOUDS_HEIGHT                       5000.0
+#define CLOUDS_FOG_DENSITY                  0.0000015
+#define FOG_DENSITY                         0.000032
+#define ZBUFFER_ACTIVATION_REL_ALT          1.009
+*/
+
+
+
+#define PLANET_RAY                          500.0
+#define PLANET_ATMO_THICKNESS               12000.0
+#define ATMO_SCATTERING_SPACE_GROUND_LIMIT  70000.0
+#define FOG_ALT_LIMIT                       10000.0
+#define ATMO_SCATTERING_ALPHA_ALT_VIEWER    75000.0
+#define FLAT_CLOUDS_ALT                     4800.0
+#define VOLUMETRIC_CLOUDS_ALT               2500.0
+#define PLAINS_AMPLITUDE                    50.0
+#define MOUNTAINS_AMPLITUDE                 800.0
+#define MOUNTAINS_OFFSET                    -120.0
+#define VERTICAL_OFFSET                     2.0
+#define TEMP_DEC_PER_KM                     66.0
+#define BEACH_LIMIT                         25.0
+#define CLOUDS_PROCEDURALRULES_FILE         "planet_clouds_small_small.rules"
+#define CLOUDS_HEIGHT                       1000.0
+#define CLOUDS_FOG_DENSITY                  0.000025
+#define FOG_DENSITY                         0.00052
+#define ZBUFFER_ACTIVATION_REL_ALT          1.0099
+
+
 
 using namespace DrawSpace;
 using namespace DrawSpace::Interface;
@@ -47,10 +88,10 @@ _DECLARE_DS_LOGGER( logger, "AppClient", DrawSpace::Logger::Configuration::GetIn
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 MultiFractalBinder::MultiFractalBinder( void ) :
-m_plains_amplitude( 800.0 ),
-m_mountains_amplitude( 7000.0 ),
-m_vertical_offset( 20.0 ),
-m_mountains_offset( -2200.0 ),
+m_plains_amplitude( PLAINS_AMPLITUDE ),
+m_mountains_amplitude( MOUNTAINS_AMPLITUDE ),
+m_vertical_offset( VERTICAL_OFFSET ),
+m_mountains_offset( MOUNTAINS_OFFSET ),
 m_plains_seed1( 18334.0 ),
 m_plains_seed2( 1770.0 ),
 m_mix_seed1( 635.0 ),
@@ -93,26 +134,26 @@ void PlanetClimateBinder::Bind( void )
     // planete temperee
     
 
-    Vector thparams( 120.0, 220.0, 6.4, 25.0 );
+    Vector thparams( 120.0, 220.0, TEMP_DEC_PER_KM, BEACH_LIMIT );
     Vector thparams2( 0.48, 0.75, 0.45, 0.55 );
 
 
 
     // planete chaude et peu humide (aride) : desertique
-    //Vector thparams( 0.0, 10.0, 6.4, 25.0 );
+    //Vector thparams( 0.0, 10.0, TEMP_DEC_PER_KM, BEACH_LIMIT );
     //Vector thparams2( 0.0, 0.0, 0.78, 0.78 );
 
     // planete chaude et tres humide : monde tropical
-    //Vector thparams( 2500.0, 1800.0, 6.4, 25.0 );
+    //Vector thparams( 2500.0, 1800.0, TEMP_DEC_PER_KM, BEACH_LIMIT );
     //Vector thparams2( 0.05, 0.1, 0.45, 0.48 );
 
 
     // monde glacé et plutot sec
-    //Vector thparams( 50.0, 80.0, 6.4, 25.0 );
+    //Vector thparams( 50.0, 80.0, TEMP_DEC_PER_KM, BEACH_LIMIT );
     //Vector thparams2( 1.4, 1.5, 0.28, 0.99 );
 
     // monde froid et plutot humide
-    //Vector thparams( 1400.0, 1900.0, 6.4, 25.0 );
+    //Vector thparams( 1400.0, 1900.0, TEMP_DEC_PER_KM, BEACH_LIMIT );
     //Vector thparams2( 0.92, 1.5, 0.37, 0.99 );
 
 
@@ -177,10 +218,10 @@ m_water_bump_factor( 0.75 )
     m_atmo_scattering_flags4[2] = m_groundfromspace_ESun;
     m_atmo_scattering_flags4[3] = m_groundfromatmo_ESun;
 
-    m_atmo_scattering_flags5[0] = 215000.0; // altitude limite de transition entre xxxfromspace_atmo_scattering et xxxfromatmo_atmo_scattering
-    m_atmo_scattering_flags5[1] = 30000.0; // altitude debut d'apparition du fog "sol"
-    m_atmo_scattering_flags5[2] = 0.000032; // intensite fog "sol"
-    m_atmo_scattering_flags5[3] = 285000.0; // altitude limite pour prise en compte facteur altitude camera pour le calcul de l'alpha
+    m_atmo_scattering_flags5[0] = ATMO_SCATTERING_SPACE_GROUND_LIMIT; // altitude limite de transition entre xxxfromspace_atmo_scattering et xxxfromatmo_atmo_scattering
+    m_atmo_scattering_flags5[1] = FOG_ALT_LIMIT; // altitude debut d'apparition du fog "sol"
+    m_atmo_scattering_flags5[2] = FOG_DENSITY; // intensite fog "sol"
+    m_atmo_scattering_flags5[3] = ATMO_SCATTERING_ALPHA_ALT_VIEWER; // altitude limite pour prise en compte facteur altitude camera pour le calcul de l'alpha
 
     // couleurs fog "sol"    
     m_atmo_scattering_flags6[0] = 0.45;
@@ -775,16 +816,16 @@ void dsAppClient::init_planet( void )
     {
         m_planet_collisions_binder[i] = new MultiFractalBinder;
         m_planet_climate_binder[i] = new PlanetClimateBinder;
-        m_planet_detail_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS * 1000.0 );
+        m_planet_detail_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS );
 
         m_planet_waterbump_binder[i] = new DrawSpace::SphericalLOD::Binder();
 
-        m_planet_atmosphere_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS * 1000.0 );
-        m_planet_atmosphere_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS * 1000.0 );
+        m_planet_atmosphere_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS );
+        m_planet_atmosphere_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS );
         m_planet_atmosphere_binder_mirror[i]->SetMirrorMode( true );
 
-        m_planet_clouds_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS * 1000.0 );
-        m_planet_clouds_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS * 1000.0 );
+        m_planet_clouds_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS );
+        m_planet_clouds_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS );
 
         m_planet_clouds_binder_mirror[i]->SetMirrorMode( true );
 
@@ -1134,7 +1175,7 @@ void dsAppClient::init_planet( void )
     planet_atmosphere.enable_datatextures = false;
     planet_atmosphere.enable_lod = false;
     planet_atmosphere.min_lodlevel = 0;
-    planet_atmosphere.ray = PLANET_RAY + 85.0;
+    planet_atmosphere.ray = PLANET_RAY + PLANET_ATMO_THICKNESS / 1000.0;
 
     for( int i = 0; i < 6; i++ )
     {
@@ -1150,7 +1191,7 @@ void dsAppClient::init_planet( void )
     planet_clouds.enable_datatextures = false;
     planet_clouds.enable_lod = false;
     planet_clouds.min_lodlevel = 0;
-    planet_clouds.ray = PLANET_RAY + 28.0;
+    planet_clouds.ray = PLANET_RAY + FLAT_CLOUDS_ALT / 1000.0;
 
     for( int i = 0; i < 6; i++ )
     {
@@ -1258,8 +1299,7 @@ void dsAppClient::init_planet( void )
    
     m_clouds_ll_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>, DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>( "impostor2_ll" ) );
     m_clouds_ll_node->SetContent( new LongLatMovement() );
-    m_clouds_ll_node->GetContent()->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 13000.0, 0.0, 0.0 );
-    //m_clouds_ll_node->GetContent()->Init( 180.0, 0.0, ( PLANET_RAY * 1000 ) + 13000.0, 0.0, 0.0 );
+    m_clouds_ll_node->GetContent()->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, 0.0, 0.0 );
 
     m_scenenodegraph.RegisterNode( m_clouds_ll_node );
     m_clouds_ll_node->LinkTo( m_planet_node );
@@ -1276,7 +1316,7 @@ void dsAppClient::init_planet( void )
     m_clouds_procedural_rules = new DrawSpace::Procedural::RulesPackage( m_clouds->GetProceduralCallback() );
 
     m_clouds_procedural_rules->InitializeSeedBase( 56645 );
-    m_clouds_procedural_rules->Run( "planet_clouds.rules", " " );
+    m_clouds_procedural_rules->Run( CLOUDS_PROCEDURALRULES_FILE, " " );
 
     m_clouds_procedural_rules->GetRootParser()->GetRules()->Apply();
 
@@ -1321,10 +1361,10 @@ void dsAppClient::init_planet( void )
 
 
     m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "flags", 24 );
-    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags", Vector( 0.0, PLANET_RAY * 1000.0, 0.0000015, 0.0 ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags", Vector( 0.0, PLANET_RAY * 1000.0, CLOUDS_FOG_DENSITY, 0.0 ) );
 
     m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "clouds_dims", 25 );
-    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "clouds_dims", Vector( 2500, -2500, 1.0, 0.65 ) );
+    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "clouds_dims", Vector( CLOUDS_HEIGHT / 2.0, -CLOUDS_HEIGHT / 2.0, 1.0, 0.65 ) );
 
     m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "view_pos", 26 );
     m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "planet_pos", 27 );
@@ -1371,7 +1411,7 @@ void dsAppClient::init_planet( void )
 
 
     m_clouds->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "flags", 24 );
-    m_clouds->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "flags", Vector( 1.0, PLANET_RAY * 1000.0, 0.0000015, 0.0 ) );
+    m_clouds->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "flags", Vector( 1.0, PLANET_RAY * 1000.0, CLOUDS_FOG_DENSITY, 0.0 ) );
 
     m_clouds->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "clouds_dims", 25 );
     m_clouds->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "clouds_dims", Vector( 2500, -2500, 1.0, 0.65 ) );
@@ -1932,7 +1972,7 @@ void dsAppClient::render_universe( void )
 
     // activer Z buffering seulement si on est pres de la surface
     
-    if( rel_alt < 1.009 )
+    if( rel_alt < ZBUFFER_ACTIVATION_REL_ALT )
     {
         m_details_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
     }
@@ -1941,7 +1981,7 @@ void dsAppClient::render_universe( void )
         m_details_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     }
     
-    if( alt > 28000.0 || false == hotstate )
+    if( alt > FLAT_CLOUDS_ALT || false == hotstate )
     {
         m_clouds_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
         m_clouds_fx->UpdateRenderStateIn( 1, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
