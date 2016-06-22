@@ -24,7 +24,7 @@
 #include "dsappclient.h"
 #include "Psapi.h"
 
-/*
+
 #define PLANET_RAY                          6000.0
 #define PLANET_ATMO_THICKNESS               85000.0
 #define ATMO_SCATTERING_SPACE_GROUND_LIMIT  215000.0
@@ -44,10 +44,10 @@
 #define FOG_DENSITY                         0.000032
 #define ZBUFFER_ACTIVATION_REL_ALT          1.009
 #define TERRAIN_BUMP_FACTOR                 100.0
-*/
 
 
 
+/*
 #define PLANET_RAY                          500.0
 #define PLANET_ATMO_THICKNESS               12000.0
 #define ATMO_SCATTERING_SPACE_GROUND_LIMIT  70000.0
@@ -67,6 +67,7 @@
 #define FOG_DENSITY                         0.00020
 #define ZBUFFER_ACTIVATION_REL_ALT          1.0099
 #define TERRAIN_BUMP_FACTOR                 10.0
+*/
 
 
 
@@ -1444,6 +1445,8 @@ void dsAppClient::init_planet( void )
 
     m_clouds_node->LinkTo( m_clouds_ll_node );
 
+
+    m_planet->SetGravityState( false );
 }
 
 void dsAppClient::init_star_impostor( void )
@@ -1683,7 +1686,7 @@ void dsAppClient::init_cameras( void )
     m_camera_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "cameradebug_transfo" ) );
     m_camera_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
     Matrix cameradebug_pos;
-    cameradebug_pos.Translation( 0.0, -10.0, 0.0 );
+    cameradebug_pos.Translation( 0.0, -20.0, 0.0 );
     m_camera_transfo_node->GetContent()->PushMatrix( cameradebug_pos );
 
     m_scenenodegraph.RegisterNode( m_camera_transfo_node );
