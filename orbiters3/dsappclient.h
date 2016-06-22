@@ -123,6 +123,8 @@ protected:
     int                                                     m_water_bump_texture_resol;
     dsreal                                                  m_water_bump_factor;
 
+    dsreal                                                  m_terrain_bump_factor;
+
 public:
 
     PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThickness );

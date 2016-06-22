@@ -43,6 +43,7 @@
 #define CLOUDS_FOG_DENSITY                  0.0000015
 #define FOG_DENSITY                         0.000032
 #define ZBUFFER_ACTIVATION_REL_ALT          1.009
+#define TERRAIN_BUMP_FACTOR                 100.0
 */
 
 
@@ -63,8 +64,9 @@
 #define CLOUDS_PROCEDURALRULES_FILE         "planet_clouds_small_small.rules"
 #define CLOUDS_HEIGHT                       1000.0
 #define CLOUDS_FOG_DENSITY                  0.000025
-#define FOG_DENSITY                         0.00052
+#define FOG_DENSITY                         0.00032
 #define ZBUFFER_ACTIVATION_REL_ALT          1.0099
+#define TERRAIN_BUMP_FACTOR                 10.0
 
 
 
@@ -174,7 +176,8 @@ PlanetDetailsBinder::PlanetDetailsBinder( dsreal p_planetRay, dsreal p_atmoThick
 m_planet_node( NULL ),
 m_ocean_details_alt( 1.0010 ),
 m_water_bump_texture_resol( 256 ),
-m_water_bump_factor( 0.75 )
+m_water_bump_factor( 0.75 ),
+m_terrain_bump_factor( TERRAIN_BUMP_FACTOR )
 {
 
     m_mirror_mode = false;
@@ -358,7 +361,11 @@ void PlanetDetailsBinder::Bind( void )
 
     Vector water_bump_flag( m_water_bump_texture_resol, m_water_bump_factor, 0.0, 0.0 );
     m_renderer->SetFxShaderParams( 1, 30, water_bump_flag );
-    
+
+    Vector terrain_bump_flag( m_terrain_bump_factor, 0.0, 0.0, 0.0 );
+    m_renderer->SetFxShaderParams( 1, 31, terrain_bump_flag );
+
+
     MultiFractalBinder::Bind();
 }
 
