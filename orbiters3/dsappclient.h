@@ -210,6 +210,7 @@ protected:
     DrawSpace::Core::CircularMovement*          m_circular_mvt;
     DrawSpace::Core::SceneNode<DrawSpace::Core::CircularMovement>*          m_circmvt_node;
 
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_camera_transfo_node;
     
 
 

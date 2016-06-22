@@ -64,7 +64,7 @@
 #define CLOUDS_PROCEDURALRULES_FILE         "planet_clouds_small_small.rules"
 #define CLOUDS_HEIGHT                       1000.0
 #define CLOUDS_FOG_DENSITY                  0.000025
-#define FOG_DENSITY                         0.00032
+#define FOG_DENSITY                         0.00020
 #define ZBUFFER_ACTIVATION_REL_ALT          1.0099
 #define TERRAIN_BUMP_FACTOR                 10.0
 
@@ -1633,7 +1633,7 @@ void dsAppClient::init_ship( void )
 
     cube_params.mass = SHIP_MASS;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
-    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285 / 2.0, 21.4704 / 2.0, 81.911 / 2.0, 1.0 );
+    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285 / 2.0, 21.4704 / 2.0, 81.911 / 2.0, 1.0 );    
     
     // TEMPORAIRE
     cube_params.initial_attitude.Translation( 269000000.0, 0.0, 59000000.0 );
@@ -1662,8 +1662,7 @@ void dsAppClient::init_ship( void )
 void dsAppClient::init_cameras( void )
 {
     m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    //m_camera3->LockOnBody( "ship", m_ship );
-    m_camera3->Lock( m_ship_node );
+    //m_camera3->Lock( m_ship_node );
     m_camera3->SetReferentBody( m_ship );
     
     m_camera3_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera3" ) );
@@ -1680,7 +1679,22 @@ void dsAppClient::init_cameras( void )
     m_circmvt_node->SetContent( m_circular_mvt );
     m_scenenodegraph.RegisterNode( m_circmvt_node );
 
-    m_camera3_node->LinkTo( m_circmvt_node );
+
+    m_camera_transfo_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( "cameradebug_transfo" ) );
+    m_camera_transfo_node->SetContent( _DRAWSPACE_NEW_( Transformation, Transformation ) );
+    Matrix cameradebug_pos;
+    cameradebug_pos.Translation( 0.0, -10.0, 0.0 );
+    m_camera_transfo_node->GetContent()->PushMatrix( cameradebug_pos );
+
+    m_scenenodegraph.RegisterNode( m_camera_transfo_node );
+    m_camera_transfo_node->LinkTo( m_ship_node );
+
+
+
+    //m_camera3_node->LinkTo( m_circmvt_node );
+
+    m_camera3_node->LinkTo( m_camera_transfo_node );
+    
 
     m_circmvt_node->LinkTo( m_ship_node );
 
