@@ -207,6 +207,14 @@ protected:
 
     
 
+    DrawSpace::Dynamics::CameraPoint*           m_camera5;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera5_node;
+    DrawSpace::Core::LongLatMovement*           m_longlat_mvt;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*          m_longlatmvt_node;
+    DrawSpace::Core::FPSMovement*              m_fps_mvt;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::FPSMovement>*          m_fpsmvt_node;
+
+
     DrawSpace::Core::CircularMovement*          m_circular_mvt;
     DrawSpace::Core::SceneNode<DrawSpace::Core::CircularMovement>*          m_circmvt_node;
 

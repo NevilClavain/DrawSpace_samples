@@ -24,7 +24,7 @@
 #include "dsappclient.h"
 #include "Psapi.h"
 
-
+/*
 #define PLANET_RAY                          6000.0
 #define PLANET_ATMO_THICKNESS               85000.0
 #define ATMO_SCATTERING_SPACE_GROUND_LIMIT  215000.0
@@ -44,10 +44,10 @@
 #define FOG_DENSITY                         0.000032
 #define ZBUFFER_ACTIVATION_REL_ALT          1.009
 #define TERRAIN_BUMP_FACTOR                 100.0
+*/
 
 
 
-/*
 #define PLANET_RAY                          500.0
 #define PLANET_ATMO_THICKNESS               12000.0
 #define ATMO_SCATTERING_SPACE_GROUND_LIMIT  70000.0
@@ -67,7 +67,7 @@
 #define FOG_DENSITY                         0.00020
 #define ZBUFFER_ACTIVATION_REL_ALT          1.0099
 #define TERRAIN_BUMP_FACTOR                 10.0
-*/
+
 
 
 
@@ -1446,7 +1446,7 @@ void dsAppClient::init_planet( void )
     m_clouds_node->LinkTo( m_clouds_ll_node );
 
 
-    m_planet->SetGravityState( false );
+    //m_planet->SetGravityState( false );
 }
 
 void dsAppClient::init_star_impostor( void )
@@ -1665,7 +1665,7 @@ void dsAppClient::init_ship( void )
 void dsAppClient::init_cameras( void )
 {
     m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
-    //m_camera3->Lock( m_ship_node );
+    m_camera3->Lock( m_ship_node );
     m_camera3->SetReferentBody( m_ship );
     
     m_camera3_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera3" ) );
@@ -1694,9 +1694,9 @@ void dsAppClient::init_cameras( void )
 
 
 
-    //m_camera3_node->LinkTo( m_circmvt_node );
+    m_camera3_node->LinkTo( m_circmvt_node );
 
-    m_camera3_node->LinkTo( m_camera_transfo_node );
+    //m_camera3_node->LinkTo( m_camera_transfo_node );
     
 
     m_circmvt_node->LinkTo( m_ship_node );
@@ -1713,6 +1713,44 @@ void dsAppClient::init_cameras( void )
 
     // TEMPORAIRE
     m_camera_occ->Lock( m_star_impostor_node );
+
+
+    /////////////////////////////////////////////////////////
+
+
+    m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
+
+    m_camera5->SetReferentBody( m_planet );
+    m_camera5_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>( "camera5" ) );
+    m_camera5_node->SetContent( m_camera5 );
+
+    m_scenenodegraph.RegisterNode( m_camera5_node );
+
+    m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
+    //m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 93.0 + 2.0, 0.0, 0.0 );
+    m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 8.0 + 5.0, 0.0, 0.0 );
+
+    m_longlatmvt_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LongLatMovement>, SceneNode<DrawSpace::Core::LongLatMovement>( "longlatmvt_node" ) );
+    m_longlatmvt_node->SetContent( m_longlat_mvt );
+
+    m_scenenodegraph.RegisterNode( m_longlatmvt_node );
+
+
+
+    m_fps_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::FPSMovement, DrawSpace::Core::FPSMovement );
+
+    Vector voidpos;
+    m_fps_mvt->Init( voidpos );
+    
+
+    m_fpsmvt_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::FPSMovement>, SceneNode<DrawSpace::Core::FPSMovement>( "fpsmvt" ) );
+    m_fpsmvt_node->SetContent( m_fps_mvt );
+    m_scenenodegraph.RegisterNode( m_fpsmvt_node );
+
+    m_camera5_node->LinkTo( m_fpsmvt_node );
+
+    m_fpsmvt_node->LinkTo( m_longlatmvt_node );
+    m_longlatmvt_node->LinkTo( m_planet_node );
 }
 
 void dsAppClient::init_reticle( void )
@@ -2259,10 +2297,18 @@ void dsAppClient::OnRenderFrame( void )
 
             case 17:
                 print_init_trace( "launching simulation..." );
-                //m_mouse_circularmode = true;
-                //m_scenenodegraph.SetCurrentCamera( "camera3" );
-                m_curr_camera = m_camera3; 
-                m_curr_camera_name = "camera3";
+
+
+                
+                //m_curr_camera = m_camera3; 
+                //m_curr_camera_name = "camera3";
+                
+
+                m_mouse_circularmode = true;
+                m_curr_camera = m_camera5; 
+                m_curr_camera_name = "camera5";
+
+
                 m_scenenodegraph.SetCurrentCamera( m_curr_camera_name );
                 //m_calendar->Startup( 162682566 );
                 m_calendar->Startup( 0 );
@@ -2482,6 +2528,23 @@ void dsAppClient::OnKeyPulse( long p_key )
             m_timefactor = "x86400";
             break;
 
+        case 'I':
+            {
+                if( m_curr_camera == m_camera3 )
+                {
+                    m_curr_camera = m_camera5; 
+                    m_curr_camera_name = "camera5";
+                    m_mouse_circularmode = true;                
+                }
+                else if( m_curr_camera == m_camera5 )
+                {
+                    m_curr_camera = m_camera3; 
+                    m_curr_camera_name = "camera3";
+                    m_mouse_circularmode = false;
+                }
+            }
+            break;
+
         case VK_F8:
 
             if( !m_final_pass_2)
@@ -2527,6 +2590,11 @@ void dsAppClient::OnKeyPulse( long p_key )
 
 void dsAppClient::OnMouseMove( long p_xm, long p_ym, long p_dx, long p_dy )
 {
+    if( m_curr_camera == m_camera5 )
+    {
+	    m_fps_mvt->RotateYaw( - p_dx / 4.0, m_timer );
+	    m_fps_mvt->RotatePitch( - p_dy / 4.0, m_timer );
+    }
 }
 
 void dsAppClient::OnMouseLeftButtonDown( long p_xm, long p_ym )
