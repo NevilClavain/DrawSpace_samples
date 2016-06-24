@@ -68,7 +68,7 @@
 #define FOG_DENSITY                         0.00020
 #define ZBUFFER_ACTIVATION_REL_ALT          1.0099
 #define TERRAIN_BUMP_FACTOR                 10.0
-#define NB_LOD                              10
+#define NB_LOD                              11
 
 
 
@@ -1731,7 +1731,7 @@ void dsAppClient::init_cameras( void )
 
     m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
     //m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 93.0 + 2.0, 0.0, 0.0 );
-    m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 8.0 + 2.0, 0.0, 0.0 );
+    m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 8.0 + 3.0, 0.0, 0.0 );
 
     m_longlatmvt_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LongLatMovement>, SceneNode<DrawSpace::Core::LongLatMovement>( "longlatmvt_node" ) );
     m_longlatmvt_node->SetContent( m_longlat_mvt );
@@ -1922,7 +1922,19 @@ void dsAppClient::render_universe( void )
     //////////////////////////////////////////////////////////////
 
     dsreal rel_alt;
-    m_planet->GetInertBodyRelativeAltitude( m_ship, rel_alt );
+
+    if( m_curr_camera == m_camera5 )
+    {
+        m_planet->GetCameraRelativeAltitude( "camera5", rel_alt );
+    }
+    else
+    {
+        m_planet->GetInertBodyRelativeAltitude( m_ship, rel_alt );
+    }
+
+    
+
+
 
     m_finalpass->GetViewportQuad()->SetShaderRealVector( "flags", Vector( rel_alt, m_planet_detail_binder[0]->GetOceansDetailsAlt(), 0.0, 0.0 ) );
 
@@ -1995,7 +2007,19 @@ void dsAppClient::render_universe( void )
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
     Vector invariantPos;
-    m_planet->GetLayer( m_ship, 0 )->GetPlanetBody()->GetInvariantViewerPos( invariantPos );
+
+    if( m_curr_camera == m_camera5 )
+    {
+        m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetInvariantViewerPos( invariantPos );
+    }
+    else
+    {
+        m_planet->GetLayerFromInertBody( m_ship, 0 )->GetBody()->GetInvariantViewerPos( invariantPos );
+    }
+
+    
+    
+    
     m_clouds->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "view_pos", invariantPos );
 
     Matrix planet_transf;
@@ -2031,9 +2055,19 @@ void dsAppClient::render_universe( void )
 
     ////////////////////////////////////////
 
-    dsreal alt = m_planet->GetLayer( m_ship, 0 )->GetPlanetBody()->GetHotPointAltitud();
+    dsreal alt;
+    bool hotstate;
 
-    bool hotstate = m_planet->GetLayer( m_ship, 0 )->GetHotState();
+    if( m_curr_camera == m_camera5 )
+    {
+        alt = m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetHotPointAltitud();
+        hotstate = m_planet->GetLayerFromCamera( "camera5", 0 )->GetHotState();
+    }
+    else
+    {
+        alt = m_planet->GetLayerFromInertBody( m_ship, 0 )->GetBody()->GetHotPointAltitud();
+        hotstate = m_planet->GetLayerFromInertBody( m_ship, 0 )->GetHotState();
+    }
 
     // activer Z buffering seulement si on est pres de la surface
     
@@ -2069,11 +2103,7 @@ void dsAppClient::render_universe( void )
         m_calendar->GetFormatedDate( date );    
         renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
 
-    
-
-
-        
-
+            
         renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h ( %.1f m/s) - aspeed = %.1f", speed * 3.6, speed, m_ship->GetAngularSpeedMagnitude() );
 
         
