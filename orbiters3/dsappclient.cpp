@@ -44,6 +44,7 @@
 #define FOG_DENSITY                         0.000032
 #define ZBUFFER_ACTIVATION_REL_ALT          1.009
 #define TERRAIN_BUMP_FACTOR                 100.0
+#define NB_LOD                              16
 */
 
 
@@ -67,6 +68,7 @@
 #define FOG_DENSITY                         0.00020
 #define ZBUFFER_ACTIVATION_REL_ALT          1.0099
 #define TERRAIN_BUMP_FACTOR                 10.0
+#define NB_LOD                              10
 
 
 
@@ -916,6 +918,7 @@ void dsAppClient::init_planet( void )
 
     config.m_lod0base = 19000.0;
     config.m_ground_layer = 0;
+    config.m_nbLODRanges = NB_LOD;
 
     Fx* collisions_fx = new Fx;
     collisions_fx->AddShader( hm_vshader );
