@@ -63,7 +63,7 @@
 #define TEMP_DEC_PER_KM                     66.0
 #define BEACH_LIMIT                         25.0
 #define CLOUDS_PROCEDURALRULES_FILE         "planet_clouds_small_small.rules"
-#define CLOUDS_HEIGHT                       1000.0
+#define CLOUDS_HEIGHT                       750.0
 #define CLOUDS_FOG_DENSITY                  0.000025
 #define FOG_DENSITY                         0.00020
 #define ZBUFFER_ACTIVATION_REL_ALT          1.0099
