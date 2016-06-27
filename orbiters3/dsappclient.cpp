@@ -2159,23 +2159,26 @@ void dsAppClient::render_universe( void )
         //m_clouds_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
         //m_clouds_fx->UpdateRenderStateIn( 1, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
 
+        /*
         for( int i = 0; i < 6; i++ )
         {
             m_flatcloudshigh_rnode[i]->SetDrawingState( true );
             m_flatcloudslow_rnode[i]->SetDrawingState( false );
         }
+        */
     }
     else
     {
         //m_clouds_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
         //m_clouds_fx->UpdateRenderStateIn( 1, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "ccw" ) );
 
+        /*
         for( int i = 0; i < 6; i++ )
         {
             m_flatcloudshigh_rnode[i]->SetDrawingState( false );
             m_flatcloudslow_rnode[i]->SetDrawingState( true );
         }
-
+        */
     }
 
 
