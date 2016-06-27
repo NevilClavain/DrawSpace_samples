@@ -1939,6 +1939,38 @@ void dsAppClient::render_universe( void )
 
     m_scenenodegraph.ComputeTransformations( m_timer );
 
+
+
+    Vector invariantPos;
+
+    if( m_curr_camera == m_camera5 )
+    {
+        m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetInvariantViewerPos( invariantPos );
+    }
+    else
+    {
+        m_planet->GetLayerFromInertBody( m_ship, 0 )->GetBody()->GetInvariantViewerPos( invariantPos );
+    }
+
+    
+    
+    
+    m_clouds->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "view_pos", invariantPos );
+
+    Matrix planet_transf;
+    Vector planet_pos;
+
+    m_planet_node->GetFinalTransform( planet_transf );
+
+    planet_pos[0] = planet_transf( 3, 0 );
+    planet_pos[1] = planet_transf( 3, 1 );
+    planet_pos[2] = planet_transf( 3, 2 );
+    planet_pos[3] = 1.0;
+
+    m_clouds->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "planet_pos", planet_pos );
+
+
+
     for( int i = 0; i < 6; i++ )
     {
         m_planet_detail_binder[i]->Update();
@@ -2047,7 +2079,7 @@ void dsAppClient::render_universe( void )
     
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
-
+    /*
     Vector invariantPos;
 
     if( m_curr_camera == m_camera5 )
@@ -2075,7 +2107,7 @@ void dsAppClient::render_universe( void )
     planet_pos[3] = 1.0;
 
     m_clouds->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "planet_pos", planet_pos );
-
+    */
 
     ////////////////////////////////////////
 
