@@ -278,6 +278,7 @@ protected:
     PlanetDetailsBinder*                                                m_planet_atmosphere_binder_mirror[6];
 
     PlanetDetailsBinder*                                                m_planet_clouds_binder[6];
+    PlanetDetailsBinder*                                                m_planet_cloudslow_binder[6];
     PlanetDetailsBinder*                                                m_planet_clouds_binder_mirror[6];
 
     DrawSpace::SphericalLOD::Binder*                                    m_planet_waterbump_binder[6];
@@ -320,7 +321,8 @@ protected:
 
     dsstring                                    m_timefactor;
 
-
+    DrawSpace::Core::RenderingNode*             m_flatcloudshigh_rnode[6];
+    DrawSpace::Core::RenderingNode*             m_flatcloudslow_rnode[6];
 
     ///////////////////////////////////////////////////////////
 

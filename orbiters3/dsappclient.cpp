@@ -837,6 +837,7 @@ void dsAppClient::init_planet( void )
         m_planet_atmosphere_binder_mirror[i]->SetMirrorMode( true );
 
         m_planet_clouds_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS );
+        m_planet_cloudslow_binder[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS );
         m_planet_clouds_binder_mirror[i] = new PlanetDetailsBinder( PLANET_RAY * 1000.0, PLANET_ATMO_THICKNESS );
 
         m_planet_clouds_binder_mirror[i]->SetMirrorMode( true );
@@ -1084,15 +1085,47 @@ void dsAppClient::init_planet( void )
     m_clouds_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
 
 
-    m_clouds_fx->SetRenderStateUniqueQueueID( "planet01_clouds" ); // parce qu'on va updater le renderstate ENABLEZBUFFER pendant le rendu
+    //m_clouds_fx->SetRenderStateUniqueQueueID( "planet01_clouds" ); // parce qu'on va updater le renderstate ENABLEZBUFFER pendant le rendu
 
 
     for( int i = 0; i < 6; i++ )
     {
         m_planet_clouds_binder[i]->SetFx( m_clouds_fx );
-        m_planet_clouds_binder[i]->SetTexture( texture_clouds, 0 );
+        m_planet_clouds_binder[i]->SetTexture( texture_clouds, 1 );
     }
 
+
+
+
+    Fx* cloudslow_fx = new Fx;
+
+    cloudslow_fx->AddShader( planet_clouds_vshader );
+    cloudslow_fx->AddShader( planet_clouds_pshader );
+
+    cloudslow_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    cloudslow_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "ccw" ) );
+    cloudslow_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    cloudslow_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    cloudslow_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    cloudslow_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    cloudslow_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );    
+    cloudslow_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
+
+
+    cloudslow_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    cloudslow_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    cloudslow_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+    cloudslow_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+
+
+    //cloudslow_fx->SetRenderStateUniqueQueueID( "planet01_clouds" ); // parce qu'on va updater le renderstate ENABLEZBUFFER pendant le rendu
+
+    for( int i = 0; i < 6; i++ )
+    {
+        m_planet_cloudslow_binder[i]->SetFx( cloudslow_fx );
+        m_planet_cloudslow_binder[i]->SetTexture( texture_clouds, 1 );
+    }
 
 
 
@@ -1124,7 +1157,7 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet_clouds_binder_mirror[i]->SetFx( m_clouds_mirror_fx );
-        m_planet_clouds_binder_mirror[i]->SetTexture( texture_clouds, 0 );
+        m_planet_clouds_binder_mirror[i]->SetTexture( texture_clouds, 1 );
     }
 
 
@@ -1158,6 +1191,7 @@ void dsAppClient::init_planet( void )
         m_planet_atmosphere_binder[i]->SetRenderer( renderer );
         m_planet_atmosphere_binder_mirror[i]->SetRenderer( renderer );
         m_planet_clouds_binder[i]->SetRenderer( renderer );
+        m_planet_cloudslow_binder[i]->SetRenderer( renderer );
 
         m_planet_clouds_binder_mirror[i]->SetRenderer( renderer );
 
@@ -1217,9 +1251,6 @@ void dsAppClient::init_planet( void )
 
 
 
-
-
-
     m_planet = _DRAWSPACE_NEW_( DrawSpace::SphericalLOD::Root, DrawSpace::SphericalLOD::Root( "planet01", PLANET_RAY, &m_timer, config ) );
 
 
@@ -1244,8 +1275,12 @@ void dsAppClient::init_planet( void )
     
     for( int i = 0; i < 6; i++ )
     {
-        m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_clouds_binder[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 3000 );
+        m_flatcloudslow_rnode[i] = m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_cloudslow_binder[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 1500 );
+        m_flatcloudshigh_rnode[i] = m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_clouds_binder[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 3000 );
+
+
         m_planet->RegisterSinglePassSlot( m_texturemirrorpass, m_planet_clouds_binder_mirror[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 3000 );
+        m_planet->RegisterSinglePassSlot( m_texturemirrorpass, m_planet_clouds_binder_mirror[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 1500 );
     }
     
     
@@ -1298,6 +1333,9 @@ void dsAppClient::init_planet( void )
 
         m_planet_clouds_binder[i]->SetPlanetNode( m_planet_node );
         m_planet_clouds_binder[i]->SetCloudsTexture( texture_clouds );
+
+        m_planet_cloudslow_binder[i]->SetPlanetNode( m_planet_node );
+        m_planet_cloudslow_binder[i]->SetCloudsTexture( texture_clouds );
 
         m_planet_clouds_binder_mirror[i]->SetPlanetNode( m_planet_node );
         m_planet_clouds_binder_mirror[i]->SetCloudsTexture( texture_clouds );
@@ -1907,6 +1945,7 @@ void dsAppClient::render_universe( void )
         m_planet_atmosphere_binder[i]->Update();
         m_planet_atmosphere_binder_mirror[i]->Update();
         m_planet_clouds_binder[i]->Update();
+        m_planet_cloudslow_binder[i]->Update();
         m_planet_clouds_binder_mirror[i]->Update();
 
     }
@@ -2085,13 +2124,26 @@ void dsAppClient::render_universe( void )
     
     if( alt > FLAT_CLOUDS_ALT || false == hotstate )
     {
-        m_clouds_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-        m_clouds_fx->UpdateRenderStateIn( 1, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+        //m_clouds_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+        //m_clouds_fx->UpdateRenderStateIn( 1, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+        for( int i = 0; i < 6; i++ )
+        {
+            m_flatcloudshigh_rnode[i]->SetDrawingState( true );
+            m_flatcloudslow_rnode[i]->SetDrawingState( false );
+        }
     }
     else
     {
-        m_clouds_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-        m_clouds_fx->UpdateRenderStateIn( 1, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "ccw" ) );
+        //m_clouds_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+        //m_clouds_fx->UpdateRenderStateIn( 1, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "ccw" ) );
+
+        for( int i = 0; i < 6; i++ )
+        {
+            m_flatcloudshigh_rnode[i]->SetDrawingState( false );
+            m_flatcloudslow_rnode[i]->SetDrawingState( true );
+        }
+
     }
 
 
