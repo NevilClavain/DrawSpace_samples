@@ -916,7 +916,6 @@ void dsAppClient::init_planet( void )
     texture_clouds->LoadFromFile();
 
 
-
     SphericalLOD::Config config;
 
     config.m_lod0base = 19000.0;
@@ -969,9 +968,9 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet_detail_binder[i]->SetFx( m_details_fx );
-        m_planet_detail_binder[i]->SetTexture( texture_th_pixels, 1 );
-        m_planet_detail_binder[i]->SetTexture( texture_th_splatting, 2 );
-        m_planet_detail_binder[i]->SetTexture( texture_bump_water, 3 );
+        
+        m_planet_detail_binder[i]->SetTexture( texture_th_pixels, 0 );
+        m_planet_detail_binder[i]->SetTexture( texture_th_splatting, 1 );
     }
 
 
@@ -994,7 +993,7 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet_waterbump_binder[i]->SetFx( water_bump_fx );
-        m_planet_waterbump_binder[i]->SetTexture( m_wavespass->GetTargetTexture(), 1 );
+        m_planet_waterbump_binder[i]->SetTexture( m_wavespass->GetTargetTexture(), 0 );
     }
 
 
@@ -1091,7 +1090,7 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet_clouds_binder[i]->SetFx( m_clouds_fx );
-        m_planet_clouds_binder[i]->SetTexture( texture_clouds, 1 );
+        m_planet_clouds_binder[i]->SetTexture( texture_clouds, 0 );
     }
 
 
@@ -1124,7 +1123,7 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet_cloudslow_binder[i]->SetFx( cloudslow_fx );
-        m_planet_cloudslow_binder[i]->SetTexture( texture_clouds, 1 );
+        m_planet_cloudslow_binder[i]->SetTexture( texture_clouds, 0 );
     }
 
 
@@ -1157,7 +1156,7 @@ void dsAppClient::init_planet( void )
     for( int i = 0; i < 6; i++ )
     {
         m_planet_clouds_binder_mirror[i]->SetFx( m_clouds_mirror_fx );
-        m_planet_clouds_binder_mirror[i]->SetTexture( texture_clouds, 1 );
+        m_planet_clouds_binder_mirror[i]->SetTexture( texture_clouds, 0 );
     }
 
 
@@ -1404,8 +1403,8 @@ void dsAppClient::init_planet( void )
 
 
 
-    m_clouds->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "clouds.bmp" ) ), 1 );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetTexture( 1 )->LoadFromFile();
+    m_clouds->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "clouds.bmp" ) ), 0 );
+    m_clouds->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
 
     
     m_clouds->GetNodeFromPass( m_texturepass )->SetOrderNumber( 2500 );
@@ -1489,8 +1488,8 @@ void dsAppClient::init_planet( void )
 
 
 
-    m_clouds_low->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "clouds.bmp" ) ), 1 );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetTexture( 1 )->LoadFromFile();
+    m_clouds_low->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "clouds.bmp" ) ), 0 );
+    m_clouds_low->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
 
     
     m_clouds_low->GetNodeFromPass( m_texturepass )->SetOrderNumber( 1600 );
@@ -1542,8 +1541,8 @@ void dsAppClient::init_planet( void )
 
 
     
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "clouds.bmp" ) ), 1 );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetTexture( 1 )->LoadFromFile();
+    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "clouds.bmp" ) ), 0 );
+    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetTexture( 0 )->LoadFromFile();
 
     
     m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetOrderNumber( 1600 );
