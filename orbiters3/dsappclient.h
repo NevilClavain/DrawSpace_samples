@@ -288,7 +288,14 @@ protected:
 
     DrawSpace::Procedural::RulesPackage*                                m_clouds_procedural_rules;
     DrawSpace::Clouds*                                                  m_clouds;
+
+    DrawSpace::Procedural::RulesPackage*                                m_clouds_low_procedural_rules;
+    DrawSpace::Clouds*                                                  m_clouds_low;
+
+
     DrawSpace::Core::SceneNode<DrawSpace::Clouds>*                      m_clouds_node;
+    DrawSpace::Core::SceneNode<DrawSpace::Clouds>*                      m_clouds_low_node;
+
     DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*       m_clouds_ll_node;
 
 
