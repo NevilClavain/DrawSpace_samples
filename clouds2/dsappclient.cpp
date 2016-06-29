@@ -245,13 +245,14 @@ bool dsAppClient::OnIdleAppInit( void )
     m_clouds = _DRAWSPACE_NEW_( DrawSpace::Clouds, DrawSpace::Clouds );
     m_clouds->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
-    m_clouds->EnableDetails( true );
+    m_clouds->EnableDetails( false );
 
 
     /////////////////////////////////////////////////
     m_procedural_rules = new DrawSpace::Procedural::RulesPackage( m_clouds->GetProceduralCallback() );
 
-    m_procedural_rules->InitializeSeedBase( 56645 );
+    //m_procedural_rules->InitializeSeedBase( 56645 );
+    m_procedural_rules->InitializeSeedBaseFromCurrentTime();
     m_procedural_rules->Run( "clouds.rules", " " );
 
     m_procedural_rules->GetRootParser()->GetRules()->Apply();
