@@ -2,7 +2,7 @@
 
   
 repeat
- integer 320
+ integer 400
 
  batch
 
@@ -51,9 +51,9 @@ repeat
    index
     random uniform integer 0 3 15
     array
-     integer 0
-     integer 0
-     integer 0
+     integer 40
+     integer 40
+     integer 40
      integer 40
     end
    end

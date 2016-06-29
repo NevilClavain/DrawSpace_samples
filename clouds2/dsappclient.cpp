@@ -558,10 +558,14 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case VK_F4:
 
+            m_clouds->CloudsReset();
+            //m_procedural_rules->InitializeSeedBaseFromCurrentTime();
+            m_procedural_rules->GetRootParser()->GetRules()->Apply();
+            m_clouds->CloudsUpdateRequest();
+
             break;
 
         case VK_F5:
-
 
             break;
 
