@@ -2029,6 +2029,9 @@ void dsAppClient::render_universe( void )
 
     m_scenenodegraph.ComputeTransformations( m_timer );
 
+    Matrix planet_transf;
+
+    m_planet_node->GetFinalTransform( planet_transf );
 
 
     Vector invariantPos;
@@ -2043,14 +2046,29 @@ void dsAppClient::render_universe( void )
     }
 
     
-    
-    
     m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "view_pos", invariantPos );
 
-    Matrix planet_transf;
-    Vector planet_pos;
 
-    m_planet_node->GetFinalTransform( planet_transf );
+    //////////////////////////////////////////////////////////////////////
+
+    Vector playerpos; // pos viewer relative à la planete
+    Vector playerpos_longlatalt;  // meme chose mais en spherique
+
+    Matrix planet_transf_notrans;
+
+    planet_transf_notrans = planet_transf;
+
+    planet_transf.ClearTranslation();
+    planet_transf.Inverse();
+
+    planet_transf.Transform( &invariantPos, &playerpos );
+
+    Utils::Maths::CartesiantoSpherical( playerpos, playerpos_longlatalt );
+  
+    //////////////////////////////////////////////////////////////////////
+
+
+    Vector planet_pos;
 
     planet_pos[0] = planet_transf( 3, 0 );
     planet_pos[1] = planet_transf( 3, 1 );
@@ -2301,6 +2319,10 @@ void dsAppClient::render_universe( void )
 
         renderer->DrawText( 0, 255, 0, 10, 250, "working set size = %d", pmc.WorkingSetSize );
         renderer->DrawText( 0, 255, 0, 10, 280, "subpasses stack size = %d", m_planet->GetSingleShotSubPassesStackSize() );
+
+
+
+        renderer->DrawText( 0, 255, 0, 10, 310, "%.3f %.3f %.3f", playerpos_longlatalt[0], playerpos_longlatalt[1], playerpos_longlatalt[2] );
 
         renderer->DrawText( 0, 255, 0, 900, 30, "%s", m_deviceDescr.description.c_str() );
     
