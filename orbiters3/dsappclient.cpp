@@ -2058,10 +2058,10 @@ void dsAppClient::render_universe( void )
 
     planet_transf_notrans = planet_transf;
 
-    planet_transf.ClearTranslation();
-    planet_transf.Inverse();
+    planet_transf_notrans.ClearTranslation();
+    planet_transf_notrans.Inverse();
 
-    planet_transf.Transform( &invariantPos, &playerpos );
+    planet_transf_notrans.Transform( &invariantPos, &playerpos );
 
     Utils::Maths::CartesiantoSpherical( playerpos, playerpos_longlatalt );
   
@@ -2322,7 +2322,8 @@ void dsAppClient::render_universe( void )
 
 
 
-        renderer->DrawText( 0, 255, 0, 10, 310, "%.3f %.3f %.3f", playerpos_longlatalt[0], playerpos_longlatalt[1], playerpos_longlatalt[2] );
+        renderer->DrawText( 0, 255, 0, 10, 310, "%.3f %.4f %.4f", playerpos_longlatalt[0] - PLANET_RAY * 1000.0, Utils::Maths::RadToDeg( playerpos_longlatalt[1] ), 
+                                                                    Utils::Maths::RadToDeg( playerpos_longlatalt[2] ) );
 
         renderer->DrawText( 0, 255, 0, 900, 30, "%s", m_deviceDescr.description.c_str() );
     
