@@ -152,6 +152,28 @@ public:
     PlanetLight GetLight( int p_index ) { return m_lights[p_index]; };
 };
 
+class CloudsStateMachine
+{
+protected:
+
+    DrawSpace::Clouds*                                              m_clouds;
+    DrawSpace::Clouds*                                              m_clouds_low;
+    DrawSpace::Core::LongLatMovement*                               m_ll;
+
+    bool                m_updated;
+    dsreal              m_deglong, m_deglat, m_alt;
+    dsreal              m_prec_deglong, m_prec_deglat, m_precalt;
+
+
+public:
+
+    CloudsStateMachine( DrawSpace::Clouds* p_clouds, DrawSpace::Clouds* p_clouds_low, DrawSpace::Core::LongLatMovement* p_ll );
+    ~CloudsStateMachine( void );
+
+    void UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_degLat, dsreal p_alt );
+    void Run( void );
+};
+
 
 class dsAppClient : public DrawSpace::App
 {
@@ -352,6 +374,8 @@ protected:
 
     dsreal                                      m_water_anim;
     bool                                        m_water_anim_inc;
+
+    CloudsStateMachine*                         m_clouds_state_machine;
     
 
     void init_planet_meshes( void );

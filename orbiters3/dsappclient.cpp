@@ -429,7 +429,26 @@ void PlanetDetailsBinder::Update( void )
     }
 }
 
+CloudsStateMachine::CloudsStateMachine( DrawSpace::Clouds* p_clouds, DrawSpace::Clouds* p_clouds_low, DrawSpace::Core::LongLatMovement* p_ll ) :
+m_clouds( p_clouds ),
+m_clouds_low( p_clouds_low ),
+m_ll( p_ll )
+{
+}
 
+CloudsStateMachine::~CloudsStateMachine( void )
+{
+}
+
+void CloudsStateMachine::UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_degLat, dsreal p_alt )
+{
+
+}
+
+void CloudsStateMachine::Run( void )
+{
+
+}
 
 dsAppClient::dsAppClient( void ) : 
 m_mouselb( false ), 
@@ -1345,11 +1364,13 @@ void dsAppClient::init_planet( void )
 
     /// volumetric clouds
 
-
+    LongLatMovement* clouds_ll = new LongLatMovement();
    
     m_clouds_ll_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>, DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>( "impostor2_ll" ) );
-    m_clouds_ll_node->SetContent( new LongLatMovement() );
-    m_clouds_ll_node->GetContent()->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, 0.0, 0.0 );
+    m_clouds_ll_node->SetContent( clouds_ll );
+
+    //m_clouds_ll_node->GetContent()->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, 0.0, 0.0 );
+    clouds_ll->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, 0.0, 0.0 );
 
     m_scenenodegraph.RegisterNode( m_clouds_ll_node );
     m_clouds_ll_node->LinkTo( m_planet_node );
@@ -1576,8 +1597,10 @@ void dsAppClient::init_planet( void )
     m_scenenodegraph.RegisterNode( m_clouds_low_node );
 
     m_clouds_low_node->LinkTo( m_clouds_ll_node );
-    
 
+
+    m_clouds_state_machine = _DRAWSPACE_NEW_( CloudsStateMachine, CloudsStateMachine( m_clouds, m_clouds_low, clouds_ll ) );
+    
     //m_planet->SetGravityState( false );
 }
 
@@ -2064,6 +2087,9 @@ void dsAppClient::render_universe( void )
     planet_transf_notrans.Transform( &invariantPos, &playerpos );
 
     Utils::Maths::CartesiantoSpherical( playerpos, playerpos_longlatalt );
+
+
+    m_clouds_state_machine->UpdateViewerSphericalPos( playerpos_longlatalt[1], playerpos_longlatalt[2], playerpos_longlatalt[0] );
   
     //////////////////////////////////////////////////////////////////////
 
@@ -2122,6 +2148,9 @@ void dsAppClient::render_universe( void )
 
 
     //DrawSpace::SphericalLOD::Patch* current_patch = m_planet->GetFragment( 0 )->GetCurrentPatch();
+
+
+    m_clouds_state_machine->Run();
 
     m_wavespass->GetRenderingQueue()->Draw();
 
