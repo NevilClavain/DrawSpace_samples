@@ -160,18 +160,23 @@ protected:
     DrawSpace::Clouds*                                              m_clouds_low;
     DrawSpace::Core::LongLatMovement*                               m_ll;
 
-    bool                m_updated;
-    dsreal              m_deglong, m_deglat, m_alt;
-    dsreal              m_prec_deglong, m_prec_deglat, m_precalt;
+     
+    dsreal              m_base_deglong, m_base_deglat, m_base_alt;
+    bool                m_base_updated;
 
+    dsreal              m_last_longlatdistance;
 
 public:
 
     CloudsStateMachine( DrawSpace::Clouds* p_clouds, DrawSpace::Clouds* p_clouds_low, DrawSpace::Core::LongLatMovement* p_ll );
     ~CloudsStateMachine( void );
 
+    void Init( void );
+
     void UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_degLat, dsreal p_alt );
     void Run( void );
+
+    dsreal GetLastLongLatDistance( void );
 };
 
 

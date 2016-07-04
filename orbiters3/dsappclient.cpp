@@ -440,14 +440,41 @@ CloudsStateMachine::~CloudsStateMachine( void )
 {
 }
 
+void CloudsStateMachine::Init( void )
+{
+    m_base_updated = false;
+    m_last_longlatdistance = 0.0;
+}
+
 void CloudsStateMachine::UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_degLat, dsreal p_alt )
 {
+    if( !m_base_updated )
+    {
+        m_base_deglong = p_degLong;
+        m_base_deglat = p_degLat;
 
+        m_base_updated = true;
+    }
+    else
+    {
+        dsreal dlg = abs( p_degLong - m_base_deglong );
+        dsreal dlt = abs( p_degLat - m_base_deglat );
+
+        m_last_longlatdistance = sqrt( dlg * dlg + dlt * dlt );
+    }
 }
 
 void CloudsStateMachine::Run( void )
 {
+    if( m_last_longlatdistance > 0.5 )
+    {
+        m_base_updated = false;   
+    }
+}
 
+dsreal CloudsStateMachine::GetLastLongLatDistance( void )
+{
+    return m_last_longlatdistance;
 }
 
 dsAppClient::dsAppClient( void ) : 
@@ -1370,7 +1397,7 @@ void dsAppClient::init_planet( void )
     m_clouds_ll_node->SetContent( clouds_ll );
 
     //m_clouds_ll_node->GetContent()->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, 0.0, 0.0 );
-    clouds_ll->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, 0.0, 0.0 );
+    clouds_ll->Init( 0.0, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, 0.0, 0.0 );
 
     m_scenenodegraph.RegisterNode( m_clouds_ll_node );
     m_clouds_ll_node->LinkTo( m_planet_node );
@@ -1600,6 +1627,7 @@ void dsAppClient::init_planet( void )
 
 
     m_clouds_state_machine = _DRAWSPACE_NEW_( CloudsStateMachine, CloudsStateMachine( m_clouds, m_clouds_low, clouds_ll ) );
+    m_clouds_state_machine->Init();
     
     //m_planet->SetGravityState( false );
 }
@@ -2261,34 +2289,6 @@ void dsAppClient::render_universe( void )
         m_details_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     }
     
-    if( alt > FLAT_CLOUDS_ALT || false == hotstate )
-    {
-        //m_clouds_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
-        //m_clouds_fx->UpdateRenderStateIn( 1, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
-
-        /*
-        for( int i = 0; i < 6; i++ )
-        {
-            m_flatcloudshigh_rnode[i]->SetDrawingState( true );
-            m_flatcloudslow_rnode[i]->SetDrawingState( false );
-        }
-        */
-    }
-    else
-    {
-        //m_clouds_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
-        //m_clouds_fx->UpdateRenderStateIn( 1, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "ccw" ) );
-
-        /*
-        for( int i = 0; i < 6; i++ )
-        {
-            m_flatcloudshigh_rnode[i]->SetDrawingState( false );
-            m_flatcloudslow_rnode[i]->SetDrawingState( true );
-        }
-        */
-    }
-
-    
     if( alt > VOLUMETRIC_CLOUDS_ALT )
     {
         m_clouds->GetNodeFromPass( m_texturepass )->SetDrawingState( true );
@@ -2353,6 +2353,9 @@ void dsAppClient::render_universe( void )
 
         renderer->DrawText( 0, 255, 0, 10, 310, "%.3f %.4f %.4f", playerpos_longlatalt[0] - PLANET_RAY * 1000.0, Utils::Maths::RadToDeg( playerpos_longlatalt[1] ), 
                                                                     Utils::Maths::RadToDeg( playerpos_longlatalt[2] ) );
+
+
+        renderer->DrawText( 0, 255, 0, 10, 340, "longlat distance = %f", m_clouds_state_machine->GetLastLongLatDistance() );
 
         renderer->DrawText( 0, 255, 0, 900, 30, "%s", m_deviceDescr.description.c_str() );
     
