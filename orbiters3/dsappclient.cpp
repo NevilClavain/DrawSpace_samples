@@ -455,13 +455,11 @@ void CloudsStateMachine::UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_de
 
         m_base_updated = true;
     }
-    else
-    {
-        dsreal dlg = abs( p_degLong - m_base_deglong );
-        dsreal dlt = abs( p_degLat - m_base_deglat );
 
-        m_last_longlatdistance = sqrt( dlg * dlg + dlt * dlt );
-    }
+    dsreal dlg = abs( p_degLong - m_base_deglong );
+    dsreal dlt = abs( p_degLat - m_base_deglat );
+
+    m_last_longlatdistance = sqrt( dlg * dlg + dlt * dlt );
 }
 
 void CloudsStateMachine::Run( void )
@@ -2117,7 +2115,7 @@ void dsAppClient::render_universe( void )
     Utils::Maths::CartesiantoSpherical( playerpos, playerpos_longlatalt );
 
 
-    m_clouds_state_machine->UpdateViewerSphericalPos( playerpos_longlatalt[1], playerpos_longlatalt[2], playerpos_longlatalt[0] );
+    m_clouds_state_machine->UpdateViewerSphericalPos( Utils::Maths::RadToDeg( playerpos_longlatalt[1] ), Utils::Maths::RadToDeg( playerpos_longlatalt[2] ), playerpos_longlatalt[0] );
   
     //////////////////////////////////////////////////////////////////////
 
