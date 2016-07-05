@@ -159,16 +159,19 @@ protected:
     DrawSpace::Clouds*                                              m_clouds;
     DrawSpace::Clouds*                                              m_clouds_low;
     DrawSpace::Core::LongLatMovement*                               m_ll;
+    DrawSpace::IntermediatePass*                                    m_pass;
+    DrawSpace::IntermediatePass*                                    m_mirrorpass;
 
      
     dsreal              m_base_deglong, m_base_deglat, m_base_alt;
+    dsreal              m_current_alt;
     bool                m_base_updated;
 
     dsreal              m_last_longlatdistance;
 
 public:
 
-    CloudsStateMachine( DrawSpace::Clouds* p_clouds, DrawSpace::Clouds* p_clouds_low, DrawSpace::Core::LongLatMovement* p_ll );
+    CloudsStateMachine( DrawSpace::Clouds* p_clouds, DrawSpace::Clouds* p_clouds_low, DrawSpace::Core::LongLatMovement* p_ll, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass );
     ~CloudsStateMachine( void );
 
     void Init( void );

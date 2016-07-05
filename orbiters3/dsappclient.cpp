@@ -31,6 +31,7 @@
 #define FOG_ALT_LIMIT                       30000.0
 #define ATMO_SCATTERING_ALPHA_ALT_VIEWER    285000.0
 #define FLAT_CLOUDS_ALT                     28000.0
+#define VOLUMETRIC_CLOUDS_DISPLAY_ALT       26000.0
 #define VOLUMETRIC_CLOUDS_ALT               13000.0
 #define PLAINS_AMPLITUDE                    800.0
 #define MOUNTAINS_AMPLITUDE                 7000.0
@@ -56,6 +57,7 @@
 #define FOG_ALT_LIMIT                       10000.0
 #define ATMO_SCATTERING_ALPHA_ALT_VIEWER    75000.0
 #define FLAT_CLOUDS_ALT                     3300.0
+#define VOLUMETRIC_CLOUDS_DISPLAY_ALT       6000.0
 #define VOLUMETRIC_CLOUDS_ALT               2100.0
 #define PLAINS_AMPLITUDE                    50.0
 #define MOUNTAINS_AMPLITUDE                 800.0
@@ -429,10 +431,12 @@ void PlanetDetailsBinder::Update( void )
     }
 }
 
-CloudsStateMachine::CloudsStateMachine( DrawSpace::Clouds* p_clouds, DrawSpace::Clouds* p_clouds_low, DrawSpace::Core::LongLatMovement* p_ll ) :
+CloudsStateMachine::CloudsStateMachine( DrawSpace::Clouds* p_clouds, DrawSpace::Clouds* p_clouds_low, DrawSpace::Core::LongLatMovement* p_ll, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass ) :
 m_clouds( p_clouds ),
 m_clouds_low( p_clouds_low ),
-m_ll( p_ll )
+m_ll( p_ll ),
+m_pass( p_pass ),
+m_mirrorpass( p_mirrorpass )
 {
 }
 
@@ -448,6 +452,8 @@ void CloudsStateMachine::Init( void )
 
 void CloudsStateMachine::UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_degLat, dsreal p_alt )
 {
+    m_current_alt = p_alt - PLANET_RAY * 1000.0;
+
     if( !m_base_updated )
     {
         m_base_deglong = p_degLong;
@@ -467,9 +473,31 @@ void CloudsStateMachine::UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_de
 
 void CloudsStateMachine::Run( void )
 {
-    if( m_last_longlatdistance > 0.5 )
+    if( m_last_longlatdistance > 2.5 )
     {
         m_base_updated = false;   
+    }
+
+    if( m_current_alt < VOLUMETRIC_CLOUDS_DISPLAY_ALT )
+    {    
+        if( m_current_alt > VOLUMETRIC_CLOUDS_ALT )
+        {
+            m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( true );
+            m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
+            m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false );
+        }
+        else
+        {
+            m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
+            m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( true );
+            m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( true );    
+        }
+    }
+    else
+    {
+        m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
+        m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
+        m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false );    
     }
 }
 
@@ -1627,7 +1655,7 @@ void dsAppClient::init_planet( void )
     m_clouds_low_node->LinkTo( m_clouds_ll_node );
 
 
-    m_clouds_state_machine = _DRAWSPACE_NEW_( CloudsStateMachine, CloudsStateMachine( m_clouds, m_clouds_low, clouds_ll ) );
+    m_clouds_state_machine = _DRAWSPACE_NEW_( CloudsStateMachine, CloudsStateMachine( m_clouds, m_clouds_low, clouds_ll, m_texturepass, m_texturemirrorpass ) );
     m_clouds_state_machine->Init();
     
     //m_planet->SetGravityState( false );
@@ -2290,6 +2318,7 @@ void dsAppClient::render_universe( void )
         m_details_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     }
     
+    /*
     if( alt > VOLUMETRIC_CLOUDS_ALT )
     {
         m_clouds->GetNodeFromPass( m_texturepass )->SetDrawingState( true );
@@ -2302,6 +2331,7 @@ void dsAppClient::render_universe( void )
         m_clouds_low->GetNodeFromPass( m_texturepass )->SetDrawingState( true );
         m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetDrawingState( true );    
     }
+    */
 
 
     long current_fps = m_timer.GetFPS();
