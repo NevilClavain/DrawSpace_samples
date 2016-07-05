@@ -454,6 +454,9 @@ void CloudsStateMachine::UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_de
         m_base_deglat = p_degLat;
 
         m_base_updated = true;
+
+        m_ll->SetLongitud( m_base_deglong );
+        m_ll->SetLatitud( m_base_deglat );
     }
 
     dsreal dlg = abs( p_degLong - m_base_deglong );
