@@ -1503,6 +1503,9 @@ void dsAppClient::init_planet( void )
 
     m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "ambient_lit", 1 );
     
+    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "alpha", 2 );
+    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "alpha", Vector( 0.15, 0.0, 0.0, 0.0 ) );
+    
 
     m_clouds->GetNodeFromPass( m_texturepass )->SetDrawingState( false );
 
@@ -1586,6 +1589,10 @@ void dsAppClient::init_planet( void )
     m_clouds_low->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "fog_color", Vector( 0.45, 0.63, 0.78, 1.0 ) );
 
     m_clouds_low->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "ambient_lit", 1 );
+
+    m_clouds_low->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "alpha", 2 );
+    m_clouds_low->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "alpha", Vector( 0.15, 0.0, 0.0, 0.0 ) );
+
     
 
     m_clouds_low->GetNodeFromPass( m_texturepass )->SetDrawingState( false );
@@ -1640,6 +1647,9 @@ void dsAppClient::init_planet( void )
 
 
     m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 1, "ambient_lit", 1 );
+
+    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 1, "alpha", 2 );
+    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "alpha", Vector( 0.15, 0.0, 0.0, 0.0 ) );
     
 
     m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetDrawingState( false );
