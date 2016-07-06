@@ -473,14 +473,15 @@ void CloudsStateMachine::UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_de
     dsreal dlt = abs( p_degLat - m_base_deglat );
 
     m_last_longlatdistance = sqrt( dlg * dlg + dlt * dlt );
-}
 
-void CloudsStateMachine::Run( void )
-{
     if( m_last_longlatdistance > 2.5 )
     {
         m_base_updated = false;   
     }
+}
+
+void CloudsStateMachine::Run( void )
+{
 
     if( m_current_alt < VOLUMETRIC_CLOUDS_DISPLAY_ALT )
     {    
@@ -510,11 +511,11 @@ void CloudsStateMachine::Run( void )
 
     if( m_clouds_alpha < m_clouds_alpha_target )
     {
-        m_timer->TranslationSpeedInc( &m_clouds_alpha, 0.02 );
+        m_timer->TranslationSpeedInc( &m_clouds_alpha, 0.1 );
     }
     else if( m_clouds_alpha > m_clouds_alpha_target )
     {
-        m_timer->TranslationSpeedDec( &m_clouds_alpha, 0.02 );
+        m_timer->TranslationSpeedDec( &m_clouds_alpha, 0.1 );
     }
 }
 

@@ -156,6 +156,14 @@ class CloudsStateMachine
 {
 protected:
 
+    typedef enum
+    {
+        SHOW,
+        HIDE,
+        OUT_OF_RANGE,
+    
+    } State;
+
     DrawSpace::Clouds*                                              m_clouds;
     DrawSpace::Clouds*                                              m_clouds_low;
     DrawSpace::Core::LongLatMovement*                               m_ll;
@@ -163,6 +171,7 @@ protected:
     DrawSpace::IntermediatePass*                                    m_mirrorpass;
     DrawSpace::Utils::TimeManager*                                  m_timer;
 
+    State                                                           m_state;
      
     dsreal              m_base_deglong, m_base_deglat, m_base_alt;
     dsreal              m_current_alt;
