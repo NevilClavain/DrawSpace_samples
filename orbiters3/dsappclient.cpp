@@ -431,12 +431,16 @@ void PlanetDetailsBinder::Update( void )
     }
 }
 
-CloudsStateMachine::CloudsStateMachine( DrawSpace::Clouds* p_clouds, DrawSpace::Clouds* p_clouds_low, DrawSpace::Core::LongLatMovement* p_ll, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass ) :
+CloudsStateMachine::CloudsStateMachine( DrawSpace::Utils::TimeManager* p_timer, DrawSpace::Clouds* p_clouds, DrawSpace::Clouds* p_clouds_low, 
+                                        DrawSpace::Core::LongLatMovement* p_ll, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass ) :
 m_clouds( p_clouds ),
 m_clouds_low( p_clouds_low ),
 m_ll( p_ll ),
 m_pass( p_pass ),
-m_mirrorpass( p_mirrorpass )
+m_mirrorpass( p_mirrorpass ),
+m_timer( p_timer ),
+m_clouds_alpha( 0.0 ),
+m_clouds_alpha_target( 0.0 )
 {
 }
 
@@ -499,11 +503,44 @@ void CloudsStateMachine::Run( void )
         m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
         m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false );    
     }
+
+    m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( m_clouds_alpha, 0.0, 0.0, 0.0 ) );
+    m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( m_clouds_alpha, 0.0, 0.0, 0.0 ) );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "alpha", Vector( m_clouds_alpha, 0.0, 0.0, 0.0 ) );
+
+    if( m_clouds_alpha < m_clouds_alpha_target )
+    {
+        m_timer->TranslationSpeedInc( &m_clouds_alpha, 0.02 );
+    }
+    else if( m_clouds_alpha > m_clouds_alpha_target )
+    {
+        m_timer->TranslationSpeedDec( &m_clouds_alpha, 0.02 );
+    }
 }
 
 dsreal CloudsStateMachine::GetLastLongLatDistance( void )
 {
     return m_last_longlatdistance;
+}
+
+void CloudsStateMachine::clouds_pop( void )
+{
+    m_clouds_alpha_target = 1.0;
+}
+
+void CloudsStateMachine::clouds_fade( void )
+{
+    m_clouds_alpha_target = 0.0;
+}
+
+void CloudsStateMachine::CloudsPop( void )
+{
+    clouds_pop();
+}
+
+void CloudsStateMachine::CloudsFade( void )
+{
+    clouds_fade();
 }
 
 dsAppClient::dsAppClient( void ) : 
@@ -1504,7 +1541,7 @@ void dsAppClient::init_planet( void )
     m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "ambient_lit", 1 );
     
     m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "alpha", 2 );
-    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "alpha", Vector( 0.15, 0.0, 0.0, 0.0 ) );
+
     
 
     m_clouds->GetNodeFromPass( m_texturepass )->SetDrawingState( false );
@@ -1591,7 +1628,6 @@ void dsAppClient::init_planet( void )
     m_clouds_low->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "ambient_lit", 1 );
 
     m_clouds_low->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "alpha", 2 );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "alpha", Vector( 0.15, 0.0, 0.0, 0.0 ) );
 
     
 
@@ -1648,9 +1684,7 @@ void dsAppClient::init_planet( void )
 
     m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 1, "ambient_lit", 1 );
 
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 1, "alpha", 2 );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "alpha", Vector( 0.15, 0.0, 0.0, 0.0 ) );
-    
+    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 1, "alpha", 2 );    
 
     m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetDrawingState( false );
 
@@ -1665,7 +1699,7 @@ void dsAppClient::init_planet( void )
     m_clouds_low_node->LinkTo( m_clouds_ll_node );
 
 
-    m_clouds_state_machine = _DRAWSPACE_NEW_( CloudsStateMachine, CloudsStateMachine( m_clouds, m_clouds_low, clouds_ll, m_texturepass, m_texturemirrorpass ) );
+    m_clouds_state_machine = _DRAWSPACE_NEW_( CloudsStateMachine, CloudsStateMachine( &m_timer, m_clouds, m_clouds_low, clouds_ll, m_texturepass, m_texturemirrorpass ) );
     m_clouds_state_machine->Init();
     
     //m_planet->SetGravityState( false );
@@ -2867,6 +2901,9 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case 'U':
             {
+                m_clouds_state_machine->CloudsPop();
+
+                /*
                 _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> memalloc dump begin <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
 
                 //_DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> core dump <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
@@ -2875,8 +2912,14 @@ void dsAppClient::OnKeyPulse( long p_key )
                 DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
                 renderer->DumpMemoryAllocs();
                 _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> memalloc dump end   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
+                */
             }
 
+            break;
+
+        case 'P':
+
+            m_clouds_state_machine->CloudsFade();
             break;
     }
 }

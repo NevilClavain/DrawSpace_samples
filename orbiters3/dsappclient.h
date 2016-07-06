@@ -161,6 +161,7 @@ protected:
     DrawSpace::Core::LongLatMovement*                               m_ll;
     DrawSpace::IntermediatePass*                                    m_pass;
     DrawSpace::IntermediatePass*                                    m_mirrorpass;
+    DrawSpace::Utils::TimeManager*                                  m_timer;
 
      
     dsreal              m_base_deglong, m_base_deglat, m_base_alt;
@@ -168,10 +169,16 @@ protected:
     bool                m_base_updated;
 
     dsreal              m_last_longlatdistance;
+    dsreal              m_clouds_alpha;
+    dsreal              m_clouds_alpha_target;
+
+    void                clouds_pop( void );
+    void                clouds_fade( void );
 
 public:
 
-    CloudsStateMachine( DrawSpace::Clouds* p_clouds, DrawSpace::Clouds* p_clouds_low, DrawSpace::Core::LongLatMovement* p_ll, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass );
+    CloudsStateMachine( DrawSpace::Utils::TimeManager* p_timer, DrawSpace::Clouds* p_clouds, DrawSpace::Clouds* p_clouds_low, DrawSpace::Core::LongLatMovement* p_ll, 
+                        DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass );
     ~CloudsStateMachine( void );
 
     void Init( void );
@@ -180,6 +187,9 @@ public:
     void Run( void );
 
     dsreal GetLastLongLatDistance( void );
+
+    void CloudsPop( void );
+    void CloudsFade( void );
 };
 
 
