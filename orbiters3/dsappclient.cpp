@@ -441,7 +441,7 @@ m_mirrorpass( p_mirrorpass ),
 m_timer( p_timer ),
 m_clouds_alpha( 0.0 ),
 m_clouds_alpha_target( 0.0 ),
-m_clouds_transition_speed( 0.1 )
+m_clouds_transition_speed( 0.5 )
 {
 }
 
@@ -488,29 +488,6 @@ void CloudsStateMachine::Run( void )
 {
     /*
     if( m_current_alt < VOLUMETRIC_CLOUDS_DISPLAY_ALT )
-    {    
-        if( m_current_alt > VOLUMETRIC_CLOUDS_ALT )
-        {
-            m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( true );
-            m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
-            m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false );
-        }
-        else
-        {
-            m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
-            m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( true );
-            m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( true );    
-        }
-    }
-    else
-    {
-        m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
-        m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
-        m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false );    
-    }
-    */
-
-    if( m_current_alt < VOLUMETRIC_CLOUDS_DISPLAY_ALT )
     {
         if( m_current_alt > VOLUMETRIC_CLOUDS_ALT )
         {
@@ -522,6 +499,12 @@ void CloudsStateMachine::Run( void )
         }
     }
     else
+    {
+        apply_next_state( DISABLED );
+    }
+    */
+
+    if( m_current_alt > VOLUMETRIC_CLOUDS_DISPLAY_ALT )
     {
         apply_next_state( DISABLED );
     }
@@ -595,19 +578,26 @@ void CloudsStateMachine::CloudsFade( void )
 
 void CloudsStateMachine::on_clouds_out_of_range( void )
 {
-    if( m_current_alt > VOLUMETRIC_CLOUDS_ALT )
+    if( SHOW_UP == m_state || SHOW_DOWN == m_state )
     {
-        apply_next_state( SHOW_UP );
+        apply_next_state( HIDE );
     }
-    else
+    else// if( HIDE == m_state )
     {
-        apply_next_state( SHOW_DOWN );
+        if( m_current_alt > VOLUMETRIC_CLOUDS_ALT )
+        {
+            apply_next_state( SHOW_UP );
+        }
+        else
+        {
+            apply_next_state( SHOW_DOWN );
+        }    
     }
 }
 
 void CloudsStateMachine::apply_next_state( State p_state )
 {
-    if( p_state == m_next_state )
+    if( p_state == m_next_state || m_clouds_transition_active )
     {
         return;
     }
@@ -2763,13 +2753,13 @@ void dsAppClient::OnRenderFrame( void )
 
 
                 
-                //m_curr_camera = m_camera3; 
-                //m_curr_camera_name = "camera3";
+                m_curr_camera = m_camera3; 
+                m_curr_camera_name = "camera3";
                 
 
-                m_mouse_circularmode = true;
-                m_curr_camera = m_camera5; 
-                m_curr_camera_name = "camera5";
+                //m_mouse_circularmode = true;
+                //m_curr_camera = m_camera5; 
+                //m_curr_camera_name = "camera5";
 
 
                 m_scenenodegraph.SetCurrentCamera( m_curr_camera_name );
