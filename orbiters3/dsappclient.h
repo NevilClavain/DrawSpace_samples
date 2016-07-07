@@ -158,9 +158,10 @@ protected:
 
     typedef enum
     {
-        SHOW,
+        SHOW_UP,
+        SHOW_DOWN,
         HIDE,
-        OUT_OF_RANGE,
+        DISABLED,
     
     } State;
 
@@ -170,8 +171,10 @@ protected:
     DrawSpace::IntermediatePass*                                    m_pass;
     DrawSpace::IntermediatePass*                                    m_mirrorpass;
     DrawSpace::Utils::TimeManager*                                  m_timer;
-
     State                                                           m_state;
+    State                                                           m_next_state;
+    bool                                                            m_clouds_transition_active;
+    dsreal                                                          m_clouds_transition_speed;
      
     dsreal              m_base_deglong, m_base_deglat, m_base_alt;
     dsreal              m_current_alt;
@@ -183,6 +186,16 @@ protected:
 
     void                clouds_pop( void );
     void                clouds_fade( void );
+
+    void                clouds_transition( void );
+
+    void                on_clouds_out_of_range( void );
+
+    void                apply_next_state( State p_state );
+
+    void                on_state_updated( void );
+
+    void                update_shaders_alpha( void );
 
 public:
 

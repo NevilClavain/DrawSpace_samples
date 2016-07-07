@@ -440,7 +440,8 @@ m_pass( p_pass ),
 m_mirrorpass( p_mirrorpass ),
 m_timer( p_timer ),
 m_clouds_alpha( 0.0 ),
-m_clouds_alpha_target( 0.0 )
+m_clouds_alpha_target( 0.0 ),
+m_clouds_transition_speed( 0.1 )
 {
 }
 
@@ -450,8 +451,10 @@ CloudsStateMachine::~CloudsStateMachine( void )
 
 void CloudsStateMachine::Init( void )
 {
+    m_state = m_next_state = DISABLED;
     m_base_updated = false;
     m_last_longlatdistance = 0.0;
+    m_clouds_transition_active = false;
 }
 
 void CloudsStateMachine::UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_degLat, dsreal p_alt )
@@ -476,13 +479,14 @@ void CloudsStateMachine::UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_de
 
     if( m_last_longlatdistance > 2.5 )
     {
-        m_base_updated = false;   
+        m_base_updated = false;  
+        on_clouds_out_of_range();
     }
 }
 
 void CloudsStateMachine::Run( void )
 {
-
+    /*
     if( m_current_alt < VOLUMETRIC_CLOUDS_DISPLAY_ALT )
     {    
         if( m_current_alt > VOLUMETRIC_CLOUDS_ALT )
@@ -504,18 +508,28 @@ void CloudsStateMachine::Run( void )
         m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
         m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false );    
     }
+    */
 
-    m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( m_clouds_alpha, 0.0, 0.0, 0.0 ) );
-    m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( m_clouds_alpha, 0.0, 0.0, 0.0 ) );
-    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "alpha", Vector( m_clouds_alpha, 0.0, 0.0, 0.0 ) );
-
-    if( m_clouds_alpha < m_clouds_alpha_target )
+    if( m_current_alt < VOLUMETRIC_CLOUDS_DISPLAY_ALT )
     {
-        m_timer->TranslationSpeedInc( &m_clouds_alpha, 0.1 );
+        if( m_current_alt > VOLUMETRIC_CLOUDS_ALT )
+        {
+            apply_next_state( SHOW_UP );
+        }
+        else
+        {
+            apply_next_state( SHOW_DOWN );
+        }
     }
-    else if( m_clouds_alpha > m_clouds_alpha_target )
+    else
     {
-        m_timer->TranslationSpeedDec( &m_clouds_alpha, 0.1 );
+        apply_next_state( DISABLED );
+    }
+    
+
+    if( m_clouds_transition_active )
+    {
+        clouds_transition();
     }
 }
 
@@ -524,14 +538,49 @@ dsreal CloudsStateMachine::GetLastLongLatDistance( void )
     return m_last_longlatdistance;
 }
 
+void CloudsStateMachine::clouds_transition( void )
+{
+    if( m_clouds_alpha < m_clouds_alpha_target )
+    {
+        m_timer->TranslationSpeedInc( &m_clouds_alpha, m_clouds_transition_speed );
+
+        if( m_clouds_alpha >= m_clouds_alpha_target )
+        {
+            m_clouds_alpha = m_clouds_alpha_target;            
+        }
+
+        update_shaders_alpha();
+    }
+    else if( m_clouds_alpha > m_clouds_alpha_target )
+    {
+        m_timer->TranslationSpeedDec( &m_clouds_alpha, m_clouds_transition_speed );
+
+        if( m_clouds_alpha <= m_clouds_alpha_target )
+        {
+            m_clouds_alpha = m_clouds_alpha_target;
+        }
+
+        update_shaders_alpha();
+    }
+    else
+    {
+        m_clouds_transition_active = false;
+        m_state = m_next_state;
+
+        on_state_updated();
+    }
+}
+
 void CloudsStateMachine::clouds_pop( void )
 {
     m_clouds_alpha_target = 1.0;
+    m_clouds_transition_active = true;
 }
 
 void CloudsStateMachine::clouds_fade( void )
 {
     m_clouds_alpha_target = 0.0;
+    m_clouds_transition_active = true;
 }
 
 void CloudsStateMachine::CloudsPop( void )
@@ -542,6 +591,92 @@ void CloudsStateMachine::CloudsPop( void )
 void CloudsStateMachine::CloudsFade( void )
 {
     clouds_fade();
+}
+
+void CloudsStateMachine::on_clouds_out_of_range( void )
+{
+    if( m_current_alt > VOLUMETRIC_CLOUDS_ALT )
+    {
+        apply_next_state( SHOW_UP );
+    }
+    else
+    {
+        apply_next_state( SHOW_DOWN );
+    }
+}
+
+void CloudsStateMachine::apply_next_state( State p_state )
+{
+    if( p_state == m_next_state )
+    {
+        return;
+    }
+
+    m_next_state = p_state;
+    if( m_next_state != m_state )
+    {
+        switch( m_next_state )
+        {
+            case SHOW_UP:
+
+                m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( true );
+                m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
+                m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false );
+                clouds_pop();
+                break;
+
+            case SHOW_DOWN:
+
+                m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
+                m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( true );
+                m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( true );
+                clouds_pop();
+                break;
+
+            case HIDE:
+
+                clouds_fade();
+                break;
+
+            case DISABLED:
+
+                clouds_fade();
+                break;       
+        }
+    }
+}
+
+void CloudsStateMachine::on_state_updated( void )
+{
+    switch( m_state )
+    {
+        case SHOW_UP:
+            break;
+
+        case SHOW_DOWN:  
+            break;
+
+        case HIDE:
+
+            m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
+            m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
+            m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false ); 
+            break;
+
+        case DISABLED:
+
+            m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
+            m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
+            m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false ); 
+            break;       
+    }
+}
+
+void CloudsStateMachine::update_shaders_alpha( void )
+{
+    m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( m_clouds_alpha, 0.0, 0.0, 0.0 ) );
+    m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( m_clouds_alpha, 0.0, 0.0, 0.0 ) );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "alpha", Vector( m_clouds_alpha, 0.0, 0.0, 0.0 ) );
 }
 
 dsAppClient::dsAppClient( void ) : 
