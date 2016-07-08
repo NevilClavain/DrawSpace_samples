@@ -431,266 +431,261 @@ void PlanetDetailsBinder::Update( void )
     }
 }
 
-CloudsStateMachine::CloudsStateMachine( DrawSpace::Utils::TimeManager* p_timer, DrawSpace::Clouds* p_clouds, DrawSpace::Clouds* p_clouds_low, 
-                                        DrawSpace::Core::LongLatMovement* p_ll, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass ) :
-m_clouds( p_clouds ),
-m_clouds_low( p_clouds_low ),
-m_ll( p_ll ),
+
+CloudsResources::CloudsResources( DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass ) :
 m_pass( p_pass ),
-m_mirrorpass( p_mirrorpass ),
-m_timer( p_timer ),
-m_clouds_alpha( 0.0 ),
-m_clouds_alpha_target( 0.0 ),
-m_clouds_transition_speed( 0.1 )
+m_mirrorpass( p_mirrorpass )
 {
+
 }
 
-CloudsStateMachine::~CloudsStateMachine( void )
+CloudsResources::~CloudsResources( void )
 {
+
 }
 
-void CloudsStateMachine::Init( void )
+void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet, dsreal p_long, dsreal p_lat, dsreal p_alt )
 {
-    m_state = m_next_state = DISABLED;
-    m_base_updated = false;
-    m_last_longlatdistance = 0.0;
-    m_clouds_transition_active = false;
-}
+    LongLatMovement* clouds_ll = new LongLatMovement();
+   
+    m_clouds_ll_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>, DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>( "impostor2_ll" ) );
+    m_clouds_ll_node->SetContent( clouds_ll );
 
-void CloudsStateMachine::Run( void )
-{
-    if( m_current_alt < VOLUMETRIC_CLOUDS_DISPLAY_ALT )
-    {
-        if( m_current_alt > VOLUMETRIC_CLOUDS_ALT )
-        {
-            // TODO...
+    clouds_ll->Init( p_long, p_lat, p_alt, 0.0, 0.0 );
 
-            apply_next_state( SHOW_UP );
-        }
-        else
-        {
-            // TODO...
+    p_scenegraph.RegisterNode( m_clouds_ll_node );
+    m_clouds_ll_node->LinkTo( p_planet );
 
-            apply_next_state( SHOW_DOWN );
-        }
-    }
-    else
-    {
-        // TODO...
+    m_ll = clouds_ll;
 
-        apply_next_state( DISABLED );
-    }
+    m_clouds = _DRAWSPACE_NEW_( DrawSpace::Clouds, DrawSpace::Clouds );
+    m_clouds->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
+    m_clouds->EnableDetails( false );
+
+
+
+    m_clouds_procedural_rules = new DrawSpace::Procedural::RulesPackage( m_clouds->GetProceduralCallback() );
+
+    m_clouds_procedural_rules->InitializeSeedBase( 56645 );
+    m_clouds_procedural_rules->Run( CLOUDS_PROCEDURALRULES_FILE, " " );
+
+    m_clouds_procedural_rules->GetRootParser()->GetRules()->Apply();
+
+
+    m_clouds->ImpostorsInit();
+
+
+
+    m_clouds->RegisterPassSlot( m_pass );
+
+
     
-    if( m_clouds_transition_active )
-    {
-        clouds_transition();
-    }
+    m_clouds->GetNodeFromPass( m_pass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_clouds->GetNodeFromPass( m_pass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.vso", true ) ) );
+    m_clouds->GetNodeFromPass( m_pass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.pso", true ) ) );
+    m_clouds->GetNodeFromPass( m_pass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_clouds->GetNodeFromPass( m_pass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_clouds->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+    m_clouds->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_clouds->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    m_clouds->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    m_clouds->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );
+    m_clouds->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
+    
+
+    m_clouds->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    
+
+    m_clouds->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+    m_clouds->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_clouds->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+
+
+
+    m_clouds->GetNodeFromPass( m_pass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "clouds.bmp" ) ), 0 );
+    m_clouds->GetNodeFromPass( m_pass )->GetTexture( 0 )->LoadFromFile();
+
+    
+    m_clouds->GetNodeFromPass( m_pass )->SetOrderNumber( 2500 );
+
+
+    m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 0, "flags", 24 );
+    m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "flags", Vector( 0.0, PLANET_RAY * 1000.0, CLOUDS_FOG_DENSITY, 0.0 ) );
+
+    m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 0, "clouds_dims", 25 );
+    m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "clouds_dims", Vector( CLOUDS_HEIGHT / 2.0, -CLOUDS_HEIGHT / 2.0, 1.0, 0.65 ) );
+
+    m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 0, "view_pos", 26 );
+    m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 0, "planet_pos", 27 );
+
+
+    m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "fog_color", 0 );
+    m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "fog_color", Vector( 0.45, 0.63, 0.78, 1.0 ) );
+
+    m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "ambient_lit", 1 );
+    
+    m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "alpha", 2 );
+    m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
+
+    
+
+    //m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
+
+
+    m_clouds_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Clouds>, SceneNode<DrawSpace::Clouds>( p_id ) );
+
+    m_clouds_node->SetContent( m_clouds );
+
+
+    p_scenegraph.RegisterNode( m_clouds_node );
+
+    m_clouds_node->LinkTo( m_clouds_ll_node );
+
+
+    m_clouds_low = _DRAWSPACE_NEW_( DrawSpace::Clouds, DrawSpace::Clouds );
+    m_clouds_low->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+
+    m_clouds_low->EnableDetails( false );
+
+
+    m_clouds_low_procedural_rules = new DrawSpace::Procedural::RulesPackage( m_clouds_low->GetProceduralCallback() );
+
+    m_clouds_low_procedural_rules->InitializeSeedBase( 56645 );
+    m_clouds_low_procedural_rules->Run( CLOUDS_PROCEDURALRULES_FILE, " " );
+
+    m_clouds_low_procedural_rules->GetRootParser()->GetRules()->Apply();
+
+
+    m_clouds_low->ImpostorsInit();
+
+
+    m_clouds_low->RegisterPassSlot( m_pass );
+    m_clouds_low->RegisterPassSlot( m_mirrorpass );
+
+    
+    m_clouds_low->GetNodeFromPass( m_pass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_clouds_low->GetNodeFromPass( m_pass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.vso", true ) ) );
+    m_clouds_low->GetNodeFromPass( m_pass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.pso", true ) ) );
+    m_clouds_low->GetNodeFromPass( m_pass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_clouds_low->GetNodeFromPass( m_pass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_clouds_low->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+    m_clouds_low->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_clouds_low->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    m_clouds_low->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    m_clouds_low->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );
+    m_clouds_low->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
+    
+
+    m_clouds_low->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    
+
+    m_clouds_low->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+    m_clouds_low->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_clouds_low->GetNodeFromPass( m_pass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+
+
+
+    m_clouds_low->GetNodeFromPass( m_pass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "clouds.bmp" ) ), 0 );
+    m_clouds_low->GetNodeFromPass( m_pass )->GetTexture( 0 )->LoadFromFile();
+
+    
+    m_clouds_low->GetNodeFromPass( m_pass )->SetOrderNumber( 1600 );
+
+
+    m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 0, "flags", 24 );
+    m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "flags", Vector( 0.0, PLANET_RAY * 1000.0, CLOUDS_FOG_DENSITY, 0.0 ) );
+
+    m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 0, "clouds_dims", 25 );
+    m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "clouds_dims", Vector( CLOUDS_HEIGHT / 2.0, -CLOUDS_HEIGHT / 2.0, 1.0, 0.65 ) );
+
+    m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 0, "view_pos", 26 );
+    m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 0, "planet_pos", 27 );
+
+
+    m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "fog_color", 0 );
+    m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "fog_color", Vector( 0.45, 0.63, 0.78, 1.0 ) );
+
+    m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "ambient_lit", 1 );
+
+    m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "alpha", 2 );
+    m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
+
+    
+
+    //m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
+
+    
+
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.vso", true ) ) );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.pso", true ) ) );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "none" ) );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
+    
+
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    
+
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
+
+
+
+
+
+    
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "clouds.bmp" ) ), 0 );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetTexture( 0 )->LoadFromFile();
+
+    
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetOrderNumber( 1600 );
+
+
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 0, "flags", 24 );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "flags", Vector( 1.0, PLANET_RAY * 1000.0, CLOUDS_FOG_DENSITY, 0.0 ) );
+
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 0, "clouds_dims", 25 );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "clouds_dims", Vector( 2500, -2500, 1.0, 0.65 ) );
+
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 0, "view_pos", 26 );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 0, "planet_pos", 27 );
+
+
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 1, "fog_color", 0 );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "fog_color", Vector( 0.45, 0.63, 0.78, 1.0 ) );
+
+
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 1, "ambient_lit", 1 );
+
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 1, "alpha", 2 );   
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
+
+    //m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false );
+
+    
+    m_clouds_low_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Clouds>, SceneNode<DrawSpace::Clouds>( p_id + "_low" ) );
+
+    m_clouds_low_node->SetContent( m_clouds_low );
+
+
+    p_scenegraph.RegisterNode( m_clouds_low_node );
+
+    m_clouds_low_node->LinkTo( m_clouds_ll_node );
 }
 
-
-void CloudsStateMachine::on_clouds_pos_update( void )
-{
-    // TODO...
-
-    m_ll->SetLongitud( m_base_deglong );
-    m_ll->SetLatitud( m_base_deglat );
-}
-
-void CloudsStateMachine::apply_next_state( State p_state )
-{
-    if( p_state == m_next_state || m_clouds_transition_active )
-    {
-        return;
-    }
-
-    m_next_state = p_state;
-    if( m_next_state != m_state )
-    {
-        switch( m_next_state )
-        {
-            case SHOW_UP:
-
-                m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( true );
-                m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
-                m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false );
-                clouds_pop();
-                break;
-
-            case SHOW_DOWN:
-
-                m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
-                m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( true );
-                m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( true );
-                clouds_pop();
-                break;
-
-            case HIDE:
-
-                clouds_fade();
-                break;
-
-            case DISABLED:
-
-                // reinit du mecanisme delta, pour la prochaine fois...
-                m_base_updated = false;
-                m_last_longlatdistance = 0.0;
-
-
-                clouds_fade();
-                break;       
-        }
-    }
-}
-
-void CloudsStateMachine::on_state_updated( void )
-{
-    switch( m_state )
-    {
-        case SHOW_UP:
-            break;
-
-        case SHOW_DOWN:  
-            break;
-
-        case HIDE:
-
-            m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
-            m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
-            m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false ); 
-            break;
-
-        case DISABLED:
-
-            m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
-            m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
-            m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false ); 
-            break;       
-    }
-}
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void CloudsStateMachine::UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_degLat, dsreal p_alt )
-{
-    m_current_alt = p_alt - PLANET_RAY * 1000.0;
-
-    if( m_next_state != DISABLED )
-    {
-        // mecanisme delta autorisé...
-
-        if( !m_base_updated )
-        {
-            m_base_deglong = p_degLong;
-            m_base_deglat = p_degLat;
-
-            m_base_updated = true;
-
-            on_clouds_pos_update();
-
-            /*
-            m_ll->SetLongitud( m_base_deglong );
-            m_ll->SetLatitud( m_base_deglat );
-            */
-        }
-
-        dsreal dlg = abs( p_degLong - m_base_deglong );
-        dsreal dlt = abs( p_degLat - m_base_deglat );
-
-        m_last_longlatdistance = sqrt( dlg * dlg + dlt * dlt );
-
-        if( m_last_longlatdistance > 2.5 )
-        {
-            m_base_updated = false;              
-        }
-    }
-}
-
-dsreal CloudsStateMachine::GetLastLongLatDistance( void )
-{
-    return m_last_longlatdistance;
-}
-
-void CloudsStateMachine::clouds_transition( void )
-{
-    if( m_clouds_alpha < m_clouds_alpha_target )
-    {
-        m_timer->TranslationSpeedInc( &m_clouds_alpha, m_clouds_transition_speed );
-
-        if( m_clouds_alpha >= m_clouds_alpha_target )
-        {
-            m_clouds_alpha = m_clouds_alpha_target;            
-        }
-
-        update_shaders_alpha();
-    }
-    else if( m_clouds_alpha > m_clouds_alpha_target )
-    {
-        m_timer->TranslationSpeedDec( &m_clouds_alpha, m_clouds_transition_speed );
-
-        if( m_clouds_alpha <= m_clouds_alpha_target )
-        {
-            m_clouds_alpha = m_clouds_alpha_target;
-        }
-
-        update_shaders_alpha();
-    }
-    else
-    {
-        m_clouds_transition_active = false;
-        m_state = m_next_state;
-
-        on_state_updated();
-    }
-}
-
-void CloudsStateMachine::clouds_pop( void )
-{
-    m_clouds_alpha_target = 1.0;
-    m_clouds_transition_active = true;
-}
-
-void CloudsStateMachine::clouds_fade( void )
-{
-    m_clouds_alpha_target = 0.0;
-    m_clouds_transition_active = true;
-}
-
-void CloudsStateMachine::CloudsPop( void )
-{
-    clouds_pop();
-}
-
-void CloudsStateMachine::CloudsFade( void )
-{
-    clouds_fade();
-}
-
-void CloudsStateMachine::update_shaders_alpha( void )
-{
-    m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( m_clouds_alpha, 0.0, 0.0, 0.0 ) );
-    m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( m_clouds_alpha, 0.0, 0.0, 0.0 ) );
-    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "alpha", Vector( m_clouds_alpha, 0.0, 0.0, 0.0 ) );
-}
-
-
-dsstring CloudsStateMachine::translate_state( State p_state )
-{
-    switch( p_state )
-    {
-        case SHOW_UP:
-            return "SHOW_UP";
-
-        case SHOW_DOWN:
-            return "SHOW_DOWN";
-
-        case HIDE:
-            return "HIDE";
-
-        case DISABLED:
-            return "DISABLED";    
-    }
-}
 
 dsAppClient::dsAppClient( void ) : 
 m_mouselb( false ), 

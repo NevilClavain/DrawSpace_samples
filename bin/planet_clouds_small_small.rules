@@ -10,8 +10,8 @@ repeat
   pub
    array
     string declare_cloud
-    random uniform real -20000.0 20000.0 10
-    random uniform real -20000.0 20000.0 11
+    random uniform real -30000.0 30000.0 10
+    random uniform real -30000.0 30000.0 11
    end
   end
 

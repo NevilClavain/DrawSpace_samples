@@ -152,79 +152,33 @@ public:
     PlanetLight GetLight( int p_index ) { return m_lights[p_index]; };
 };
 
-class CloudsStateMachine
+class CloudsResources
 {
-
-public:
-    typedef enum
-    {
-        SHOW_UP,
-        SHOW_DOWN,
-        HIDE,
-        DISABLED,
-    
-    } State;
-
 protected:
+
+    
+    DrawSpace::Procedural::RulesPackage*                            m_clouds_procedural_rules;
+    DrawSpace::Procedural::RulesPackage*                            m_clouds_low_procedural_rules;
+
     DrawSpace::Clouds*                                              m_clouds;
     DrawSpace::Clouds*                                              m_clouds_low;
     DrawSpace::Core::LongLatMovement*                               m_ll;
+
+    DrawSpace::Core::SceneNode<DrawSpace::Clouds>*                  m_clouds_node;
+    DrawSpace::Core::SceneNode<DrawSpace::Clouds>*                  m_clouds_low_node;
+
+    DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*   m_clouds_ll_node;
+
     DrawSpace::IntermediatePass*                                    m_pass;
     DrawSpace::IntermediatePass*                                    m_mirrorpass;
-    DrawSpace::Utils::TimeManager*                                  m_timer;
-    State                                                           m_state;
-    State                                                           m_next_state;
-    bool                                                            m_clouds_transition_active;
-    dsreal                                                          m_clouds_transition_speed;
-     
-    dsreal              m_base_deglong, m_base_deglat, m_base_alt;
-    dsreal              m_current_alt;
-    bool                m_base_updated;
 
-    dsreal              m_last_longlatdistance;
-    dsreal              m_clouds_alpha;
-    dsreal              m_clouds_alpha_target;
-
-    void                clouds_pop( void );
-    void                clouds_fade( void );
-
-    void                clouds_transition( void );
-
-    void                on_clouds_pos_update( void );
-
-    void                apply_next_state( State p_state );
-
-    void                on_state_updated( void );
-
-    void                update_shaders_alpha( void );
-
-    dsstring            translate_state( State p_state );
 
 public:
 
-    CloudsStateMachine( DrawSpace::Utils::TimeManager* p_timer, DrawSpace::Clouds* p_clouds, DrawSpace::Clouds* p_clouds_low, DrawSpace::Core::LongLatMovement* p_ll, 
-                        DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass );
-    ~CloudsStateMachine( void );
+    CloudsResources( DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass );
+    ~CloudsResources( void );
 
-    void Init( void );
-
-    void UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_degLat, dsreal p_alt );
-    void Run( void );
-
-    dsreal GetLastLongLatDistance( void );
-
-    void CloudsPop( void );
-    void CloudsFade( void );
-
-    State GetNextState( void ) { return m_next_state; };
-    State GetState( void ) { return m_state; };
-
-    dsstring GetNextStateString( void ) { return translate_state( m_next_state ); };
-    dsstring GetStateString( void ) { return translate_state( m_state ); };
-
-
-    dsreal GetCurrentCloudsAlpha( void ) { return m_clouds_alpha; };
-    dsreal GetTargetCloudsAlpha( void ) { return m_clouds_alpha_target; };
+    void Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet, dsreal p_long, dsreal p_lat, dsreal p_alt );
 };
 
 
@@ -428,9 +382,8 @@ protected:
     dsreal                                      m_water_anim;
     bool                                        m_water_anim_inc;
 
-    CloudsStateMachine*                         m_clouds_state_machine;
-    
 
+   
     void init_planet_meshes( void );
     void init_assets_loaders( void );
     void init_passes( void );
