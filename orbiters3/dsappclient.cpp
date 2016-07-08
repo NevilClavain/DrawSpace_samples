@@ -486,23 +486,25 @@ void CloudsStateMachine::UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_de
 
 void CloudsStateMachine::Run( void )
 {
-    /*
     if( m_current_alt < VOLUMETRIC_CLOUDS_DISPLAY_ALT )
     {
-        if( m_current_alt > VOLUMETRIC_CLOUDS_ALT )
+        if( SHOW_UP == m_state || SHOW_DOWN == m_state )
         {
-            apply_next_state( SHOW_UP );
-        }
-        else
-        {
-            apply_next_state( SHOW_DOWN );
+            if( m_current_alt > VOLUMETRIC_CLOUDS_ALT )
+            {
+                apply_next_state( SHOW_UP );
+            }
+            else
+            {
+                apply_next_state( SHOW_DOWN );
+            }
         }
     }
     else
     {
         apply_next_state( DISABLED );
     }
-    */
+    
 
     if( m_current_alt > VOLUMETRIC_CLOUDS_DISPLAY_ALT )
     {
@@ -667,6 +669,25 @@ void CloudsStateMachine::update_shaders_alpha( void )
     m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( m_clouds_alpha, 0.0, 0.0, 0.0 ) );
     m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( m_clouds_alpha, 0.0, 0.0, 0.0 ) );
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "alpha", Vector( m_clouds_alpha, 0.0, 0.0, 0.0 ) );
+}
+
+
+dsstring CloudsStateMachine::translate_state( State p_state )
+{
+    switch( p_state )
+    {
+        case SHOW_UP:
+            return "SHOW_UP";
+
+        case SHOW_DOWN:
+            return "SHOW_DOWN";
+
+        case HIDE:
+            return "HIDE";
+
+        case DISABLED:
+            return "DISABLED";    
+    }
 }
 
 dsAppClient::dsAppClient( void ) : 
@@ -2557,6 +2578,11 @@ void dsAppClient::render_universe( void )
 
 
         renderer->DrawText( 0, 255, 0, 10, 340, "longlat distance = %f", m_clouds_state_machine->GetLastLongLatDistance() );
+
+
+        renderer->DrawText( 0, 255, 0, 10, 570, "State = %s Next_State = %s curr_alpha = %.3f target_alpha = %.3f", m_clouds_state_machine->GetStateString().c_str(), 
+                                   m_clouds_state_machine->GetNextStateString().c_str(), m_clouds_state_machine->GetCurrentCloudsAlpha(), m_clouds_state_machine->GetTargetCloudsAlpha() );
+
 
         renderer->DrawText( 0, 255, 0, 900, 30, "%s", m_deviceDescr.description.c_str() );
     

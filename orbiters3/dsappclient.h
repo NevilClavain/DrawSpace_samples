@@ -154,8 +154,8 @@ public:
 
 class CloudsStateMachine
 {
-protected:
 
+public:
     typedef enum
     {
         SHOW_UP,
@@ -165,6 +165,7 @@ protected:
     
     } State;
 
+protected:
     DrawSpace::Clouds*                                              m_clouds;
     DrawSpace::Clouds*                                              m_clouds_low;
     DrawSpace::Core::LongLatMovement*                               m_ll;
@@ -197,6 +198,8 @@ protected:
 
     void                update_shaders_alpha( void );
 
+    dsstring            translate_state( State p_state );
+
 public:
 
     CloudsStateMachine( DrawSpace::Utils::TimeManager* p_timer, DrawSpace::Clouds* p_clouds, DrawSpace::Clouds* p_clouds_low, DrawSpace::Core::LongLatMovement* p_ll, 
@@ -212,6 +215,16 @@ public:
 
     void CloudsPop( void );
     void CloudsFade( void );
+
+    State GetNextState( void ) { return m_next_state; };
+    State GetState( void ) { return m_state; };
+
+    dsstring GetNextStateString( void ) { return translate_state( m_next_state ); };
+    dsstring GetStateString( void ) { return translate_state( m_state ); };
+
+
+    dsreal GetCurrentCloudsAlpha( void ) { return m_clouds_alpha; };
+    dsreal GetTargetCloudsAlpha( void ) { return m_clouds_alpha_target; };
 };
 
 
