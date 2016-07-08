@@ -441,7 +441,7 @@ m_mirrorpass( p_mirrorpass ),
 m_timer( p_timer ),
 m_clouds_alpha( 0.0 ),
 m_clouds_alpha_target( 0.0 ),
-m_clouds_transition_speed( 0.5 )
+m_clouds_transition_speed( 0.1 )
 {
 }
 
@@ -457,64 +457,152 @@ void CloudsStateMachine::Init( void )
     m_clouds_transition_active = false;
 }
 
-void CloudsStateMachine::UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_degLat, dsreal p_alt )
-{
-    m_current_alt = p_alt - PLANET_RAY * 1000.0;
-
-    if( !m_base_updated )
-    {
-        m_base_deglong = p_degLong;
-        m_base_deglat = p_degLat;
-
-        m_base_updated = true;
-
-        m_ll->SetLongitud( m_base_deglong );
-        m_ll->SetLatitud( m_base_deglat );
-    }
-
-    dsreal dlg = abs( p_degLong - m_base_deglong );
-    dsreal dlt = abs( p_degLat - m_base_deglat );
-
-    m_last_longlatdistance = sqrt( dlg * dlg + dlt * dlt );
-
-    if( m_last_longlatdistance > 2.5 )
-    {
-        m_base_updated = false;  
-        on_clouds_out_of_range();
-    }
-}
-
 void CloudsStateMachine::Run( void )
 {
     if( m_current_alt < VOLUMETRIC_CLOUDS_DISPLAY_ALT )
     {
-        if( SHOW_UP == m_state || SHOW_DOWN == m_state )
+        if( m_current_alt > VOLUMETRIC_CLOUDS_ALT )
         {
-            if( m_current_alt > VOLUMETRIC_CLOUDS_ALT )
-            {
-                apply_next_state( SHOW_UP );
-            }
-            else
-            {
-                apply_next_state( SHOW_DOWN );
-            }
+            // TODO...
+
+            apply_next_state( SHOW_UP );
+        }
+        else
+        {
+            // TODO...
+
+            apply_next_state( SHOW_DOWN );
         }
     }
     else
     {
+        // TODO...
+
         apply_next_state( DISABLED );
     }
     
-
-    if( m_current_alt > VOLUMETRIC_CLOUDS_DISPLAY_ALT )
-    {
-        apply_next_state( DISABLED );
-    }
-    
-
     if( m_clouds_transition_active )
     {
         clouds_transition();
+    }
+}
+
+
+void CloudsStateMachine::on_clouds_pos_update( void )
+{
+    // TODO...
+
+    m_ll->SetLongitud( m_base_deglong );
+    m_ll->SetLatitud( m_base_deglat );
+}
+
+void CloudsStateMachine::apply_next_state( State p_state )
+{
+    if( p_state == m_next_state || m_clouds_transition_active )
+    {
+        return;
+    }
+
+    m_next_state = p_state;
+    if( m_next_state != m_state )
+    {
+        switch( m_next_state )
+        {
+            case SHOW_UP:
+
+                m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( true );
+                m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
+                m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false );
+                clouds_pop();
+                break;
+
+            case SHOW_DOWN:
+
+                m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
+                m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( true );
+                m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( true );
+                clouds_pop();
+                break;
+
+            case HIDE:
+
+                clouds_fade();
+                break;
+
+            case DISABLED:
+
+                // reinit du mecanisme delta, pour la prochaine fois...
+                m_base_updated = false;
+                m_last_longlatdistance = 0.0;
+
+
+                clouds_fade();
+                break;       
+        }
+    }
+}
+
+void CloudsStateMachine::on_state_updated( void )
+{
+    switch( m_state )
+    {
+        case SHOW_UP:
+            break;
+
+        case SHOW_DOWN:  
+            break;
+
+        case HIDE:
+
+            m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
+            m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
+            m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false ); 
+            break;
+
+        case DISABLED:
+
+            m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
+            m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
+            m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false ); 
+            break;       
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void CloudsStateMachine::UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_degLat, dsreal p_alt )
+{
+    m_current_alt = p_alt - PLANET_RAY * 1000.0;
+
+    if( m_state != DISABLED )
+    {
+        // mecanisme delta autorisé...
+
+        if( !m_base_updated )
+        {
+            m_base_deglong = p_degLong;
+            m_base_deglat = p_degLat;
+
+            m_base_updated = true;
+
+            on_clouds_pos_update();
+
+            /*
+            m_ll->SetLongitud( m_base_deglong );
+            m_ll->SetLatitud( m_base_deglat );
+            */
+        }
+
+        dsreal dlg = abs( p_degLong - m_base_deglong );
+        dsreal dlt = abs( p_degLat - m_base_deglat );
+
+        m_last_longlatdistance = sqrt( dlg * dlg + dlt * dlt );
+
+        if( m_last_longlatdistance > 2.5 )
+        {
+            m_base_updated = false;              
+        }
     }
 }
 
@@ -576,92 +664,6 @@ void CloudsStateMachine::CloudsPop( void )
 void CloudsStateMachine::CloudsFade( void )
 {
     clouds_fade();
-}
-
-void CloudsStateMachine::on_clouds_out_of_range( void )
-{
-    if( SHOW_UP == m_state || SHOW_DOWN == m_state )
-    {
-        apply_next_state( HIDE );
-    }
-    else// if( HIDE == m_state )
-    {
-        if( m_current_alt > VOLUMETRIC_CLOUDS_ALT )
-        {
-            apply_next_state( SHOW_UP );
-        }
-        else
-        {
-            apply_next_state( SHOW_DOWN );
-        }    
-    }
-}
-
-void CloudsStateMachine::apply_next_state( State p_state )
-{
-    if( p_state == m_next_state || m_clouds_transition_active )
-    {
-        return;
-    }
-
-    m_next_state = p_state;
-    if( m_next_state != m_state )
-    {
-        switch( m_next_state )
-        {
-            case SHOW_UP:
-
-                m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( true );
-                m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
-                m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false );
-                clouds_pop();
-                break;
-
-            case SHOW_DOWN:
-
-                m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
-                m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( true );
-                m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( true );
-                clouds_pop();
-                break;
-
-            case HIDE:
-
-                clouds_fade();
-                break;
-
-            case DISABLED:
-
-                clouds_fade();
-                break;       
-        }
-    }
-}
-
-void CloudsStateMachine::on_state_updated( void )
-{
-    switch( m_state )
-    {
-        case SHOW_UP:
-            break;
-
-        case SHOW_DOWN:  
-            break;
-
-        case HIDE:
-
-            m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
-            m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
-            m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false ); 
-            break;
-
-        case DISABLED:
-
-            m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
-            m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
-            m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false ); 
-            break;       
-    }
 }
 
 void CloudsStateMachine::update_shaders_alpha( void )

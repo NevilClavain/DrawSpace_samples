@@ -190,7 +190,7 @@ protected:
 
     void                clouds_transition( void );
 
-    void                on_clouds_out_of_range( void );
+    void                on_clouds_pos_update( void );
 
     void                apply_next_state( State p_state );
 
