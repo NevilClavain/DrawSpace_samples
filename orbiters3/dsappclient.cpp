@@ -575,7 +575,7 @@ void CloudsStateMachine::UpdateViewerSphericalPos( dsreal p_degLong, dsreal p_de
 {
     m_current_alt = p_alt - PLANET_RAY * 1000.0;
 
-    if( m_state != DISABLED )
+    if( m_next_state != DISABLED )
     {
         // mecanisme delta autorisé...
 
