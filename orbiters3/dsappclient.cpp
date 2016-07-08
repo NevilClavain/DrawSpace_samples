@@ -1612,7 +1612,7 @@ void dsAppClient::init_planet( void )
     m_clouds_ll_node->SetContent( clouds_ll );
 
     //m_clouds_ll_node->GetContent()->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, 0.0, 0.0 );
-    clouds_ll->Init( 0.0, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, 0.0, 0.0 );
+    clouds_ll->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, 0.0, 0.0 );
 
     m_scenenodegraph.RegisterNode( m_clouds_ll_node );
     m_clouds_ll_node->LinkTo( m_planet_node );
@@ -1690,10 +1690,11 @@ void dsAppClient::init_planet( void )
     m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "ambient_lit", 1 );
     
     m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "alpha", 2 );
+    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
 
     
 
-    m_clouds->GetNodeFromPass( m_texturepass )->SetDrawingState( false );
+    //m_clouds->GetNodeFromPass( m_texturepass )->SetDrawingState( false );
 
 
     m_clouds_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Clouds>, SceneNode<DrawSpace::Clouds>( "clouds_1" ) );
@@ -1777,10 +1778,11 @@ void dsAppClient::init_planet( void )
     m_clouds_low->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "ambient_lit", 1 );
 
     m_clouds_low->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "alpha", 2 );
+    m_clouds_low->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
 
     
 
-    m_clouds_low->GetNodeFromPass( m_texturepass )->SetDrawingState( false );
+    //m_clouds_low->GetNodeFromPass( m_texturepass )->SetDrawingState( false );
 
     
 
@@ -1833,9 +1835,10 @@ void dsAppClient::init_planet( void )
 
     m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 1, "ambient_lit", 1 );
 
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 1, "alpha", 2 );    
+    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 1, "alpha", 2 );   
+    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
 
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetDrawingState( false );
+    //m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetDrawingState( false );
 
 
     m_clouds_low_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Clouds>, SceneNode<DrawSpace::Clouds>( "clouds_1_low" ) );
@@ -1848,8 +1851,8 @@ void dsAppClient::init_planet( void )
     m_clouds_low_node->LinkTo( m_clouds_ll_node );
 
 
-    m_clouds_state_machine = _DRAWSPACE_NEW_( CloudsStateMachine, CloudsStateMachine( &m_timer, m_clouds, m_clouds_low, clouds_ll, m_texturepass, m_texturemirrorpass ) );
-    m_clouds_state_machine->Init();
+    //m_clouds_state_machine = _DRAWSPACE_NEW_( CloudsStateMachine, CloudsStateMachine( &m_timer, m_clouds, m_clouds_low, clouds_ll, m_texturepass, m_texturemirrorpass ) );
+    //m_clouds_state_machine->Init();
     
     //m_planet->SetGravityState( false );
 }
@@ -2339,7 +2342,7 @@ void dsAppClient::render_universe( void )
     Utils::Maths::CartesiantoSpherical( playerpos, playerpos_longlatalt );
 
 
-    m_clouds_state_machine->UpdateViewerSphericalPos( Utils::Maths::RadToDeg( playerpos_longlatalt[1] ), Utils::Maths::RadToDeg( playerpos_longlatalt[2] ), playerpos_longlatalt[0] );
+    //m_clouds_state_machine->UpdateViewerSphericalPos( Utils::Maths::RadToDeg( playerpos_longlatalt[1] ), Utils::Maths::RadToDeg( playerpos_longlatalt[2] ), playerpos_longlatalt[0] );
   
     //////////////////////////////////////////////////////////////////////
 
@@ -2400,7 +2403,7 @@ void dsAppClient::render_universe( void )
     //DrawSpace::SphericalLOD::Patch* current_patch = m_planet->GetFragment( 0 )->GetCurrentPatch();
 
 
-    m_clouds_state_machine->Run();
+    //m_clouds_state_machine->Run();
 
     m_wavespass->GetRenderingQueue()->Draw();
 
@@ -2511,7 +2514,7 @@ void dsAppClient::render_universe( void )
         m_details_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     }
     
-    /*
+    
     if( alt > VOLUMETRIC_CLOUDS_ALT )
     {
         m_clouds->GetNodeFromPass( m_texturepass )->SetDrawingState( true );
@@ -2524,7 +2527,7 @@ void dsAppClient::render_universe( void )
         m_clouds_low->GetNodeFromPass( m_texturepass )->SetDrawingState( true );
         m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetDrawingState( true );    
     }
-    */
+    
 
 
     long current_fps = m_timer.GetFPS();
@@ -2578,7 +2581,7 @@ void dsAppClient::render_universe( void )
         renderer->DrawText( 0, 255, 0, 10, 310, "%.3f %.4f %.4f", playerpos_longlatalt[0] - PLANET_RAY * 1000.0, Utils::Maths::RadToDeg( playerpos_longlatalt[1] ), 
                                                                     Utils::Maths::RadToDeg( playerpos_longlatalt[2] ) );
 
-
+        /*
         renderer->DrawText( 0, 255, 0, 10, 340, "longlat distance = %f", m_clouds_state_machine->GetLastLongLatDistance() );
 
 
@@ -2587,7 +2590,9 @@ void dsAppClient::render_universe( void )
 
 
         renderer->DrawText( 0, 255, 0, 900, 30, "%s", m_deviceDescr.description.c_str() );
-    
+            */
+
+
         /*
         if( current_patch )
         {
@@ -3055,7 +3060,7 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case 'U':
             {
-                m_clouds_state_machine->CloudsPop();
+                //m_clouds_state_machine->CloudsPop();
 
                 /*
                 _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> memalloc dump begin <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
@@ -3073,7 +3078,7 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case 'P':
 
-            m_clouds_state_machine->CloudsFade();
+            //m_clouds_state_machine->CloudsFade();
             break;
     }
 }
