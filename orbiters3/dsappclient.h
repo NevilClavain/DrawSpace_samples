@@ -26,6 +26,7 @@
 
 #include <dsapp.h>
 
+#define NB_VOLUMETRIC_CLOUDS    1
 
 class MultiFractalBinder : public DrawSpace::SphericalLOD::Binder
 {
@@ -179,10 +180,11 @@ public:
     CloudsResources( DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass );
     ~CloudsResources( void );
 
-    void Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet, dsreal p_long, dsreal p_lat, dsreal p_alt );
+    void Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, dsreal p_long, dsreal p_lat, dsreal p_alt );
 
     void ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor );
     void ComputeAlt( dsreal p_alt );
+    void UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos, const DrawSpace::Utils::Vector& p_planetpos );
 };
 
 
@@ -363,6 +365,9 @@ protected:
 
     DrawSpace::Core::RenderingNode*             m_flatcloudshigh_rnode[6];
     DrawSpace::Core::RenderingNode*             m_flatcloudslow_rnode[6];
+
+
+    CloudsResources*                            m_volumetric_clouds[NB_VOLUMETRIC_CLOUDS];
 
     ///////////////////////////////////////////////////////////
 
