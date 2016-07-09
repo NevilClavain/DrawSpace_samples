@@ -432,16 +432,15 @@ void PlanetDetailsBinder::Update( void )
 }
 
 
-CloudsResources::CloudsResources( DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass ) :
+CloudsResources::CloudsResources( DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass ) :
 m_pass( p_pass ),
-m_mirrorpass( p_mirrorpass )
+m_mirrorpass( p_mirrorpass ),
+m_planet_node( p_planet_node )
 {
-
 }
 
 CloudsResources::~CloudsResources( void )
 {
-
 }
 
 void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet, dsreal p_long, dsreal p_lat, dsreal p_alt )
@@ -686,6 +685,44 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
     m_clouds_low_node->LinkTo( m_clouds_ll_node );
 }
 
+void CloudsResources::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor )
+{
+    Matrix planet_transf;
+    Vector local_clouds_pos;
+    Vector global_clouds_pos;
+    m_clouds_ll_node->GetContent()->GetXYZ( local_clouds_pos );
+
+    m_planet_node->GetFinalTransform( planet_transf );
+    planet_transf.ClearTranslation();
+
+    planet_transf.Transform( &local_clouds_pos, &global_clouds_pos );
+
+    global_clouds_pos.Normalize();
+
+    Vector ambient_lit = p_lcolor;
+
+    ambient_lit.Scale( Utils::Maths::Clamp( 0.0, 1.0, p_ldir * global_clouds_pos + 0.35 ) );  // produit scalaire plus un biais
+
+    m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "ambient_lit", ambient_lit );
+    m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "ambient_lit", ambient_lit );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "ambient_lit", ambient_lit );
+}
+
+void CloudsResources::ComputeAlt( dsreal p_alt )
+{
+    if( p_alt > VOLUMETRIC_CLOUDS_ALT )
+    {
+        m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( true );
+        m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
+        m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false );
+    }
+    else
+    {
+        m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
+        m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( true );
+        m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( true );    
+    }
+}
 
 dsAppClient::dsAppClient( void ) : 
 m_mouselb( false ), 
