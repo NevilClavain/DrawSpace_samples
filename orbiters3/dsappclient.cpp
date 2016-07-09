@@ -2466,7 +2466,7 @@ void dsAppClient::render_universe( void )
 
     // calcul lumiere ambiante pour les nuages volumetriques
 
-
+    /*
     invariantPos.Normalize();
 
     PlanetLight l0 = m_planet_detail_binder[0]->GetLight( 0 );
@@ -2477,10 +2477,34 @@ void dsAppClient::render_universe( void )
     ambient_lit.Scale( Utils::Maths::Clamp( 0.0, 1.0, l0.m_dir * invariantPos + 0.35 ) );  // produit scalaire plus un biais
 
     m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "ambient_lit", ambient_lit );
-    //m_clouds->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "ambient_lit", ambient_lit );
+    m_clouds_low->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "ambient_lit", ambient_lit );
+    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "ambient_lit", ambient_lit );
+    */
+
+    Vector local_clouds_pos;
+    Vector global_clouds_pos;
+    m_clouds_ll_node->GetContent()->GetXYZ( local_clouds_pos );
+
+    m_planet_node->GetFinalTransform( planet_transf );
+    planet_transf.ClearTranslation();
+
+    planet_transf.Transform( &local_clouds_pos, &global_clouds_pos );
+
+    global_clouds_pos.Normalize();
+
+    PlanetLight l0 = m_planet_detail_binder[0]->GetLight( 0 );
+
+
+    Vector ambient_lit = l0.m_color;
+
+    ambient_lit.Scale( Utils::Maths::Clamp( 0.0, 1.0, l0.m_dir * global_clouds_pos + 0.35 ) );  // produit scalaire plus un biais
+
+    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "ambient_lit", ambient_lit );
     m_clouds_low->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "ambient_lit", ambient_lit );
     m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "ambient_lit", ambient_lit );
 
+
+    
 
     ////////////////////////////////////////
 
