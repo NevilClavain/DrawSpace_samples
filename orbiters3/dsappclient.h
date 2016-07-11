@@ -180,7 +180,7 @@ public:
     CloudsResources( DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass );
     ~CloudsResources( void );
 
-    void Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, dsreal p_long, dsreal p_lat, dsreal p_alt );
+    void Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, dsreal p_long, dsreal p_lat, dsreal p_alt, int p_seed );
 
     void ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor );
     void ComputeAlt( dsreal p_alt );

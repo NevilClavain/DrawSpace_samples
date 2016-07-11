@@ -443,7 +443,7 @@ CloudsResources::~CloudsResources( void )
 {
 }
 
-void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, dsreal p_long, dsreal p_lat, dsreal p_alt )
+void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, dsreal p_long, dsreal p_lat, dsreal p_alt, int p_seed )
 {
     LongLatMovement* clouds_ll = new LongLatMovement();
    
@@ -466,7 +466,7 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
 
     m_clouds_procedural_rules = new DrawSpace::Procedural::RulesPackage( m_clouds->GetProceduralCallback() );
 
-    m_clouds_procedural_rules->InitializeSeedBase( 56645 );
+    m_clouds_procedural_rules->InitializeSeedBase( p_seed );
     m_clouds_procedural_rules->Run( CLOUDS_PROCEDURALRULES_FILE, " " );
 
     m_clouds_procedural_rules->GetRootParser()->GetRules()->Apply();
@@ -552,7 +552,7 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
 
     m_clouds_low_procedural_rules = new DrawSpace::Procedural::RulesPackage( m_clouds_low->GetProceduralCallback() );
 
-    m_clouds_low_procedural_rules->InitializeSeedBase( 56645 );
+    m_clouds_low_procedural_rules->InitializeSeedBase( p_seed );
     m_clouds_low_procedural_rules->Run( CLOUDS_PROCEDURALRULES_FILE, " " );
 
     m_clouds_low_procedural_rules->GetRootParser()->GetRules()->Apply();
@@ -1894,6 +1894,9 @@ void dsAppClient::init_planet( void )
 
     dsreal curr_theta = 274.0;
 
+    DrawSpace::Procedural::SeedsBase sb;
+    sb.InitializeFromCurrentTime();
+
     for( size_t i = 0; i < NB_VOLUMETRIC_CLOUDS; i++, curr_theta += 4.0 )
     {
         
@@ -1901,7 +1904,7 @@ void dsAppClient::init_planet( void )
 
         char vclouds_number[32];
         sprintf( vclouds_number, "clouds_array_%d", i );
-        m_volumetric_clouds[i]->Init( vclouds_number, m_scenenodegraph, curr_theta, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT ); 
+        m_volumetric_clouds[i]->Init( vclouds_number, m_scenenodegraph, curr_theta, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, sb.GetSeed( i ) ); 
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
