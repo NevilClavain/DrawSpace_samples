@@ -1892,10 +1892,16 @@ void dsAppClient::init_planet( void )
 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    for( size_t i = 0; i < NB_VOLUMETRIC_CLOUDS; i++ )
+    dsreal curr_theta = 274.0;
+
+    for( size_t i = 0; i < NB_VOLUMETRIC_CLOUDS; i++, curr_theta += 4.0 )
     {
+        
         m_volumetric_clouds[i] = new CloudsResources( m_planet_node, m_texturepass, m_texturemirrorpass );
-        m_volumetric_clouds[i]->Init( "clouds_array_", m_scenenodegraph, 274.0, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT ); 
+
+        char vclouds_number[32];
+        sprintf( vclouds_number, "clouds_array_%d", i );
+        m_volumetric_clouds[i]->Init( vclouds_number, m_scenenodegraph, curr_theta, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT ); 
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
