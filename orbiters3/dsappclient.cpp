@@ -435,7 +435,8 @@ void PlanetDetailsBinder::Update( void )
 CloudsResources::CloudsResources( DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass ) :
 m_pass( p_pass ),
 m_mirrorpass( p_mirrorpass ),
-m_planet_node( p_planet_node )
+m_planet_node( p_planet_node ),
+m_hide( false )
 {
 }
 
@@ -687,6 +688,11 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
 
 void CloudsResources::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor )
 {
+    if( m_hide )
+    {
+        return;
+    }
+
     Matrix planet_transf;
     Vector local_clouds_pos;
     Vector global_clouds_pos;
@@ -710,6 +716,11 @@ void CloudsResources::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace:
 
 void CloudsResources::ComputeAlt( dsreal p_alt )
 {
+    if( m_hide )
+    {
+        return;
+    }
+
     if( p_alt > VOLUMETRIC_CLOUDS_ALT )
     {
         m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( true );
@@ -726,8 +737,21 @@ void CloudsResources::ComputeAlt( dsreal p_alt )
 
 void CloudsResources::UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos, const DrawSpace::Utils::Vector& p_planetpos )
 {
+    if( m_hide )
+    {
+        return;
+    }
+
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "view_pos", p_viewpos );
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "planet_pos", p_planetpos );
+}
+
+void CloudsResources::SetDrawingState( bool p_state )
+{
+    m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( p_state );
+    m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( p_state );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( p_state );
+    m_hide = !p_state;
 }
 
 dsAppClient::dsAppClient( void ) : 
@@ -1897,6 +1921,7 @@ void dsAppClient::init_planet( void )
     DrawSpace::Procedural::SeedsBase sb;
     sb.InitializeFromCurrentTime();
 
+    
     for( size_t i = 0; i < NB_VOLUMETRIC_CLOUDS; i++, curr_theta += 4.0 )
     {
         
@@ -1906,6 +1931,7 @@ void dsAppClient::init_planet( void )
         sprintf( vclouds_number, "clouds_array_%d", i );
         m_volumetric_clouds[i]->Init( vclouds_number, m_scenenodegraph, curr_theta, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, sb.GetSeed( i ) ); 
     }
+    
 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2407,11 +2433,12 @@ void dsAppClient::render_universe( void )
     planet_pos[3] = 1.0;
 
     //m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "planet_pos", planet_pos );
-
+    
     for( size_t i = 0; i < NB_VOLUMETRIC_CLOUDS; i++ )
     {
         m_volumetric_clouds[i]->UpdateMirror( invariantPos, planet_pos );
     }
+    
     
 
 
@@ -2566,10 +2593,12 @@ void dsAppClient::render_universe( void )
     m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "ambient_lit", ambient_lit );
     */
 
+    
     for( size_t i = 0; i < NB_VOLUMETRIC_CLOUDS; i++ )
     {
         m_volumetric_clouds[i]->ComputeLight( l0.m_dir, l0.m_color );
     }
+    
 
     ////////////////////////////////////////
 
@@ -2613,10 +2642,12 @@ void dsAppClient::render_universe( void )
     }
     */
 
+    
     for( size_t i = 0; i < NB_VOLUMETRIC_CLOUDS; i++ )
     {
         m_volumetric_clouds[i]->ComputeAlt( alt );
     }
+    
 
 
     long current_fps = m_timer.GetFPS();
@@ -3150,6 +3181,7 @@ void dsAppClient::OnKeyPulse( long p_key )
         case 'U':
             {
                 //m_clouds_state_machine->CloudsPop();
+                m_volumetric_clouds[0]->SetDrawingState( true );
 
                 /*
                 _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> memalloc dump begin <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
@@ -3168,6 +3200,7 @@ void dsAppClient::OnKeyPulse( long p_key )
         case 'P':
 
             //m_clouds_state_machine->CloudsFade();
+            m_volumetric_clouds[0]->SetDrawingState( false );
             break;
     }
 }

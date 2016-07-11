@@ -26,7 +26,7 @@
 
 #include <dsapp.h>
 
-#define NB_VOLUMETRIC_CLOUDS    1
+#define NB_VOLUMETRIC_CLOUDS    4
 
 class MultiFractalBinder : public DrawSpace::SphericalLOD::Binder
 {
@@ -174,6 +174,8 @@ protected:
     DrawSpace::IntermediatePass*                                    m_mirrorpass;
     DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>*      m_planet_node;
 
+    bool                                                            m_hide;
+
 
 public:
 
@@ -185,6 +187,8 @@ public:
     void ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor );
     void ComputeAlt( dsreal p_alt );
     void UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos, const DrawSpace::Utils::Vector& p_planetpos );
+
+    void SetDrawingState( bool p_state );
 };
 
 
