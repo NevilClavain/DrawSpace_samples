@@ -394,7 +394,8 @@ protected:
     DrawSpace::Core::RenderingNode*             m_flatcloudslow_rnode[6];
 
 
-    CloudsResources*                            m_volumetric_clouds[NB_VOLUMETRIC_CLOUDS];
+    //CloudsResources*                            m_volumetric_clouds[NB_VOLUMETRIC_CLOUDS];
+    CloudsStateMachine*                         m_clouds_state_machine;
 
     ///////////////////////////////////////////////////////////
 
