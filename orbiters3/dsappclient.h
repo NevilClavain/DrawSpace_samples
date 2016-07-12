@@ -176,6 +176,8 @@ protected:
 
     bool                                                            m_hide;
 
+    dsreal                                                          m_viewdotp;
+
 
 public:
 
@@ -185,10 +187,31 @@ public:
     void Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, dsreal p_long, dsreal p_lat, dsreal p_alt, int p_seed );
 
     void ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor );
+    void ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view );
     void ComputeAlt( dsreal p_alt );
     void UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos, const DrawSpace::Utils::Vector& p_planetpos );
 
     void SetDrawingState( bool p_state );
+};
+
+class CloudsStateMachine
+{
+protected:
+
+    std::vector<CloudsResources*>   m_volumetrics_clouds;
+
+public:
+    CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, 
+                        DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass, 
+                        DrawSpace::Core::SceneNodeGraph& p_scenegraph );
+
+    ~CloudsStateMachine( void );
+
+    void ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor );
+    void ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view );
+    void ComputeAlt( dsreal p_alt );
+    void UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos, const DrawSpace::Utils::Vector& p_planetpos );
+
 };
 
 

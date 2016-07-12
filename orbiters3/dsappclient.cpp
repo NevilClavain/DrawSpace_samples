@@ -436,7 +436,8 @@ CloudsResources::CloudsResources( DrawSpace::Core::SceneNode<DrawSpace::Spherica
 m_pass( p_pass ),
 m_mirrorpass( p_mirrorpass ),
 m_planet_node( p_planet_node ),
-m_hide( false )
+m_hide( false ),
+m_viewdotp( 0.0 )
 {
 }
 
@@ -714,6 +715,26 @@ void CloudsResources::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace:
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "ambient_lit", ambient_lit );
 }
 
+void CloudsResources::ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view )
+{
+    Vector view = p_view;
+    view.Normalize();
+
+    Matrix planet_transf;
+    Vector local_clouds_pos;
+    Vector global_clouds_pos;
+    m_clouds_ll_node->GetContent()->GetXYZ( local_clouds_pos );
+
+    m_planet_node->GetFinalTransform( planet_transf );
+    planet_transf.ClearTranslation();
+
+    planet_transf.Transform( &local_clouds_pos, &global_clouds_pos );
+
+    global_clouds_pos.Normalize();
+
+    m_viewdotp = global_clouds_pos * view;
+}
+
 void CloudsResources::ComputeAlt( dsreal p_alt )
 {
     if( m_hide )
@@ -753,6 +774,63 @@ void CloudsResources::SetDrawingState( bool p_state )
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( p_state );
     m_hide = !p_state;
 }
+
+CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, 
+                        DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass, 
+                        DrawSpace::Core::SceneNodeGraph& p_scenegraph )
+{
+    dsreal curr_theta = 274.0;
+
+    DrawSpace::Procedural::SeedsBase sb;
+    sb.InitializeFromCurrentTime();
+
+    for( size_t i = 0; i < p_nbCloudsField; i++, curr_theta += 4.0 )
+    {        
+        CloudsResources* clouds = new CloudsResources( p_planet_node, p_pass, p_mirrorpass );
+
+        char vclouds_number[32];
+        sprintf( vclouds_number, "clouds_array_%d", i );
+        clouds->Init( vclouds_number, p_scenegraph, curr_theta, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, sb.GetSeed( i ) ); 
+    }
+}
+
+CloudsStateMachine::~CloudsStateMachine( void )
+{
+}
+
+void CloudsStateMachine::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor )
+{
+    for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
+    {
+        m_volumetrics_clouds[i]->ComputeLight( p_ldir, p_lcolor );
+    }
+}
+
+void CloudsStateMachine::ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view )
+{
+    for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
+    {
+        m_volumetrics_clouds[i]->ComputeViewDotProduct( p_view );
+    }
+}
+
+void CloudsStateMachine::ComputeAlt( dsreal p_alt )
+{
+    for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
+    {
+        m_volumetrics_clouds[i]->ComputeAlt( p_alt );
+    }
+}
+
+void CloudsStateMachine::UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos, const DrawSpace::Utils::Vector& p_planetpos )
+{
+    for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
+    {
+        m_volumetrics_clouds[i]->UpdateMirror( p_viewpos, p_planetpos );
+    }
+}
+
+
 
 dsAppClient::dsAppClient( void ) : 
 m_mouselb( false ), 
@@ -2569,6 +2647,11 @@ void dsAppClient::render_universe( void )
     m_clouds_low->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "ambient_lit", ambient_lit );
     m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "ambient_lit", ambient_lit );
     */
+
+    for( size_t i = 0; i < NB_VOLUMETRIC_CLOUDS; i++ )
+    {
+        m_volumetric_clouds[i]->ComputeViewDotProduct( invariantPos );
+    }
 
     Vector local_clouds_pos;
     Vector global_clouds_pos;
