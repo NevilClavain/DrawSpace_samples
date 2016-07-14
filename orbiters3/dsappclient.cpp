@@ -24,6 +24,7 @@
 #include "dsappclient.h"
 #include "Psapi.h"
 
+
 /*
 #define PLANET_RAY                          6000.0
 #define PLANET_ATMO_THICKNESS               85000.0
@@ -784,7 +785,7 @@ CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::Sc
     DrawSpace::Procedural::SeedsBase sb;
     sb.InitializeFromCurrentTime();
 
-    for( size_t i = 0; i < p_nbCloudsField; i++, curr_theta += 4.0 )
+    for( size_t i = 0; i < p_nbCloudsField; i++, curr_theta += 12.0 )
     {        
         CloudsResources* clouds = new CloudsResources( p_planet_node, p_pass, p_mirrorpass );
 
@@ -813,6 +814,15 @@ void CloudsStateMachine::ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view
     for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
     {
         m_volumetrics_clouds[i]->ComputeViewDotProduct( p_view );
+
+        if( m_volumetrics_clouds[i]->m_viewdotp > 0.995 )
+        {
+            m_volumetrics_clouds[i]->SetDrawingState( true );
+        }
+        else
+        {
+            m_volumetrics_clouds[i]->SetDrawingState( false );
+        }
     }
 }
 
@@ -831,8 +841,6 @@ void CloudsStateMachine::UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos
         m_volumetrics_clouds[i]->UpdateMirror( p_viewpos, p_planetpos );
     }
 }
-
-
 
 dsAppClient::dsAppClient( void ) : 
 m_mouselb( false ), 

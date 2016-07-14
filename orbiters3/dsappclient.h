@@ -192,6 +192,8 @@ public:
     void UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos, const DrawSpace::Utils::Vector& p_planetpos );
 
     void SetDrawingState( bool p_state );
+
+    friend class CloudsStateMachine;
 };
 
 class CloudsStateMachine
@@ -199,6 +201,7 @@ class CloudsStateMachine
 protected:
 
     std::vector<CloudsResources*>   m_volumetrics_clouds;
+
 
 public:
     CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, 
