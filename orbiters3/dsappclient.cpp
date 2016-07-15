@@ -446,6 +446,38 @@ CloudsResources::~CloudsResources( void )
 {
 }
 
+void CloudsResources::compute_clouds_vector_global( DrawSpace::Utils::Vector& p_out )
+{
+    Vector local_clouds_pos;
+
+    local_clouds_pos[0] = 0.0;
+    local_clouds_pos[1] = 0.0;
+    local_clouds_pos[2] = 0.0;
+    local_clouds_pos[3] = 1.0;
+    Vector global_clouds_pos;
+
+    Matrix clouds_transf;
+
+    m_clouds_node->GetFinalTransform( clouds_transf );
+
+    clouds_transf.Transform( &local_clouds_pos, &global_clouds_pos );
+
+    Matrix planet_transf;
+    m_planet_node->GetFinalTransform( planet_transf );
+    Vector local_pos;
+    Vector global_pos;
+
+    planet_transf.Transform( &local_pos, &global_pos );
+    
+    global_clouds_pos[0] -= global_pos[0];
+    global_clouds_pos[1] -= global_pos[1];
+    global_clouds_pos[2] -= global_pos[2];
+
+    global_clouds_pos.Normalize();
+
+    p_out = global_clouds_pos;
+}
+
 void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, dsreal p_long, dsreal p_lat, dsreal p_alt, int p_seed )
 {
     LongLatMovement* clouds_ll = new LongLatMovement();
@@ -532,9 +564,7 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
     m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "alpha", 2 );
     m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
 
-    
-
-    //m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
+   
 
 
     m_clouds_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Clouds>, SceneNode<DrawSpace::Clouds>( p_id ) );
@@ -618,11 +648,6 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
     m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
 
     
-
-    //m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
-
-    
-
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.vso", true ) ) );
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.pso", true ) ) );
@@ -675,8 +700,6 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 1, "alpha", 2 );   
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
 
-    //m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false );
-
     
     m_clouds_low_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Clouds>, SceneNode<DrawSpace::Clouds>( p_id + "_low" ) );
 
@@ -695,17 +718,8 @@ void CloudsResources::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace:
         return;
     }
 
-    Matrix planet_transf;
-    Vector local_clouds_pos;
     Vector global_clouds_pos;
-    m_clouds_ll_node->GetContent()->GetXYZ( local_clouds_pos );
-
-    m_planet_node->GetFinalTransform( planet_transf );
-    planet_transf.ClearTranslation();
-
-    planet_transf.Transform( &local_clouds_pos, &global_clouds_pos );
-
-    global_clouds_pos.Normalize();
+    compute_clouds_vector_global( global_clouds_pos );
 
     Vector ambient_lit = p_lcolor;
 
@@ -721,6 +735,7 @@ void CloudsResources::ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view )
     Vector view = p_view;
     view.Normalize();
 
+    /*
     Matrix planet_transf;
     Vector local_clouds_pos;
     Vector global_clouds_pos;
@@ -732,6 +747,10 @@ void CloudsResources::ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view )
     planet_transf.Transform( &local_clouds_pos, &global_clouds_pos );
 
     global_clouds_pos.Normalize();
+    */
+
+    Vector global_clouds_pos;
+    compute_clouds_vector_global( global_clouds_pos );
 
     m_viewdotp = global_clouds_pos * view;
 }

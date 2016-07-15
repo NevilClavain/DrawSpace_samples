@@ -179,6 +179,10 @@ protected:
     dsreal                                                          m_viewdotp;
 
 
+    void compute_clouds_vector_global( DrawSpace::Utils::Vector& p_out ); //calcul vector position champ nuage par rapport au centre planete exprimé dans le repere global
+
+
+
 public:
 
     CloudsResources( DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass );
