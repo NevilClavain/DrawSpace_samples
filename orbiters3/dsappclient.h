@@ -165,10 +165,13 @@ protected:
     DrawSpace::Clouds*                                              m_clouds_low;
     DrawSpace::Core::LongLatMovement*                               m_ll;
 
+    DrawSpace::Core::Transformation*                                m_rand_rot;
+
     DrawSpace::Core::SceneNode<DrawSpace::Clouds>*                  m_clouds_node;
     DrawSpace::Core::SceneNode<DrawSpace::Clouds>*                  m_clouds_low_node;
 
     DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*   m_clouds_ll_node;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*    m_rand_rot_node;
 
     DrawSpace::IntermediatePass*                                    m_pass;
     DrawSpace::IntermediatePass*                                    m_mirrorpass;

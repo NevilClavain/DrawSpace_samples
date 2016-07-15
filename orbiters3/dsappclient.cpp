@@ -480,15 +480,40 @@ void CloudsResources::compute_clouds_vector_global( DrawSpace::Utils::Vector& p_
 
 void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, dsreal p_long, dsreal p_lat, dsreal p_alt, int p_seed )
 {
-    LongLatMovement* clouds_ll = new LongLatMovement();
+    //////////////////////////////////////////////////////////////////////////////////
+
+    m_rand_rot = _DRAWSPACE_NEW_( DrawSpace::Core::Transformation, DrawSpace::Core::Transformation );
+    m_rand_rot_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( p_id + "impostor_rot" ) );
+
+    Matrix rotx, roty, rotz;
+
+    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0 ), Utils::Maths::DegToRad( 0.0 ) );
+    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0 ), Utils::Maths::DegToRad( 8.0 ) );
+    rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Utils::Maths::DegToRad( 0.0 ) );
+
+    m_rand_rot->PushMatrix( rotx );
+    m_rand_rot->PushMatrix( roty );
+    m_rand_rot->PushMatrix( rotz );
+
+    m_rand_rot_node->SetContent( m_rand_rot );
+    p_scenegraph.RegisterNode( m_rand_rot_node );
+
+    m_rand_rot_node->LinkTo( m_planet_node );
+
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+    LongLatMovement* clouds_ll = _DRAWSPACE_NEW_( LongLatMovement, LongLatMovement );
    
-    m_clouds_ll_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>, DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>( "impostor2_ll" ) );
+    m_clouds_ll_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>, DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>( p_id + "impostor_ll" ) );
     m_clouds_ll_node->SetContent( clouds_ll );
 
     clouds_ll->Init( p_long, p_lat, p_alt, 0.0, 0.0 );
 
     p_scenegraph.RegisterNode( m_clouds_ll_node );
-    m_clouds_ll_node->LinkTo( m_planet_node );
+
+    //m_clouds_ll_node->LinkTo( m_planet_node );
+    m_clouds_ll_node->LinkTo( m_rand_rot_node );
 
     m_ll = clouds_ll;
 
@@ -735,20 +760,6 @@ void CloudsResources::ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view )
     Vector view = p_view;
     view.Normalize();
 
-    /*
-    Matrix planet_transf;
-    Vector local_clouds_pos;
-    Vector global_clouds_pos;
-    m_clouds_ll_node->GetContent()->GetXYZ( local_clouds_pos );
-
-    m_planet_node->GetFinalTransform( planet_transf );
-    planet_transf.ClearTranslation();
-
-    planet_transf.Transform( &local_clouds_pos, &global_clouds_pos );
-
-    global_clouds_pos.Normalize();
-    */
-
     Vector global_clouds_pos;
     compute_clouds_vector_global( global_clouds_pos );
 
@@ -834,7 +845,7 @@ void CloudsStateMachine::ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view
     {
         m_volumetrics_clouds[i]->ComputeViewDotProduct( p_view );
 
-        if( m_volumetrics_clouds[i]->m_viewdotp > 0.995 )
+        if( m_volumetrics_clouds[i]->m_viewdotp > 0.98 )
         {
             m_volumetrics_clouds[i]->SetDrawingState( true );
         }
