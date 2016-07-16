@@ -26,7 +26,6 @@
 
 #include <dsapp.h>
 
-#define NB_VOLUMETRIC_CLOUDS    4
 
 class MultiFractalBinder : public DrawSpace::SphericalLOD::Binder
 {
@@ -209,6 +208,7 @@ protected:
 
     std::vector<CloudsResources*>   m_volumetrics_clouds;
 
+    int                             m_nbactives;
 
 public:
     CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, 
@@ -222,6 +222,7 @@ public:
     void ComputeAlt( dsreal p_alt );
     void UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos, const DrawSpace::Utils::Vector& p_planetpos );
 
+    int  GetLastNbActives( void ) { return m_nbactives; };
 };
 
 

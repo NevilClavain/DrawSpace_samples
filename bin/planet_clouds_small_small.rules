@@ -2,7 +2,7 @@
 
   
 repeat
- integer 80
+ integer 5
 
  batch
 

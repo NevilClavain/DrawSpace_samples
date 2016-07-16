@@ -810,18 +810,32 @@ CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::Sc
                         DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass, 
                         DrawSpace::Core::SceneNodeGraph& p_scenegraph )
 {
-    dsreal curr_theta = 274.0;
+    m_nbactives = 0;
+
+    dsreal rand_theta, rand_phi;
 
     DrawSpace::Procedural::SeedsBase sb;
     sb.InitializeFromCurrentTime();
 
-    for( size_t i = 0; i < p_nbCloudsField; i++, curr_theta += 12.0 )
+
+    std::default_random_engine generator;
+    std::uniform_int_distribution<unsigned int> rand( 0, 350 );
+    std::uniform_int_distribution<unsigned int> rand2( -89, 89 );
+
+    generator.seed( ::GetTickCount() );
+
+    for( size_t i = 0; i < p_nbCloudsField; i++ )
     {        
         CloudsResources* clouds = new CloudsResources( p_planet_node, p_pass, p_mirrorpass );
 
+
+        rand_theta = (dsreal)rand( generator );
+        rand_phi = (dsreal)rand2( generator );
+
+
         char vclouds_number[32];
         sprintf( vclouds_number, "clouds_array_%d", i );
-        clouds->Init( vclouds_number, p_scenegraph, curr_theta, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, sb.GetSeed( i ) );
+        clouds->Init( vclouds_number, p_scenegraph, rand_theta, rand_phi, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, sb.GetSeed( i ) );
 
         m_volumetrics_clouds.push_back( clouds );
     }
@@ -841,6 +855,8 @@ void CloudsStateMachine::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpa
 
 void CloudsStateMachine::ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view )
 {
+    m_nbactives = 0;
+
     for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
     {
         m_volumetrics_clouds[i]->ComputeViewDotProduct( p_view );
@@ -848,6 +864,7 @@ void CloudsStateMachine::ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view
         if( m_volumetrics_clouds[i]->m_viewdotp > 0.98 )
         {
             m_volumetrics_clouds[i]->SetDrawingState( true );
+            m_nbactives++;
         }
         else
         {
@@ -2034,25 +2051,7 @@ void dsAppClient::init_planet( void )
 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-/*
-    dsreal curr_theta = 274.0;
-
-    DrawSpace::Procedural::SeedsBase sb;
-    sb.InitializeFromCurrentTime();
-
-    
-    for( size_t i = 0; i < NB_VOLUMETRIC_CLOUDS; i++, curr_theta += 4.0 )
-    {
-        
-        m_volumetric_clouds[i] = new CloudsResources( m_planet_node, m_texturepass, m_texturemirrorpass );
-
-        char vclouds_number[32];
-        sprintf( vclouds_number, "clouds_array_%d", i );
-        m_volumetric_clouds[i]->Init( vclouds_number, m_scenenodegraph, curr_theta, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, sb.GetSeed( i ) ); 
-    }
-  */  
-
-    m_clouds_state_machine = new CloudsStateMachine( NB_VOLUMETRIC_CLOUDS, m_planet_node, m_texturepass, m_texturemirrorpass, m_scenenodegraph );
+    m_clouds_state_machine = new CloudsStateMachine( 0, m_planet_node, m_texturepass, m_texturemirrorpass, m_scenenodegraph );
 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2840,6 +2839,8 @@ void dsAppClient::render_universe( void )
 
         renderer->DrawText( 0, 255, 0, 10, 310, "%.3f %.4f %.4f", playerpos_longlatalt[0] - PLANET_RAY * 1000.0, Utils::Maths::RadToDeg( playerpos_longlatalt[1] ), 
                                                                     Utils::Maths::RadToDeg( playerpos_longlatalt[2] ) );
+
+        renderer->DrawText( 0, 255, 0, 10, 330, "nb clouds field : %d", m_clouds_state_machine->GetLastNbActives() );
 
         /*
         renderer->DrawText( 0, 255, 0, 10, 340, "longlat distance = %f", m_clouds_state_machine->GetLastLongLatDistance() );
