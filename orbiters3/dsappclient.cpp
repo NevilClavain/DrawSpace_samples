@@ -59,7 +59,7 @@
 #define ATMO_SCATTERING_ALPHA_ALT_VIEWER    75000.0
 #define FLAT_CLOUDS_ALT                     3300.0
 #define VOLUMETRIC_CLOUDS_DISPLAY_ALT       6000.0
-#define VOLUMETRIC_CLOUDS_ALT               2100.0
+#define VOLUMETRIC_CLOUDS_ALT               1400.0
 #define PLAINS_AMPLITUDE                    50.0
 #define MOUNTAINS_AMPLITUDE                 800.0
 #define MOUNTAINS_OFFSET                    -120.0
@@ -2051,7 +2051,7 @@ void dsAppClient::init_planet( void )
 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    m_clouds_state_machine = new CloudsStateMachine( 0, m_planet_node, m_texturepass, m_texturemirrorpass, m_scenenodegraph );
+    m_clouds_state_machine = new CloudsStateMachine( 25, m_planet_node, m_texturepass, m_texturemirrorpass, m_scenenodegraph );
 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
