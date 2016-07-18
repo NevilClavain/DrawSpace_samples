@@ -482,26 +482,6 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
 {
     //////////////////////////////////////////////////////////////////////////////////
 
-    m_rand_rot = _DRAWSPACE_NEW_( DrawSpace::Core::Transformation, DrawSpace::Core::Transformation );
-    m_rand_rot_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( p_id + "impostor_rot" ) );
-
-    Matrix rotx, roty, rotz;
-
-    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0 ), Utils::Maths::DegToRad( 0.0 ) );
-    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0 ), Utils::Maths::DegToRad( 8.0 ) );
-    rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0 ), Utils::Maths::DegToRad( 0.0 ) );
-
-    m_rand_rot->PushMatrix( rotx );
-    m_rand_rot->PushMatrix( roty );
-    m_rand_rot->PushMatrix( rotz );
-
-    m_rand_rot_node->SetContent( m_rand_rot );
-    p_scenegraph.RegisterNode( m_rand_rot_node );
-
-    m_rand_rot_node->LinkTo( m_planet_node );
-
-
-    //////////////////////////////////////////////////////////////////////////////////
 
     LongLatMovement* clouds_ll = _DRAWSPACE_NEW_( LongLatMovement, LongLatMovement );
    
@@ -512,8 +492,7 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
 
     p_scenegraph.RegisterNode( m_clouds_ll_node );
 
-    //m_clouds_ll_node->LinkTo( m_planet_node );
-    m_clouds_ll_node->LinkTo( m_rand_rot_node );
+    m_clouds_ll_node->LinkTo( m_planet_node );
 
     m_ll = clouds_ll;
 
@@ -599,7 +578,8 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
 
     p_scenegraph.RegisterNode( m_clouds_node );
 
-    m_clouds_node->LinkTo( m_clouds_ll_node );
+    //m_clouds_node->LinkTo( m_clouds_ll_node );
+    m_clouds_node->LinkTo( m_planet_node );
 
 
     m_clouds_low = _DRAWSPACE_NEW_( DrawSpace::Clouds, DrawSpace::Clouds );
@@ -733,7 +713,8 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
 
     p_scenegraph.RegisterNode( m_clouds_low_node );
 
-    m_clouds_low_node->LinkTo( m_clouds_ll_node );
+    //m_clouds_low_node->LinkTo( m_clouds_ll_node );
+    m_clouds_low_node->LinkTo( m_planet_node );
 }
 
 void CloudsResources::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor )
@@ -775,6 +756,7 @@ void CloudsResources::ComputeAlt( dsreal p_alt )
 
     if( p_alt > VOLUMETRIC_CLOUDS_ALT )
     {
+        
         m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( true );
         m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
         m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false );
@@ -783,7 +765,8 @@ void CloudsResources::ComputeAlt( dsreal p_alt )
     {
         m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
         m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( true );
-        m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( true );    
+        m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( true ); 
+        
     }
 }
 
@@ -800,10 +783,12 @@ void CloudsResources::UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos, c
 
 void CloudsResources::SetDrawingState( bool p_state )
 {
+    
     m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( p_state );
     m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( p_state );
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( p_state );
     m_hide = !p_state;
+    
 }
 
 CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, 
@@ -820,7 +805,7 @@ CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::Sc
 
     std::default_random_engine generator;
     std::uniform_int_distribution<unsigned int> rand( 0, 350 );
-    std::uniform_int_distribution<unsigned int> rand2( -89, 89 );
+    std::uniform_int_distribution<int> rand2( -89, 89 );
 
     generator.seed( ::GetTickCount() );
 
@@ -835,7 +820,7 @@ CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::Sc
 
         char vclouds_number[32];
         sprintf( vclouds_number, "clouds_array_%d", i );
-        clouds->Init( vclouds_number, p_scenegraph, rand_theta, rand_phi, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, sb.GetSeed( i ) );
+        clouds->Init( vclouds_number, p_scenegraph, /*rand_theta, rand_phi,*/ 0.0, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, sb.GetSeed( i ) );
 
         m_volumetrics_clouds.push_back( clouds );
     }
@@ -859,9 +844,13 @@ void CloudsStateMachine::ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view
 
     for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
     {
+
+        //m_volumetrics_clouds[i]->SetDrawingState( true );
+
+        /*
         m_volumetrics_clouds[i]->ComputeViewDotProduct( p_view );
 
-        if( m_volumetrics_clouds[i]->m_viewdotp > 0.98 )
+        if( m_volumetrics_clouds[i]->m_viewdotp > 0.70 )
         {
             m_volumetrics_clouds[i]->SetDrawingState( true );
             m_nbactives++;
@@ -870,6 +859,7 @@ void CloudsStateMachine::ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view
         {
             m_volumetrics_clouds[i]->SetDrawingState( false );
         }
+        */
     }
 }
 
@@ -2051,7 +2041,7 @@ void dsAppClient::init_planet( void )
 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    m_clouds_state_machine = new CloudsStateMachine( 25, m_planet_node, m_texturepass, m_texturemirrorpass, m_scenenodegraph );
+    m_clouds_state_machine = new CloudsStateMachine( 1, m_planet_node, m_texturepass, m_texturemirrorpass, m_scenenodegraph );
 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2339,7 +2329,9 @@ void dsAppClient::init_cameras( void )
 
     m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
     //m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 93.0 + 2.0, 0.0, 0.0 );
-    m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 8.0 + 3.0, 0.0, 0.0 );
+    //m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 8.0 + 3.0, 0.0, 0.0 );
+
+    m_longlat_mvt->Init( 29.0, 86.5, ( PLANET_RAY * 1000 ) + 8.0 + 3.0, 0.0, 0.0 );
 
     m_longlatmvt_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LongLatMovement>, SceneNode<DrawSpace::Core::LongLatMovement>( "longlatmvt_node" ) );
     m_longlatmvt_node->SetContent( m_longlat_mvt );
