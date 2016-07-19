@@ -733,7 +733,9 @@ void CloudsResources::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace:
 
     Vector ambient_lit = p_lcolor;
 
-    ambient_lit.Scale( Utils::Maths::Clamp( 0.0, 1.0, p_ldir * global_clouds_pos + 0.35 ) );  // produit scalaire plus un biais
+    ambient_lit.Scale( /*Utils::Maths::Clamp( 0.0, 1.0, p_ldir * global_clouds_pos + 0.35 )*/ 1.0 );  // produit scalaire plus un biais
+
+    
 
     m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "ambient_lit", ambient_lit );
     m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "ambient_lit", ambient_lit );

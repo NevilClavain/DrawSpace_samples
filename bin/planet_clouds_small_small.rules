@@ -2,7 +2,7 @@
 
   
 repeat
- integer 1
+ integer 100
 
  batch
 
@@ -10,10 +10,10 @@ repeat
   pub
    array
     string declare_cloud_spherical_pos
-      # random uniform real 0.0 359.0 10
-      # random uniform real -90.0 90.0 11
-      real 0.0
-      real 0.0
+      random uniform real 0.0 359.0 10
+      random uniform real -9.0 9.0 11
+      # real 0.0
+      # real 0.0
    end
   end
 
