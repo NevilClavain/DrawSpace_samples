@@ -2331,7 +2331,7 @@ void dsAppClient::init_cameras( void )
     //m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 93.0 + 2.0, 0.0, 0.0 );
     //m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 8.0 + 3.0, 0.0, 0.0 );
 
-    m_longlat_mvt->Init( 29.0, 86.5, ( PLANET_RAY * 1000 ) + 8.0 + 3.0, 0.0, 0.0 );
+    m_longlat_mvt->Init( -90, 59.5, ( PLANET_RAY * 1000 ) + 8.0 + 300.0, 0.0, 0.0 );
 
     m_longlatmvt_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LongLatMovement>, SceneNode<DrawSpace::Core::LongLatMovement>( "longlatmvt_node" ) );
     m_longlatmvt_node->SetContent( m_longlat_mvt );
