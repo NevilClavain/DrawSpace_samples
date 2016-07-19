@@ -498,6 +498,7 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
 
     m_clouds = _DRAWSPACE_NEW_( DrawSpace::Clouds, DrawSpace::Clouds );
     m_clouds->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+    m_clouds->SetSphericalPosRay( PLANET_RAY * 1000 + VOLUMETRIC_CLOUDS_ALT );
 
     m_clouds->EnableDetails( false );
 
@@ -568,7 +569,7 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
     m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "alpha", 2 );
     m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
 
-   
+    
 
 
     m_clouds_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Clouds>, SceneNode<DrawSpace::Clouds>( p_id ) );
@@ -584,6 +585,7 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
 
     m_clouds_low = _DRAWSPACE_NEW_( DrawSpace::Clouds, DrawSpace::Clouds );
     m_clouds_low->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
+    m_clouds_low->SetSphericalPosRay( PLANET_RAY * 1000 + VOLUMETRIC_CLOUDS_ALT );
 
     m_clouds_low->EnableDetails( false );
 
@@ -704,6 +706,8 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
 
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 1, "alpha", 2 );   
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
+
+    
 
     
     m_clouds_low_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Clouds>, SceneNode<DrawSpace::Clouds>( p_id + "_low" ) );
@@ -2331,7 +2335,7 @@ void dsAppClient::init_cameras( void )
     //m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 93.0 + 2.0, 0.0, 0.0 );
     //m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 8.0 + 3.0, 0.0, 0.0 );
 
-    m_longlat_mvt->Init( -90, 59.5, ( PLANET_RAY * 1000 ) + 8.0 + 300.0, 0.0, 0.0 );
+    m_longlat_mvt->Init( 0.0, 89.0, ( PLANET_RAY * 1000 ) + 8.0 + 300.0, 0.0, 0.0 );
 
     m_longlatmvt_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LongLatMovement>, SceneNode<DrawSpace::Core::LongLatMovement>( "longlatmvt_node" ) );
     m_longlatmvt_node->SetContent( m_longlat_mvt );
