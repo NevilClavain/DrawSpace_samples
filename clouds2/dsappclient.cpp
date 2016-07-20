@@ -436,6 +436,8 @@ bool dsAppClient::OnIdleAppInit( void )
 
     m_scenenodegraph.SetCurrentCamera( "camera" );
 
+    m_clouds->SetCurrentCamera( m_camera_node );
+
 
     m_texturepass->GetRenderingQueue()->UpdateOutputQueue();
     m_texturepass2->GetRenderingQueue()->UpdateOutputQueue();
@@ -548,11 +550,15 @@ void dsAppClient::OnKeyPulse( long p_key )
             {
                 m_scenenodegraph.SetCurrentCamera( "camera2" );
                 m_selected_camera = 1;
+
+                m_clouds->SetCurrentCamera( m_camera2_node );
             }
             else
             {
                 m_scenenodegraph.SetCurrentCamera( "camera" );
                 m_selected_camera = 0;
+
+                m_clouds->SetCurrentCamera( m_camera_node );
             }
             break;
 

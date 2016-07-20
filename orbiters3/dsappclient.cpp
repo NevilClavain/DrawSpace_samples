@@ -797,6 +797,12 @@ void CloudsResources::SetDrawingState( bool p_state )
     
 }
 
+void CloudsResources::SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* p_cam )
+{
+    m_clouds->SetCurrentCamera( p_cam );
+    m_clouds_low->SetCurrentCamera( p_cam );
+}
+
 CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, 
                         DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass, 
                         DrawSpace::Core::SceneNodeGraph& p_scenegraph )
@@ -834,6 +840,14 @@ CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::Sc
 
 CloudsStateMachine::~CloudsStateMachine( void )
 {
+}
+
+void CloudsStateMachine::SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* p_cam )
+{
+    for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
+    {
+        m_volumetrics_clouds[i]->SetCurrentCamera( p_cam );
+    }
 }
 
 void CloudsStateMachine::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor )
@@ -3053,6 +3067,7 @@ void dsAppClient::OnRenderFrame( void )
                 //m_curr_camera = m_camera5; 
                 //m_curr_camera_name = "camera5";
 
+                m_clouds_state_machine->SetCurrentCamera( m_curr_camera->GetOwner() );
 
                 m_scenenodegraph.SetCurrentCamera( m_curr_camera_name );
                 //m_calendar->Startup( 162682566 );
@@ -3287,6 +3302,8 @@ void dsAppClient::OnKeyPulse( long p_key )
                     m_curr_camera_name = "camera3";
                     m_mouse_circularmode = false;
                 }
+
+                m_clouds_state_machine->SetCurrentCamera( m_curr_camera->GetOwner() );
             }
             break;
 

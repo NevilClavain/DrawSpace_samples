@@ -199,6 +199,8 @@ public:
 
     void SetDrawingState( bool p_state );
 
+    void SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* p_cam );
+
     friend class CloudsStateMachine;
 };
 
@@ -223,6 +225,8 @@ public:
     void UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos, const DrawSpace::Utils::Vector& p_planetpos );
 
     int  GetLastNbActives( void ) { return m_nbactives; };
+
+    void SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* p_cam );
 };
 
 
