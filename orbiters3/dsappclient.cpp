@@ -564,9 +564,11 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
     m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "fog_color", 0 );
     m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "fog_color", Vector( 0.45, 0.63, 0.78, 1.0 ) );
 
-    m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "ambient_lit", 1 );
+    m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "ldir", 1 );
+    m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "lcolor", 2 );
+
     
-    m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "alpha", 2 );
+    m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "alpha", 3 );
     m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
 
     
@@ -649,9 +651,10 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
     m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "fog_color", 0 );
     m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "fog_color", Vector( 0.45, 0.63, 0.78, 1.0 ) );
 
-    m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "ambient_lit", 1 );
+    m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "ldir", 1 );
+    m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "lcolor", 2 );
 
-    m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "alpha", 2 );
+    m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "alpha", 3 );
     m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
 
     
@@ -702,9 +705,10 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "fog_color", Vector( 0.45, 0.63, 0.78, 1.0 ) );
 
 
-    m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 1, "ambient_lit", 1 );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 1, "ldir", 1 );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 1, "lcolor", 2 );
 
-    m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 1, "alpha", 2 );   
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 1, "alpha", 3 );   
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
 
     
@@ -728,18 +732,27 @@ void CloudsResources::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace:
         return;
     }
 
-    Vector global_clouds_pos;
-    compute_clouds_vector_global( global_clouds_pos );
+    //Vector global_clouds_pos;
+    //compute_clouds_vector_global( global_clouds_pos );
 
-    Vector ambient_lit = p_lcolor;
+    //Vector ambient_lit = p_lcolor;
 
-    ambient_lit.Scale( /*Utils::Maths::Clamp( 0.0, 1.0, p_ldir * global_clouds_pos + 0.35 )*/ 1.0 );  // produit scalaire plus un biais
+    //ambient_lit.Scale( /*Utils::Maths::Clamp( 0.0, 1.0, p_ldir * global_clouds_pos + 0.35 )*/ 1.0 );  // produit scalaire plus un biais
 
     
-
+    /*
     m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "ambient_lit", ambient_lit );
     m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "ambient_lit", ambient_lit );
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "ambient_lit", ambient_lit );
+    */
+
+    m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "ldir", p_ldir );
+    m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "ldir", p_ldir );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "ldir", p_ldir );
+
+    m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "lcolor", p_lcolor );
+    m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "lcolor", p_lcolor );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "lcolor", p_lcolor );
 }
 
 void CloudsResources::ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view )
