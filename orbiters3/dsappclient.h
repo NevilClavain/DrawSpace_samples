@@ -162,14 +162,13 @@ protected:
 
     DrawSpace::Clouds*                                              m_clouds;
     DrawSpace::Clouds*                                              m_clouds_low;
-    DrawSpace::Core::LongLatMovement*                               m_ll;
-
     
 
     DrawSpace::Core::SceneNode<DrawSpace::Clouds>*                  m_clouds_node;
     DrawSpace::Core::SceneNode<DrawSpace::Clouds>*                  m_clouds_low_node;
 
-    DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*   m_clouds_ll_node;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*    m_clouds_rot_node;
+    DrawSpace::Core::Transformation*                                m_clouds_rot;
     
 
     DrawSpace::IntermediatePass*                                    m_pass;
@@ -346,20 +345,6 @@ protected:
     DrawSpace::SphericalLOD::Binder*                                    m_planet_waterbump_binder[6];
 
     DrawSpace::SphericalLOD::Binder*                                    m_planet_occlusion_binder[6];
-
-    /*
-    DrawSpace::Procedural::RulesPackage*                                m_clouds_procedural_rules;
-    DrawSpace::Clouds*                                                  m_clouds;
-
-    DrawSpace::Procedural::RulesPackage*                                m_clouds_low_procedural_rules;
-    DrawSpace::Clouds*                                                  m_clouds_low;
-
-
-    DrawSpace::Core::SceneNode<DrawSpace::Clouds>*                      m_clouds_node;
-    DrawSpace::Core::SceneNode<DrawSpace::Clouds>*                      m_clouds_low_node;
-
-    DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*       m_clouds_ll_node;
-    */
 
     DrawSpace::Chunk*                                                   m_star_impostor;
     DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_star_impostor_node;

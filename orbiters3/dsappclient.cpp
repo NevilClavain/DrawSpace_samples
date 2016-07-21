@@ -481,6 +481,8 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
     //////////////////////////////////////////////////////////////////////////////////
 
 
+    /*
+
     LongLatMovement* clouds_ll = _DRAWSPACE_NEW_( LongLatMovement, LongLatMovement );
    
     m_clouds_ll_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>, DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>( p_id + "impostor_ll" ) );
@@ -493,6 +495,30 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
     m_clouds_ll_node->LinkTo( m_planet_node );
 
     m_ll = clouds_ll;
+
+    */
+
+    m_clouds_rot = _DRAWSPACE_NEW_( Transformation, Transformation );
+    m_clouds_rot_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( p_id + "clouds_rot" ) );
+    m_clouds_rot_node->SetContent( m_clouds_rot );
+
+    Matrix rotx;
+    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0), Maths::DegToRad( 47 ) );
+
+    Matrix roty;
+    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0), Maths::DegToRad( 28 ) );
+
+    Matrix rotz;
+    rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0), Maths::DegToRad( 55 ) );
+
+    m_clouds_rot->PushMatrix( rotx );
+    m_clouds_rot->PushMatrix( roty );
+    m_clouds_rot->PushMatrix( rotz );
+
+    p_scenegraph.RegisterNode( m_clouds_rot_node );
+
+    m_clouds_rot_node->LinkTo( m_planet_node );
+
 
     m_clouds = _DRAWSPACE_NEW_( DrawSpace::Clouds, DrawSpace::Clouds );
     m_clouds->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
@@ -579,8 +605,8 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
 
     p_scenegraph.RegisterNode( m_clouds_node );
 
-    //m_clouds_node->LinkTo( m_clouds_ll_node );
-    m_clouds_node->LinkTo( m_planet_node );
+    m_clouds_node->LinkTo( m_clouds_rot_node );
+    //m_clouds_node->LinkTo( m_planet_node );
 
 
     m_clouds_low = _DRAWSPACE_NEW_( DrawSpace::Clouds, DrawSpace::Clouds );
@@ -719,8 +745,8 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
 
     p_scenegraph.RegisterNode( m_clouds_low_node );
 
-    //m_clouds_low_node->LinkTo( m_clouds_ll_node );
-    m_clouds_low_node->LinkTo( m_planet_node );
+    m_clouds_low_node->LinkTo( m_clouds_rot_node );
+    //m_clouds_low_node->LinkTo( m_planet_node );
 }
 
 void CloudsResources::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor )
