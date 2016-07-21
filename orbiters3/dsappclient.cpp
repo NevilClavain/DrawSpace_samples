@@ -32,7 +32,7 @@
 #define FOG_ALT_LIMIT                       30000.0
 #define ATMO_SCATTERING_ALPHA_ALT_VIEWER    285000.0
 #define FLAT_CLOUDS_ALT                     28000.0
-#define VOLUMETRIC_CLOUDS_DISPLAY_ALT       26000.0
+#define VOLUMETRIC_CLOUDS_DISTANCE_CLIP     60000.0
 #define VOLUMETRIC_CLOUDS_ALT               13000.0
 #define PLAINS_AMPLITUDE                    800.0
 #define MOUNTAINS_AMPLITUDE                 7000.0
@@ -58,7 +58,7 @@
 #define FOG_ALT_LIMIT                       10000.0
 #define ATMO_SCATTERING_ALPHA_ALT_VIEWER    75000.0
 #define FLAT_CLOUDS_ALT                     3300.0
-#define VOLUMETRIC_CLOUDS_DISPLAY_ALT       6000.0
+#define VOLUMETRIC_CLOUDS_DISTANCE_CLIP     60000.0
 #define VOLUMETRIC_CLOUDS_ALT               1400.0
 #define PLAINS_AMPLITUDE                    50.0
 #define MOUNTAINS_AMPLITUDE                 800.0
@@ -436,9 +436,7 @@ void PlanetDetailsBinder::Update( void )
 CloudsResources::CloudsResources( DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass ) :
 m_pass( p_pass ),
 m_mirrorpass( p_mirrorpass ),
-m_planet_node( p_planet_node ),
-m_hide( false ),
-m_viewdotp( 0.0 )
+m_planet_node( p_planet_node )
 {
 }
 
@@ -568,8 +566,8 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
     m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "lcolor", 2 );
 
     
-    m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "alpha", 3 );
-    m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
+    m_clouds->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "flagsp", 3 );
+    m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "flagsp", Vector( 1.0, VOLUMETRIC_CLOUDS_DISTANCE_CLIP, 0.0, 0.0 ) );
 
     
 
@@ -654,8 +652,8 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
     m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "ldir", 1 );
     m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "lcolor", 2 );
 
-    m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "alpha", 3 );
-    m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
+    m_clouds_low->GetNodeFromPass( m_pass )->AddShaderParameter( 1, "flagsp", 3 );
+    m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "flagsp", Vector( 1.0, VOLUMETRIC_CLOUDS_DISTANCE_CLIP, 0.0, 0.0 ) );
 
     
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
@@ -708,8 +706,8 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 1, "ldir", 1 );
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 1, "lcolor", 2 );
 
-    m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 1, "alpha", 3 );   
-    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->AddShaderParameter( 1, "flagsp", 3 );   
+    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "flagsp", Vector( 1.0, VOLUMETRIC_CLOUDS_DISTANCE_CLIP, 0.0, 0.0 ) );
 
     
 
@@ -727,25 +725,6 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
 
 void CloudsResources::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor )
 {
-    if( m_hide )
-    {
-        return;
-    }
-
-    //Vector global_clouds_pos;
-    //compute_clouds_vector_global( global_clouds_pos );
-
-    //Vector ambient_lit = p_lcolor;
-
-    //ambient_lit.Scale( /*Utils::Maths::Clamp( 0.0, 1.0, p_ldir * global_clouds_pos + 0.35 )*/ 1.0 );  // produit scalaire plus un biais
-
-    
-    /*
-    m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "ambient_lit", ambient_lit );
-    m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "ambient_lit", ambient_lit );
-    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "ambient_lit", ambient_lit );
-    */
-
     m_clouds->GetNodeFromPass( m_pass )->SetShaderRealVector( "ldir", p_ldir );
     m_clouds_low->GetNodeFromPass( m_pass )->SetShaderRealVector( "ldir", p_ldir );
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "ldir", p_ldir );
@@ -755,27 +734,10 @@ void CloudsResources::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace:
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "lcolor", p_lcolor );
 }
 
-void CloudsResources::ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view )
-{
-    Vector view = p_view;
-    view.Normalize();
-
-    Vector global_clouds_pos;
-    compute_clouds_vector_global( global_clouds_pos );
-
-    m_viewdotp = global_clouds_pos * view;
-}
-
 void CloudsResources::ComputeAlt( dsreal p_alt )
 {
-    if( m_hide )
-    {
-        return;
-    }
-
-    if( p_alt > VOLUMETRIC_CLOUDS_ALT )
-    {
-        
+    if( p_alt > VOLUMETRIC_CLOUDS_ALT - CLOUDS_HEIGHT )
+    {        
         m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( true );
         m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( false );
         m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( false );
@@ -784,30 +746,14 @@ void CloudsResources::ComputeAlt( dsreal p_alt )
     {
         m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( false );
         m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( true );
-        m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( true ); 
-        
+        m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( true );         
     }
 }
 
 void CloudsResources::UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos, const DrawSpace::Utils::Vector& p_planetpos )
 {
-    if( m_hide )
-    {
-        return;
-    }
-
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "view_pos", p_viewpos );
     m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetShaderRealVector( "planet_pos", p_planetpos );
-}
-
-void CloudsResources::SetDrawingState( bool p_state )
-{
-    
-    m_clouds->GetNodeFromPass( m_pass )->SetDrawingState( p_state );
-    m_clouds_low->GetNodeFromPass( m_pass )->SetDrawingState( p_state );
-    m_clouds_low->GetNodeFromPass( m_mirrorpass )->SetDrawingState( p_state );
-    m_hide = !p_state;
-    
 }
 
 void CloudsResources::SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* p_cam )
@@ -820,8 +766,6 @@ CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::Sc
                         DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass, 
                         DrawSpace::Core::SceneNodeGraph& p_scenegraph )
 {
-    m_nbactives = 0;
-
     dsreal rand_theta, rand_phi;
 
     DrawSpace::Procedural::SeedsBase sb;
@@ -871,30 +815,6 @@ void CloudsStateMachine::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpa
     }
 }
 
-void CloudsStateMachine::ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view )
-{
-    m_nbactives = 0;
-
-    for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
-    {
-
-        //m_volumetrics_clouds[i]->SetDrawingState( true );
-
-        /*
-        m_volumetrics_clouds[i]->ComputeViewDotProduct( p_view );
-
-        if( m_volumetrics_clouds[i]->m_viewdotp > 0.70 )
-        {
-            m_volumetrics_clouds[i]->SetDrawingState( true );
-            m_nbactives++;
-        }
-        else
-        {
-            m_volumetrics_clouds[i]->SetDrawingState( false );
-        }
-        */
-    }
-}
 
 void CloudsStateMachine::ComputeAlt( dsreal p_alt )
 {
@@ -1821,257 +1741,6 @@ void dsAppClient::init_planet( void )
 
     }
 
-    ////////////////////////
-
-
-    /// volumetric clouds
-
-    /*
-    LongLatMovement* clouds_ll = new LongLatMovement();
-   
-    m_clouds_ll_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>, DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>( "impostor2_ll" ) );
-    m_clouds_ll_node->SetContent( clouds_ll );
-
-    //m_clouds_ll_node->GetContent()->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, 0.0, 0.0 );
-    clouds_ll->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, 0.0, 0.0 );
-
-    m_scenenodegraph.RegisterNode( m_clouds_ll_node );
-    m_clouds_ll_node->LinkTo( m_planet_node );
-
-
-    
-    m_clouds = _DRAWSPACE_NEW_( DrawSpace::Clouds, DrawSpace::Clouds );
-    m_clouds->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
-
-    m_clouds->EnableDetails( false );
-
-
-    /////////////////////////////////////////////////
-    m_clouds_procedural_rules = new DrawSpace::Procedural::RulesPackage( m_clouds->GetProceduralCallback() );
-
-    m_clouds_procedural_rules->InitializeSeedBase( 56645 );
-    m_clouds_procedural_rules->Run( CLOUDS_PROCEDURALRULES_FILE, " " );
-
-    m_clouds_procedural_rules->GetRootParser()->GetRules()->Apply();
-
-
-    m_clouds->ImpostorsInit();
-    
-
-
-    m_clouds->RegisterPassSlot( m_texturepass );
-    //m_clouds->RegisterPassSlot( m_texturemirrorpass );
-
-    
-    m_clouds->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.vso", true ) ) );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.pso", true ) ) );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
-
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
-    
-
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    
-
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
-
-
-
-
-    m_clouds->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "clouds.bmp" ) ), 0 );
-    m_clouds->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
-
-    
-    m_clouds->GetNodeFromPass( m_texturepass )->SetOrderNumber( 2500 );
-    //m_clouds->GetNodeFromPass( m_texturepass )->SetOrderNumber( 12000 );
-
-
-    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "flags", 24 );
-    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags", Vector( 0.0, PLANET_RAY * 1000.0, CLOUDS_FOG_DENSITY, 0.0 ) );
-
-    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "clouds_dims", 25 );
-    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "clouds_dims", Vector( CLOUDS_HEIGHT / 2.0, -CLOUDS_HEIGHT / 2.0, 1.0, 0.65 ) );
-
-    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "view_pos", 26 );
-    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "planet_pos", 27 );
-
-
-    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "fog_color", 0 );
-    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "fog_color", Vector( 0.45, 0.63, 0.78, 1.0 ) );
-
-    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "ambient_lit", 1 );
-    
-    m_clouds->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "alpha", 2 );
-    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
-
-    
-
-    //m_clouds->GetNodeFromPass( m_texturepass )->SetDrawingState( false );
-
-
-    m_clouds_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Clouds>, SceneNode<DrawSpace::Clouds>( "clouds_1" ) );
-
-    m_clouds_node->SetContent( m_clouds );
-
-
-    m_scenenodegraph.RegisterNode( m_clouds_node );
-
-    m_clouds_node->LinkTo( m_clouds_ll_node );
-
-    
-    
-    m_clouds_low = _DRAWSPACE_NEW_( DrawSpace::Clouds, DrawSpace::Clouds );
-    m_clouds_low->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
-
-    m_clouds_low->EnableDetails( false );
-
-
-    /////////////////////////////////////////////////
-    m_clouds_low_procedural_rules = new DrawSpace::Procedural::RulesPackage( m_clouds_low->GetProceduralCallback() );
-
-    m_clouds_low_procedural_rules->InitializeSeedBase( 56645 );
-    m_clouds_low_procedural_rules->Run( CLOUDS_PROCEDURALRULES_FILE, " " );
-
-    m_clouds_low_procedural_rules->GetRootParser()->GetRules()->Apply();
-
-
-    m_clouds_low->ImpostorsInit();
-    
-
-
-    m_clouds_low->RegisterPassSlot( m_texturepass );
-    m_clouds_low->RegisterPassSlot( m_texturemirrorpass );
-
-    
-    m_clouds_low->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.vso", true ) ) );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.pso", true ) ) );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
-
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
-    
-
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    
-
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
-
-
-
-
-    m_clouds_low->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "clouds.bmp" ) ), 0 );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
-
-    
-    m_clouds_low->GetNodeFromPass( m_texturepass )->SetOrderNumber( 1600 );
-
-
-    m_clouds_low->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "flags", 24 );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags", Vector( 0.0, PLANET_RAY * 1000.0, CLOUDS_FOG_DENSITY, 0.0 ) );
-
-    m_clouds_low->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "clouds_dims", 25 );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "clouds_dims", Vector( CLOUDS_HEIGHT / 2.0, -CLOUDS_HEIGHT / 2.0, 1.0, 0.65 ) );
-
-    m_clouds_low->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "view_pos", 26 );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "planet_pos", 27 );
-
-
-    m_clouds_low->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "fog_color", 0 );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "fog_color", Vector( 0.45, 0.63, 0.78, 1.0 ) );
-
-    m_clouds_low->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "ambient_lit", 1 );
-
-    m_clouds_low->GetNodeFromPass( m_texturepass )->AddShaderParameter( 1, "alpha", 2 );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
-
-    
-
-    //m_clouds_low->GetNodeFromPass( m_texturepass )->SetDrawingState( false );
-
-    
-
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.vso", true ) ) );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "planet_cloudsimpostor.pso", true ) ) );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetFx()->GetShader( 1 )->LoadFromFile();
-
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "none" ) );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add" ) );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always" ) );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "invsrcalpha" ) );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha" ) );
-    
-
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    
-
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
-
-
-
-
-
-    
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "clouds.bmp" ) ), 0 );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->GetTexture( 0 )->LoadFromFile();
-
-    
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetOrderNumber( 1600 );
-
-
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "flags", 24 );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "flags", Vector( 1.0, PLANET_RAY * 1000.0, CLOUDS_FOG_DENSITY, 0.0 ) );
-
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "clouds_dims", 25 );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "clouds_dims", Vector( 2500, -2500, 1.0, 0.65 ) );
-
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "view_pos", 26 );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "planet_pos", 27 );
-
-
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 1, "fog_color", 0 );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "fog_color", Vector( 0.45, 0.63, 0.78, 1.0 ) );
-
-
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 1, "ambient_lit", 1 );
-
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 1, "alpha", 2 );   
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "alpha", Vector( 1.0, 0.0, 0.0, 0.0 ) );
-
-    //m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetDrawingState( false );
-
-
-    m_clouds_low_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Clouds>, SceneNode<DrawSpace::Clouds>( "clouds_1_low" ) );
-
-    m_clouds_low_node->SetContent( m_clouds_low );
-
-
-    m_scenenodegraph.RegisterNode( m_clouds_low_node );
-
-    m_clouds_low_node->LinkTo( m_clouds_ll_node );
-    */
-
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     m_clouds_state_machine = new CloudsStateMachine( 1, m_planet_node, m_texturepass, m_texturemirrorpass, m_scenenodegraph );
@@ -2633,11 +2302,6 @@ void dsAppClient::render_universe( void )
     m_finalpass->GetViewportQuad()->SetShaderRealVector( "flags", Vector( rel_alt, m_planet_detail_binder[0]->GetOceansDetailsAlt(), 0.0, 0.0 ) );
 
 
-    //DrawSpace::SphericalLOD::Patch* current_patch = m_planet->GetFragment( 0 )->GetCurrentPatch();
-
-
-    //m_clouds_state_machine->Run();
-
     m_wavespass->GetRenderingQueue()->Draw();
 
     m_planet->DrawSubPasses();
@@ -2700,37 +2364,10 @@ void dsAppClient::render_universe( void )
     m_starhalo_impostor->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "color", Vector( 1.0, 1.0, 1.0, star_alpha_occlusion * star_alpha_altitude ) );
     
     
-    ////////////////////////////////////////
 
-    // calcul lumiere ambiante pour les nuages volumetriques
-
-    /*
-    invariantPos.Normalize();
-
-    PlanetLight l0 = m_planet_detail_binder[0]->GetLight( 0 );
-
-
-    Vector ambient_lit = l0.m_color;
-
-    ambient_lit.Scale( Utils::Maths::Clamp( 0.0, 1.0, l0.m_dir * invariantPos + 0.35 ) );  // produit scalaire plus un biais
-
-    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "ambient_lit", ambient_lit );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "ambient_lit", ambient_lit );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "ambient_lit", ambient_lit );
-    */
-
-    /*
-    for( size_t i = 0; i < NB_VOLUMETRIC_CLOUDS; i++ )
-    {
-        m_volumetric_clouds[i]->ComputeViewDotProduct( invariantPos );
-    }
-    */
-
-    m_clouds_state_machine->ComputeViewDotProduct( invariantPos );
 
     Vector local_clouds_pos;
     Vector global_clouds_pos;
-    //m_clouds_ll_node->GetContent()->GetXYZ( local_clouds_pos );
 
     m_planet_node->GetFinalTransform( planet_transf );
     planet_transf.ClearTranslation();
@@ -2745,18 +2382,6 @@ void dsAppClient::render_universe( void )
     Vector ambient_lit = l0.m_color;
 
     ambient_lit.Scale( Utils::Maths::Clamp( 0.0, 1.0, l0.m_dir * global_clouds_pos + 0.35 ) );  // produit scalaire plus un biais
-    /*
-    m_clouds->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "ambient_lit", ambient_lit );
-    m_clouds_low->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "ambient_lit", ambient_lit );
-    m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "ambient_lit", ambient_lit );
-    */
-
-    /*
-    for( size_t i = 0; i < NB_VOLUMETRIC_CLOUDS; i++ )
-    {
-        m_volumetric_clouds[i]->ComputeLight( l0.m_dir, l0.m_color );
-    }
-    */
 
     m_clouds_state_machine->ComputeLight( l0.m_dir, l0.m_color );
     
@@ -2788,32 +2413,8 @@ void dsAppClient::render_universe( void )
         m_details_fx->UpdateRenderStateIn( 0, DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     }
     
-    /*
-    if( alt > VOLUMETRIC_CLOUDS_ALT )
-    {
-        m_clouds->GetNodeFromPass( m_texturepass )->SetDrawingState( true );
-        m_clouds_low->GetNodeFromPass( m_texturepass )->SetDrawingState( false );
-        m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetDrawingState( false );
-    }
-    else
-    {
-        m_clouds->GetNodeFromPass( m_texturepass )->SetDrawingState( false );
-        m_clouds_low->GetNodeFromPass( m_texturepass )->SetDrawingState( true );
-        m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetDrawingState( true );    
-    }
-    */
-
-    /*
-    for( size_t i = 0; i < NB_VOLUMETRIC_CLOUDS; i++ )
-    {
-        m_volumetric_clouds[i]->ComputeAlt( alt );
-    }
-    */
-
     m_clouds_state_machine->ComputeAlt( alt );
     
-
-
     long current_fps = m_timer.GetFPS();
     renderer->DrawText( 0, 255, 0, 10, 35, "%d fps", current_fps );
 
@@ -2865,7 +2466,6 @@ void dsAppClient::render_universe( void )
         renderer->DrawText( 0, 255, 0, 10, 310, "%.3f %.4f %.4f", playerpos_longlatalt[0] - PLANET_RAY * 1000.0, Utils::Maths::RadToDeg( playerpos_longlatalt[1] ), 
                                                                     Utils::Maths::RadToDeg( playerpos_longlatalt[2] ) );
 
-        renderer->DrawText( 0, 255, 0, 10, 330, "nb clouds field : %d", m_clouds_state_machine->GetLastNbActives() );
 
         /*
         renderer->DrawText( 0, 255, 0, 10, 340, "longlat distance = %f", m_clouds_state_machine->GetLastLongLatDistance() );

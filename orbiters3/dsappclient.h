@@ -176,14 +176,7 @@ protected:
     DrawSpace::IntermediatePass*                                    m_mirrorpass;
     DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>*      m_planet_node;
 
-    bool                                                            m_hide;
-
-    dsreal                                                          m_viewdotp;
-
-
     void compute_clouds_vector_global( DrawSpace::Utils::Vector& p_out ); //calcul vector position champ nuage par rapport au centre planete exprimé dans le repere global
-
-
 
 public:
 
@@ -193,11 +186,8 @@ public:
     void Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, dsreal p_long, dsreal p_lat, dsreal p_alt, int p_seed );
 
     void ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor );
-    void ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view );
     void ComputeAlt( dsreal p_alt );
     void UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos, const DrawSpace::Utils::Vector& p_planetpos );
-
-    void SetDrawingState( bool p_state );
 
     void SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* p_cam );
 
@@ -210,8 +200,6 @@ protected:
 
     std::vector<CloudsResources*>   m_volumetrics_clouds;
 
-    int                             m_nbactives;
-
 public:
     CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, 
                         DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass, 
@@ -220,11 +208,8 @@ public:
     ~CloudsStateMachine( void );
 
     void ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor );
-    void ComputeViewDotProduct( DrawSpace::Utils::Vector& p_view );
     void ComputeAlt( dsreal p_alt );
     void UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos, const DrawSpace::Utils::Vector& p_planetpos );
-
-    int  GetLastNbActives( void ) { return m_nbactives; };
 
     void SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* p_cam );
 };
@@ -362,7 +347,7 @@ protected:
 
     DrawSpace::SphericalLOD::Binder*                                    m_planet_occlusion_binder[6];
 
-
+    /*
     DrawSpace::Procedural::RulesPackage*                                m_clouds_procedural_rules;
     DrawSpace::Clouds*                                                  m_clouds;
 
@@ -374,7 +359,7 @@ protected:
     DrawSpace::Core::SceneNode<DrawSpace::Clouds>*                      m_clouds_low_node;
 
     DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>*       m_clouds_ll_node;
-
+    */
 
     DrawSpace::Chunk*                                                   m_star_impostor;
     DrawSpace::Core::SceneNode<DrawSpace::Chunk>*                       m_star_impostor_node;
