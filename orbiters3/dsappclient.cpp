@@ -58,7 +58,7 @@
 #define FOG_ALT_LIMIT                       10000.0
 #define ATMO_SCATTERING_ALPHA_ALT_VIEWER    75000.0
 #define FLAT_CLOUDS_ALT                     3300.0
-#define VOLUMETRIC_CLOUDS_DISTANCE_CLIP     60000.0
+#define VOLUMETRIC_CLOUDS_DISTANCE_CLIP     6000000.0
 #define VOLUMETRIC_CLOUDS_ALT               1400.0
 #define PLAINS_AMPLITUDE                    50.0
 #define MOUNTAINS_AMPLITUDE                 800.0
@@ -436,7 +436,10 @@ void PlanetDetailsBinder::Update( void )
 CloudsResources::CloudsResources( DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass ) :
 m_pass( p_pass ),
 m_mirrorpass( p_mirrorpass ),
-m_planet_node( p_planet_node )
+m_planet_node( p_planet_node ),
+m_deg_rotx( 0.0 ),
+m_deg_roty( 0.0 ),
+m_deg_rotz( 0.0 )
 {
 }
 
@@ -476,40 +479,26 @@ void CloudsResources::compute_clouds_vector_global( DrawSpace::Utils::Vector& p_
     p_out = global_clouds_pos;
 }
 
-void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, dsreal p_long, dsreal p_lat, dsreal p_alt, int p_seed )
+void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, int p_seed, dsreal p_deg_rotx, dsreal p_deg_roty, dsreal p_deg_rotz )
 {
     //////////////////////////////////////////////////////////////////////////////////
 
-
-    /*
-
-    LongLatMovement* clouds_ll = _DRAWSPACE_NEW_( LongLatMovement, LongLatMovement );
-   
-    m_clouds_ll_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>, DrawSpace::Core::SceneNode<DrawSpace::Core::LongLatMovement>( p_id + "impostor_ll" ) );
-    m_clouds_ll_node->SetContent( clouds_ll );
-
-    clouds_ll->Init( p_long, p_lat, p_alt, 0.0, 0.0 );
-
-    p_scenegraph.RegisterNode( m_clouds_ll_node );
-
-    m_clouds_ll_node->LinkTo( m_planet_node );
-
-    m_ll = clouds_ll;
-
-    */
+    m_deg_rotx = p_deg_rotx;
+    m_deg_roty = p_deg_roty;
+    m_deg_rotz = p_deg_rotz;
 
     m_clouds_rot = _DRAWSPACE_NEW_( Transformation, Transformation );
     m_clouds_rot_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( p_id + "clouds_rot" ) );
     m_clouds_rot_node->SetContent( m_clouds_rot );
 
     Matrix rotx;
-    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0), Maths::DegToRad( 47 ) );
+    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0), Maths::DegToRad( m_deg_rotx ) );
 
     Matrix roty;
-    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0), Maths::DegToRad( 28 ) );
+    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0), Maths::DegToRad( m_deg_roty ) );
 
     Matrix rotz;
-    rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0), Maths::DegToRad( 55 ) );
+    rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0), Maths::DegToRad( m_deg_rotz ) );
 
     m_clouds_rot->PushMatrix( rotx );
     m_clouds_rot->PushMatrix( roty );
@@ -788,6 +777,26 @@ void CloudsResources::SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dy
     m_clouds_low->SetCurrentCamera( p_cam );
 }
 
+void CloudsResources::Evolve( DrawSpace::Utils::TimeManager& p_tm )
+{
+    p_tm.AngleSpeedInc( &m_deg_rotx, 0.1 );
+    p_tm.AngleSpeedInc( &m_deg_roty, 0.1 );
+    p_tm.AngleSpeedInc( &m_deg_rotz, 0.1 );
+
+    Matrix rotx;
+    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0), Maths::DegToRad( m_deg_rotx ) );
+
+    Matrix roty;
+    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0), Maths::DegToRad( m_deg_roty ) );
+
+    Matrix rotz;
+    rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0), Maths::DegToRad( m_deg_rotz ) );
+
+    m_clouds_rot->UpdateMatrix( 0, rotx );
+    m_clouds_rot->UpdateMatrix( 1, roty );
+    m_clouds_rot->UpdateMatrix( 2, rotz );
+}
+
 CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, 
                         DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass, 
                         DrawSpace::Core::SceneNodeGraph& p_scenegraph )
@@ -808,14 +817,12 @@ CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::Sc
     {        
         CloudsResources* clouds = new CloudsResources( p_planet_node, p_pass, p_mirrorpass );
 
-
         rand_theta = (dsreal)rand( generator );
         rand_phi = (dsreal)rand2( generator );
 
-
         char vclouds_number[32];
         sprintf( vclouds_number, "clouds_array_%d", i );
-        clouds->Init( vclouds_number, p_scenegraph, /*rand_theta, rand_phi,*/ 0.0, 0.0, ( PLANET_RAY * 1000 ) + VOLUMETRIC_CLOUDS_ALT, sb.GetSeed( i ) );
+        clouds->Init( vclouds_number, p_scenegraph, sb.GetSeed( i ), 10.0, 20.0, 30.0 );
 
         m_volumetrics_clouds.push_back( clouds );
     }
@@ -855,6 +862,14 @@ void CloudsStateMachine::UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos
     for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
     {
         m_volumetrics_clouds[i]->UpdateMirror( p_viewpos, p_planetpos );
+    }
+}
+
+void CloudsStateMachine::Evolve( DrawSpace::Utils::TimeManager& p_tm )
+{
+    for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
+    {
+        m_volumetrics_clouds[i]->Evolve( p_tm );
     }
 }
 
@@ -2440,6 +2455,8 @@ void dsAppClient::render_universe( void )
     }
     
     m_clouds_state_machine->ComputeAlt( alt );
+
+    m_clouds_state_machine->Evolve( m_timer );
     
     long current_fps = m_timer.GetFPS();
     renderer->DrawText( 0, 255, 0, 10, 35, "%d fps", current_fps );
