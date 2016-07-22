@@ -34,6 +34,8 @@
 #define FLAT_CLOUDS_ALT                     28000.0
 #define VOLUMETRIC_CLOUDS_DISTANCE_CLIP     60000.0
 #define VOLUMETRIC_CLOUDS_ALT               13000.0
+#define VOLUMETRIC_CLOUDS_MIN_SPEED_DEG_S   0.05
+#define VOLUMETRIC_CLOUDS_MAX_SPEED_DEG_S   0.15
 #define PLAINS_AMPLITUDE                    800.0
 #define MOUNTAINS_AMPLITUDE                 7000.0
 #define MOUNTAINS_OFFSET                    -2200.0
@@ -60,6 +62,8 @@
 #define FLAT_CLOUDS_ALT                     3300.0
 #define VOLUMETRIC_CLOUDS_DISTANCE_CLIP     6000000.0
 #define VOLUMETRIC_CLOUDS_ALT               1400.0
+#define VOLUMETRIC_CLOUDS_MIN_SPEED_DEG_S   0.003
+#define VOLUMETRIC_CLOUDS_MAX_SPEED_DEG_S   0.004
 #define PLAINS_AMPLITUDE                    50.0
 #define MOUNTAINS_AMPLITUDE                 800.0
 #define MOUNTAINS_OFFSET                    -120.0
@@ -436,10 +440,7 @@ void PlanetDetailsBinder::Update( void )
 CloudsResources::CloudsResources( DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass ) :
 m_pass( p_pass ),
 m_mirrorpass( p_mirrorpass ),
-m_planet_node( p_planet_node ),
-m_deg_rotx( 0.0 ),
-m_deg_roty( 0.0 ),
-m_deg_rotz( 0.0 )
+m_planet_node( p_planet_node )
 {
 }
 
@@ -479,26 +480,25 @@ void CloudsResources::compute_clouds_vector_global( DrawSpace::Utils::Vector& p_
     p_out = global_clouds_pos;
 }
 
-void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, int p_seed, dsreal p_deg_rotx, dsreal p_deg_roty, dsreal p_deg_rotz )
+void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, int p_seed, const DrawSpace::Utils::Vector& p_deg_rots, const DrawSpace::Utils::Vector& p_deg_rots_speeds )
 {
     //////////////////////////////////////////////////////////////////////////////////
 
-    m_deg_rotx = p_deg_rotx;
-    m_deg_roty = p_deg_roty;
-    m_deg_rotz = p_deg_rotz;
+    m_deg_rots = p_deg_rots;
+    m_deg_rots_speeds = p_deg_rots_speeds;
 
     m_clouds_rot = _DRAWSPACE_NEW_( Transformation, Transformation );
     m_clouds_rot_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( p_id + "clouds_rot" ) );
     m_clouds_rot_node->SetContent( m_clouds_rot );
 
     Matrix rotx;
-    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0), Maths::DegToRad( m_deg_rotx ) );
+    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0), Maths::DegToRad( m_deg_rots[0] ) );
 
     Matrix roty;
-    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0), Maths::DegToRad( m_deg_roty ) );
+    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0), Maths::DegToRad( m_deg_rots[1] ) );
 
     Matrix rotz;
-    rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0), Maths::DegToRad( m_deg_rotz ) );
+    rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0), Maths::DegToRad( m_deg_rots[2] ) );
 
     m_clouds_rot->PushMatrix( rotx );
     m_clouds_rot->PushMatrix( roty );
@@ -779,18 +779,18 @@ void CloudsResources::SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dy
 
 void CloudsResources::Evolve( DrawSpace::Utils::TimeManager& p_tm )
 {
-    p_tm.AngleSpeedInc( &m_deg_rotx, 0.1 );
-    p_tm.AngleSpeedInc( &m_deg_roty, 0.1 );
-    p_tm.AngleSpeedInc( &m_deg_rotz, 0.1 );
+    p_tm.AngleSpeedInc( &m_deg_rots[0], m_deg_rots_speeds[0] );
+    p_tm.AngleSpeedInc( &m_deg_rots[1], m_deg_rots_speeds[1] );
+    p_tm.AngleSpeedInc( &m_deg_rots[2], m_deg_rots_speeds[2] );
 
     Matrix rotx;
-    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0), Maths::DegToRad( m_deg_rotx ) );
+    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0), Maths::DegToRad( m_deg_rots[0] ) );
 
     Matrix roty;
-    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0), Maths::DegToRad( m_deg_roty ) );
+    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0), Maths::DegToRad( m_deg_rots[1] ) );
 
     Matrix rotz;
-    rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0), Maths::DegToRad( m_deg_rotz ) );
+    rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0), Maths::DegToRad( m_deg_rots[2] ) );
 
     m_clouds_rot->UpdateMatrix( 0, rotx );
     m_clouds_rot->UpdateMatrix( 1, roty );
@@ -801,28 +801,48 @@ CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::Sc
                         DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass, 
                         DrawSpace::Core::SceneNodeGraph& p_scenegraph )
 {
-    dsreal rand_theta, rand_phi;
-
     DrawSpace::Procedural::SeedsBase sb;
     sb.InitializeFromCurrentTime();
 
+    std::default_random_engine cloudspos_generator;
+    std::uniform_real_distribution<dsreal> cloudspos_randrotx( 0.0, 359.0 );
+    std::uniform_real_distribution<dsreal> cloudspos_randroty( 0.0, 359.0 );
+    std::uniform_real_distribution<dsreal> cloudspos_randrotz( 0.0, 359.0 );
 
-    std::default_random_engine generator;
+    std::default_random_engine cloudsspeeds_generator;
+    std::uniform_int_distribution<int> cloudspos_randrotspeedsign( 0, 1 );
+    std::uniform_real_distribution<dsreal> cloudspos_randrotxspeed( VOLUMETRIC_CLOUDS_MIN_SPEED_DEG_S, VOLUMETRIC_CLOUDS_MAX_SPEED_DEG_S );
+    std::uniform_real_distribution<dsreal> cloudspos_randrotyspeed( VOLUMETRIC_CLOUDS_MIN_SPEED_DEG_S, VOLUMETRIC_CLOUDS_MAX_SPEED_DEG_S );
+    std::uniform_real_distribution<dsreal> cloudspos_randrotzspeed( VOLUMETRIC_CLOUDS_MIN_SPEED_DEG_S, VOLUMETRIC_CLOUDS_MAX_SPEED_DEG_S );
+
+
+    
+    /*
     std::uniform_int_distribution<unsigned int> rand( 0, 350 );
     std::uniform_int_distribution<int> rand2( -89, 89 );
+    */
 
-    generator.seed( ::GetTickCount() );
+    cloudspos_generator.seed( sb.GetSeed( 1000 ) );
+    cloudsspeeds_generator.seed( sb.GetSeed( 1001 ) );
 
     for( size_t i = 0; i < p_nbCloudsField; i++ )
     {        
         CloudsResources* clouds = new CloudsResources( p_planet_node, p_pass, p_mirrorpass );
 
-        rand_theta = (dsreal)rand( generator );
-        rand_phi = (dsreal)rand2( generator );
-
         char vclouds_number[32];
         sprintf( vclouds_number, "clouds_array_%d", i );
-        clouds->Init( vclouds_number, p_scenegraph, sb.GetSeed( i ), 10.0, 20.0, 30.0 );
+
+        Vector rots, rots_speeds;
+
+        rots[0] = cloudspos_randrotx( cloudspos_generator );
+        rots[1] = cloudspos_randroty( cloudspos_generator );
+        rots[2] = cloudspos_randrotz( cloudspos_generator );
+
+        rots_speeds[0] = cloudspos_randrotxspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
+        rots_speeds[1] = cloudspos_randrotyspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
+        rots_speeds[2] = cloudspos_randrotzspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
+
+        clouds->Init( vclouds_number, p_scenegraph, sb.GetSeed( i ), rots, rots_speeds );
 
         m_volumetrics_clouds.push_back( clouds );
     }
@@ -1788,7 +1808,7 @@ void dsAppClient::init_planet( void )
 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    //m_planet->SetGravityState( false );
+    m_planet->SetGravityState( false );
 }
 
 void dsAppClient::init_star_impostor( void )
