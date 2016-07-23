@@ -193,7 +193,7 @@ public:
 
     void SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* p_cam );
 
-    void Evolve( DrawSpace::Utils::TimeManager& p_tm );
+    void Evolve( DrawSpace::Dynamics::Calendar& p_cald );
 
     friend class CloudsStateMachine;
 };
@@ -217,7 +217,7 @@ public:
 
     void SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* p_cam );
 
-    void Evolve( DrawSpace::Utils::TimeManager& p_tm );
+    void Evolve( DrawSpace::Dynamics::Calendar& p_cald );
 };
 
 

@@ -777,11 +777,11 @@ void CloudsResources::SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dy
     m_clouds_low->SetCurrentCamera( p_cam );
 }
 
-void CloudsResources::Evolve( DrawSpace::Utils::TimeManager& p_tm )
+void CloudsResources::Evolve( DrawSpace::Dynamics::Calendar& p_cald )
 {
-    p_tm.AngleSpeedInc( &m_deg_rots[0], m_deg_rots_speeds[0] );
-    p_tm.AngleSpeedInc( &m_deg_rots[1], m_deg_rots_speeds[1] );
-    p_tm.AngleSpeedInc( &m_deg_rots[2], m_deg_rots_speeds[2] );
+    p_cald.AngleSpeedInc( &m_deg_rots[0], m_deg_rots_speeds[0] );
+    p_cald.AngleSpeedInc( &m_deg_rots[1], m_deg_rots_speeds[1] );
+    p_cald.AngleSpeedInc( &m_deg_rots[2], m_deg_rots_speeds[2] );
 
     Matrix rotx;
     rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0), Maths::DegToRad( m_deg_rots[0] ) );
@@ -885,11 +885,11 @@ void CloudsStateMachine::UpdateMirror( const DrawSpace::Utils::Vector& p_viewpos
     }
 }
 
-void CloudsStateMachine::Evolve( DrawSpace::Utils::TimeManager& p_tm )
+void CloudsStateMachine::Evolve( DrawSpace::Dynamics::Calendar& p_cald )
 {
     for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
     {
-        m_volumetrics_clouds[i]->Evolve( p_tm );
+        m_volumetrics_clouds[i]->Evolve( p_cald );
     }
 }
 
@@ -2476,7 +2476,7 @@ void dsAppClient::render_universe( void )
     
     m_clouds_state_machine->ComputeAlt( alt );
 
-    m_clouds_state_machine->Evolve( m_timer );
+    m_clouds_state_machine->Evolve( *m_calendar );
     
     long current_fps = m_timer.GetFPS();
     renderer->DrawText( 0, 255, 0, 10, 35, "%d fps", current_fps );
