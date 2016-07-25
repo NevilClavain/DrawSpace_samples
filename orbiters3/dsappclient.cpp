@@ -60,7 +60,7 @@
 #define FOG_ALT_LIMIT                       10000.0
 #define ATMO_SCATTERING_ALPHA_ALT_VIEWER    75000.0
 #define FLAT_CLOUDS_ALT                     3300.0
-#define VOLUMETRIC_CLOUDS_DISTANCE_CLIP     6000000.0
+#define VOLUMETRIC_CLOUDS_DISTANCE_CLIP     60000.0
 #define VOLUMETRIC_CLOUDS_ALT               1400.0
 #define VOLUMETRIC_CLOUDS_MIN_SPEED_DEG_S   0.003
 #define VOLUMETRIC_CLOUDS_MAX_SPEED_DEG_S   0.004
@@ -805,9 +805,9 @@ CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::Sc
     sb.InitializeFromCurrentTime();
 
     std::default_random_engine cloudspos_generator;
-    std::uniform_real_distribution<dsreal> cloudspos_randrotx( 0.0, 359.0 );
-    std::uniform_real_distribution<dsreal> cloudspos_randroty( 0.0, 359.0 );
-    std::uniform_real_distribution<dsreal> cloudspos_randrotz( 0.0, 359.0 );
+    std::uniform_real_distribution<dsreal> cloudspos_randrotx( 0.0, 179.0 );
+    std::uniform_real_distribution<dsreal> cloudspos_randroty( 0.0, 179.0 );
+    std::uniform_real_distribution<dsreal> cloudspos_randrotz( 0.0, 179.0 );
 
     std::default_random_engine cloudsspeeds_generator;
     std::uniform_int_distribution<int> cloudspos_randrotspeedsign( 0, 1 );
@@ -816,36 +816,32 @@ CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::Sc
     std::uniform_real_distribution<dsreal> cloudspos_randrotzspeed( VOLUMETRIC_CLOUDS_MIN_SPEED_DEG_S, VOLUMETRIC_CLOUDS_MAX_SPEED_DEG_S );
 
 
-    
-    /*
-    std::uniform_int_distribution<unsigned int> rand( 0, 350 );
-    std::uniform_int_distribution<int> rand2( -89, 89 );
-    */
-
     cloudspos_generator.seed( sb.GetSeed( 1000 ) );
     cloudsspeeds_generator.seed( sb.GetSeed( 1001 ) );
+       
+    Vector rots, rots_compl, rots_speeds;
 
-    for( size_t i = 0; i < p_nbCloudsField; i++ )
-    {        
-        CloudsResources* clouds = new CloudsResources( p_planet_node, p_pass, p_mirrorpass );
 
-        char vclouds_number[32];
-        sprintf( vclouds_number, "clouds_array_%d", i );
+    CloudsResources* clouds = new CloudsResources( p_planet_node, p_pass, p_mirrorpass );
+    CloudsResources* clouds_compl = new CloudsResources( p_planet_node, p_pass, p_mirrorpass );
 
-        Vector rots, rots_speeds;
+    rots[0] = cloudspos_randrotx( cloudspos_generator );
+    rots[1] = cloudspos_randroty( cloudspos_generator );
+    rots[2] = cloudspos_randrotz( cloudspos_generator );
+    
+    rots_compl[0] = rots[0] + 180.0;
+    rots_compl[1] = rots[1] + 180.0;
+    rots_compl[2] = rots[2] + 180.0;
 
-        rots[0] = cloudspos_randrotx( cloudspos_generator );
-        rots[1] = cloudspos_randroty( cloudspos_generator );
-        rots[2] = cloudspos_randrotz( cloudspos_generator );
+    rots_speeds[0] = cloudspos_randrotxspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
+    rots_speeds[1] = cloudspos_randrotyspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
+    rots_speeds[2] = cloudspos_randrotzspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
 
-        rots_speeds[0] = cloudspos_randrotxspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
-        rots_speeds[1] = cloudspos_randrotyspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
-        rots_speeds[2] = cloudspos_randrotzspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
+    clouds->Init( "clouds_array_0", p_scenegraph, sb.GetSeed( 0 ), rots, rots_speeds );
+    clouds_compl->Init( "clouds_array_1", p_scenegraph, sb.GetSeed( 1 ), rots_compl, rots_speeds );
 
-        clouds->Init( vclouds_number, p_scenegraph, sb.GetSeed( i ), rots, rots_speeds );
-
-        m_volumetrics_clouds.push_back( clouds );
-    }
+    m_volumetrics_clouds.push_back( clouds );
+    m_volumetrics_clouds.push_back( clouds_compl );
 }
 
 CloudsStateMachine::~CloudsStateMachine( void )
@@ -1808,7 +1804,7 @@ void dsAppClient::init_planet( void )
 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    m_planet->SetGravityState( false );
+    //m_planet->SetGravityState( false );
 }
 
 void dsAppClient::init_star_impostor( void )
