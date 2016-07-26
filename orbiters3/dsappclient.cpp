@@ -60,8 +60,8 @@
 #define FOG_ALT_LIMIT                       10000.0
 #define ATMO_SCATTERING_ALPHA_ALT_VIEWER    75000.0
 #define FLAT_CLOUDS_ALT                     3300.0
-#define VOLUMETRIC_CLOUDS_DISTANCE_CLIP     60000.0
-#define VOLUMETRIC_CLOUDS_ALT               1400.0
+#define VOLUMETRIC_CLOUDS_DISTANCE_CLIP     6000000.0
+#define VOLUMETRIC_CLOUDS_ALT               2400.0
 #define VOLUMETRIC_CLOUDS_MIN_SPEED_DEG_S   0.003
 #define VOLUMETRIC_CLOUDS_MAX_SPEED_DEG_S   0.004
 #define PLAINS_AMPLITUDE                    50.0
@@ -825,10 +825,17 @@ CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::Sc
     CloudsResources* clouds = new CloudsResources( p_planet_node, p_pass, p_mirrorpass );
     CloudsResources* clouds_compl = new CloudsResources( p_planet_node, p_pass, p_mirrorpass );
 
+    
     rots[0] = cloudspos_randrotx( cloudspos_generator );
     rots[1] = cloudspos_randroty( cloudspos_generator );
     rots[2] = cloudspos_randrotz( cloudspos_generator );
     
+
+    rots[0] = cloudspos_randrotx( cloudspos_generator );
+    rots[1] = cloudspos_randroty( cloudspos_generator );
+    rots[2] = cloudspos_randrotz( cloudspos_generator );
+
+
     rots_compl[0] = rots[0] + 180.0;
     rots_compl[1] = rots[1] + 180.0;
     rots_compl[2] = rots[2] + 180.0;
@@ -2087,10 +2094,9 @@ void dsAppClient::init_cameras( void )
     m_scenenodegraph.RegisterNode( m_camera5_node );
 
     m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    //m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 93.0 + 2.0, 0.0, 0.0 );
-    //m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ) + 8.0 + 3.0, 0.0, 0.0 );
+    //m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ), 0.0, 0.0 );
 
-    m_longlat_mvt->Init( 0.0, 89.0, ( PLANET_RAY * 1000 ) + 8.0 + 300.0, 0.0, 0.0 );
+    m_longlat_mvt->Init( 155.8846, -12.2136, ( PLANET_RAY * 1000 ), 0.0, 0.0 );
 
     m_longlatmvt_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LongLatMovement>, SceneNode<DrawSpace::Core::LongLatMovement>( "longlatmvt_node" ) );
     m_longlatmvt_node->SetContent( m_longlat_mvt );
@@ -2253,6 +2259,9 @@ void dsAppClient::init_planet_noise( void )
 
 void dsAppClient::render_universe( void )
 {
+    dsreal ship_ground_alt;
+    dsreal cam_ground_alt;
+
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 
     m_scenenodegraph.ComputeTransformations( m_timer );
@@ -2262,15 +2271,20 @@ void dsAppClient::render_universe( void )
     m_planet_node->GetFinalTransform( planet_transf );
 
 
+    cam_ground_alt = m_planet->GetLayerFromCamera( "camera5", 0 )->GetLastMaxHeight();
+    ship_ground_alt = m_planet->GetLayerFromInertBody( m_ship, 0 )->GetLastMaxHeight();
+
+    m_longlat_mvt->SetAlt( ( PLANET_RAY * 1000 ) + cam_ground_alt + 2.0 );
+
     Vector invariantPos;
 
     if( m_curr_camera == m_camera5 )
     {
-        m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetInvariantViewerPos( invariantPos );
+        m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetInvariantViewerPos( invariantPos );        
     }
     else
     {
-        m_planet->GetLayerFromInertBody( m_ship, 0 )->GetBody()->GetInvariantViewerPos( invariantPos );
+        m_planet->GetLayerFromInertBody( m_ship, 0 )->GetBody()->GetInvariantViewerPos( invariantPos );        
     }
 
     
@@ -2526,6 +2540,8 @@ void dsAppClient::render_universe( void )
                                                                     Utils::Maths::RadToDeg( playerpos_longlatalt[2] ) );
 
 
+        renderer->DrawText( 0, 255, 0, 10, 330, "ship ground = %.1f cam ground = %.1f", ship_ground_alt, cam_ground_alt );
+
         /*
         renderer->DrawText( 0, 255, 0, 10, 340, "longlat distance = %f", m_clouds_state_machine->GetLastLongLatDistance() );
 
@@ -2587,7 +2603,7 @@ void dsAppClient::render_universe( void )
 
         renderer->DrawText( 0, 255, 0, 10, 130, "time factor = %s", m_timefactor.c_str() );
 
-        renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h", speed * 3.6 );
+        renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h", speed * 3.6 );        
     }
   
     renderer->FlipScreen();
