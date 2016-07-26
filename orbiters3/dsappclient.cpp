@@ -60,7 +60,7 @@
 #define FOG_ALT_LIMIT                       10000.0
 #define ATMO_SCATTERING_ALPHA_ALT_VIEWER    75000.0
 #define FLAT_CLOUDS_ALT                     3300.0
-#define VOLUMETRIC_CLOUDS_DISTANCE_CLIP     6000000.0
+#define VOLUMETRIC_CLOUDS_DISTANCE_CLIP     60000.0
 #define VOLUMETRIC_CLOUDS_ALT               2400.0
 #define VOLUMETRIC_CLOUDS_MIN_SPEED_DEG_S   0.003
 #define VOLUMETRIC_CLOUDS_MAX_SPEED_DEG_S   0.004
@@ -148,8 +148,8 @@ void PlanetClimateBinder::Bind( void )
     // planete temperee
     
 
-    Vector thparams( 120.0, 220.0, TEMP_DEC_PER_KM, BEACH_LIMIT );
-    Vector thparams2( 0.48, 0.75, 0.45, 0.55 );
+    Vector thparams( 40.0, 20.0, TEMP_DEC_PER_KM, BEACH_LIMIT );
+    Vector thparams2( 0.48, 0.87, 0.45, 0.75 );
 
 
 
