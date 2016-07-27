@@ -418,6 +418,12 @@ protected:
     bool                                        m_water_anim_inc;
 
 
+    bool                                        m_walking;
+    dsreal                                      m_walking_long;
+    dsreal                                      m_walking_lat;
+    dsreal                                      m_walking_speed;
+
+
    
     void init_planet_meshes( void );
     void init_assets_loaders( void );

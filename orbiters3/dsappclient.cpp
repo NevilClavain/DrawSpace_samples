@@ -920,7 +920,8 @@ m_init_count( 0 ),
 m_showinfos( false ),
 m_water_anim( 0.0 ),
 m_water_anim_inc( true ),
-m_timefactor( "x1" )
+m_timefactor( "x1" ),
+m_walking_speed( 0.0 )
 {    
     _INIT_LOGGER( "logorbiters3.conf" )  
     m_w_title = "orbiters 3 test";
@@ -2106,9 +2107,15 @@ void dsAppClient::init_cameras( void )
     m_scenenodegraph.RegisterNode( m_camera5_node );
 
     m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
-    //m_longlat_mvt->Init( 274.0, 0.0, ( PLANET_RAY * 1000 ), 0.0, 0.0 );
 
-    m_longlat_mvt->Init( 155.8846, -12.2136, ( PLANET_RAY * 1000 ), 0.0, 0.0 );
+
+    //m_walking_long = 155.8846;
+    //m_walking_lat = -12.2136;
+
+    m_walking_long = 274.0;
+    m_walking_lat = 0.0;
+
+    m_longlat_mvt->Init( m_walking_long, m_walking_lat, ( PLANET_RAY * 1000 ), 0.0, 0.0 );
 
     m_longlatmvt_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LongLatMovement>, SceneNode<DrawSpace::Core::LongLatMovement>( "longlatmvt_node" ) );
     m_longlatmvt_node->SetContent( m_longlat_mvt );
@@ -2646,6 +2653,13 @@ void dsAppClient::render_universe( void )
                 m_water_anim_inc = true;
             }        
         }
+
+        ///////////////////////////////////////////
+
+        m_calendar->TranslationSpeedInc( &m_walking_long, m_walking_speed );
+
+        m_longlat_mvt->SetLongitud( m_walking_long );
+
     }
 
     m_wavespass->GetViewportQuad()->SetShaderRealVector( "waves", DrawSpace::Utils::Vector( m_water_anim, 0.0, 0.0, 0.0 ) );
@@ -2761,11 +2775,13 @@ void dsAppClient::OnRenderFrame( void )
                 
                 m_curr_camera = m_camera3; 
                 m_curr_camera_name = "camera3";
+                m_walking = false;
                 
 
                 //m_mouse_circularmode = true;
                 //m_curr_camera = m_camera5; 
                 //m_curr_camera_name = "camera5";
+                //m_walking = true;
 
                 m_clouds_state_machine->SetCurrentCamera( m_curr_camera->GetOwner() );
 
@@ -2807,143 +2823,179 @@ void dsAppClient::OnClose( void )
 
 void dsAppClient::OnKeyPress( long p_key ) 
 {
-    switch( p_key )
+    if( m_walking )
     {
-        case 'Q':
-
-
-            m_timer.TranslationSpeedInc( &m_speed, m_speed_speed );
-            m_speed_speed *= 1.83;
+        switch( p_key )
+        {
+            case 'Q':
           
-            break;
+                m_walking_speed = 0.001;
+                break;
 
-        case 'W':
-
-            m_timer.TranslationSpeedDec( &m_speed, m_speed_speed );
-            m_speed_speed *= 1.86;
+            case 'W':
  
-            break;
+                m_walking_speed = -0.001;
+                break;
+        }    
+    }
+    else
+    {
+        switch( p_key )
+        {
+            case 'Q':
 
 
-        case 'E':
+                m_timer.TranslationSpeedInc( &m_speed, m_speed_speed );
+                m_speed_speed *= 1.83;
+          
+                break;
 
-            m_ship->ApplyUpPitch( 50000.0 );
+            case 'W':
 
-            m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
-            m_timefactor = "x1";
-            break;
-
-        case 'C':
-
-            m_ship->ApplyDownPitch( 50000.0 );
-
-            m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
-            m_timefactor = "x1";
-            break;
-
-        case 'S':
-
-            m_ship->ApplyLeftYaw( 50000.0 );
-
-            m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
-            m_timefactor = "x1";
-            break;
-
-        case 'F':
-
-            m_ship->ApplyRightYaw( 50000.0 );
-
-            m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
-            m_timefactor = "x1";
-            break;
+                m_timer.TranslationSpeedDec( &m_speed, m_speed_speed );
+                m_speed_speed *= 1.86;
+ 
+                break;
 
 
-        case 'Z':
+            case 'E':
 
-            m_ship->ApplyLeftRoll( 50000.0 );
+                m_ship->ApplyUpPitch( 50000.0 );
 
-            m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
-            m_timefactor = "x1";
-            break;
+                m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+                m_timefactor = "x1";
+                break;
 
-        case 'R':
+            case 'C':
 
-            m_ship->ApplyRightRoll( 50000.0 );
+                m_ship->ApplyDownPitch( 50000.0 );
 
-            m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
-            m_timefactor = "x1";
-            break;
+                m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+                m_timefactor = "x1";
+                break;
+
+            case 'S':
+
+                m_ship->ApplyLeftYaw( 50000.0 );
+
+                m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+                m_timefactor = "x1";
+                break;
+
+            case 'F':
+
+                m_ship->ApplyRightYaw( 50000.0 );
+
+                m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+                m_timefactor = "x1";
+                break;
 
 
-        case 'M':
-            m_ship->ZeroASpeed();
-            break;
+            case 'Z':
+
+                m_ship->ApplyLeftRoll( 50000.0 );
+
+                m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+                m_timefactor = "x1";
+                break;
+
+            case 'R':
+
+                m_ship->ApplyRightRoll( 50000.0 );
+
+                m_calendar->SetTimeFactor( Calendar::NORMAL_TIME );
+                m_timefactor = "x1";
+                break;
 
 
-        case 'L':
+            case 'M':
+                m_ship->ZeroASpeed();
+                break;
+
+
+            case 'L':
             
-            m_ship->ZeroLSpeed();
-            break;
+                m_ship->ZeroLSpeed();
+                break;
 
 
-        case VK_SPACE:
-            break;
+            case VK_SPACE:
+                break;
 
-        case VK_RETURN:
+            case VK_RETURN:
 
-            m_ship->ApplyFwdForce( 11000.0 );
-            break;
+                m_ship->ApplyFwdForce( 11000.0 );
+                break;
 
-        case VK_UP:
+            case VK_UP:
 
-            m_ship->ApplyFwdForce( -5000.0 );
-            break;
+                m_ship->ApplyFwdForce( -5000.0 );
+                break;
 
-        case VK_DOWN:
+            case VK_DOWN:
 
-            m_ship->ApplyDownForce( -10000.0 );
-            break;
-
-
-        case VK_LEFT:
-
-            m_circular_mvt->SetAngularSpeed( 30.0 );
-            break;
-
-        case VK_RIGHT:
-
-            m_circular_mvt->SetAngularSpeed( -30.0 );
-            break;
+                m_ship->ApplyDownForce( -10000.0 );
+                break;
 
 
+            case VK_LEFT:
+
+                m_circular_mvt->SetAngularSpeed( 30.0 );
+                break;
+
+            case VK_RIGHT:
+
+                m_circular_mvt->SetAngularSpeed( -30.0 );
+                break;
+
+
+        }    
     }
 }
 
 void dsAppClient::OnEndKeyPress( long p_key )
 {
-    switch( p_key )
+    if( m_walking )
     {
-        case 'Q':
+        switch( p_key )
+        {
+            case 'Q':
+          
+                m_walking_speed = 0.0;
+                break;
 
-            m_speed_speed = 5.0;
-            break;
+            case 'W':
+ 
+                m_walking_speed = 0.0;
+                break;
+        }    
+    }
+    else
+    {
+
+        switch( p_key )
+        {
+            case 'Q':
+
+                m_speed_speed = 5.0;
+                break;
 
 
-        case 'W':
+            case 'W':
 
-            m_speed_speed = 5.0;                        
-            break;
+                m_speed_speed = 5.0;                        
+                break;
 
-        case VK_SPACE:
+            case VK_SPACE:
 
-            m_speed = 0.0;
-            break;
+                m_speed = 0.0;
+                break;
 
-        case VK_LEFT:
-        case VK_RIGHT:
-            m_circular_mvt->SetAngularSpeed( 0.0 );
-            break;
-
+            case VK_LEFT:
+            case VK_RIGHT:
+                m_circular_mvt->SetAngularSpeed( 0.0 );
+                break;
+        }
     }
 }
 
@@ -2994,13 +3046,15 @@ void dsAppClient::OnKeyPulse( long p_key )
                 {
                     m_curr_camera = m_camera5; 
                     m_curr_camera_name = "camera5";
-                    m_mouse_circularmode = true;                
+                    m_mouse_circularmode = true;
+                    m_walking = true;
                 }
                 else if( m_curr_camera == m_camera5 )
                 {
                     m_curr_camera = m_camera3; 
                     m_curr_camera_name = "camera3";
                     m_mouse_circularmode = false;
+                    m_walking = false;
                 }
 
                 m_clouds_state_machine->SetCurrentCamera( m_curr_camera->GetOwner() );
@@ -3032,31 +3086,6 @@ void dsAppClient::OnKeyPulse( long p_key )
 
             m_ship_drawable->SetDrawingState( m_texturepass, true );
             m_showinfos = true;
-            break;
-
-        case 'U':
-            {
-                //m_clouds_state_machine->CloudsPop();
-                //m_volumetric_clouds[0]->SetDrawingState( true );
-
-                /*
-                _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> memalloc dump begin <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
-
-                //_DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> core dump <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
-                MemAlloc::GetInstance()->DumpContent();
-                _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> plugin dump <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
-                DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
-                renderer->DumpMemoryAllocs();
-                _DSTRACE( logger, ">>>>>>>>>>>>>>>>>>>>>>>>>>>> memalloc dump end   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" );
-                */
-            }
-
-            break;
-
-        case 'P':
-
-            //m_clouds_state_machine->CloudsFade();
-            //m_volumetric_clouds[0]->SetDrawingState( false );
             break;
     }
 }
