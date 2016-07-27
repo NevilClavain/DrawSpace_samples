@@ -480,29 +480,28 @@ void CloudsResources::compute_clouds_vector_global( DrawSpace::Utils::Vector& p_
     p_out = global_clouds_pos;
 }
 
-void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, int p_seed, const DrawSpace::Utils::Vector& p_deg_rots, const DrawSpace::Utils::Vector& p_deg_rots_speeds )
+void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, int p_seed, dsreal p_initial_deg_rot, dsreal p_deg_rot_speed,
+                            DrawSpace::Utils::Vector p_rotaxis, DrawSpace::Utils::Vector p_rotaxisrotaxis )
 {
     //////////////////////////////////////////////////////////////////////////////////
 
-    m_deg_rots = p_deg_rots;
-    m_deg_rots_speeds = p_deg_rots_speeds;
+    m_deg_rot = p_initial_deg_rot;
+    m_deg_rot_speed = p_deg_rot_speed;
+
+    m_deg_rot_axis = 0.0;
 
     m_clouds_rot = _DRAWSPACE_NEW_( Transformation, Transformation );
     m_clouds_rot_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( p_id + "clouds_rot" ) );
     m_clouds_rot_node->SetContent( m_clouds_rot );
 
+    m_rot_axis = p_rotaxis;
+    m_rot_axis_rot_axis = p_rotaxisrotaxis;
+
     Matrix rotx;
-    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0), Maths::DegToRad( m_deg_rots[0] ) );
+    rotx.Rotation( m_rot_axis, Maths::DegToRad( m_deg_rot) );
 
-    Matrix roty;
-    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0), Maths::DegToRad( m_deg_rots[1] ) );
-
-    Matrix rotz;
-    rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0), Maths::DegToRad( m_deg_rots[2] ) );
 
     m_clouds_rot->PushMatrix( rotx );
-    m_clouds_rot->PushMatrix( roty );
-    m_clouds_rot->PushMatrix( rotz );
 
     p_scenegraph.RegisterNode( m_clouds_rot_node );
 
@@ -779,22 +778,25 @@ void CloudsResources::SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dy
 
 void CloudsResources::Evolve( DrawSpace::Dynamics::Calendar& p_cald )
 {
-    p_cald.AngleSpeedInc( &m_deg_rots[0], m_deg_rots_speeds[0] );
-    p_cald.AngleSpeedInc( &m_deg_rots[1], m_deg_rots_speeds[1] );
-    p_cald.AngleSpeedInc( &m_deg_rots[2], m_deg_rots_speeds[2] );
+    p_cald.AngleSpeedInc( &m_deg_rot, m_deg_rot_speed );
+    p_cald.AngleSpeedInc( &m_deg_rot_axis, 0.001 );
+
+    // rotation de l'axe de rotation :-P
+
+    Matrix rot2;
+    rot2.Rotation( m_rot_axis_rot_axis, Maths::DegToRad( m_deg_rot_axis ) );
+
+    Vector rot_axis_t;
+
+    rot2.Transform( &m_rot_axis, &rot_axis_t );
+
+
+    // puis rotation du champ de nuages
 
     Matrix rotx;
-    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0), Maths::DegToRad( m_deg_rots[0] ) );
-
-    Matrix roty;
-    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0), Maths::DegToRad( m_deg_rots[1] ) );
-
-    Matrix rotz;
-    rotz.Rotation( Vector( 0.0, 0.0, 1.0, 1.0), Maths::DegToRad( m_deg_rots[2] ) );
+    rotx.Rotation( rot_axis_t, Maths::DegToRad( m_deg_rot ) );
 
     m_clouds_rot->UpdateMatrix( 0, rotx );
-    m_clouds_rot->UpdateMatrix( 1, roty );
-    m_clouds_rot->UpdateMatrix( 2, rotz );
 }
 
 CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, 
@@ -806,46 +808,56 @@ CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::Sc
 
     std::default_random_engine cloudspos_generator;
     std::uniform_real_distribution<dsreal> cloudspos_randrotx( 0.0, 179.0 );
-    std::uniform_real_distribution<dsreal> cloudspos_randroty( 0.0, 179.0 );
-    std::uniform_real_distribution<dsreal> cloudspos_randrotz( 0.0, 179.0 );
 
     std::default_random_engine cloudsspeeds_generator;
     std::uniform_int_distribution<int> cloudspos_randrotspeedsign( 0, 1 );
     std::uniform_real_distribution<dsreal> cloudspos_randrotxspeed( VOLUMETRIC_CLOUDS_MIN_SPEED_DEG_S, VOLUMETRIC_CLOUDS_MAX_SPEED_DEG_S );
-    std::uniform_real_distribution<dsreal> cloudspos_randrotyspeed( VOLUMETRIC_CLOUDS_MIN_SPEED_DEG_S, VOLUMETRIC_CLOUDS_MAX_SPEED_DEG_S );
-    std::uniform_real_distribution<dsreal> cloudspos_randrotzspeed( VOLUMETRIC_CLOUDS_MIN_SPEED_DEG_S, VOLUMETRIC_CLOUDS_MAX_SPEED_DEG_S );
 
+
+    std::default_random_engine cloudsrotaxis_generator;
+    std::uniform_real_distribution<dsreal> clouds_randrotaxis( -1.0, 1.0 );
 
     cloudspos_generator.seed( sb.GetSeed( 1000 ) );
     cloudsspeeds_generator.seed( sb.GetSeed( 1001 ) );
+    cloudsrotaxis_generator.seed( sb.GetSeed( 1002 ) );
        
-    Vector rots, rots_compl, rots_speeds;
+    dsreal rot, rot_compl, rot_speed;
 
 
     CloudsResources* clouds = new CloudsResources( p_planet_node, p_pass, p_mirrorpass );
     CloudsResources* clouds_compl = new CloudsResources( p_planet_node, p_pass, p_mirrorpass );
 
     
-    rots[0] = cloudspos_randrotx( cloudspos_generator );
-    rots[1] = cloudspos_randroty( cloudspos_generator );
-    rots[2] = cloudspos_randrotz( cloudspos_generator );
-    
-
-    rots[0] = cloudspos_randrotx( cloudspos_generator );
-    rots[1] = cloudspos_randroty( cloudspos_generator );
-    rots[2] = cloudspos_randrotz( cloudspos_generator );
+    rot = cloudspos_randrotx( cloudspos_generator );
 
 
-    rots_compl[0] = rots[0] + 180.0;
-    rots_compl[1] = rots[1] + 180.0;
-    rots_compl[2] = rots[2] + 180.0;
+    rot_compl = rot + 180.0;
 
-    rots_speeds[0] = cloudspos_randrotxspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
-    rots_speeds[1] = cloudspos_randrotyspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
-    rots_speeds[2] = cloudspos_randrotzspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
+    rot_speed = cloudspos_randrotxspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
 
-    clouds->Init( "clouds_array_0", p_scenegraph, sb.GetSeed( 0 ), rots, rots_speeds );
-    clouds_compl->Init( "clouds_array_1", p_scenegraph, sb.GetSeed( 1 ), rots_compl, rots_speeds );
+    Vector rand_rotaxis( 1.0, 0.0, 0.0, 0.0 );
+    Vector rand_rotrotaxis;
+    Vector v2( 1.0, 0.0, 0.0, 0.0 );
+
+    rand_rotaxis[1] = clouds_randrotaxis( cloudsrotaxis_generator );
+    rand_rotaxis[2] = clouds_randrotaxis( cloudsrotaxis_generator );
+
+    rand_rotaxis.Normalize();
+
+    // rand_rotrotaxis doit etre perpendiculaire a rand_rotaxis
+
+    v2[1] = clouds_randrotaxis( cloudsrotaxis_generator );
+    v2[2] = clouds_randrotaxis( cloudsrotaxis_generator );
+    v2.Normalize();
+
+    rand_rotrotaxis = ProdVec( rand_rotaxis, v2 );
+
+    rand_rotrotaxis.Normalize();
+
+
+
+    clouds->Init( "clouds_array_0", p_scenegraph, sb.GetSeed( 0 ), rot, rot_speed, rand_rotaxis, rand_rotrotaxis );
+    clouds_compl->Init( "clouds_array_1", p_scenegraph, sb.GetSeed( 1 ), rot_compl, rot_speed, rand_rotaxis, rand_rotrotaxis );
 
     m_volumetrics_clouds.push_back( clouds );
     m_volumetrics_clouds.push_back( clouds_compl );

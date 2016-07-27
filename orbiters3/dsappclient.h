@@ -175,8 +175,12 @@ protected:
     DrawSpace::IntermediatePass*                                    m_mirrorpass;
     DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>*      m_planet_node;
    
-    DrawSpace::Utils::Vector                                        m_deg_rots;
-    DrawSpace::Utils::Vector                                        m_deg_rots_speeds;
+    dsreal                                                          m_deg_rot;
+    dsreal                                                          m_deg_rot_speed;
+
+    DrawSpace::Utils::Vector                                        m_rot_axis;
+    DrawSpace::Utils::Vector                                        m_rot_axis_rot_axis;
+    dsreal                                                          m_deg_rot_axis;
 
     void compute_clouds_vector_global( DrawSpace::Utils::Vector& p_out ); //calcul vector position champ nuage par rapport au centre planete exprimé dans le repere global
 
@@ -185,7 +189,11 @@ public:
     CloudsResources( DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass );
     ~CloudsResources( void );
 
-    void Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, int p_seed, const DrawSpace::Utils::Vector& p_deg_rots, const DrawSpace::Utils::Vector& p_deg_rots_speeds );
+    //void Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, int p_seed, const DrawSpace::Utils::Vector& p_deg_rots, const DrawSpace::Utils::Vector& p_deg_rots_speeds );
+
+    void Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, int p_seed, 
+                    dsreal p_initial_deg_rot, dsreal p_deg_rot_speed, DrawSpace::Utils::Vector p_rotaxis, 
+                    DrawSpace::Utils::Vector p_rotaxisrotaxis );
 
     void ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor );
     void ComputeAlt( dsreal p_alt );
