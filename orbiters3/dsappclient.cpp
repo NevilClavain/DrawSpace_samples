@@ -2656,9 +2656,16 @@ void dsAppClient::render_universe( void )
 
         ///////////////////////////////////////////
 
-        m_calendar->TranslationSpeedInc( &m_walking_long, m_walking_speed );
+        dsreal walk_longit_speed, walk_latit_speed;
+
+        walk_longit_speed = -m_walking_speed * sin( m_fps_mvt->GetCurrentYaw() );
+        walk_latit_speed = m_walking_speed * cos( m_fps_mvt->GetCurrentYaw() );
+
+        m_calendar->TranslationSpeedInc( &m_walking_long, walk_longit_speed );
+        m_calendar->TranslationSpeedInc( &m_walking_lat, walk_latit_speed );
 
         m_longlat_mvt->SetLongitud( m_walking_long );
+        m_longlat_mvt->SetLatitud( m_walking_lat );
 
     }
 
