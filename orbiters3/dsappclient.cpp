@@ -2109,11 +2109,11 @@ void dsAppClient::init_cameras( void )
     m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
 
 
-    //m_walking_long = 155.8846;
-    //m_walking_lat = -12.2136;
+    m_walking_long = 155.8846;
+    m_walking_lat = -12.2136;
 
-    m_walking_long = 274.0;
-    m_walking_lat = 0.0;
+    //m_walking_long = 274.0;
+    //m_walking_lat = 0.0;
 
     m_longlat_mvt->Init( m_walking_long, m_walking_lat, ( PLANET_RAY * 1000 ), 0.0, 0.0 );
 
@@ -2290,8 +2290,8 @@ void dsAppClient::render_universe( void )
     m_planet_node->GetFinalTransform( planet_transf );
 
 
-    cam_ground_alt = m_planet->GetLayerFromCamera( "camera5", 0 )->GetLastMaxHeight();
-    ship_ground_alt = m_planet->GetLayerFromInertBody( m_ship, 0 )->GetLastMaxHeight();
+    cam_ground_alt = m_planet->GetLayerFromCamera( "camera5", 0 )->GetCurrentHeight();
+    ship_ground_alt = m_planet->GetLayerFromInertBody( m_ship, 0 )->GetCurrentHeight();
 
     m_longlat_mvt->SetAlt( ( PLANET_RAY * 1000 ) + cam_ground_alt + 2.0 );
 
@@ -2306,9 +2306,10 @@ void dsAppClient::render_universe( void )
         m_planet->GetLayerFromInertBody( m_ship, 0 )->GetBody()->GetInvariantViewerPos( invariantPos );        
     }
 
-    
-    //m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "view_pos", invariantPos );
+    //////////////////////////////////////////////////////////////////////
 
+    Vector view_patch_coords;
+    m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetFace( m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetCurrentFace() )->GetCurrentPatchViewCoords( view_patch_coords );
 
     //////////////////////////////////////////////////////////////////////
 
@@ -2560,6 +2561,10 @@ void dsAppClient::render_universe( void )
 
 
         renderer->DrawText( 0, 255, 0, 10, 330, "ship ground = %.1f cam ground = %.1f", ship_ground_alt, cam_ground_alt );
+
+        renderer->DrawText( 0, 255, 0, 10, 360, "curr patch coords : %.6f %.6f", view_patch_coords[0], view_patch_coords[1] );
+
+        
 
         /*
         renderer->DrawText( 0, 255, 0, 10, 340, "longlat distance = %f", m_clouds_state_machine->GetLastLongLatDistance() );
