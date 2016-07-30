@@ -2109,11 +2109,11 @@ void dsAppClient::init_cameras( void )
     m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
 
 
-    //m_walking_long = 155.8846;
-    //m_walking_lat = -12.2136;
+    m_walking_long = 155.8846;
+    m_walking_lat = -12.2136;
 
-    m_walking_long = 274.0;
-    m_walking_lat = 0.0;
+    //m_walking_long = 274.0;
+    //m_walking_lat = 0.0;
 
     m_longlat_mvt->Init( m_walking_long, m_walking_lat, ( PLANET_RAY * 1000 ), 0.0, 0.0 );
 
