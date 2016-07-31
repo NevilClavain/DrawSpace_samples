@@ -1984,7 +1984,7 @@ void dsAppClient::init_ship( void )
     
     m_ship_drawable->GetMeshe()->SetImporter( m_meshe_import );
 
-    m_ship_drawable->GetMeshe()->LoadFromFile( "survey.ac", 0 );    
+    m_ship_drawable->GetMeshe()->LoadFromFile( "bellerophon.ac", 0 );    
 
     m_ship_drawable->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
@@ -1997,7 +1997,7 @@ void dsAppClient::init_ship( void )
     m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
 
-    m_ship_drawable->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "surveyship_color.jpg" ) ), 0 );
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
 
 
 
@@ -2014,7 +2014,7 @@ void dsAppClient::init_ship( void )
 
     cube_params.mass = SHIP_MASS;
     cube_params.shape_descr.shape = DrawSpace::Dynamics::Body::BOX_SHAPE;
-    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 74.1285 / 2.0, 21.4704 / 2.0, 81.911 / 2.0, 1.0 );    
+    cube_params.shape_descr.box_dims = DrawSpace::Utils::Vector( 100.0, 75.0, 165.0, 1.0 );    
     
     // TEMPORAIRE
 
@@ -2054,7 +2054,7 @@ void dsAppClient::init_cameras( void )
 
 
     m_circular_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::CircularMovement, DrawSpace::Core::CircularMovement );
-    m_circular_mvt->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 185.0, 40.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 270.0, 0.0, 0.0 );
+    m_circular_mvt->Init( Vector( 0.0, 0.0, 0.0, 1.0 ), Vector( 685.0, 40.0, 0.0, 1.0 ), Vector( 0.0, 1.0, 0.0, 1.0 ), 270.0, 0.0, 0.0 );
 
     m_circmvt_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::CircularMovement>, SceneNode<DrawSpace::Core::CircularMovement>( "circmvt" ) );
 
@@ -2109,11 +2109,11 @@ void dsAppClient::init_cameras( void )
     m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
 
 
-    m_walking_long = 155.8846;
-    m_walking_lat = -12.2136;
+    //m_walking_long = 155.8846;
+    //m_walking_lat = -12.2136;
 
-    //m_walking_long = 274.0;
-    //m_walking_lat = 0.0;
+    m_walking_long = 274.0;
+    m_walking_lat = 0.0;
 
     m_longlat_mvt->Init( m_walking_long, m_walking_lat, ( PLANET_RAY * 1000 ), 0.0, 0.0 );
 
