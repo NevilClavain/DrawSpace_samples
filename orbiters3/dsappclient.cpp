@@ -917,11 +917,12 @@ m_curr_camera( NULL ),
 m_final_pass_2( false ),
 m_ready( false ),
 m_init_count( 0 ),
-m_showinfos( false ),
+m_showinfos( true ),
 m_water_anim( 0.0 ),
 m_water_anim_inc( true ),
 m_timefactor( "x1" ),
-m_walking_speed( 0.0 )
+m_walking_speed( 0.0 ),
+m_haslanded( false )
 {    
     _INIT_LOGGER( "logorbiters3.conf" )  
     m_w_title = "orbiters 3 test";
@@ -1076,7 +1077,7 @@ void dsAppClient::init_passes( void )
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    m_finalpass2->GetViewportQuad()->SetTexture( m_texturemirrorpass->GetTargetTexture(), 0 );    
+    m_finalpass2->GetViewportQuad()->SetTexture( m_occlusionpass->GetTargetTexture(), 0 );    
     m_finalpass2->GetViewportQuad()->SetDrawingState( false );
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -1980,12 +1981,14 @@ void dsAppClient::init_ship( void )
     m_ship_drawable->SetMeshe( _DRAWSPACE_NEW_( Meshe, Meshe ) );
 
     m_ship_drawable->RegisterPassSlot( m_texturepass );
+    m_ship_drawable->RegisterPassSlot( m_occlusionpass );
 
     
     m_ship_drawable->GetMeshe()->SetImporter( m_meshe_import );
 
     m_ship_drawable->GetMeshe()->LoadFromFile( "bellerophon.ac", 0 );    
 
+    
     m_ship_drawable->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
     m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
@@ -1999,9 +2002,34 @@ void dsAppClient::init_ship( void )
 
     m_ship_drawable->GetNodeFromPass( m_texturepass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
 
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->SetOrderNumber( 5000 );
 
 
     m_ship_drawable->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+    
+
+
+
+    
+    m_ship_drawable->GetNodeFromPass( m_occlusionpass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_ship_drawable->GetNodeFromPass( m_occlusionpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "color.vsh", false ) ) );
+    m_ship_drawable->GetNodeFromPass( m_occlusionpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "color.psh", false ) ) );
+    m_ship_drawable->GetNodeFromPass( m_occlusionpass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_ship_drawable->GetNodeFromPass( m_occlusionpass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    
+    m_ship_drawable->GetNodeFromPass( m_occlusionpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );    
+    m_ship_drawable->GetNodeFromPass( m_occlusionpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+
+
+    m_ship_drawable->GetNodeFromPass( m_occlusionpass )->AddShaderParameter( 1, "color", 0 );
+    m_ship_drawable->GetNodeFromPass( m_occlusionpass )->SetShaderRealVector( "color", Vector( 0.0, 0.0, 0.0, 1.0 ) );
+
+
+    
+
+
 
     
     m_ship_drawable_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Chunk>, SceneNode<DrawSpace::Chunk>( "rocket" ) );
@@ -2035,7 +2063,7 @@ void dsAppClient::init_ship( void )
 
 
 
-    m_ship_drawable->SetDrawingState( m_texturepass, false );
+    //m_ship_drawable->SetDrawingState( m_texturepass, false );
 
     
     //////////////////////////////////////////////////////////////
@@ -2419,6 +2447,9 @@ void dsAppClient::render_universe( void )
     m_finalpass2->GetRenderingQueue()->Draw();
 
 
+    m_haslanded = m_ship->HasLanded();
+
+
     m_zoompass->GetTargetTexture()->CopyTextureContent();
 
     // TEMPORAIRE
@@ -2563,6 +2594,11 @@ void dsAppClient::render_universe( void )
         renderer->DrawText( 0, 255, 0, 10, 330, "ship ground = %f cam ground = %f", ship_ground_alt, cam_ground_alt );
 
         renderer->DrawText( 0, 255, 0, 10, 360, "curr patch coords : %.6f %.6f", view_patch_coords[0], view_patch_coords[1] );
+
+        if( m_haslanded )
+        {
+            renderer->DrawText( 0, 255, 0, 10, 390, "has landed" );
+        }
 
         
 
@@ -3091,12 +3127,14 @@ void dsAppClient::OnKeyPulse( long p_key )
         case VK_F9:
 
             m_ship_drawable->SetDrawingState( m_texturepass, false );
+            m_ship_drawable->SetDrawingState( m_occlusionpass, false );
             m_showinfos = false;
             break;
 
         case VK_F7:
 
             m_ship_drawable->SetDrawingState( m_texturepass, true );
+            m_ship_drawable->SetDrawingState( m_occlusionpass, true );
             m_showinfos = true;
             break;
     }

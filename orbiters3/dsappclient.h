@@ -423,7 +423,7 @@ protected:
     dsreal                                      m_walking_lat;
     dsreal                                      m_walking_speed;
 
-
+    bool                                        m_haslanded;
    
     void init_planet_meshes( void );
     void init_assets_loaders( void );
