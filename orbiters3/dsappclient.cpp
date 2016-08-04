@@ -922,7 +922,8 @@ m_water_anim( 0.0 ),
 m_water_anim_inc( true ),
 m_timefactor( "x1" ),
 m_walking_speed( 0.0 ),
-m_haslanded( false )
+m_haslanded( false ),
+m_ship_walker_distance( 0.0 )
 {    
     _INIT_LOGGER( "logorbiters3.conf" )  
     m_w_title = "orbiters 3 test";
@@ -2327,8 +2328,9 @@ void dsAppClient::render_universe( void )
 
     m_longlat_mvt->SetAlt( ( PLANET_RAY * 1000 ) + cam_ground_alt + 4.0 );
 
-    Vector invariantPos;
+    //Vector invariantPos;
 
+    /*
     if( m_curr_camera == m_camera5 )
     {
         m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetInvariantViewerPos( invariantPos );        
@@ -2337,6 +2339,7 @@ void dsAppClient::render_universe( void )
     {
         m_planet->GetLayerFromInertBody( m_ship, 0 )->GetBody()->GetInvariantViewerPos( invariantPos );
     }
+    */
 
     //////////////////////////////////////////////////////////////////////
 
@@ -2345,16 +2348,18 @@ void dsAppClient::render_universe( void )
 
     //////////////////////////////////////////////////////////////////////
 
-    Vector playerpos; // pos viewer relative à la planete
-    //Vector playerpos_longlatalt;  // meme chose mais en spherique
-
+    //Vector playerpos; // pos viewer relative à la planete
+    
+    /*
     Matrix planet_transf_notrans;
 
     planet_transf_notrans = planet_transf;
 
     planet_transf_notrans.ClearTranslation();
     planet_transf_notrans.Inverse();
+    */
 
+    /*
     planet_transf_notrans.Transform( &invariantPos, &playerpos );
 
     Utils::Maths::CartesiantoSpherical( playerpos, m_playerpos_longlatalt );
@@ -2363,11 +2368,22 @@ void dsAppClient::render_universe( void )
     {
         m_playerpos_longlatalt[1] = ( 2 * PI ) + m_playerpos_longlatalt[1];
     }
+    */
 
 
     //////////////////////////////////////////////////////////////////////
 
     Vector shippos;
+
+    Vector invariantPos;
+
+
+    Matrix planet_transf_notrans;
+
+    planet_transf_notrans = planet_transf;
+
+    planet_transf_notrans.ClearTranslation();
+    planet_transf_notrans.Inverse();
 
     m_planet->GetLayerFromInertBody( m_ship, 0 )->GetBody()->GetInvariantViewerPos( invariantPos );
 
@@ -2380,6 +2396,7 @@ void dsAppClient::render_universe( void )
         m_shippos_longlatalt[1] = ( 2 * PI ) + m_shippos_longlatalt[1];
     }
 
+
     //////////////////////////////////////////////////////////////////////
 
 
@@ -2390,20 +2407,8 @@ void dsAppClient::render_universe( void )
     planet_pos[2] = planet_transf( 3, 2 );
     planet_pos[3] = 1.0;
 
-    //m_clouds_low->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "planet_pos", planet_pos );
-    
-    /*
-    for( size_t i = 0; i < NB_VOLUMETRIC_CLOUDS; i++ )
-    {
-        m_volumetric_clouds[i]->UpdateMirror( invariantPos, planet_pos );
-    }
-    */
-
     m_clouds_state_machine->UpdateMirror( invariantPos, planet_pos );
     
-    
-
-
     for( int i = 0; i < 6; i++ )
     {
         m_planet_detail_binder[i]->Update();
@@ -2479,15 +2484,17 @@ void dsAppClient::render_universe( void )
 
         if( m_haslanded )
         {
-            /*
-            m_longlat_mvt->SetLatitud( Utils::Maths::RadToDeg( m_playerpos_longlatalt[3] ) );
-            m_longlat_mvt->SetLongitud( Utils::Maths::RadToDeg( m_playerpos_longlatalt[2] ) );
-            */
-
             m_walking_long = Utils::Maths::RadToDeg( m_shippos_longlatalt[1] );
             m_walking_lat = Utils::Maths::RadToDeg( m_shippos_longlatalt[2] );
         }
     }
+
+    m_ship_walker_distance = sqrt( ( m_walking_long - Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ) ) * ( m_walking_long - Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ) ) + 
+                                    ( m_walking_lat - Utils::Maths::RadToDeg( m_shippos_longlatalt[2] ) ) * ( m_walking_lat - Utils::Maths::RadToDeg( m_shippos_longlatalt[2] ) ) );
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     m_zoompass->GetTargetTexture()->CopyTextureContent();
@@ -2640,6 +2647,7 @@ void dsAppClient::render_universe( void )
             renderer->DrawText( 0, 255, 0, 10, 390, "has landed" );
         }
 
+        renderer->DrawText( 0, 255, 0, 10, 420, "w s distance = %.4f", m_ship_walker_distance );
         
 
         /*

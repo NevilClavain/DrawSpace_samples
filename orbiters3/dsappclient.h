@@ -428,6 +428,8 @@ protected:
     DrawSpace::Utils::Vector                    m_playerpos_longlatalt;
 
     DrawSpace::Utils::Vector                    m_shippos_longlatalt;
+    
+    dsreal                                      m_ship_walker_distance;
    
     void init_planet_meshes( void );
     void init_assets_loaders( void );
