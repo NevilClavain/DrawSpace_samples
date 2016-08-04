@@ -2140,8 +2140,12 @@ void dsAppClient::init_cameras( void )
     //m_walking_long = 155.8846;
     //m_walking_lat = -12.2136;
 
-    m_walking_long = 274.0;
+    //m_walking_long = 274.0;
+    //m_walking_lat = 0.0;
+
+    m_walking_long = 0.0;
     m_walking_lat = 0.0;
+
 
     m_longlat_mvt->Init( m_walking_long, m_walking_lat, ( PLANET_RAY * 1000 ), 0.0, 0.0 );
 
@@ -2331,7 +2335,7 @@ void dsAppClient::render_universe( void )
     }
     else
     {
-        m_planet->GetLayerFromInertBody( m_ship, 0 )->GetBody()->GetInvariantViewerPos( invariantPos );        
+        m_planet->GetLayerFromInertBody( m_ship, 0 )->GetBody()->GetInvariantViewerPos( invariantPos );
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -2342,7 +2346,7 @@ void dsAppClient::render_universe( void )
     //////////////////////////////////////////////////////////////////////
 
     Vector playerpos; // pos viewer relative à la planete
-    Vector playerpos_longlatalt;  // meme chose mais en spherique
+    //Vector playerpos_longlatalt;  // meme chose mais en spherique
 
     Matrix planet_transf_notrans;
 
@@ -2353,7 +2357,28 @@ void dsAppClient::render_universe( void )
 
     planet_transf_notrans.Transform( &invariantPos, &playerpos );
 
-    Utils::Maths::CartesiantoSpherical( playerpos, playerpos_longlatalt );
+    Utils::Maths::CartesiantoSpherical( playerpos, m_playerpos_longlatalt );
+
+    if( m_playerpos_longlatalt[1] < 0.0 )
+    {
+        m_playerpos_longlatalt[1] = ( 2 * PI ) + m_playerpos_longlatalt[1];
+    }
+
+
+    //////////////////////////////////////////////////////////////////////
+
+    Vector shippos;
+
+    m_planet->GetLayerFromInertBody( m_ship, 0 )->GetBody()->GetInvariantViewerPos( invariantPos );
+
+    planet_transf_notrans.Transform( &invariantPos, &shippos );
+
+    Utils::Maths::CartesiantoSpherical( shippos, m_shippos_longlatalt );
+
+    if( m_shippos_longlatalt[1] < 0.0 )
+    {
+        m_shippos_longlatalt[1] = ( 2 * PI ) + m_shippos_longlatalt[1];
+    }
 
     //////////////////////////////////////////////////////////////////////
 
@@ -2446,8 +2471,23 @@ void dsAppClient::render_universe( void )
 
     m_finalpass2->GetRenderingQueue()->Draw();
 
+    bool haslanded = m_ship->HasLanded();
+    
+    if( haslanded != m_haslanded )
+    {
+        m_haslanded = haslanded;
 
-    m_haslanded = m_ship->HasLanded();
+        if( m_haslanded )
+        {
+            /*
+            m_longlat_mvt->SetLatitud( Utils::Maths::RadToDeg( m_playerpos_longlatalt[3] ) );
+            m_longlat_mvt->SetLongitud( Utils::Maths::RadToDeg( m_playerpos_longlatalt[2] ) );
+            */
+
+            m_walking_long = Utils::Maths::RadToDeg( m_shippos_longlatalt[1] );
+            m_walking_lat = Utils::Maths::RadToDeg( m_shippos_longlatalt[2] );
+        }
+    }
 
 
     m_zoompass->GetTargetTexture()->CopyTextureContent();
@@ -2587,13 +2627,13 @@ void dsAppClient::render_universe( void )
 
 
 
-        renderer->DrawText( 0, 255, 0, 10, 310, "%.3f %.4f %.4f", playerpos_longlatalt[0] - PLANET_RAY * 1000.0, Utils::Maths::RadToDeg( playerpos_longlatalt[1] ), 
-                                                                    Utils::Maths::RadToDeg( playerpos_longlatalt[2] ) );
+        renderer->DrawText( 0, 255, 0, 10, 310, "%.3f %.4f %.4f", m_playerpos_longlatalt[0] - PLANET_RAY * 1000.0, Utils::Maths::RadToDeg( m_playerpos_longlatalt[1] ), 
+                                                                    Utils::Maths::RadToDeg( m_playerpos_longlatalt[2] ) );
 
 
-        renderer->DrawText( 0, 255, 0, 10, 330, "ship ground = %f cam ground = %f", ship_ground_alt, cam_ground_alt );
 
-        renderer->DrawText( 0, 255, 0, 10, 360, "curr patch coords : %.6f %.6f", view_patch_coords[0], view_patch_coords[1] );
+        renderer->DrawText( 0, 255, 0, 10, 330, "ship pos : %.4f %.4f", Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ), Utils::Maths::RadToDeg( m_shippos_longlatalt[2] ) );
+        renderer->DrawText( 0, 255, 0, 10, 360, "walk pos : %.4f %.4f", m_walking_long, m_walking_lat );
 
         if( m_haslanded )
         {

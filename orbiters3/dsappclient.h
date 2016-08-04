@@ -424,6 +424,10 @@ protected:
     dsreal                                      m_walking_speed;
 
     bool                                        m_haslanded;
+
+    DrawSpace::Utils::Vector                    m_playerpos_longlatalt;
+
+    DrawSpace::Utils::Vector                    m_shippos_longlatalt;
    
     void init_planet_meshes( void );
     void init_assets_loaders( void );
