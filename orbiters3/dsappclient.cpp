@@ -2489,10 +2489,16 @@ void dsAppClient::render_universe( void )
         }
     }
 
-    m_ship_walker_distance = sqrt( ( m_walking_long - Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ) ) * ( m_walking_long - Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ) ) + 
+
+    // distance au vaisseau, en degres
+    dsreal ship_walker_distance_deg;
+
+    ship_walker_distance_deg = sqrt( ( m_walking_long - Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ) ) * ( m_walking_long - Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ) ) + 
                                     ( m_walking_lat - Utils::Maths::RadToDeg( m_shippos_longlatalt[2] ) ) * ( m_walking_lat - Utils::Maths::RadToDeg( m_shippos_longlatalt[2] ) ) );
 
+    // convertir en une distance en metres
 
+    m_ship_walker_distance = ( ship_walker_distance_deg / 0.1 ) * ( 2 * PI * ( PLANET_RAY * 1000.0 ) / 3600.0 );
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
