@@ -2328,48 +2328,12 @@ void dsAppClient::render_universe( void )
 
     m_longlat_mvt->SetAlt( ( PLANET_RAY * 1000 ) + cam_ground_alt + 4.0 );
 
-    //Vector invariantPos;
 
-    /*
-    if( m_curr_camera == m_camera5 )
-    {
-        m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetInvariantViewerPos( invariantPos );        
-    }
-    else
-    {
-        m_planet->GetLayerFromInertBody( m_ship, 0 )->GetBody()->GetInvariantViewerPos( invariantPos );
-    }
-    */
 
     //////////////////////////////////////////////////////////////////////
 
     Vector view_patch_coords;
     m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetFace( m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetCurrentFace() )->GetCurrentPatchViewCoords( view_patch_coords );
-
-    //////////////////////////////////////////////////////////////////////
-
-    //Vector playerpos; // pos viewer relative à la planete
-    
-    /*
-    Matrix planet_transf_notrans;
-
-    planet_transf_notrans = planet_transf;
-
-    planet_transf_notrans.ClearTranslation();
-    planet_transf_notrans.Inverse();
-    */
-
-    /*
-    planet_transf_notrans.Transform( &invariantPos, &playerpos );
-
-    Utils::Maths::CartesiantoSpherical( playerpos, m_playerpos_longlatalt );
-
-    if( m_playerpos_longlatalt[1] < 0.0 )
-    {
-        m_playerpos_longlatalt[1] = ( 2 * PI ) + m_playerpos_longlatalt[1];
-    }
-    */
-
 
     //////////////////////////////////////////////////////////////////////
 
@@ -2596,9 +2560,11 @@ void dsAppClient::render_universe( void )
     renderer->DrawText( 0, 255, 0, 10, 35, "%d fps", current_fps );
 
     dsreal speed = m_ship->GetLinearSpeedMagnitude();
-
+    /*
     if( m_showinfos )
     {
+    */
+        /*
         dsstring date;
         m_calendar->GetFormatedDate( date );    
         renderer->DrawText( 0, 255, 0, 10, 55, "%s", date.c_str() );
@@ -2654,6 +2620,8 @@ void dsAppClient::render_universe( void )
         }
 
         renderer->DrawText( 0, 255, 0, 10, 420, "w s distance = %.4f", m_ship_walker_distance );
+
+        */
         
 
         /*
@@ -2697,9 +2665,14 @@ void dsAppClient::render_universe( void )
             renderer->DrawText( 0, 255, 0, 10, 245, "current_patch => null" );
         }
         */
+
+/*
     }
     else
     {
+    */
+
+
         if( hotstate )
         {
 
@@ -2717,8 +2690,10 @@ void dsAppClient::render_universe( void )
 
         renderer->DrawText( 0, 255, 0, 10, 130, "time factor = %s", m_timefactor.c_str() );
 
-        renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h", speed * 3.6 );        
-    }
+        renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h", speed * 3.6 ); 
+
+
+    //}
   
     renderer->FlipScreen();
 
