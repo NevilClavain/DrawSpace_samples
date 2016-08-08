@@ -1008,11 +1008,16 @@ void dsAppClient::init_passes( void )
 
     m_texturemirrorpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "texturemirror_pass" ) );
 
+
+
+    m_texturemirrorpass->SetTargetDimsFromRenderer( false );
+    m_texturemirrorpass->SetTargetDims( 512, 512 );
     m_texturemirrorpass->Initialize();
     
     m_texturemirrorpass->GetRenderingQueue()->EnableDepthClearing( true );
     m_texturemirrorpass->GetRenderingQueue()->EnableTargetClearing( true );
     m_texturemirrorpass->GetRenderingQueue()->SetTargetClearingColor( 0, 0, 0, 255 );
+
 
 
 
@@ -1080,7 +1085,8 @@ void dsAppClient::init_passes( void )
     m_finalpass2->GetViewportQuad()->GetFx()->GetShader( 1 )->LoadFromFile();
     
 
-    m_finalpass2->GetViewportQuad()->SetTexture( m_occlusionpass->GetTargetTexture(), 0 );    
+    //m_finalpass2->GetViewportQuad()->SetTexture( m_occlusionpass->GetTargetTexture(), 0 );
+    m_finalpass2->GetViewportQuad()->SetTexture( m_texturemirrorpass->GetTargetTexture(), 0 );
     m_finalpass2->GetViewportQuad()->SetDrawingState( false );
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -1985,6 +1991,7 @@ void dsAppClient::init_ship( void )
 
     m_ship_drawable->RegisterPassSlot( m_texturepass );
     m_ship_drawable->RegisterPassSlot( m_occlusionpass );
+    m_ship_drawable->RegisterPassSlot( m_texturemirrorpass );
 
     
     m_ship_drawable->GetMeshe()->SetImporter( m_meshe_import );
@@ -1993,8 +2000,8 @@ void dsAppClient::init_ship( void )
 
     
     m_ship_drawable->GetNodeFromPass( m_texturepass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "ship.vso", true ) ) );
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "ship.pso", true ) ) );
     m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 0 )->LoadFromFile();
     m_ship_drawable->GetNodeFromPass( m_texturepass )->GetFx()->GetShader( 1 )->LoadFromFile();
 
@@ -2009,7 +2016,44 @@ void dsAppClient::init_ship( void )
 
 
     m_ship_drawable->GetNodeFromPass( m_texturepass )->GetTexture( 0 )->LoadFromFile();
+
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->AddShaderParameter( 0, "flags", 24 );
+    m_ship_drawable->GetNodeFromPass( m_texturepass )->SetShaderRealVector( "flags", Vector( 0.0, PLANET_RAY * 1000.0, 0.0, 0.0 ) );
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "ship.vso", true ) ) );
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "ship.pso", true ) ) );
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->GetFx()->GetShader( 0 )->LoadFromFile();
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->GetFx()->GetShader( 1 )->LoadFromFile();
+
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "true" ) );
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "bellerophon.jpg" ) ), 0 );
+
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->SetOrderNumber( 5000 );
+
+
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->GetTexture( 0 )->LoadFromFile();
+
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "flags", 25 );
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "flags", Vector( 1.0, PLANET_RAY * 1000.0, 0.0, 0.0 ) );
+
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "view_pos", 26 );
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "planet_pos", 27 );
     
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 
@@ -2028,6 +2072,11 @@ void dsAppClient::init_ship( void )
 
     m_ship_drawable->GetNodeFromPass( m_occlusionpass )->AddShaderParameter( 1, "color", 0 );
     m_ship_drawable->GetNodeFromPass( m_occlusionpass )->SetShaderRealVector( "color", Vector( 0.0, 0.0, 0.0, 1.0 ) );
+
+
+
+
+
 
 
     
@@ -2374,6 +2423,10 @@ void dsAppClient::render_universe( void )
     planet_pos[3] = 1.0;
 
     m_clouds_state_machine->UpdateMirror( invariantPos, planet_pos );
+
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "view_pos", invariantPos );
+    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "planet_pos", planet_pos );
+
     
     for( int i = 0; i < 6; i++ )
     {
