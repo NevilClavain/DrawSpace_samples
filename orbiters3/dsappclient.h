@@ -430,6 +430,9 @@ protected:
     DrawSpace::Utils::Vector                    m_shippos_longlatalt;
     
     dsreal                                      m_ship_walker_distance;
+
+    bool                                        m_can_leave;
+    bool                                        m_can_join;
    
     void init_planet_meshes( void );
     void init_assets_loaders( void );

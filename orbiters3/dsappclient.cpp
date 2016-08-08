@@ -923,7 +923,9 @@ m_water_anim_inc( true ),
 m_timefactor( "x1" ),
 m_walking_speed( 0.0 ),
 m_haslanded( false ),
-m_ship_walker_distance( 0.0 )
+m_ship_walker_distance( 0.0 ),
+m_can_leave( false ),
+m_can_join( true )
 {    
     _INIT_LOGGER( "logorbiters3.conf" )  
     m_w_title = "orbiters 3 test";
@@ -2692,6 +2694,15 @@ void dsAppClient::render_universe( void )
 
         renderer->DrawText( 0, 255, 0, 10, 95, "speed = %.1f km/h", speed * 3.6 ); 
 
+        if( m_can_leave )
+        {
+            renderer->DrawText( 0, 255, 0, 700, 15, "Press (I) to leave the ship" );
+        }
+        else if( m_can_join )
+        {
+            renderer->DrawText( 0, 255, 0, 700, 15, "Press (I) to join the ship" );
+        }
+
 
     //}
   
@@ -2740,6 +2751,36 @@ void dsAppClient::render_universe( void )
     }
 
     m_wavespass->GetViewportQuad()->SetShaderRealVector( "waves", DrawSpace::Utils::Vector( m_water_anim, 0.0, 0.0, 0.0 ) );
+
+
+    ////////////////////////////////////////////////////////////
+
+    if( m_haslanded )
+    {
+        if( m_walking )
+        {
+            m_can_leave = false;
+
+            if( m_ship_walker_distance < 50.0 )
+            {
+                m_can_join = true;
+            }
+            else
+            {
+                m_can_join = false;
+            }
+        }
+        else
+        {
+            m_can_leave = true;
+            m_can_join = false;
+        }
+    }
+    else
+    {
+        m_can_leave = false;
+        m_can_join = false;
+    }
 }
 
 void dsAppClient::print_init_trace( const dsstring& p_string )
@@ -3119,22 +3160,25 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case 'I':
             {
-                if( m_curr_camera == m_camera3 )
+                if( m_can_leave || m_can_join )
                 {
-                    m_curr_camera = m_camera5; 
-                    m_curr_camera_name = "camera5";
-                    m_mouse_circularmode = true;
-                    m_walking = true;
-                }
-                else if( m_curr_camera == m_camera5 )
-                {
-                    m_curr_camera = m_camera3; 
-                    m_curr_camera_name = "camera3";
-                    m_mouse_circularmode = false;
-                    m_walking = false;
-                }
+                    if( m_curr_camera == m_camera3 )
+                    {
+                        m_curr_camera = m_camera5; 
+                        m_curr_camera_name = "camera5";
+                        m_mouse_circularmode = true;
+                        m_walking = true;
+                    }
+                    else if( m_curr_camera == m_camera5 )
+                    {
+                        m_curr_camera = m_camera3; 
+                        m_curr_camera_name = "camera3";
+                        m_mouse_circularmode = false;
+                        m_walking = false;
+                    }
 
-                m_clouds_state_machine->SetCurrentCamera( m_curr_camera->GetOwner() );
+                    m_clouds_state_machine->SetCurrentCamera( m_curr_camera->GetOwner() );
+                }
             }
             break;
 
