@@ -1993,7 +1993,7 @@ void dsAppClient::init_ship( void )
 
     m_ship_drawable->RegisterPassSlot( m_texturepass );
     m_ship_drawable->RegisterPassSlot( m_occlusionpass );
-    m_ship_drawable->RegisterPassSlot( m_texturemirrorpass );
+    //m_ship_drawable->RegisterPassSlot( m_texturemirrorpass );
 
     
     m_ship_drawable->GetMeshe()->SetImporter( m_meshe_import );
@@ -2027,7 +2027,7 @@ void dsAppClient::init_ship( void )
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
+    /*
     m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
     m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "ship.vso", true ) ) );
     m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "ship.pso", true ) ) );
@@ -2051,7 +2051,7 @@ void dsAppClient::init_ship( void )
 
     m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "view_pos", 26 );
     m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->AddShaderParameter( 0, "planet_pos", 27 );
-    
+    */
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2426,8 +2426,8 @@ void dsAppClient::render_universe( void )
 
     m_clouds_state_machine->UpdateMirror( invariantPos, planet_pos );
 
-    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "view_pos", invariantPos );
-    m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "planet_pos", planet_pos );
+    //m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "view_pos", invariantPos );
+    //m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "planet_pos", planet_pos );
 
     
     for( int i = 0; i < 6; i++ )
