@@ -213,6 +213,8 @@ public:
 
     void UpdateLongLatPos( dsreal p_long, dsreal p_lat );
 
+    void CloudsUpdateRequest( void );
+
     friend class CloudsStateMachine;
 };
 
@@ -238,6 +240,8 @@ public:
     void Evolve( DrawSpace::Dynamics::Calendar& p_cald );
 
     void UpdateLongLatPos( dsreal p_long, dsreal p_lat );
+
+    void CloudsUpdateRequest( void );
 };
 
 

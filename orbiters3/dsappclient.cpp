@@ -803,6 +803,16 @@ void CloudsResources::UpdateLongLatPos( dsreal p_long, dsreal p_lat )
     m_deg_lat = 90.0 - p_lat;
 }
 
+void CloudsResources::CloudsUpdateRequest( void )
+{
+    m_clouds->CloudsReset();
+    m_clouds_low->CloudsReset();
+    m_clouds_procedural_rules->GetRootParser()->GetRules()->Apply();
+    m_clouds_low_procedural_rules->GetRootParser()->GetRules()->Apply();
+    m_clouds->CloudsUpdateRequest();
+    m_clouds_low->CloudsUpdateRequest();
+}
+
 CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, 
                         DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass, 
                         DrawSpace::Core::SceneNodeGraph& p_scenegraph )
@@ -889,6 +899,14 @@ void CloudsStateMachine::UpdateLongLatPos( dsreal p_long, dsreal p_lat )
     for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
     {
         m_volumetrics_clouds[i]->UpdateLongLatPos( p_long, p_lat );
+    }
+}
+
+void CloudsStateMachine::CloudsUpdateRequest( void )
+{
+    for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
+    {
+        m_volumetrics_clouds[i]->CloudsUpdateRequest();
     }
 }
 
@@ -3224,6 +3242,7 @@ void dsAppClient::OnKeyPulse( long p_key )
         case 'H':
             {
                 m_clouds_state_machine->UpdateLongLatPos( Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ), Utils::Maths::RadToDeg( m_shippos_longlatalt[2] ) );
+                m_clouds_state_machine->CloudsUpdateRequest();
             }
             break;
 
