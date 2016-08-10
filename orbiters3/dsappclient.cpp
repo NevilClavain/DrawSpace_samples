@@ -440,7 +440,11 @@ void PlanetDetailsBinder::Update( void )
 CloudsResources::CloudsResources( DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, DrawSpace::IntermediatePass* p_pass, DrawSpace::IntermediatePass* p_mirrorpass ) :
 m_pass( p_pass ),
 m_mirrorpass( p_mirrorpass ),
-m_planet_node( p_planet_node )
+m_planet_node( p_planet_node ),
+m_deg_long( 0.0 ),
+m_deg_lat( 0.0 ),
+m_deg_long_speed( 0.0 ),
+m_deg_lat_speed( 0.0 )
 {
 }
 
@@ -480,27 +484,29 @@ void CloudsResources::compute_clouds_vector_global( DrawSpace::Utils::Vector& p_
     p_out = global_clouds_pos;
 }
 
-void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, int p_seed, dsreal p_initial_deg_rot, dsreal p_deg_rot_speed,
-                            DrawSpace::Utils::Vector p_rotaxis, DrawSpace::Utils::Vector p_rotaxisrotaxis )
+void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, int p_seed, 
+                            dsreal p_deg_init_lat, dsreal p_deg_init_long, dsreal p_deg_lat_speed, dsreal p_deg_long_speed )
 {
+    m_deg_long = p_deg_init_long;
+    m_deg_lat = p_deg_init_lat;
+    m_deg_long_speed = p_deg_long_speed;
+    m_deg_lat_speed = p_deg_lat_speed;
+
     //////////////////////////////////////////////////////////////////////////////////
-
-    m_deg_rot = p_initial_deg_rot;
-    m_deg_rot_speed = p_deg_rot_speed;
-
-    m_deg_rot_axis = 0.0;
 
     m_clouds_rot = _DRAWSPACE_NEW_( Transformation, Transformation );
     m_clouds_rot_node = _DRAWSPACE_NEW_( DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>( p_id + "clouds_rot" ) );
     m_clouds_rot_node->SetContent( m_clouds_rot );
 
-    m_rot_axis = p_rotaxis;
-    m_rot_axis_rot_axis = p_rotaxisrotaxis;
+
 
     Matrix rotx;
-    rotx.Rotation( m_rot_axis, Maths::DegToRad( m_deg_rot) );
+    Matrix roty;
 
+    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0 ), Maths::DegToRad( m_deg_lat ) );
+    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0 ), Maths::DegToRad( m_deg_long ) );
 
+    m_clouds_rot->PushMatrix( roty );
     m_clouds_rot->PushMatrix( rotx );
 
     p_scenegraph.RegisterNode( m_clouds_rot_node );
@@ -733,8 +739,7 @@ void CloudsResources::Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGrap
 
     p_scenegraph.RegisterNode( m_clouds_low_node );
 
-    m_clouds_low_node->LinkTo( m_clouds_rot_node );
-    //m_clouds_low_node->LinkTo( m_planet_node );
+    m_clouds_low_node->LinkTo( m_clouds_rot_node );    
 }
 
 void CloudsResources::ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor )
@@ -778,25 +783,24 @@ void CloudsResources::SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dy
 
 void CloudsResources::Evolve( DrawSpace::Dynamics::Calendar& p_cald )
 {
-    p_cald.AngleSpeedInc( &m_deg_rot, m_deg_rot_speed );
-    p_cald.AngleSpeedInc( &m_deg_rot_axis, 0.001 );
 
-    // rotation de l'axe de rotation :-P
-
-    Matrix rot2;
-    rot2.Rotation( m_rot_axis_rot_axis, Maths::DegToRad( m_deg_rot_axis ) );
-
-    Vector rot_axis_t;
-
-    rot2.Transform( &m_rot_axis, &rot_axis_t );
-
-
-    // puis rotation du champ de nuages
+    p_cald.AngleSpeedInc( &m_deg_lat, m_deg_lat_speed );
+    p_cald.AngleSpeedInc( &m_deg_long, m_deg_long_speed );
 
     Matrix rotx;
-    rotx.Rotation( rot_axis_t, Maths::DegToRad( m_deg_rot ) );
+    Matrix roty;
 
-    m_clouds_rot->UpdateMatrix( 0, rotx );
+    rotx.Rotation( Vector( 1.0, 0.0, 0.0, 1.0 ), Maths::DegToRad( m_deg_lat ) );
+    roty.Rotation( Vector( 0.0, 1.0, 0.0, 1.0 ), Maths::DegToRad( m_deg_long ) );
+
+    m_clouds_rot->UpdateMatrix( 0, roty );
+    m_clouds_rot->UpdateMatrix( 1, rotx );
+}
+
+void CloudsResources::UpdateLongLatPos( dsreal p_long, dsreal p_lat )
+{
+    m_deg_long = p_long;
+    m_deg_lat = 90.0 - p_lat;
 }
 
 CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>* p_planet_node, 
@@ -807,60 +811,32 @@ CloudsStateMachine::CloudsStateMachine( int p_nbCloudsField, DrawSpace::Core::Sc
     sb.InitializeFromCurrentTime();
 
     std::default_random_engine cloudspos_generator;
-    std::uniform_real_distribution<dsreal> cloudspos_randrotx( 0.0, 179.0 );
+    std::uniform_real_distribution<dsreal> cloudspos_randrotx( 0.0, 359.0 );
+    std::uniform_real_distribution<dsreal> cloudspos_randroty( 0.0, 359.0 );
 
     std::default_random_engine cloudsspeeds_generator;
     std::uniform_int_distribution<int> cloudspos_randrotspeedsign( 0, 1 );
     std::uniform_real_distribution<dsreal> cloudspos_randrotxspeed( VOLUMETRIC_CLOUDS_MIN_SPEED_DEG_S, VOLUMETRIC_CLOUDS_MAX_SPEED_DEG_S );
+    std::uniform_real_distribution<dsreal> cloudspos_randrotyspeed( VOLUMETRIC_CLOUDS_MIN_SPEED_DEG_S, VOLUMETRIC_CLOUDS_MAX_SPEED_DEG_S );
 
-
-    std::default_random_engine cloudsrotaxis_generator;
-    std::uniform_real_distribution<dsreal> clouds_randrotaxis( -1.0, 1.0 );
 
     cloudspos_generator.seed( sb.GetSeed( 1000 ) );
     cloudsspeeds_generator.seed( sb.GetSeed( 1001 ) );
-    cloudsrotaxis_generator.seed( sb.GetSeed( 1002 ) );
-       
-    dsreal rot, rot_compl, rot_speed;
-
+    
+    dsreal rot_lat, rot_long;
+    dsreal rot_lat_speed, rot_long_speed;
 
     CloudsResources* clouds = new CloudsResources( p_planet_node, p_pass, p_mirrorpass );
-    CloudsResources* clouds_compl = new CloudsResources( p_planet_node, p_pass, p_mirrorpass );
 
-    
-    rot = cloudspos_randrotx( cloudspos_generator );
+    rot_lat = cloudspos_randrotx( cloudspos_generator );
+    rot_long = cloudspos_randroty( cloudspos_generator );
 
+    rot_lat_speed = cloudspos_randrotxspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
+    rot_long_speed = cloudspos_randrotyspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
 
-    rot_compl = rot + 180.0;
-
-    rot_speed = cloudspos_randrotxspeed( cloudsspeeds_generator ) * ( cloudspos_randrotspeedsign( cloudsspeeds_generator ) > 0 ? -1.0 : 1.0 );
-
-    Vector rand_rotaxis( 1.0, 0.0, 0.0, 0.0 );
-    Vector rand_rotrotaxis;
-    Vector v2( 1.0, 0.0, 0.0, 0.0 );
-
-    rand_rotaxis[1] = clouds_randrotaxis( cloudsrotaxis_generator );
-    rand_rotaxis[2] = clouds_randrotaxis( cloudsrotaxis_generator );
-
-    rand_rotaxis.Normalize();
-
-    // rand_rotrotaxis doit etre perpendiculaire a rand_rotaxis
-
-    v2[1] = clouds_randrotaxis( cloudsrotaxis_generator );
-    v2[2] = clouds_randrotaxis( cloudsrotaxis_generator );
-    v2.Normalize();
-
-    rand_rotrotaxis = ProdVec( rand_rotaxis, v2 );
-
-    rand_rotrotaxis.Normalize();
-
-
-
-    clouds->Init( "clouds_array_0", p_scenegraph, sb.GetSeed( 0 ), rot, rot_speed, rand_rotaxis, rand_rotrotaxis );
-    clouds_compl->Init( "clouds_array_1", p_scenegraph, sb.GetSeed( 1 ), rot_compl, rot_speed, rand_rotaxis, rand_rotrotaxis );
+    clouds->Init( "clouds_array_0", p_scenegraph, sb.GetSeed( 0 ), rot_lat, rot_long, rot_lat_speed, rot_long_speed );
 
     m_volumetrics_clouds.push_back( clouds );
-    m_volumetrics_clouds.push_back( clouds_compl );
 }
 
 CloudsStateMachine::~CloudsStateMachine( void )
@@ -905,6 +881,14 @@ void CloudsStateMachine::Evolve( DrawSpace::Dynamics::Calendar& p_cald )
     for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
     {
         m_volumetrics_clouds[i]->Evolve( p_cald );
+    }
+}
+
+void CloudsStateMachine::UpdateLongLatPos( dsreal p_long, dsreal p_lat )
+{
+    for( size_t i = 0; i < m_volumetrics_clouds.size(); i++ )
+    {
+        m_volumetrics_clouds[i]->UpdateLongLatPos( p_long, p_lat );
     }
 }
 
@@ -2757,6 +2741,8 @@ void dsAppClient::render_universe( void )
         }
 
 
+        renderer->DrawText( 0, 255, 0, 10, 330, "ship pos : %.4f %.4f", Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ), Utils::Maths::RadToDeg( m_shippos_longlatalt[2] ) );
+
     //}
   
     renderer->FlipScreen();
@@ -3232,6 +3218,12 @@ void dsAppClient::OnKeyPulse( long p_key )
 
                     m_clouds_state_machine->SetCurrentCamera( m_curr_camera->GetOwner() );
                 }
+            }
+            break;
+
+        case 'H':
+            {
+                m_clouds_state_machine->UpdateLongLatPos( Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ), Utils::Maths::RadToDeg( m_shippos_longlatalt[2] ) );
             }
             break;
 

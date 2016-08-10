@@ -175,12 +175,21 @@ protected:
     DrawSpace::IntermediatePass*                                    m_mirrorpass;
     DrawSpace::Core::SceneNode<DrawSpace::SphericalLOD::Root>*      m_planet_node;
    
-    dsreal                                                          m_deg_rot;
-    dsreal                                                          m_deg_rot_speed;
+    //dsreal                                                          m_deg_rot;
+    //dsreal                                                          m_deg_rot_speed;
 
-    DrawSpace::Utils::Vector                                        m_rot_axis;
-    DrawSpace::Utils::Vector                                        m_rot_axis_rot_axis;
-    dsreal                                                          m_deg_rot_axis;
+    dsreal                                                          m_deg_long;
+    dsreal                                                          m_deg_lat;
+
+    dsreal                                                          m_deg_long_speed;
+    dsreal                                                          m_deg_lat_speed;
+
+
+    //DrawSpace::Utils::Vector                                        m_rot_axis;
+    //DrawSpace::Utils::Vector                                        m_rot_axis_rot_axis;
+    //dsreal                                                          m_deg_rot_axis;
+
+
 
     void compute_clouds_vector_global( DrawSpace::Utils::Vector& p_out ); //calcul vector position champ nuage par rapport au centre planete exprimé dans le repere global
 
@@ -192,8 +201,7 @@ public:
     //void Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, int p_seed, const DrawSpace::Utils::Vector& p_deg_rots, const DrawSpace::Utils::Vector& p_deg_rots_speeds );
 
     void Init( const dsstring& p_id, DrawSpace::Core::SceneNodeGraph& p_scenegraph, int p_seed, 
-                    dsreal p_initial_deg_rot, dsreal p_deg_rot_speed, DrawSpace::Utils::Vector p_rotaxis, 
-                    DrawSpace::Utils::Vector p_rotaxisrotaxis );
+                    dsreal p_deg_init_lat, dsreal p_deg_init_long, dsreal p_deg_lat_speed, dsreal p_deg_long_speed );
 
     void ComputeLight( DrawSpace::Utils::Vector& p_ldir, DrawSpace::Utils::Vector& p_lcolor );
     void ComputeAlt( dsreal p_alt );
@@ -202,6 +210,8 @@ public:
     void SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* p_cam );
 
     void Evolve( DrawSpace::Dynamics::Calendar& p_cald );
+
+    void UpdateLongLatPos( dsreal p_long, dsreal p_lat );
 
     friend class CloudsStateMachine;
 };
@@ -226,6 +236,8 @@ public:
     void SetCurrentCamera( DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>* p_cam );
 
     void Evolve( DrawSpace::Dynamics::Calendar& p_cald );
+
+    void UpdateLongLatPos( dsreal p_long, dsreal p_lat );
 };
 
 
