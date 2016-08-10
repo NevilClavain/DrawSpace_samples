@@ -5,7 +5,7 @@ batch
  pub
   array
    string declare_nbmax_impostors
-  integer 18000
+  integer 7000
  end
 end
   
