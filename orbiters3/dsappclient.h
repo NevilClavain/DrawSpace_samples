@@ -251,7 +251,7 @@ protected:
 
     typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Gui::Widget*>   WidgetEventHandler;
 
-    typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Utils::Timer*> WaterTimer;
+    typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Utils::Timer*> TimerCb;
 
 
     static dsAppClient*                         m_instance;
@@ -261,6 +261,11 @@ protected:
     DrawSpace::Core::SceneNodeGraph             m_scenenodegraph;
 
     bool                                        m_showinfos;
+
+
+    TimerCb*                                    m_timer_cb;
+
+    DrawSpace::Utils::Timer*                    m_period_timer;
 
 
     DrawSpace::IntermediatePass*                m_texturepass;    
@@ -278,6 +283,10 @@ protected:
 
 
     DrawSpace::Utils::TimeManager               m_timer;
+
+
+    std::default_random_engine                  m_cloudspos_generator;
+    
 
     bool                                        m_mouselb;
     bool                                        m_mouserb;
@@ -471,6 +480,8 @@ protected:
     void print_init_trace( const dsstring& p_string );
 
     void on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget );
+
+    void on_timer( DrawSpace::Utils::Timer* p_timer );
 
 
     dsAppClient( void );

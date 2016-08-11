@@ -932,6 +932,19 @@ m_can_join( true )
     _INIT_LOGGER( "logorbiters3.conf" )  
     m_w_title = "orbiters 3 test";
     m_mouseleftbuttondown_eventhandler = _DRAWSPACE_NEW_( WidgetEventHandler, WidgetEventHandler( this, &dsAppClient::on_mouseleftbuttondown ) );
+
+
+
+    m_timer_cb = _DRAWSPACE_NEW_( TimerCb, TimerCb( this, &dsAppClient::on_timer ) );
+    m_period_timer = _DRAWSPACE_NEW_( DrawSpace::Utils::Timer, DrawSpace::Utils::Timer );
+
+    m_period_timer->SetHandler( m_timer_cb );
+    m_period_timer->SetPeriod( 20000 );
+    m_timer.RegisterTimer( m_period_timer );
+
+    m_period_timer->SetState( true );
+
+    m_cloudspos_generator.seed( ::GetTickCount() );
 }
 
 dsAppClient::~dsAppClient( void )
@@ -3324,4 +3337,16 @@ void dsAppClient::OnAppEvent( WPARAM p_wParam, LPARAM p_lParam )
 void dsAppClient::on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget )
 {
 
+}
+
+void dsAppClient::on_timer( DrawSpace::Utils::Timer* p_timer )
+{
+    std::uniform_int_distribution<int> cloudspos_rand( 0, 3 );
+
+    int chance = cloudspos_rand( m_cloudspos_generator );
+    if( chance == 0 )
+    {
+        m_clouds_state_machine->UpdateLongLatPos( m_playerpos_longlatalt[1], m_playerpos_longlatalt[2] );
+        m_clouds_state_machine->CloudsUpdateRequest();       
+    }
 }
