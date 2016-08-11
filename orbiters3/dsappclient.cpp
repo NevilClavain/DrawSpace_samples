@@ -2191,12 +2191,6 @@ void dsAppClient::init_cameras( void )
     m_longlat_mvt = _DRAWSPACE_NEW_( DrawSpace::Core::LongLatMovement, DrawSpace::Core::LongLatMovement );
 
 
-    //m_walking_long = 155.8846;
-    //m_walking_lat = -12.2136;
-
-    //m_walking_long = 274.0;
-    //m_walking_lat = 0.0;
-
     m_walking_long = 0.0;
     m_walking_lat = 0.0;
 
@@ -2411,6 +2405,20 @@ void dsAppClient::render_universe( void )
     if( m_shippos_longlatalt[1] < 0.0 )
     {
         m_shippos_longlatalt[1] = ( 2 * PI ) + m_shippos_longlatalt[1];
+    }
+
+
+    //////////////////////////////////////////////////////////////////////
+
+    if( m_walking )
+    {
+        m_playerpos_longlatalt[1] = m_walking_long;
+        m_playerpos_longlatalt[2] = m_walking_lat;
+    }
+    else
+    {
+        m_playerpos_longlatalt[1] = DrawSpace::Utils::Maths::RadToDeg( m_shippos_longlatalt[1] );
+        m_playerpos_longlatalt[2] = DrawSpace::Utils::Maths::RadToDeg( m_shippos_longlatalt[2] );    
     }
 
 
@@ -2759,7 +2767,9 @@ void dsAppClient::render_universe( void )
         }
 
 
-        renderer->DrawText( 0, 255, 0, 10, 330, "ship pos : %.4f %.4f", Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ), Utils::Maths::RadToDeg( m_shippos_longlatalt[2] ) );
+        //renderer->DrawText( 0, 255, 0, 10, 160, "ship pos : %.4f %.4f", Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ), Utils::Maths::RadToDeg( m_shippos_longlatalt[2] ) );
+
+        renderer->DrawText( 0, 255, 0, 10, 160, "pos : %.4f %.4f", m_playerpos_longlatalt[1], m_playerpos_longlatalt[2] );
 
     //}
   
@@ -3241,7 +3251,7 @@ void dsAppClient::OnKeyPulse( long p_key )
 
         case 'H':
             {
-                m_clouds_state_machine->UpdateLongLatPos( Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ), Utils::Maths::RadToDeg( m_shippos_longlatalt[2] ) );
+                m_clouds_state_machine->UpdateLongLatPos( m_playerpos_longlatalt[1], m_playerpos_longlatalt[2] );
                 m_clouds_state_machine->CloudsUpdateRequest();
             }
             break;
