@@ -3345,7 +3345,7 @@ void dsAppClient::on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget )
 
 void dsAppClient::on_timer( DrawSpace::Utils::Timer* p_timer )
 {
-    std::uniform_int_distribution<int> cloudspos_rand( 0, 3 );
+    std::uniform_int_distribution<int> cloudspos_rand( 0, 5 );
 
     int chance = cloudspos_rand( m_cloudspos_generator );
     if( chance == 0 )
