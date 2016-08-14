@@ -106,10 +106,10 @@ m_plains_amplitude( PLAINS_AMPLITUDE ),
 m_mountains_amplitude( MOUNTAINS_AMPLITUDE ),
 m_vertical_offset( VERTICAL_OFFSET ),
 m_mountains_offset( MOUNTAINS_OFFSET ),
-m_plains_seed1( 18334.0 ),
-m_plains_seed2( 1770.0 ),
-m_mix_seed1( 635.0 ),
-m_mix_seed2( 82.0 )
+m_plains_seed1( 234.4 ),
+m_plains_seed2( 9334.1 ),
+m_mix_seed1( 823.4 ),
+m_mix_seed2( 509.0 )
 {
     m_renderer = SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
 }
@@ -2750,6 +2750,10 @@ void dsAppClient::render_universe( void )
     {
     */
 
+        DrawSpace::Interface::Renderer::DeviceDescr dd;
+        renderer->GetDeviceDescr( dd );
+
+        renderer->DrawText( 0, 255, 0, 10, 50, "%s", dd.description.c_str() );
 
         if( hotstate )
         {
