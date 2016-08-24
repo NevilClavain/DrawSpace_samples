@@ -2523,7 +2523,7 @@ void dsAppClient::render_universe( void )
     {
         m_haslanded = haslanded;
 
-        if( m_haslanded )
+        if( m_haslanded && !m_walking )
         {
 
             m_walking_long = 0.0;
