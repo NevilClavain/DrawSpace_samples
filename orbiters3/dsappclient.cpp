@@ -2207,7 +2207,6 @@ void dsAppClient::init_cameras( void )
     m_walking_long = 0.0;
     m_walking_lat = 0.0;
 
-
     m_longlat_mvt->Init( m_walking_long, m_walking_lat, ( PLANET_RAY * 1000 ), 0.0, 0.0 );
 
     m_longlatmvt_node = _DRAWSPACE_NEW_( SceneNode<DrawSpace::Core::LongLatMovement>, SceneNode<DrawSpace::Core::LongLatMovement>( "longlatmvt_node" ) );
@@ -2526,17 +2525,32 @@ void dsAppClient::render_universe( void )
 
         if( m_haslanded )
         {
+            /*
             m_walking_long = Utils::Maths::RadToDeg( m_shippos_longlatalt[1] );
             m_walking_lat = Utils::Maths::RadToDeg( m_shippos_longlatalt[2] );
+            */
+
+            m_walking_long = 0.0;
+            m_walking_lat = 0.0;
+
+    
+            m_longlat_mvt->SetLongitudBase( Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ) );
+            m_longlat_mvt->SetLatitudBase( Utils::Maths::RadToDeg( m_shippos_longlatalt[2] ) );
+
+
         }
     }
 
 
     // distance au vaisseau, en degres
     dsreal ship_walker_distance_deg;
-
+    /*
     ship_walker_distance_deg = sqrt( ( m_walking_long - Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ) ) * ( m_walking_long - Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ) ) + 
                                     ( m_walking_lat - Utils::Maths::RadToDeg( m_shippos_longlatalt[2] ) ) * ( m_walking_lat - Utils::Maths::RadToDeg( m_shippos_longlatalt[2] ) ) );
+                                    */
+
+    ship_walker_distance_deg = sqrt( ( m_walking_long ) * ( m_walking_long ) + 
+                                    ( m_walking_lat ) * ( m_walking_lat ) );
 
     // convertir en une distance en metres
 
