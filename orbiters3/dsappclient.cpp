@@ -2525,14 +2525,11 @@ void dsAppClient::render_universe( void )
 
         if( m_haslanded )
         {
-            /*
-            m_walking_long = Utils::Maths::RadToDeg( m_shippos_longlatalt[1] );
-            m_walking_lat = Utils::Maths::RadToDeg( m_shippos_longlatalt[2] );
-            */
 
             m_walking_long = 0.0;
             m_walking_lat = 0.0;
 
+            m_fps_mvt->InitRot();
     
             m_longlat_mvt->SetLongitudBase( Utils::Maths::RadToDeg( m_shippos_longlatalt[1] ) );
             m_longlat_mvt->SetLatitudBase( Utils::Maths::RadToDeg( m_shippos_longlatalt[2] ) );
@@ -3260,6 +3257,12 @@ void dsAppClient::OnKeyPulse( long p_key )
             {
                 if( m_can_leave || m_can_join )
                 {
+
+                    m_walking_long = 0.0;
+                    m_walking_lat = 0.0;
+
+                    m_fps_mvt->InitRot();
+
                     if( m_curr_camera == m_camera3 )
                     {
                         m_curr_camera = m_camera5; 
