@@ -67,7 +67,7 @@
 #define PLAINS_AMPLITUDE                    50.0
 #define MOUNTAINS_AMPLITUDE                 800.0
 #define MOUNTAINS_OFFSET                    -120.0
-#define VERTICAL_OFFSET                     2.0
+#define VERTICAL_OFFSET                     0.0
 #define TEMP_DEC_PER_KM                     66.0
 #define BEACH_LIMIT                         25.0
 #define CLOUDS_PROCEDURALRULES_FILE         "planet_clouds_small_small.rules"
@@ -1412,11 +1412,16 @@ void dsAppClient::init_planet( void )
     Texture* texture_th_splatting = _DRAWSPACE_NEW_( Texture, Texture( "earth_th_splatting_16.jpg" ) );
     texture_th_splatting->LoadFromFile();
 
-    Texture* texture_bump_water = _DRAWSPACE_NEW_( Texture, Texture( "water.png" ) );
-    texture_bump_water->LoadFromFile();
 
     Texture* texture_clouds = _DRAWSPACE_NEW_( Texture, Texture( "storm_clouds_8k.jpg" ) );
     texture_clouds->LoadFromFile();
+
+
+    Texture* texture_river = _DRAWSPACE_NEW_( Texture, Texture( "rivers.bmp" ) );
+    texture_river->LoadFromFile();
+
+    Texture* texture_canyons = _DRAWSPACE_NEW_( Texture, Texture( "canyons.bmp" ) );
+    texture_canyons->LoadFromFile();
 
 
     SphericalLOD::Config config;
@@ -1430,23 +1435,35 @@ void dsAppClient::init_planet( void )
     collisions_fx->AddShader( hm_vshader );
     collisions_fx->AddShader( hm_pshader );
     collisions_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    collisions_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "linear" ) );
     collisions_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    collisions_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "none" ) );
 
 
     for( int i = 0; i < 6; i++ )
     {
         m_planet_collisions_binder[i]->SetFx( collisions_fx );
+
+        m_planet_collisions_binder[i]->SetVertexTexture( texture_river, 0 );        
+        m_planet_collisions_binder[i]->SetVertexTexture( texture_canyons, 1 );
+
     }
+
 
 
 
     Fx* climate_fx = new Fx;
     climate_fx->AddShader( colors_vshader );
     climate_fx->AddShader( colors_pshader );
+    climate_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "linear" ) );
+    climate_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "none" ) );
 
     for( int i = 0; i < 6; i++ )
     {
         m_planet_climate_binder[i]->SetFx( climate_fx );
+
+        m_planet_climate_binder[i]->SetVertexTexture( texture_river, 0 );
+        m_planet_climate_binder[i]->SetVertexTexture( texture_canyons, 1 );
     }
 
 
@@ -1459,10 +1476,12 @@ void dsAppClient::init_planet( void )
 
     m_details_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     m_details_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
+    m_details_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "linear" ) );
     //m_details_fx->AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "line" ) );
 
     m_details_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ENABLEZBUFFER, "false" ) );
     m_details_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
+    m_details_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETVERTEXTEXTUREFILTERTYPE, "none" ) );
     //m_details_fx->AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETFILLMODE, "solid" ) );
 
 
@@ -1474,6 +1493,9 @@ void dsAppClient::init_planet( void )
         
         m_planet_detail_binder[i]->SetTexture( texture_th_pixels, 0 );
         m_planet_detail_binder[i]->SetTexture( texture_th_splatting, 1 );
+
+        m_planet_detail_binder[i]->SetVertexTexture( texture_river, 0 );
+        m_planet_detail_binder[i]->SetVertexTexture( texture_canyons, 1 );
     }
 
 
