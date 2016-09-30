@@ -290,6 +290,12 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
     m_fillpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "fill_pass" ) );
+
+    m_fillpass->SetRenderTarget( DrawSpace::Core::Texture::RENDERTARGET_CPU ); 
+        // passe dont la texture resultante est destinee a être lue par le CPU, et non pas bindee a un shader (GPU)
+        // flag necessaire a cause d'une specificite D3D11 !!
+
+    
     m_fillpass->Initialize();
 
     m_fillpass->GetRenderingQueue()->EnableDepthClearing( true );

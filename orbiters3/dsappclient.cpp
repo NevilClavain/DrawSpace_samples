@@ -989,6 +989,10 @@ void dsAppClient::init_passes( void )
 
 
     m_occlusionpass = _DRAWSPACE_NEW_( IntermediatePass, IntermediatePass( "occlusion_pass" ) );
+    m_occlusionpass->SetRenderTarget( DrawSpace::Core::Texture::RENDERTARGET_CPU ); 
+        // passe dont la texture resultante est destinee a être lue par le CPU, et non pas bindee a un shader (GPU)
+        // flag necessaire a cause d'une specificite D3D11 !!
+
     m_occlusionpass->Initialize();
 
     m_occlusionpass->GetRenderingQueue()->EnableDepthClearing( false );
