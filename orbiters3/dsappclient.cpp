@@ -2747,7 +2747,7 @@ void dsAppClient::render_universe( void )
                                    m_clouds_state_machine->GetNextStateString().c_str(), m_clouds_state_machine->GetCurrentCloudsAlpha(), m_clouds_state_machine->GetTargetCloudsAlpha() );
 
 
-        renderer->DrawText( 0, 255, 0, 900, 30, "%s", m_deviceDescr.description.c_str() );
+        
             */
 
 
@@ -2787,10 +2787,6 @@ void dsAppClient::render_universe( void )
     {
     */
 
-        DrawSpace::Interface::Renderer::DeviceDescr dd;
-        renderer->GetDeviceDescr( dd );
-
-        renderer->DrawText( 0, 255, 0, 10, 50, "%s", dd.description.c_str() );
 
         if( hotstate )
         {
@@ -3028,8 +3024,7 @@ void dsAppClient::OnRenderFrame( void )
                 //m_calendar->Startup( 162682566 );
                 m_calendar->Startup( 0 );
                 m_ready = true;
-
-                renderer->GetDeviceDescr( m_deviceDescr );
+                
                 break;        
         }
 
