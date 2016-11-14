@@ -30,6 +30,9 @@ bin/*.exp
 bin/*.txt
 bin/*.pso
 bin/*.vso
+bin/*.bank
+bin/test_data
+bin/skybox_data
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
