@@ -16,6 +16,7 @@ build/
 
 test_data/
 skybox_data/
+datafiles/
 
 bin/*.lua
 bin/*.psh
