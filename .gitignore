@@ -17,6 +17,7 @@ build/
 test_data/
 skybox_data/
 gui_datafiles/
+test02modgui_datafiles
 
 bin/*.lua
 bin/*.psh
