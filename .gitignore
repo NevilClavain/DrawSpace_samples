@@ -17,7 +17,11 @@ build/
 test_data/
 skybox_data/
 gui_datafiles/
-test02modgui_datafiles
+test02modgui_datafiles/
+testskin/
+xfskin/
+cdlodplanet_data/
+worldinspector_data/
 
 bin/*.lua
 bin/*.psh
