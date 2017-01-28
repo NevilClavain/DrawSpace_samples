@@ -1803,9 +1803,8 @@ void dsAppClient::init_planet( void )
     
     for( int i = 0; i < 6; i++ )
     {
-        m_flatcloudslow_rnode[i] = m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_cloudslow_binder[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 1500 );
-        m_flatcloudshigh_rnode[i] = m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_clouds_binder[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 3000 );
-
+        m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_cloudslow_binder[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 1500 );
+        m_planet->RegisterSinglePassSlot( m_texturepass, m_planet_clouds_binder[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 3000 );
 
         m_planet->RegisterSinglePassSlot( m_texturemirrorpass, m_planet_clouds_binder_mirror[i], i, DrawSpace::SphericalLOD::Body::AVGRES_MESHE, 2, 1500 );
     }

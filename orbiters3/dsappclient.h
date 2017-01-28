@@ -415,9 +415,6 @@ protected:
 
     dsstring                                    m_timefactor;
 
-    DrawSpace::Core::RenderingNode*             m_flatcloudshigh_rnode[6];
-    DrawSpace::Core::RenderingNode*             m_flatcloudslow_rnode[6];
-
     CloudsStateMachine*                         m_clouds_state_machine;
 
     ///////////////////////////////////////////////////////////
