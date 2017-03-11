@@ -96,14 +96,14 @@
             <Property name="Text" value="Planet View" />
             <Property name="VerticalAlignment" value="Centre" />
         </Window>
-        <Window type="xfskin/Button" name="Button" >
+        <Window type="xfskin/Button" name="GroundSetup_Button" >
             <Property name="ID" value="11" />
             <Property name="Area" value="{{0.280556,0},{0.239507,0},{0.481945,0},{0.323458,0}}" />
             <Property name="Text" value="Ground" />
         </Window>
         <Window type="xfskin/Button" name="Button2" >
             <Property name="ID" value="12" />
-            <Property name="Area" value="{{0.280556,1},{0.356791,0},{0.481945,1},{0.440742,0}}" />
+            <Property name="Area" value="{{0.280556,0},{0.356791,0},{0.481945,0},{0.440742,0}}" />
             <Property name="Text" value="Fog &amp; Atmosphere" />
         </Window>
         <Window type="xfskin/Button" name="Button22" >

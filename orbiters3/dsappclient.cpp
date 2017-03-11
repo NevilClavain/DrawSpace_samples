@@ -1448,8 +1448,8 @@ void dsAppClient::init_planet( void )
     {
         m_planet_collisions_binder[i]->SetFx( collisions_fx );
 
-        m_planet_collisions_binder[i]->SetVertexTexture( texture_river, 0 );        
-        m_planet_collisions_binder[i]->SetVertexTexture( texture_canyons, 1 );
+        //m_planet_collisions_binder[i]->SetVertexTexture( texture_river, 0 );        
+        //m_planet_collisions_binder[i]->SetVertexTexture( texture_canyons, 1 );
 
     }
 
@@ -1466,10 +1466,10 @@ void dsAppClient::init_planet( void )
     {
         m_planet_climate_binder[i]->SetFx( climate_fx );
 
-        m_planet_climate_binder[i]->SetVertexTexture( texture_river, 0 );
-        m_planet_climate_binder[i]->SetVertexTexture( texture_canyons, 1 );
+        //m_planet_climate_binder[i]->SetVertexTexture( texture_river, 0 );
+        //m_planet_climate_binder[i]->SetVertexTexture( texture_canyons, 1 );
     }
-
+    
 
 
     m_details_fx = new Fx;
