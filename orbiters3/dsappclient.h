@@ -249,7 +249,6 @@ class dsAppClient : public DrawSpace::App
 {
 protected:
 
-    typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Gui::Widget*>   WidgetEventHandler;
 
     typedef DrawSpace::Core::CallBack<dsAppClient, void, DrawSpace::Utils::Timer*> TimerCb;
 
@@ -420,17 +419,8 @@ protected:
     ///////////////////////////////////////////////////////////
 
 
-    DrawSpace::Gui::ReticleWidget*              m_reticle_widget;
-    DrawSpace::Gui::TextWidget*                 m_text_widget;
-    DrawSpace::Gui::TextWidget*                 m_text_widget_2;
-
-
     bool                                        m_final_pass_2;
 
-
-    DrawSpace::SystemMouseInputProvider         m_mouse_input;
-
-    WidgetEventHandler*                         m_mouseleftbuttondown_eventhandler;
 
     bool                                        m_ready;
 
@@ -466,8 +456,6 @@ protected:
     void init_ship( void );
     void init_star_impostor( void );
     void init_cameras( void );
-    void init_reticle( void );
-    void init_text_assets( void );
     void init_rendering_queues( void );
     void init_calendar( void );
     void init_planet_noise( void );
@@ -476,7 +464,6 @@ protected:
 
     void print_init_trace( const dsstring& p_string );
 
-    void on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget );
 
     void on_timer( DrawSpace::Utils::Timer* p_timer );
 

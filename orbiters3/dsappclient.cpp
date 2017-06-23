@@ -85,7 +85,6 @@
 using namespace DrawSpace;
 using namespace DrawSpace::Interface;
 using namespace DrawSpace::Core;
-using namespace DrawSpace::Gui;
 using namespace DrawSpace::Utils;
 using namespace DrawSpace::Dynamics;
 
@@ -940,7 +939,7 @@ m_can_join( true )
 {    
     _INIT_LOGGER( "logorbiters3.conf" )  
     m_w_title = "orbiters 3 test";
-    m_mouseleftbuttondown_eventhandler = _DRAWSPACE_NEW_( WidgetEventHandler, WidgetEventHandler( this, &dsAppClient::on_mouseleftbuttondown ) );
+
 
 
 
@@ -972,7 +971,6 @@ void dsAppClient::init_planet_meshes( void )
 
 void dsAppClient::init_assets_loaders( void )
 {
-    RegisterMouseInputEventsProvider( &m_mouse_input );
 
     bool status;
 
@@ -1448,6 +1446,7 @@ void dsAppClient::init_planet( void )
     SphericalLOD::Config config;
 
     config.m_lod0base = 19000.0;
+    config.m_landplace_patch = false;
     config.m_ground_layer = 0;
     config.m_nbLODRanges_inertBodies = NB_LOD_INERTBODIES;
     config.m_nbLODRanges_freeCameras = NB_LOD_FREECAMERAS;
@@ -2327,117 +2326,7 @@ void dsAppClient::init_cameras( void )
     m_longlatmvt_node->LinkTo( m_planet_node );
 }
 
-void dsAppClient::init_reticle( void )
-{
-    m_reticle_widget = _DRAWSPACE_NEW_( ReticleWidget, ReticleWidget( "reticle_widget", (long)10, (long)10, &m_scenenodegraph, NULL ) );
 
-    m_reticle_widget->Lock( m_socle_node );
-    
-    DrawSpace::Gui::ReticleWidget::ClippingParams clp;
-    clp.clipping_policy = DrawSpace::Gui::ReticleWidget::CLIPPING_HOLD;
-    clp.xmin = -0.5;
-    clp.xmax = 0.5;
-    clp.ymin = -0.375;
-    clp.ymax = 0.375;
-
-    m_reticle_widget->SetClippingParams( clp );
-
-    m_reticle_widget->RegisterMouseLeftButtonDownEventHandler( m_mouseleftbuttondown_eventhandler );
-
-    m_mouse_input.RegisterWidget( m_reticle_widget );    
-}
-
-void dsAppClient::init_text_assets( void )
-{
-    m_text_widget = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget", DRAWSPACE_GUI_WIDTH, DRAWSPACE_GUI_HEIGHT, m_font, true, m_reticle_widget ) );
-
-
-    m_text_widget->GetBackgroundImage()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_text_widget->GetBackgroundImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_text_widget->GetBackgroundImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-
-
-    m_text_widget->GetBackgroundImage()->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_text_widget->GetBackgroundImage()->GetFx()->GetShader( 1 )->LoadFromFile();
-
-    m_text_widget->GetBackgroundImage()->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "reticle.bmp" ) ), 0 );
-    m_text_widget->GetBackgroundImage()->GetTexture( 0 )->LoadFromFile();
-
-
-    m_text_widget->GetImage()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );  
-    m_text_widget->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_text_widget->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-
-    RenderStatesSet text_rss;
-
-    text_rss.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
-    text_rss.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add"  ) );
-    text_rss.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always"  ) );
-    text_rss.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one"  ) );
-    text_rss.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha"  ) );
-    text_rss.AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
-
-    m_text_widget->GetImage()->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_text_widget->GetImage()->GetFx()->GetShader( 1 )->LoadFromFile();
-
-
-    m_text_widget->GetText()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );      
-    m_text_widget->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
-    m_text_widget->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
-    m_text_widget->GetText()->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_text_widget->GetText()->GetFx()->GetShader( 1 )->LoadFromFile();
-    text_rss.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    text_rss.AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-
-
-    m_text_widget->GetText()->GetFx()->SetRenderStates( text_rss );
-
-
-    m_text_widget->GetText()->AddShaderParameter( 1, "color", 0 );
-    m_text_widget->GetText()->SetShaderRealVector( "color", Utils::Vector( 1.0, 1.0, 0.0, 1.0 ) );
-
-    m_text_widget->GetImage()->SetOrderNumber( 20000 );
-    m_text_widget->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
-
-    m_text_widget->RegisterToPass( m_finalpass );
-    
-    m_text_widget_2 = _DRAWSPACE_NEW_( TextWidget, TextWidget( "text_widget_2", 1200, 360, m_font, false, m_text_widget ) );
-    
-    m_text_widget_2->GetImage()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_text_widget_2->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_text_widget_2->GetImage()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-
-
-    RenderStatesSet text_rss_2;
-
-    text_rss_2.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
-    text_rss_2.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add"  ) );
-    text_rss_2.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always"  ) );
-    text_rss_2.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one"  ) );
-    text_rss_2.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha"  ) );
-    text_rss_2.AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
-
-    m_text_widget_2->GetImage()->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_text_widget_2->GetImage()->GetFx()->GetShader( 1 )->LoadFromFile();
-
-    m_text_widget_2->GetText()->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_text_widget_2->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.vsh", false ) ) );
-    m_text_widget_2->GetText()->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "text.psh", false ) ) );
-    m_text_widget_2->GetText()->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_text_widget_2->GetText()->GetFx()->GetShader( 1 )->LoadFromFile();
-    text_rss_2.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "linear" ) );
-    text_rss_2.AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETTEXTUREFILTERTYPE, "none" ) );
-    m_text_widget_2->GetText()->AddShaderParameter( 1, "color", 0 );
-    m_text_widget_2->GetText()->SetShaderRealVector( "color", Utils::Vector( 0.0, 1.0, 0.0, 1.0 ) );
-
-
-    m_text_widget_2->GetText()->GetFx()->SetRenderStates( text_rss_2 );
-
-    m_text_widget_2->GetImage()->SetOrderNumber( 20000 );
-    m_text_widget_2->GetInternalPass()->GetRenderingQueue()->UpdateOutputQueue();
-
-    m_text_widget_2->RegisterToPass( m_finalpass );
-}
 
 void dsAppClient::init_rendering_queues( void )
 {
@@ -2566,16 +2455,14 @@ void dsAppClient::render_universe( void )
 
     }
 
-    m_text_widget->SetVirtualTranslation( 100, 75 );
-    m_text_widget_2->SetVirtualTranslation( -60, 160 );
-
+    /*
     char distance[64];
     sprintf( distance, "%.3f km", m_reticle_widget->GetLastDistance() / 1000.0 );
 
     m_text_widget_2->SetText( -40, 0, 30, dsstring( distance ), DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
     m_reticle_widget->Transform();
     //m_reticle_widget->Draw(); // pour ne plus afficher le reticule
-    
+    */
 
     //////////////////////////////////////////////////////////////
 
@@ -3055,13 +2942,11 @@ void dsAppClient::OnRenderFrame( void )
                 break;
 
             case 11:
-                print_init_trace( "reticle creation..." );
-                init_reticle();
+
                 break;
 
             case 12:
-                print_init_trace( "text display assets creation..." );
-                init_text_assets();
+
                 break;
 
             case 13:
@@ -3457,10 +3342,6 @@ void dsAppClient::OnAppEvent( WPARAM p_wParam, LPARAM p_lParam )
 
 }
 
-void dsAppClient::on_mouseleftbuttondown( DrawSpace::Gui::Widget* p_widget )
-{
-
-}
 
 void dsAppClient::on_timer( DrawSpace::Utils::Timer* p_timer )
 {
