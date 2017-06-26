@@ -28,7 +28,6 @@
 using namespace DrawSpace;
 using namespace DrawSpace::Interface;
 using namespace DrawSpace::Core;
-using namespace DrawSpace::Gui;
 using namespace DrawSpace::Utils;
 using namespace DrawSpace::Dynamics;
 
@@ -66,30 +65,17 @@ void dsAppClient::OnRenderFrame( void )
 
     m_scenenodegraph.ComputeTransformations( m_timer );
 
-    static long last_fps;
 
     long current_fps = m_timer.GetFPS();
     char fps[256];
     sprintf( fps, "%d fps", m_timer.GetFPS() );
     
-    if( last_fps != current_fps )
-    {
-        m_fpstext_widget->SetText( 0, 0, 70, fps, DrawSpace::Text::HorizontalCentering | DrawSpace::Text::VerticalCentering );
-        last_fps = current_fps;		
-    }
-    
-
-
-    m_fpstext_widget->SetVirtualTranslation( 10, 5 );
-    m_fpstext_widget->Transform();
+    renderer->DrawText( 255, 0, 0, 30, 20, "%s", fps );
 
     m_texturepass->GetRenderingQueue()->Draw();
     m_texturepass2->GetRenderingQueue()->Draw();
     m_maskpass->GetRenderingQueue()->Draw();
     m_filterpass->GetRenderingQueue()->Draw();
-
-
-    m_fpstext_widget->Draw();
 
     m_finalpass->GetRenderingQueue()->Draw();
     m_finalpass2->GetRenderingQueue()->Draw();
@@ -261,8 +247,6 @@ void dsAppClient::create_box( void )
 
 bool dsAppClient::OnIdleAppInit( void )
 {
-    bool status;
-
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
     renderer->SetRenderState( &DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::SETCULLING, "cw" ) );
 
@@ -458,28 +442,6 @@ bool dsAppClient::OnIdleAppInit( void )
     
 
 
-
-    //////////////////////////////////////////////////////////////
-
-
-    m_font_import = new DrawSpace::Utils::CBFGFontImport();
-
-    m_font = _DRAWSPACE_NEW_( Font, Font );
-
-    m_font->SetImporter( m_font_import );
-
-    status = m_font->Build( "mangalfont.bmp", "mangalfont.csv" );
-    if( !status )
-    {
-        return false;
-    }
-
-    m_fpstext_widget = DrawSpace::Utils::BuildText( m_font, 15, 10, DrawSpace::Utils::Vector( 1.0, 1.0, 1.0, 0.0 ), "fps" );
-
-    m_fpstext_widget->GetImage()->SetOrderNumber( 20000 );
-
-    m_fpstext_widget->RegisterToPass( m_finalpass );
-    
 
     //////////////////////////////////////////////////////////////
 

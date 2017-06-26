@@ -977,11 +977,6 @@ void dsAppClient::init_assets_loaders( void )
     m_meshe_import = new DrawSpace::Utils::AC3DMesheImport();
     /////////////////////////////////////
 
-    m_font_import = new DrawSpace::Utils::CBFGFontImport();
-    m_font = _DRAWSPACE_NEW_( Font, Font );
-    m_font->SetImporter( m_font_import );
-
-    status = m_font->Build( "mangalfont.bmp", "mangalfont.csv" );
 }
 
 void dsAppClient::init_passes( void )

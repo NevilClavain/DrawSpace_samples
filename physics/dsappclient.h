@@ -57,10 +57,6 @@ protected:
     bool                                                                m_mouselb;
     bool                                                                m_mouserb;
 
-    DrawSpace::Gui::TextWidget*                                         m_fpstext_widget;
-
-    DrawSpace::Interface::FontImport*                                   m_font_import;
-    DrawSpace::Core::Font*                                              m_font;
 
     DrawSpace::Dynamics::CameraPoint*                                   m_camera;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera_node;

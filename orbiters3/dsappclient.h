@@ -291,8 +291,6 @@ protected:
     bool                                        m_mouserb;
 
 
-    DrawSpace::Interface::FontImport*           m_font_import;
-    DrawSpace::Core::Font*                      m_font;
 
 
     DrawSpace::Spacebox*                        m_spacebox;
