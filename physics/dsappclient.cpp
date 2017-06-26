@@ -107,7 +107,6 @@ void dsAppClient::OnRenderFrame( void )
 
     m_scenenodegraph.PointProjection( cube0_pos_v, center_x, center_y, out_z );
 
-    m_image1->SetTranslation( center_x, center_y );
 
     renderer->DrawText( 0, 255, 0, 10, 105, "%f %f", center_x, center_y );
     
@@ -443,37 +442,7 @@ bool dsAppClient::OnIdleAppInit( void )
 
 
 
-    //////////////////////////////////////////////////////////////
 
-    
-    m_image1 = _DRAWSPACE_NEW_( Image, Image( (long)8, (long)8 ) );
-
-    RenderStatesSet image_rss;
-
-    m_image1->SetFx( _DRAWSPACE_NEW_( Fx, Fx ) );
-    m_image1->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.vsh", false ) ) );
-    m_image1->GetFx()->AddShader( _DRAWSPACE_NEW_( Shader, Shader( "texture.psh", false ) ) );
-    image_rss.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "true" ) );
-    image_rss.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDOP, "add"  ) );
-    image_rss.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDFUNC, "always"  ) );
-    image_rss.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDDEST, "one"  ) );
-    image_rss.AddRenderStateIn( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDSRC, "srcalpha"  ) );
-    image_rss.AddRenderStateOut( DrawSpace::Core::RenderState( DrawSpace::Core::RenderState::ALPHABLENDENABLE, "false" ) );
-
-    m_image1->GetFx()->SetRenderStates( image_rss );
-
-    m_image1->GetFx()->GetShader( 0 )->LoadFromFile();
-    m_image1->GetFx()->GetShader( 1 )->LoadFromFile();
-
-
-    m_image1->SetTexture( _DRAWSPACE_NEW_( Texture, Texture( "reticle.bmp" ) ), 0 );
-    m_image1->GetTexture( 0 )->LoadFromFile();
-
-    m_image1->SetOrderNumber( 20000 );
-    
-
-
-    m_finalpass->GetRenderingQueue()->Add( m_image1 );
 
 
 
