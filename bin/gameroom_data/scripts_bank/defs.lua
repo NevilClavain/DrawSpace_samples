@@ -1,0 +1,67 @@
+
+FALSE=0
+TRUE=1
+
+-- type aspect
+BODY_ASPECT=0
+CAMERA_ASPECT=1
+PHYSICS_ASPECT=2
+RENDERING_ASPECT=3
+SERVICE_ASPECT=4
+TIME_ASPECT=5
+TRANSFORM_ASPECT=6
+
+-- args loading shaders
+SHADER_COMPILED=1
+SHADER_NOT_COMPILED=0
+
+-- time scale
+NORMAL_TIME=0
+MUL2_TIME=1
+MUL4_TIME=2
+MUL10_TIME=3
+MUL100_TIME=4
+MUL500_TIME=5
+SEC_1HOUR_TIME=6
+SEC_1DAY_TIME=7
+SEC_30DAYS_TIME=8
+SEC_1YEAR_TIME=9
+DIV2_TIME=10
+DIV4_TIME=11
+DIV10_TIME=12
+FREEZE=13
+
+renderer=Renderer()
+rg=RenderPassNodeGraph('rg')
+rg:create_root('final_pass')
+rg:update_renderingqueues()
+    
+
+eg=EntityNodeGraph('eg')
+root_entity=Entity()
+
+root_entity:add_aspect(RENDERING_ASPECT)
+root_entity:add_aspect(TIME_ASPECT)
+root_entity:configure_timemanager(NORMAL_TIME)
+
+root_entity:connect_renderingaspect_rendergraph(rg)
+eg:set_root('root', root_entity )
+
+
+-- creation cote lua de l'enum RenderState::Operation
+RENDERSTATE_OPE_NONE=0
+RENDERSTATE_OPE_SETCULLING=1
+RENDERSTATE_OPE_ENABLEZBUFFER=2
+RENDERSTATE_OPE_SETTEXTUREFILTERTYPE=3
+RENDERSTATE_OPE_SETVERTEXTEXTUREFILTERTYPE=4
+RENDERSTATE_OPE_SETFILLMODE=5
+RENDERSTATE_OPE_ALPHABLENDENABLE=6
+RENDERSTATE_OPE_ALPHABLENDOP=7
+RENDERSTATE_OPE_ALPHABLENDFUNC=8
+RENDERSTATE_OPE_ALPHABLENDDEST=9
+RENDERSTATE_OPE_ALPHABLENDSRC=10
+
+
+print_memsize=function() 
+	g:print('Total mem = '..g:total_mem()..' byte(s)') 
+end
