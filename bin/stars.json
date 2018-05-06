@@ -1,0 +1,213 @@
+{
+  "Entity": 
+  {
+    "Id": "root",
+    "Aspects": 
+    [
+      {
+        "ProceduralAspect":
+        {
+          "Components":
+          [
+		    { 
+			  "RootProceduralBloc":
+			  {
+				"Group"  : "stars generator",
+				"BlocId" : "root"
+			  }
+			}
+          ]
+        }
+      }
+    ],
+	"Children":
+	[
+	  {
+	    "Entity":
+	    {
+          "Id": "repeat",
+		  "Aspects": 
+          [
+		    {
+			  "ProceduralAspect":
+              {
+			    "Components":
+                [
+				  {
+				    "RepProceduralBloc":
+					{
+					  "Group"  : "stars generator",
+					  "BlocId" : "repeat"
+					}
+				  }
+				]
+			  }
+			}
+		  ],
+	      "Children":
+	      [
+		    {
+		      "Entity": 
+              {
+			    "Id": "nb_ite",
+                "Aspects": 
+                [
+                  {
+			        "ProceduralAspect":
+                    {
+                      "Components":
+                      [
+					    {
+						  "UniformRandomIntValueProceduralBloc":
+						  {
+							"Group"  : "stars generator",
+							"BlocId" : "rand"						    
+						  }
+						}
+					  ]
+					}
+			      }
+				],
+                "Children":
+	            [
+		          {
+		            "Entity": 
+                    {
+			          "Id": "seed",
+                      "Aspects": 
+                      [
+                        {
+			              "ProceduralAspect": 
+						  {
+                            "Components":
+                            [
+					          {
+						        "SeedSourceProceduralBloc":
+						        {
+							      "Group"  : "stars generator",
+							      "BlocId" : "seed"
+						        }
+							  }
+							]
+						  }
+						}
+				      ]
+					}
+				  },
+		          {
+		            "Entity": 
+                    {
+			          "Id": "max",
+                      "Aspects": 
+                      [
+                        {
+			              "ProceduralAspect": 
+						  {
+                            "Components":
+                            [
+					          {
+						        "IntegerProceduralBloc":
+						        {
+                                  "Value"  : 5,
+							      "Group"  : "stars generator",
+							      "BlocId" : "max"
+						        }
+							  }
+							]						  
+						  }
+						}
+				      ]
+					}
+				  },
+		          {
+		            "Entity": 
+                    {
+			          "Id": "min",
+                      "Aspects": 
+                      [
+                        {
+			              "ProceduralAspect": 
+						  {
+                            "Components":
+                            [
+					          {
+						        "IntegerProceduralBloc":
+						        {
+                                  "Value"  : 2,
+							      "Group"  : "stars generator",
+							      "BlocId" : "min"
+						        }
+							  }
+							]						  
+						  }
+						}
+				      ]
+					}
+				  }
+				]
+			  }
+			},
+            {
+		      "Entity": 
+              {
+			    "Id": "publisher",
+                "Aspects": 
+                [
+                  {
+			        "ProceduralAspect":
+                    {
+                      "Components":
+                      [
+				        {
+			              "PublishProceduralBloc": 
+					      {
+					        "MessageId" :"message_pos_xyz",
+							"Group"  : "stars generator",
+							"BlocId" : "publisher"
+					      }
+						}
+					  ]
+					}
+			      }
+				],				                
+				"Children":
+	            [
+		          {
+		            "Entity":
+					{
+			          "Id": "array",
+                      "Aspects": 
+                      [
+                        {
+			              "ProceduralAspect":
+                          {
+						    "Components":
+							[
+							  {
+						        "IntegerArrayProceduralBloc":
+						        {
+							      "Group"  : "stars generator",
+							      "BlocId" : "array",
+								  "IntegerArray":
+								  [
+								    { "0": 24 },
+                                    { "1": 25 },
+									{ "2": 27 }
+								  ]								 								  
+						        }
+							  }
+							]
+						  }
+						}
+					  ]
+					}
+				  } 
+				]
+			  }
+			}
+		  ]
+	    }
+	  }	
+	]
+  }
+}
