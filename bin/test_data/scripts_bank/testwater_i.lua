@@ -21,7 +21,8 @@ rg:create_child('final_pass', 'texture_pass', 0)
 text_renderer=TextRendering()
 text_renderer:configure(root_entity, "fps", 320, 30, 255, 0, 255, "??? fps")
 
-
+--root_entity:add_aspect(PHYSICS_ASPECT)
+--root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
 
 
 
@@ -208,6 +209,7 @@ function()
 end)
 
 
+
 gui=Gui()
 gui:init()
 gui:set_resourcespath("./testskin")
@@ -220,11 +222,61 @@ gui:show_gui(TRUE)
 g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
 
+y_cube = 1
+
+cube_instances = {}
+
+
+add_cube = function()
+
+	local cube_infos = {}
+	local cube_name = 'cube_entity'..y_cube
+
+	local cube_entity
+	local cube_renderer 
+	
+	
+	cube_entity, cube_render = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'bloc1.jpg')
+	eg:add_child('root',cube_name,cube_entity)
+
+	local cube_transform = RawTransform()
+	cube_transform:configure(cube_entity)
+
+	local cube_pos_mat = Matrix()
+	cube_pos_mat:translation( 0.0, y_cube * 2.0, -20.0 )
+	cube_transform:add_matrix("cube_pos",cube_pos_mat)
+
+	cube_infos.entity = cube_entity
+	cube_infos.renderer = cube_renderer
+	cube_infos.transform = cube_transform
+
+	cube_instances[y_cube] = cube_infos
+
+	y_cube = y_cube + 1
+
+end
+
+
+
+destroy_all_cube = function()
+
+end
+
+
 
 gui:add_pushbuttonclickedcb( "onpushbutton",
 function( layout, widget )
+  
   if layout == 'main.layout' and widget == "Quit" then
     g:quit()
+  
+  elseif layout == 'main.layout' and widget == "Button_Create" then
+    g:print('create !')
+	add_cube()	
+	rg:update_renderingqueues()
+
+  elseif layout == 'main.layout' and widget == "Button_Destroy" then
+    g:print('destroy !')
   end
 end)
 
