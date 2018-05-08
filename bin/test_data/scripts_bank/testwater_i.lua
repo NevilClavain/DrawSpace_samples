@@ -21,8 +21,10 @@ rg:create_child('final_pass', 'texture_pass', 0)
 text_renderer=TextRendering()
 text_renderer:configure(root_entity, "fps", 320, 30, 255, 0, 255, "??? fps")
 
---root_entity:add_aspect(PHYSICS_ASPECT)
---root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
+
+
+root_entity:add_aspect(PHYSICS_ASPECT)
+root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
 
 
 
