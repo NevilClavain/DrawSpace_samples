@@ -42,6 +42,10 @@ gui:release()
 g:show_mousecursor(TRUE)
 g:set_mousecursorcircularmode(FALSE)
 
+root_entity:release_world()
+
+root_entity:remove_aspect(PHYSICS_ASPECT)
+
 
 sb_mod:unload()
 
