@@ -259,16 +259,21 @@ end
 
 
 
-destroy_all_cube = function()
---[[
-	for k, v in pairs(cube_instances) do
-		
-		local cube_info = v
+destroy_all_cubes = function()
 
-		g:print(k)
+	
+	for k, v in pairs(cube_instances_entity) do		
 
+		cube_instances_transform[k]:release()
+		commons.trash.meshe(rg, cube_instances_entity[k], cube_instances_renderer[k])
+
+		cube_instances_transform[k] = nil
+		cube_instances_renderer[k] = nil
+		cube_instances_entity[k] = nil
+
+		eg:remove(k)
 	end
-]]
+	
 end
 
 
@@ -280,13 +285,16 @@ function( layout, widget )
     g:quit()
   
   elseif layout == 'main.layout' and widget == "Button_Create" then
-    g:print('create !')
+
 	add_cube()	
 	rg:update_renderingqueues()
 
   elseif layout == 'main.layout' and widget == "Button_Destroy" then
-    g:print('destroy !')
-	destroy_all_cube()
+	
+	destroy_all_cubes()	
+	y_cube = 1
+	rg:update_renderingqueues()
+	
   end
 end)
 
