@@ -226,33 +226,32 @@ g:set_mousecursorcircularmode(TRUE)
 
 y_cube = 1
 
-cube_instances = {}
+cube_instances_entity = {}
+cube_instances_renderer = {}
+cube_instances_transform = {}
 
 
 add_cube = function()
 
-	local cube_infos = {}
 	local cube_name = 'cube_entity'..y_cube
 
-	local cube_entity
-	local cube_renderer 
 	
-	
-	cube_entity, cube_render = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'bloc1.jpg')
-	eg:add_child('root',cube_name,cube_entity)
 
-	local cube_transform = RawTransform()
-	cube_transform:configure(cube_entity)
+	cube_instances_entity[cube_name], cube_instances_renderer[cube_name] = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'bloc1.jpg')
+
+	eg:add_child('root',cube_name,cube_instances_entity[cube_name])
+
+	cube_instances_transform[cube_name] = RawTransform()
+
+
+	cube_instances_transform[cube_name]:configure(cube_instances_entity[cube_name])
 
 	local cube_pos_mat = Matrix()
 	cube_pos_mat:translation( 0.0, y_cube * 2.0, -20.0 )
-	cube_transform:add_matrix("cube_pos",cube_pos_mat)
 
-	cube_infos.entity = cube_entity
-	cube_infos.renderer = cube_renderer
-	cube_infos.transform = cube_transform
 
-	cube_instances[y_cube] = cube_infos
+	cube_instances_transform[cube_name]:add_matrix("cube_pos",cube_pos_mat)
+
 
 	y_cube = y_cube + 1
 
@@ -261,7 +260,15 @@ end
 
 
 destroy_all_cube = function()
+--[[
+	for k, v in pairs(cube_instances) do
+		
+		local cube_info = v
 
+		g:print(k)
+
+	end
+]]
 end
 
 
@@ -279,6 +286,7 @@ function( layout, widget )
 
   elseif layout == 'main.layout' and widget == "Button_Destroy" then
     g:print('destroy !')
+	destroy_all_cube()
   end
 end)
 
