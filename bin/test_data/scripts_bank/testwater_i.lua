@@ -239,7 +239,7 @@ add_cube = function()
 	local cube_renderer
 	local cube_transform	
 
-	cube_entity, cube_renderer = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'bloc1.jpg')
+	cube_entity, cube_renderer = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'Bloc1.jpg')
 
 	eg:add_child('root',cube_name,cube_entity)
 
