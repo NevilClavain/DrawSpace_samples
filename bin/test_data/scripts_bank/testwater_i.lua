@@ -226,32 +226,39 @@ g:set_mousecursorcircularmode(TRUE)
 
 y_cube = 1
 
-cube_instances_entity = {}
-cube_instances_renderer = {}
-cube_instances_transform = {}
 
+cube_instances = {}
 
 add_cube = function()
 
 	local cube_name = 'cube_entity'..y_cube
 
-	
+	local cube_infos = {}
 
-	cube_instances_entity[cube_name], cube_instances_renderer[cube_name] = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'bloc1.jpg')
+	local cube_entity
+	local cube_renderer
+	local cube_transform	
 
-	eg:add_child('root',cube_name,cube_instances_entity[cube_name])
+	cube_entity, cube_renderer = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'bloc1.jpg')
 
-	cube_instances_transform[cube_name] = RawTransform()
+	eg:add_child('root',cube_name,cube_entity)
+
+	cube_transform = RawTransform()
 
 
-	cube_instances_transform[cube_name]:configure(cube_instances_entity[cube_name])
+	cube_transform:configure(cube_entity)
 
 	local cube_pos_mat = Matrix()
 	cube_pos_mat:translation( 0.0, y_cube * 2.0, -20.0 )
 
 
-	cube_instances_transform[cube_name]:add_matrix("cube_pos",cube_pos_mat)
+	cube_transform:add_matrix("cube_pos",cube_pos_mat)
 
+	cube_infos['renderer'] = cube_renderer
+	cube_infos['entity'] = cube_entity
+	cube_infos['transform'] = cube_transform
+
+	cube_instances[y_cube] = cube_infos
 
 	y_cube = y_cube + 1
 
@@ -261,19 +268,23 @@ end
 
 destroy_all_cubes = function()
 
+	for k, v in pairs(cube_instances) do
 	
-	for k, v in pairs(cube_instances_entity) do		
+		local cube_infos = v
+			
+		cube_infos['transform']:release()
+		commons.trash.meshe(rg, cube_infos['entity'], cube_infos['renderer'])
 
-		cube_instances_transform[k]:release()
-		commons.trash.meshe(rg, cube_instances_entity[k], cube_instances_renderer[k])
+		cube_infos['transform'] = nil
+		cube_infos['entity'] = nil
+		cube_infos['renderer'] = nil
 
-		cube_instances_transform[k] = nil
-		cube_instances_renderer[k] = nil
-		cube_instances_entity[k] = nil
+		cube_instances[k] = nil
 
-		eg:remove(k)
-	end
-	
+		local cube_name = 'cube_entity'..k
+		eg:remove(cube_name)
+
+	end	
 end
 
 
