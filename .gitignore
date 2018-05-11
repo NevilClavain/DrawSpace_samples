@@ -39,6 +39,7 @@ bin/*.txt
 bin/*.pso
 bin/*.vso
 bin/*.bank
+bin/*.zip
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
@@ -173,3 +174,4 @@ Desktop.ini
 $RECYCLE.BIN/
 bin/vm_2016_9_27_19_11_16.vsglog.GraphicsFrameAnalysisParameters.xml
 bin/vm_2016_9_27_19_8_17.vsglog.GraphicsFrameAnalysisParameters.xml
+bin/lua_commons/user.lua
