@@ -243,9 +243,8 @@ add_cube = function()
 
 	eg:add_child('root',cube_name,cube_entity)
 
+	--[[
 	cube_transform = RawTransform()
-
-
 	cube_transform:configure(cube_entity)
 
 	local cube_pos_mat = Matrix()
@@ -253,10 +252,31 @@ add_cube = function()
 
 
 	cube_transform:add_matrix("cube_pos",cube_pos_mat)
+	]]
+
+	cube_entity:add_aspect(BODY_ASPECT)
+	local cube_body=Body()
+
+	cube_body:attach_toentity(cube_entity)
+
+	cube_body:configure_shape( SHAPE_BOX, 0.5, 0.5, 0.5)
+
+	local cube_pos_mat = Matrix()
+	cube_pos_mat:translation( 0.0, y_cube * 2.0, -20.0 )
+
+	cube_body:configure_attitude(cube_pos_mat)
+
+	cube_body:configure_mass(7.0)
+
+	cube_body:configure_mode(BODY_MODE)
+
+	cube_body:configure_state(TRUE)
+
+
 
 	cube_infos['renderer'] = cube_renderer
 	cube_infos['entity'] = cube_entity
-	cube_infos['transform'] = cube_transform
+	--cube_infos['transform'] = cube_transform
 
 	cube_instances[y_cube] = cube_infos
 
@@ -272,10 +292,10 @@ destroy_all_cubes = function()
 	
 		local cube_infos = v
 			
-		cube_infos['transform']:release()
+		--cube_infos['transform']:release()
 		commons.trash.meshe(rg, cube_infos['entity'], cube_infos['renderer'])
 
-		cube_infos['transform'] = nil
+		--cube_infos['transform'] = nil
 		cube_infos['entity'] = nil
 		cube_infos['renderer'] = nil
 
