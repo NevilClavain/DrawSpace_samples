@@ -38,22 +38,50 @@ eg:add_child('root','camera_entity',camera_entity)
 ground_entity, ground_renderer = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'water.ac',0, '002b2su2.jpg')
 eg:add_child('root','ground_entity',ground_entity)
 
+ground_entity:add_aspect(BODY_ASPECT)
+ground_body=Body()
+
+ground_body:attach_toentity(ground_entity)
+
+ground_body:configure_shape( SHAPE_BOX, 100, 0.0, 100.0)
+
+
+ground_body:configure_mode(COLLIDER_MODE)
+
+ground_body:configure_state(TRUE)
+
+
 cube_entity, cube_renderer = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'mars.jpg')
 eg:add_child('root','cube_entity',cube_entity)
 
 
+cube_entity:add_aspect(BODY_ASPECT)
+cube_body=Body()
+
+cube_body:attach_toentity(cube_entity)
+cube_body:configure_shape( SHAPE_BOX, 0.5, 0.5, 0.5)
+
+cube_body:configure_mode(COLLIDER_MODE)
+
+cube_body:configure_state(TRUE)
+
 cube_transform = RawTransform()
-cube_transform:configure(cube_entity)
+--cube_transform:configure(cube_entity)
+
 
 cube_rot_mat = Matrix()
 cube_rot_mat:rotation( 0.0, 1.0, 0.0, commons.utils.deg_to_rad( 0.0 ) )
-cube_transform:add_matrix("cube_rot",cube_rot_mat)
+
+
+--cube_transform:add_matrix("cube_rot",cube_rot_mat)
 
 cube_pos_mat = Matrix()
-cube_pos_mat:translation( 0.0, 4.0, -15.0 )
-cube_transform:add_matrix("cube_pos",cube_pos_mat)
+cube_pos_mat:translation( 0.0, 2.0, -15.0 )
 
 
+--cube_transform:add_matrix("cube_pos",cube_pos_mat)
+
+cube_body:configure_attitude(cube_pos_mat)
 
 
 
@@ -205,8 +233,8 @@ function()
 
 	cube_rot:inc( 10.0 )
 	
-	cube_rot_mat:rotation( 0.0, 1.0, 0.0, commons.utils.deg_to_rad( cube_rot:get_value() ) )
-	cube_transform:update_matrix("cube_rot",cube_rot_mat)
+	--cube_rot_mat:rotation( 0.0, 1.0, 0.0, commons.utils.deg_to_rad( cube_rot:get_value() ) )
+	--cube_transform:update_matrix("cube_rot",cube_rot_mat)
 
 end)
 
@@ -237,22 +265,11 @@ add_cube = function()
 
 	local cube_entity
 	local cube_renderer
-	local cube_transform	
+	--local cube_transform	
 
 	cube_entity, cube_renderer = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'Bloc1.jpg')
 
 	eg:add_child('root',cube_name,cube_entity)
-
-	--[[
-	cube_transform = RawTransform()
-	cube_transform:configure(cube_entity)
-
-	local cube_pos_mat = Matrix()
-	cube_pos_mat:translation( 0.0, y_cube * 2.0, -20.0 )
-
-
-	cube_transform:add_matrix("cube_pos",cube_pos_mat)
-	]]
 
 	cube_entity:add_aspect(BODY_ASPECT)
 	local cube_body=Body()
@@ -262,7 +279,9 @@ add_cube = function()
 	cube_body:configure_shape( SHAPE_BOX, 0.5, 0.5, 0.5)
 
 	local cube_pos_mat = Matrix()
-	cube_pos_mat:translation( 0.0, y_cube * 2.0, -20.0 )
+	--cube_pos_mat:translation( 0.7, y_cube * 4.0, -15.0 )
+
+	cube_pos_mat:translation( 0.7, 9.0, -15.0 )
 
 	cube_body:configure_attitude(cube_pos_mat)
 
