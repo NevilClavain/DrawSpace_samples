@@ -66,6 +66,7 @@ cube_body:configure_mode(COLLIDER_MODE)
 cube_body:configure_state(TRUE)
 
 cube_transform = RawTransform()
+
 --cube_transform:configure(cube_entity)
 
 
@@ -81,10 +82,13 @@ cube_pos_mat:translation( 0.0, 2.0, -15.0 )
 
 --cube_transform:add_matrix("cube_pos",cube_pos_mat)
 
-cube_body:configure_attitude(cube_pos_mat)
+--cube_body:configure_attitude(cube_pos_mat)
 
 
+cube_final_mat = Matrix()
+cube_final_mat:set_product( cube_rot_mat, cube_pos_mat)
 
+cube_body:configure_attitude(cube_final_mat)
 
 
 
@@ -233,8 +237,13 @@ function()
 
 	cube_rot:inc( 10.0 )
 	
-	--cube_rot_mat:rotation( 0.0, 1.0, 0.0, commons.utils.deg_to_rad( cube_rot:get_value() ) )
+	cube_rot_mat:rotation( 0.0, 1.0, 0.0, commons.utils.deg_to_rad( cube_rot:get_value() ) )
 	--cube_transform:update_matrix("cube_rot",cube_rot_mat)
+
+	cube_final_mat:set_product( cube_rot_mat, cube_pos_mat)
+
+	cube_body:update_attitude(cube_final_mat)
+
 
 end)
 
