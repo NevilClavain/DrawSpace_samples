@@ -49,6 +49,7 @@ ground_body:configure_shape( SHAPE_BOX, 100, 0.0, 100.0)
 ground_body:configure_mode(COLLIDER_MODE)
 
 ground_body:configure_state(TRUE)
+ground_body:init()
 
 
 cube_entity, cube_renderer = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'mars.jpg')
@@ -64,7 +65,7 @@ cube_body:configure_shape( SHAPE_BOX, 0.5, 0.5, 0.5)
 cube_body:configure_mode(COLLIDER_MODE)
 
 cube_body:configure_state(TRUE)
-
+cube_body:init()
 
 
 cube_rot_mat = Matrix()
@@ -265,7 +266,6 @@ add_cube = function()
 
 	local cube_entity
 	local cube_renderer
-	--local cube_transform	
 
 	cube_entity, cube_renderer = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'Bloc1.jpg')
 
@@ -279,7 +279,6 @@ add_cube = function()
 	cube_body:configure_shape( SHAPE_BOX, 0.5, 0.5, 0.5)
 
 	local cube_pos_mat = Matrix()
-	--cube_pos_mat:translation( 0.7, y_cube * 4.0, -15.0 )
 
 	cube_pos_mat:translation( 0.7, 9.0, -15.0 )
 
@@ -291,11 +290,12 @@ add_cube = function()
 
 	cube_body:configure_state(TRUE)
 
-
+	cube_body:init()
 
 	cube_infos['renderer'] = cube_renderer
 	cube_infos['entity'] = cube_entity
-	--cube_infos['transform'] = cube_transform
+	cube_infos['body'] = cube_body;
+
 
 	cube_instances[y_cube] = cube_infos
 
@@ -310,13 +310,16 @@ destroy_all_cubes = function()
 	for k, v in pairs(cube_instances) do
 	
 		local cube_infos = v
-			
-		--cube_infos['transform']:release()
+
+		cube_infos['body']:release()
+		cube_infos['body']:detach_fromentity(cube_infos['entity'])
+		cube_infos['entity']:remove_aspect(BODY_ASPECT)
 		commons.trash.meshe(rg, cube_infos['entity'], cube_infos['renderer'])
 
-		--cube_infos['transform'] = nil
+
 		cube_infos['entity'] = nil
 		cube_infos['renderer'] = nil
+		cube_infos['body'] = nil;
 
 		cube_instances[k] = nil
 
