@@ -49,7 +49,6 @@ ground_body:configure_shape( SHAPE_BOX, 100, 0.0, 100.0)
 ground_body:configure_mode(COLLIDER_MODE)
 
 ground_body:configure_state(TRUE)
-ground_body:init()
 
 
 cube_entity, cube_renderer = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'mars.jpg')
@@ -65,7 +64,6 @@ cube_body:configure_shape( SHAPE_BOX, 0.5, 0.5, 0.5)
 cube_body:configure_mode(COLLIDER_MODE)
 
 cube_body:configure_state(TRUE)
-cube_body:init()
 
 
 cube_rot_mat = Matrix()
@@ -289,8 +287,6 @@ add_cube = function()
 	cube_body:configure_mode(BODY_MODE)
 
 	cube_body:configure_state(TRUE)
-
-	cube_body:init()
 
 	cube_infos['renderer'] = cube_renderer
 	cube_infos['entity'] = cube_entity
