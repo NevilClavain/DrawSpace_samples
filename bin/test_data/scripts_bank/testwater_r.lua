@@ -58,3 +58,39 @@ root_entity:remove_aspect(PHYSICS_ASPECT)
 
 sb_mod:unload()
 
+
+
+-- classes instances cleanup
+
+sb_mod = nil
+text_renderer = nil
+
+camera_entity = nil
+fps_transfo = nil
+
+ground_entity = nil
+ground_renderer = nil
+ground_body = nil
+
+cube_entity = nil
+cube_renderer = nil
+cube_body = nil
+
+cube_rot_mat=nil
+cube_pos_mat = nil
+cube_final_mat = nil
+
+skybox_entity = nil
+skybox_renderer = nil
+sb_transform = nil
+
+fps_yaw = nil
+fps_pitch = nil
+cube_rot = nil
+
+gui = nil
+
+y_cube = nil
+
+
+
