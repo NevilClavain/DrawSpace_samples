@@ -35,7 +35,7 @@ eg:add_child('root','camera_entity',camera_entity)
 
 
 
-ground_entity, ground_renderer = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'water.ac',0, '002b2su2.jpg')
+ground_entity, ground_renderer = commons.create_colored_meshe( rg, 'texture_pass', 'water.ac',0)
 eg:add_child('root','ground_entity',ground_entity)
 
 ground_entity:add_aspect(BODY_ASPECT)
@@ -51,7 +51,7 @@ ground_body:configure_mode(COLLIDER_MODE)
 ground_body:configure_state(TRUE)
 
 
-cube_entity, cube_renderer = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'mars.jpg')
+cube_entity, cube_renderer = commons.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'mars.jpg')
 eg:add_child('root','cube_entity',cube_entity)
 
 
@@ -265,7 +265,7 @@ add_cube = function()
 	local cube_entity
 	local cube_renderer
 
-	cube_entity, cube_renderer = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'Bloc1.jpg')
+	cube_entity, cube_renderer = commons.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'Bloc1.jpg')
 
 	eg:add_child('root',cube_name,cube_entity)
 

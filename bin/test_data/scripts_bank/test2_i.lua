@@ -28,7 +28,7 @@ eg:add_child('root','camera_entity',camera_entity)
 
 
 
-ground_entity, ground_renderer = commons.rawtransform.create_unlit_meshe( rg, 'texture_pass', 'water.ac',0, 'bloc1.jpg')
+ground_entity, ground_renderer = commons.create_unlit_meshe( rg, 'texture_pass', 'water.ac',0, 'bloc1.jpg')
 
 
 eg:add_child('root','ground_entity',ground_entity)
