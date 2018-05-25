@@ -14,8 +14,14 @@ sb_mod:load()
 g:print(sb_mod:get_descr().. ' loaded')
 
 
-commons.init_final_pass(rg, 'final_pass')
+--commons.init_final_pass(rg, 'final_pass')
+
+commons.init_final_pass_water_mask(rg, 'final_pass')
+
 rg:create_child('final_pass', 'texture_pass', 0)
+rg:create_child('final_pass', 'texturemirror_pass', 1)
+
+
 
 
 text_renderer=TextRendering()
@@ -83,8 +89,11 @@ cube_body:configure_attitude(cube_final_mat)
 
 
 
-skybox_entity, skybox_renderer, sb_transform = commons.create_skybox( rg, sb_mod, "sb0.bmp", "sb2.bmp", "sb3.bmp", "sb1.bmp", "sb4.bmp", "sb4.bmp", 1000.0)
+skybox_entity, skybox_renderer, sb_transform = commons.create_skybox_with_mirror( 'texture_pass', 'texturemirror_pass', rg, sb_mod, "sb0.bmp", "sb2.bmp", "sb3.bmp", "sb1.bmp", "sb4.bmp", "sb4.bmp", 1000.0)
 eg:add_child('root','skybox_entity',skybox_entity)
+
+skybox_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
+skybox_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_normale', 0.0, 1.0, 0.0, 1.0)
 
 -- ///////////////////////////////
 

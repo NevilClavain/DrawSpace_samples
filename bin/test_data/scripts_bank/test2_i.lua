@@ -40,7 +40,7 @@ g:print(sb_mod:get_descr().. ' loaded')
 
 
 
-skybox_entity, skybox_renderer, sb_transform = commons.create_skybox( rg, sb_mod, "sb0.bmp", "sb2.bmp", "sb3.bmp", "sb1.bmp", "sb4.bmp", "sb4.bmp", 1000.0)
+skybox_entity, skybox_renderer, sb_transform = commons.create_skybox( 'texture_pass', rg, sb_mod, "sb0.bmp", "sb2.bmp", "sb3.bmp", "sb1.bmp", "sb4.bmp", "sb4.bmp", 1000.0)
 eg:add_child('root','skybox_entity',skybox_entity)
 
 -- ///////////////////////////////

@@ -32,6 +32,7 @@ g:remove_appruncb('run')
 
 
 rg:remove_pass('texture_pass')
+rg:remove_pass('texturemirror_pass')
 
 commons.trash.final_pass(rg, 'final_pass')
 
