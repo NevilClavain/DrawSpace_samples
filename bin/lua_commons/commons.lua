@@ -177,8 +177,7 @@ commons.create_skybox_with_mirror = function(p_passid, p_mirrorpassid, p_renderg
 
 	skybox_fxparams_mirror:add_shaderfile('texture_mirror.vso',SHADER_COMPILED)
 	skybox_fxparams_mirror:add_shaderfile('texture_mirror.pso',SHADER_COMPILED)
-	--skybox_fxparams_mirror:add_shaderfile('texture.vso',SHADER_COMPILED)
-	--skybox_fxparams_mirror:add_shaderfile('texture.pso',SHADER_COMPILED)
+
 
 	skybox_rendercontext_mirror = RenderContext(p_mirrorpassid)
 	skybox_fxparams_mirror:set_renderstatesset(mirror_rss)
@@ -254,7 +253,7 @@ commons.create_unlit_meshe = function( p_rendergraph, p_passname, p_meshefile, p
 	renderer:attach_toentity(meshe_entity)
 
 
-	renderer:configure(p_passname,renderconfig,p_meshefile,p_meshe_index)
+	renderer:configure(renderconfig,p_meshefile,p_meshe_index)
 
 	renderer:register_to_rendering(p_rendergraph)
 
@@ -295,12 +294,86 @@ commons.create_colored_meshe = function( p_rendergraph, p_passname, p_meshefile,
 	renderer:attach_toentity(meshe_entity)
 
 
-	renderer:configure(p_passname,renderconfig,p_meshefile,p_meshe_index)
+	renderer:configure(renderconfig,p_meshefile,p_meshe_index)
 
 	renderer:register_to_rendering(p_rendergraph)
 
 
 	renderer:set_shaderrealvector(p_passname, "color", 1.0, 0.0, 1.0, 1.0 )
+
+	return meshe_entity, renderer
+
+end
+
+
+commons.create_unlit_meshe_mirror = function( p_rendergraph, p_passname, p_mirrorpassname, p_meshefile, p_meshe_index, p_texturefile)
+	
+	local meshe_entity=Entity()
+	meshe_entity:add_aspect(RENDERING_ASPECT)
+	meshe_entity:add_aspect(TRANSFORM_ASPECT)
+
+
+	local textures = TexturesSet()
+	textures:set_texturefiletostage(p_texturefile, 0)
+
+
+
+
+
+	local rss=RenderStatesSet()
+	rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
+	rss:add_renderstate_out(RENDERSTATE_OPE_ENABLEZBUFFER, "false")
+
+
+
+
+	local fxparams = FxParams()
+	fxparams:add_shaderfile('texture.vso',SHADER_COMPILED)
+	fxparams:add_shaderfile('texture.pso',SHADER_COMPILED)
+	fxparams:set_renderstatesset(rss)
+
+	rendercontext = RenderContext(p_passname)
+
+	rendercontext:add_fxparams(fxparams)
+	rendercontext:add_texturesset(textures)
+
+
+
+
+
+	local mirror_rss=RenderStatesSet()
+
+	mirror_rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
+	mirror_rss:add_renderstate_in(RENDERSTATE_OPE_SETCULLING, "ccw")
+	mirror_rss:add_renderstate_out(RENDERSTATE_OPE_ENABLEZBUFFER, "false")
+	mirror_rss:add_renderstate_out(RENDERSTATE_OPE_SETCULLING, "cw")
+
+
+	local fxparams_mirror = FxParams()
+	fxparams_mirror:add_shaderfile('texture_mirror.vso',SHADER_COMPILED)
+	fxparams_mirror:add_shaderfile('texture_mirror.pso',SHADER_COMPILED)
+	fxparams_mirror:set_renderstatesset(mirror_rss)
+
+	rendercontext_mirror = RenderContext(p_mirrorpassname)
+	rendercontext_mirror:add_fxparams(fxparams_mirror)
+	rendercontext_mirror:add_texturesset(textures)
+
+	rendercontext_mirror:add_shaderparam("reflector_pos", 0, 24)
+	rendercontext_mirror:add_shaderparam("reflector_normale", 0, 25)
+
+
+
+	renderconfig=RenderConfig()
+	renderconfig:add_rendercontext(rendercontext)
+	renderconfig:add_rendercontext(rendercontext_mirror)
+
+	local renderer=MesheRendering()
+	renderer:attach_toentity(meshe_entity)
+
+
+	renderer:configure(renderconfig,p_meshefile,p_meshe_index)
+
+	renderer:register_to_rendering(p_rendergraph)
 
 	return meshe_entity, renderer
 
@@ -325,7 +398,7 @@ end
 commons.trash.meshe = function(p_rendergraph, p_entity, p_renderer)
 
 	p_renderer:unregister_from_rendering(p_rendergraph)
-	p_renderer:release('texture_pass')
+	p_renderer:release()
 	p_renderer:detach_fromentity()
 
 	p_entity:remove_aspect(TRANSFORM_ASPECT)

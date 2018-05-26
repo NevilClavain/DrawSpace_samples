@@ -57,8 +57,17 @@ ground_body:configure_mode(COLLIDER_MODE)
 ground_body:configure_state(TRUE)
 
 
-cube_entity, cube_renderer = commons.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'mars.jpg')
+
+
+
+--cube_entity, cube_renderer = commons.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'mars.jpg')
+cube_entity, cube_renderer = commons.create_unlit_meshe_mirror( rg, 'texture_pass', 'texturemirror_pass', 'object.ac',0, 'mars.jpg')
 eg:add_child('root','cube_entity',cube_entity)
+
+cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
+cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_normale', 0.0, 1.0, 0.0, 1.0)
+
+
 
 
 cube_entity:add_aspect(BODY_ASPECT)
