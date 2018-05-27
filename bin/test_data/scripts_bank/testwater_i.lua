@@ -22,6 +22,30 @@ rg:create_child('final_pass', 'texture_pass', 0)
 rg:create_child('final_pass', 'texturemirror_pass', 1)
 
 
+--rg:create_child('final_pass', 'wave_pass', NO_TEXTURESTAGE_CONNECTION, RENDERPURPOSE_COLOR, RENDERTARGET_GPU, FALSE, 512, 512)
+rg:create_child('final_pass', 'wave_pass', 3, RENDERPURPOSE_COLOR, RENDERTARGET_GPU, FALSE, 512, 512) -- temporaire
+
+
+rg:create_pass_viewportquad('wave_pass')
+
+wave_fxparams = FxParams()
+wave_fxparams:add_shaderfile('water_waves.vso',SHADER_COMPILED)
+wave_fxparams:add_shaderfile('water_waves.pso',SHADER_COMPILED)
+
+wave_textures = TexturesSet()
+wave_rendercontext = RenderContext('wave_pass')
+wave_rendercontext:add_fxparams(wave_fxparams)
+wave_rendercontext:add_texturesset(wave_textures)
+wave_rendercontext:add_shaderparam("waves", 1, 0)
+
+waves_renderconfig=RenderConfig()
+waves_renderconfig:add_rendercontext(wave_rendercontext)
+rg:configure_pass_viewportquad_resources('wave_pass',waves_renderconfig)
+
+
+
+
+
 
 
 text_renderer=TextRendering()
@@ -117,11 +141,17 @@ fps_pitch=SyncAngle()
 
 cube_rot=SyncAngle()
 
+waves=SyncAngle()
+
+waves_inc = TRUE
+
 
 fps_yaw:init_fromtimeaspectof(root_entity, 0.0)
 fps_pitch:init_fromtimeaspectof(root_entity,0.0)
 
 cube_rot:init_fromtimeaspectof(root_entity,0.0)
+
+waves:init_fromtimeaspectof(root_entity,0.0)
 
 
 
@@ -239,9 +269,9 @@ g:add_appruncb( "run",
 function()  
 
 	time_infos = { root_entity:read_timemanager() }
-	output_infos = renderer:descr() .." "..time_infos[3].. " fps "..time_infos[2]
+	output_infos = renderer:descr() .." "..time_infos[3].. " fps debug = "..waves:get_value()
 
-	text_renderer:update(320, 30, 255, 0, 0, output_infos)
+	text_renderer:update(520, 30, 255, 0, 0, output_infos)
 
 	cube_rot:inc( 10.0 )
 	
@@ -251,6 +281,25 @@ function()
 	cube_final_mat:set_product( cube_rot_mat, cube_pos_mat)
 
 	cube_body:update_attitude(cube_final_mat)
+
+
+    if waves_inc == TRUE then
+
+        if waves:get_value() < 200.0 then
+            waves:inc( 1.0 )
+        else
+            waves_inc = FALSE
+		end
+    else
+
+        if waves:get_value() > 0.0 then
+            waves:dec( 1.0 )
+        else
+            waves_inc = TRUE
+		end
+	end
+
+	rg:set_viewportquadshaderrealvector('wave_pass', 'waves', waves:get_value(), 0.0, 0.0, 0.0, 0.0)
 
 
 end)
