@@ -283,9 +283,12 @@ add_cube = function()
 	local cube_entity
 	local cube_renderer
 
-	cube_entity, cube_renderer = commons.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'Bloc1.jpg')
+	cube_entity, cube_renderer = commons.create_unlit_meshe_mirror( rg, 'texture_pass', 'texturemirror_pass', 'object.ac',0, 'Bloc1.jpg')
 
 	eg:add_child('root',cube_name,cube_entity)
+
+	cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
+	cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_normale', 0.0, 1.0, 0.0, 1.0)
 
 	cube_entity:add_aspect(BODY_ASPECT)
 	local cube_body=Body()
