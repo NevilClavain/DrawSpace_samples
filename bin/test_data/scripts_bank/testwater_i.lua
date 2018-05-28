@@ -70,7 +70,25 @@ eg:add_child('root','camera_entity',camera_entity)
 
 
 
-ground_entity, ground_renderer = commons.create_colored_meshe( rg, 'texture_pass', 'water.ac',0)
+--ground_entity, ground_renderer = commons.create_colored_meshe( rg, 'texture_pass', 'water.ac',0)
+
+ground_entity=Entity()
+ground_entity:add_aspect(RENDERING_ASPECT)
+ground_entity:add_aspect(TRANSFORM_ASPECT)
+
+color_rss=RenderStatesSet()
+color_rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
+color_rss:add_renderstate_out(RENDERSTATE_OPE_ENABLEZBUFFER, "false")
+color_textures = TexturesSet()
+color_fxparams = FxParams()
+color_fxparams:add_shaderfile('color.vso',SHADER_COMPILED)
+color_fxparams:add_shaderfile('color.pso',SHADER_COMPILED)
+color_fxparams:set_renderstatesset(color_rss)
+
+color_rendercontext = RenderContext('texture_pass')
+color_rendercontext:add_fxparams(color_fxparams)
+color_rendercontext:add_texturesset(color_textures)
+color_rendercontext:add_shaderparam( "color", 1, 0 )
 
 bump_rss=RenderStatesSet()
 bump_rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
@@ -83,10 +101,19 @@ bump_fxparams:set_renderstatesset(bump_rss)
 bump_rendercontext = RenderContext('bump_pass')
 bump_rendercontext:add_fxparams(bump_fxparams)
 bump_rendercontext:add_texturesset(bump_textures)
-bump_renderconfig=RenderConfig()
-bump_renderconfig:add_rendercontext(bump_rendercontext)
 
-ground_renderer:configure(bump_renderconfig,'water.ac',0)
+ground_renderconfig=RenderConfig()
+ground_renderconfig:add_rendercontext(color_rendercontext)
+ground_renderconfig:add_rendercontext(bump_rendercontext)
+
+ground_renderer=MesheRendering()
+ground_renderer:attach_toentity(ground_entity)
+
+ground_renderer:configure(ground_renderconfig,'water.ac',0)
+
+ground_renderer:register_to_rendering(rg)
+
+ground_renderer:set_shaderrealvector('texture_pass', "color", 1.0, 0.0, 1.0, 1.0 )
 
 ground_renderer:set_passnodetexturefrompass(rg, 'wave_pass', 'bump_pass', 0)
 
