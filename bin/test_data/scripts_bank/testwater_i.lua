@@ -21,9 +21,14 @@ commons.init_final_pass_water_mask(rg, 'final_pass')
 rg:create_child('final_pass', 'texture_pass', 0)
 rg:create_child('final_pass', 'texturemirror_pass', 1)
 
+rg:create_child('final_pass', 'bump_pass', 2, RENDERPURPOSE_FLOATVECTOR)
+rg:set_pass_depthclearstate('bump_pass', TRUE)
+rg:set_pass_targetclearstate('bump_pass', TRUE)
+--rg:set_pass_targetclearcolor('bump_pass', 255, 255, 255, 255)
+rg:set_pass_targetclearcolor('bump_pass', 0, 0, 0, 0)
 
---rg:create_child('final_pass', 'wave_pass', NO_TEXTURESTAGE_CONNECTION, RENDERPURPOSE_COLOR, RENDERTARGET_GPU, FALSE, 512, 512)
-rg:create_child('final_pass', 'wave_pass', 3, RENDERPURPOSE_COLOR, RENDERTARGET_GPU, FALSE, 512, 512) -- temporaire
+rg:create_child('final_pass', 'wave_pass', NO_TEXTURESTAGE_CONNECTION, RENDERPURPOSE_COLOR, RENDERTARGET_GPU, FALSE, 512, 512)
+--rg:create_child('final_pass', 'wave_pass', 3, RENDERPURPOSE_COLOR, RENDERTARGET_GPU, FALSE, 512, 512) -- temporaire
 
 
 rg:create_pass_viewportquad('wave_pass')
@@ -66,6 +71,25 @@ eg:add_child('root','camera_entity',camera_entity)
 
 
 ground_entity, ground_renderer = commons.create_colored_meshe( rg, 'texture_pass', 'water.ac',0)
+
+bump_rss=RenderStatesSet()
+bump_rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
+bump_rss:add_renderstate_out(RENDERSTATE_OPE_ENABLEZBUFFER, "false")
+bump_textures = TexturesSet()
+bump_fxparams = FxParams()
+bump_fxparams:add_shaderfile('water_bump.vso',SHADER_COMPILED)
+bump_fxparams:add_shaderfile('water_bump.pso',SHADER_COMPILED)
+bump_fxparams:set_renderstatesset(bump_rss)
+bump_rendercontext = RenderContext('bump_pass')
+bump_rendercontext:add_fxparams(bump_fxparams)
+bump_rendercontext:add_texturesset(bump_textures)
+bump_renderconfig=RenderConfig()
+bump_renderconfig:add_rendercontext(bump_rendercontext)
+
+ground_renderer:configure(bump_renderconfig,'water.ac',0)
+
+ground_renderer:set_passnodetexturefrompass(rg, 'wave_pass', 'bump_pass', 0)
+
 eg:add_child('root','ground_entity',ground_entity)
 
 ground_entity:add_aspect(BODY_ASPECT)

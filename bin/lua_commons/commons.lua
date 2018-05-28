@@ -261,6 +261,8 @@ commons.create_unlit_meshe = function( p_rendergraph, p_passname, p_meshefile, p
 
 end
 
+
+
 commons.create_colored_meshe = function( p_rendergraph, p_passname, p_meshefile, p_meshe_index)
 	
 	local meshe_entity=Entity()
@@ -304,6 +306,8 @@ commons.create_colored_meshe = function( p_rendergraph, p_passname, p_meshefile,
 	return meshe_entity, renderer
 
 end
+
+
 
 
 commons.create_unlit_meshe_mirror = function( p_rendergraph, p_passname, p_mirrorpassname, p_meshefile, p_meshe_index, p_texturefile)
