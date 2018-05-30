@@ -132,8 +132,6 @@ ground_body:configure_state(TRUE)
 
 
 
-
---cube_entity, cube_renderer = commons.create_unlit_meshe( rg, 'texture_pass', 'object.ac',0, 'mars.jpg')
 cube_entity, cube_renderer = commons.create_unlit_meshe_mirror( rg, 'texture_pass', 'texturemirror_pass', 'object.ac',0, 'mars.jpg')
 eg:add_child('root','cube_entity',cube_entity)
 

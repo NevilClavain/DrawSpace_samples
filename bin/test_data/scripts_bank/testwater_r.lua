@@ -31,6 +31,12 @@ text_renderer:release()
 g:remove_appruncb('run')
 
 
+
+rg:release_pass_viewportquad_resources('wave_pass')
+rg:remove_pass_viewportquad('wave_pass')
+rg:remove_pass('wave_pass')
+rg:remove_pass('bump_pass')
+
 rg:remove_pass('texture_pass')
 rg:remove_pass('texturemirror_pass')
 
@@ -87,6 +93,7 @@ sb_transform = nil
 
 fps_yaw = nil
 fps_pitch = nil
+waves = nil
 cube_rot = nil
 
 gui = nil
@@ -94,4 +101,17 @@ gui = nil
 y_cube = nil
 
 
+bump_rendercontext = nil
+bump_fxparams = nil
+bump_textures = nil
+bump_rss = nil
 
+color_rendercontext = nil
+color_fxparams = nil
+color_textures = nil
+color_rss = nil
+
+wave_textures = nil
+wave_fxparams = nil
+wave_rendercontext = nil
+waves_renderconfig = nil
