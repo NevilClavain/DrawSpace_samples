@@ -21,6 +21,11 @@ cube_entity:remove_aspect(BODY_ASPECT)
 commons.trash.meshe(rg, cube_entity, cube_renderer)
 eg:remove('cube_entity')
 
+
+commons.trash.meshe(rg, land_entity, land_renderer)
+eg:remove('land_entity')
+
+
 commons.trash.fps_camera( camera_entity, fps_transfo)
 eg:remove('camera_entity')
 
@@ -90,6 +95,9 @@ cube_final_mat = nil
 skybox_entity = nil
 skybox_renderer = nil
 sb_transform = nil
+
+land_entity = nil
+land_renderer = nil
 
 fps_yaw = nil
 fps_pitch = nil

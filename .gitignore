@@ -22,6 +22,8 @@ xfskin/
 cdlodplanet_data/
 worldinspector_data/
 
+*.bak
+
 bin/*.lua
 bin/*.psh
 bin/*.vsh
