@@ -420,7 +420,7 @@ commons.create_unlit_landmeshe_mirror = function( p_rendergraph, p_passname, p_m
 
 
 
-	--[[
+	
 	local mirror_rss=RenderStatesSet()
 
 	mirror_rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
@@ -430,22 +430,23 @@ commons.create_unlit_landmeshe_mirror = function( p_rendergraph, p_passname, p_m
 
 
 	local fxparams_mirror = FxParams()
-	fxparams_mirror:add_shaderfile('texture_mirror.vso',SHADER_COMPILED)
-	fxparams_mirror:add_shaderfile('texture_mirror.pso',SHADER_COMPILED)
+	fxparams_mirror:add_shaderfile('heightmap_mirror.vso',SHADER_COMPILED)
+	fxparams_mirror:add_shaderfile('heightmap_mirror.pso',SHADER_COMPILED)
 	fxparams_mirror:set_renderstatesset(mirror_rss)
 
 	rendercontext_mirror = RenderContext(p_mirrorpassname)
 	rendercontext_mirror:add_fxparams(fxparams_mirror)
 	rendercontext_mirror:add_texturesset(textures)
+	rendercontext_mirror:add_vertextexturesset(vertex_textures)
 
 	rendercontext_mirror:add_shaderparam("reflector_pos", 0, 24)
 	rendercontext_mirror:add_shaderparam("reflector_normale", 0, 25)
-	]]
+
 
 
 	renderconfig=RenderConfig()
 	renderconfig:add_rendercontext(rendercontext)
-	--renderconfig:add_rendercontext(rendercontext_mirror)
+	renderconfig:add_rendercontext(rendercontext_mirror)
 
 	local renderer=MesheRendering()
 	renderer:attach_toentity(meshe_entity)
