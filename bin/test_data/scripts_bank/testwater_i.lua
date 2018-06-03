@@ -177,11 +177,11 @@ skybox_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_normale',
 
 
 
-land_entity, land_renderer = commons.create_unlit_meshe_mirror(rg, 'texture_pass', 'texturemirror_pass', 'land.ac',0, '012b2su2.jpg')
+land_entity, land_renderer = commons.create_unlit_landmeshe_mirror(rg, 'texture_pass', 'texturemirror_pass', 'land.ac',0, '012b2su2.jpg', 'hm.jpg')
 eg:add_child('root','land_entity',land_entity)
 
-land_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
-land_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_normale', 0.0, 1.0, 0.0, 1.0)
+--land_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
+--land_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_normale', 0.0, 1.0, 0.0, 1.0)
 
 -- ///////////////////////////////
 

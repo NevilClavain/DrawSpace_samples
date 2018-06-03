@@ -384,6 +384,81 @@ commons.create_unlit_meshe_mirror = function( p_rendergraph, p_passname, p_mirro
 end
 
 
+commons.create_unlit_landmeshe_mirror = function( p_rendergraph, p_passname, p_mirrorpassname, p_meshefile, p_meshe_index, p_texturefile, p_vtexturefile)
+	
+	local meshe_entity=Entity()
+	meshe_entity:add_aspect(RENDERING_ASPECT)
+	meshe_entity:add_aspect(TRANSFORM_ASPECT)
+
+
+	local textures = TexturesSet()
+	textures:set_texturefiletostage(p_texturefile, 0)
+
+
+	local vertex_textures = TexturesSet()
+	vertex_textures:set_texturefiletostage(p_vtexturefile, 0)
+
+
+	local rss=RenderStatesSet()
+	rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
+	rss:add_renderstate_out(RENDERSTATE_OPE_ENABLEZBUFFER, "false")
+
+
+
+
+	local fxparams = FxParams()
+	fxparams:add_shaderfile('heightmap.vso',SHADER_COMPILED)
+	fxparams:add_shaderfile('heightmap.pso',SHADER_COMPILED)
+	fxparams:set_renderstatesset(rss)
+
+	rendercontext = RenderContext(p_passname)
+
+	rendercontext:add_fxparams(fxparams)
+	rendercontext:add_texturesset(textures)
+	rendercontext:add_vertextexturesset(vertex_textures)
+
+
+
+
+	--[[
+	local mirror_rss=RenderStatesSet()
+
+	mirror_rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
+	mirror_rss:add_renderstate_in(RENDERSTATE_OPE_SETCULLING, "ccw")
+	mirror_rss:add_renderstate_out(RENDERSTATE_OPE_ENABLEZBUFFER, "false")
+	mirror_rss:add_renderstate_out(RENDERSTATE_OPE_SETCULLING, "cw")
+
+
+	local fxparams_mirror = FxParams()
+	fxparams_mirror:add_shaderfile('texture_mirror.vso',SHADER_COMPILED)
+	fxparams_mirror:add_shaderfile('texture_mirror.pso',SHADER_COMPILED)
+	fxparams_mirror:set_renderstatesset(mirror_rss)
+
+	rendercontext_mirror = RenderContext(p_mirrorpassname)
+	rendercontext_mirror:add_fxparams(fxparams_mirror)
+	rendercontext_mirror:add_texturesset(textures)
+
+	rendercontext_mirror:add_shaderparam("reflector_pos", 0, 24)
+	rendercontext_mirror:add_shaderparam("reflector_normale", 0, 25)
+	]]
+
+
+	renderconfig=RenderConfig()
+	renderconfig:add_rendercontext(rendercontext)
+	--renderconfig:add_rendercontext(rendercontext_mirror)
+
+	local renderer=MesheRendering()
+	renderer:attach_toentity(meshe_entity)
+
+
+	renderer:configure(renderconfig,p_meshefile,p_meshe_index)
+
+	renderer:register_to_rendering(p_rendergraph)
+
+	return meshe_entity, renderer
+
+end
+
 
 commons.trash.skybox = function(p_rendergraph, p_module, p_entity, p_renderer, p_transform)
 
