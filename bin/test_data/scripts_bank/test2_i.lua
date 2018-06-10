@@ -37,16 +37,9 @@ eg:add_child('root','ground_entity',ground_entity)
 clothbox_entity,clothbox_renderer = commons.create_lit_meshe( rg, 'texture_pass', 'mythcloth.ac',0, 'clothbox.jpg')
 eg:add_child('root','clothbox_entity',clothbox_entity)
 
-sphere_entity,sphere_renderer = commons.create_lit_meshe( rg, 'texture_pass', 'planet.ac',0, 'marbre.jpg')
-eg:add_child('root','sphere_entity',sphere_entity)
-
-
-
 cube_roty_mat = Matrix()
 
 cube_rotx_mat = Matrix()
-
-
 
 cube_pos_mat = Matrix()
 cube_pos_mat:translation( 0.0, 2.0, -15.0 )
@@ -59,6 +52,16 @@ clothbox_transform:add_matrix( "roty", cube_roty_mat )
 clothbox_transform:add_matrix( "rotx", cube_rotx_mat )
 clothbox_transform:add_matrix( "pos", cube_pos_mat )
 
+sphere_entity,sphere_renderer = commons.create_lit_meshe( rg, 'texture_pass', 'planet.ac',0, 'marbre.jpg')
+eg:add_child('root','sphere_entity',sphere_entity)
+
+
+sphere_pos_mat = Matrix()
+sphere_pos_mat:translation( -5.0, 2.0, -20.0 )
+
+sphere_transform = RawTransform()
+sphere_transform:configure(sphere_entity)
+sphere_transform:add_matrix( "pos", sphere_pos_mat )
 
 
 

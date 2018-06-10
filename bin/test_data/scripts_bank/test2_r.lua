@@ -5,6 +5,8 @@ clothbox_transform:release()
 commons.trash.meshe(rg, clothbox_entity, clothbox_renderer)
 eg:remove('clothbox_entity')
 
+sphere_transform:release()
+
 commons.trash.meshe(rg, sphere_entity, sphere_renderer)
 eg:remove('sphere_entity')
 
