@@ -261,7 +261,7 @@ commons.create_unlit_meshe = function( p_rendergraph, p_passname, p_meshefile, p
 
 end
 
-commons.create_lit_meshe = function( p_rendergraph, p_passname, p_meshefile, p_meshe_index, p_texturefile)
+commons.create_lit_meshe = function( p_rendergraph, p_passname, p_meshefile, p_meshe_index, p_texturefile, p_spherical_normales)
 	
 	local meshe_entity=Entity()
 	meshe_entity:add_aspect(RENDERING_ASPECT)
@@ -292,7 +292,7 @@ commons.create_lit_meshe = function( p_rendergraph, p_passname, p_meshefile, p_m
 	renderer:attach_toentity(meshe_entity)
 
 
-	renderer:configure(renderconfig,p_meshefile,p_meshe_index)
+	renderer:configure(renderconfig,p_meshefile,p_meshe_index,p_spherical_normales)
 
 	renderer:register_to_rendering(p_rendergraph)
 
