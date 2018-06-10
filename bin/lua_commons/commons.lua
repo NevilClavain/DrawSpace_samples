@@ -261,6 +261,45 @@ commons.create_unlit_meshe = function( p_rendergraph, p_passname, p_meshefile, p
 
 end
 
+commons.create_lit_meshe = function( p_rendergraph, p_passname, p_meshefile, p_meshe_index, p_texturefile)
+	
+	local meshe_entity=Entity()
+	meshe_entity:add_aspect(RENDERING_ASPECT)
+	meshe_entity:add_aspect(TRANSFORM_ASPECT)
+
+	local rss=RenderStatesSet()
+	rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
+	rss:add_renderstate_out(RENDERSTATE_OPE_ENABLEZBUFFER, "false")
+
+
+	local textures = TexturesSet()
+	textures:set_texturefiletostage(p_texturefile, 0)
+
+	local fxparams = FxParams()
+	fxparams:add_shaderfile('lit.vso',SHADER_COMPILED)
+	fxparams:add_shaderfile('lit.pso',SHADER_COMPILED)
+	fxparams:set_renderstatesset(rss)
+
+	rendercontext = RenderContext(p_passname)
+
+	rendercontext:add_fxparams(fxparams)
+	rendercontext:add_texturesset(textures)
+
+	renderconfig=RenderConfig()
+	renderconfig:add_rendercontext(rendercontext)
+
+	local renderer=MesheRendering()
+	renderer:attach_toentity(meshe_entity)
+
+
+	renderer:configure(renderconfig,p_meshefile,p_meshe_index)
+
+	renderer:register_to_rendering(p_rendergraph)
+
+	return meshe_entity, renderer
+
+end
+
 
 
 commons.create_colored_meshe = function( p_rendergraph, p_passname, p_meshefile, p_meshe_index)

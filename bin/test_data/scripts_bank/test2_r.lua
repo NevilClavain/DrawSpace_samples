@@ -1,9 +1,12 @@
 
 
-commons.trash.skybox(rg, sb_mod, skybox_entity, skybox_renderer, sb_transform)
-eg:remove('skybox_entity')
+clothbox_transform:release()
 
+commons.trash.meshe(rg, clothbox_entity, clothbox_renderer)
+eg:remove('clothbox_entity')
 
+commons.trash.meshe(rg, sphere_entity, sphere_renderer)
+eg:remove('sphere_entity')
 
 commons.trash.meshe(rg, ground_entity, ground_renderer)
 eg:remove('ground_entity')
