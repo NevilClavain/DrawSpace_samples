@@ -280,10 +280,13 @@ commons.create_lit_meshe = function( p_rendergraph, p_passname, p_meshefile, p_m
 	fxparams:add_shaderfile('lit.pso',SHADER_COMPILED)
 	fxparams:set_renderstatesset(rss)
 
+
 	rendercontext = RenderContext(p_passname)
 
 	rendercontext:add_fxparams(fxparams)
 	rendercontext:add_texturesset(textures)
+
+	rendercontext:add_shaderparam("ambient_color", 1, 0)
 
 	renderconfig=RenderConfig()
 	renderconfig:add_rendercontext(rendercontext)

@@ -1,4 +1,7 @@
 
+
+ambient_light = {r = 0.65, g = 0.0, b = 0.65, a = 0.0 }
+
 ctrl_key = FALSE
 last_key = 0
 
@@ -11,31 +14,25 @@ commons.init_final_pass(rg, 'final_pass')
 rg:create_child('final_pass', 'texture_pass', 0)
 
 
-
-
-
-
-
 text_renderer=TextRendering()
 text_renderer:configure(root_entity, "fps", 10, 40, 255, 0, 255, "??? fps")
-
-
-
-
 
 
 camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 0.0, renderer_infos[5],renderer_infos[6])
 eg:add_child('root','camera_entity',camera_entity)
 
 
-
-
-ground_entity, ground_renderer = commons.create_unlit_meshe( rg, 'texture_pass', 'water.ac',0, 'bloc1.jpg')
+ground_entity, ground_renderer = commons.create_lit_meshe( rg, 'texture_pass', 'water.ac',0, 'bloc1.jpg', FALSE)
 eg:add_child('root','ground_entity',ground_entity)
+
+ground_renderer:set_shaderrealvector( 'texture_pass', 'ambient_color', ambient_light.r, ambient_light.g, ambient_light.b, ambient_light.a )
+
 
 
 clothbox_entity,clothbox_renderer = commons.create_lit_meshe( rg, 'texture_pass', 'mythcloth.ac',0, 'clothbox.jpg', FALSE)
 eg:add_child('root','clothbox_entity',clothbox_entity)
+
+clothbox_renderer:set_shaderrealvector( 'texture_pass', 'ambient_color', ambient_light.r, ambient_light.g, ambient_light.b, ambient_light.a )
 
 cube_roty_mat = Matrix()
 
@@ -55,6 +52,7 @@ clothbox_transform:add_matrix( "pos", cube_pos_mat )
 sphere_entity,sphere_renderer = commons.create_lit_meshe( rg, 'texture_pass', 'planet.ac',0, 'marbre.jpg',TRUE)
 eg:add_child('root','sphere_entity',sphere_entity)
 
+sphere_renderer:set_shaderrealvector( 'texture_pass', 'ambient_color', ambient_light.r, ambient_light.g, ambient_light.b, ambient_light.a )
 
 sphere_pos_mat = Matrix()
 sphere_pos_mat:translation( -5.0, 2.0, -20.0 )
