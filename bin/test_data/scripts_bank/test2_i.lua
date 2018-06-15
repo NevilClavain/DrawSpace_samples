@@ -22,14 +22,74 @@ camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 0.0, renderer_inf
 eg:add_child('root','camera_entity',camera_entity)
 
 
-ground_entity, ground_renderer = commons.create_lit_meshe( rg, 'texture_pass', 'water.ac',0, 'bloc1.jpg', FALSE)
-eg:add_child('root','ground_entity',ground_entity)
+ground_entity_config = 
+{ 
+	texture_pass = 
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='lit.vso',mode=SHADER_COMPILED },
+				{ path='lit.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true"	}		
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+			}
+		},
+		textures =
+		{
+			{ path='bloc1.jpg', stage=0}
+		},
+		shaders_params =
+		{
+			{ param_name = "ambient_color", shader_index = 1, register = 0 }
+		}
+	}
+}
 
+ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'water.ac', 0, FALSE)
+eg:add_child('root','ground_entity',ground_entity)
 ground_renderer:set_shaderrealvector( 'texture_pass', 'ambient_color', ambient_light.r, ambient_light.g, ambient_light.b, ambient_light.a )
 
 
+clothbox_entity_config = 
+{ 
+	texture_pass = 
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='lit.vso',mode=SHADER_COMPILED },
+				{ path='lit.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true"	}		
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+			}
+		},
+		textures =
+		{
+			{ path='clothbox.jpg', stage=0}
+		},
+		shaders_params =
+		{
+			{ param_name = "ambient_color", shader_index = 1, register = 0 }
+		}
+	}
+}
 
-clothbox_entity,clothbox_renderer = commons.create_lit_meshe( rg, 'texture_pass', 'mythcloth.ac',0, 'clothbox.jpg', FALSE)
+clothbox_entity,clothbox_renderer = commons.create_rendered_meshe(rg, clothbox_entity_config, 'mythcloth.ac', 0, FALSE)
 eg:add_child('root','clothbox_entity',clothbox_entity)
 
 clothbox_renderer:set_shaderrealvector( 'texture_pass', 'ambient_color', ambient_light.r, ambient_light.g, ambient_light.b, ambient_light.a )
@@ -49,7 +109,38 @@ clothbox_transform:add_matrix( "roty", cube_roty_mat )
 clothbox_transform:add_matrix( "rotx", cube_rotx_mat )
 clothbox_transform:add_matrix( "pos", cube_pos_mat )
 
-sphere_entity,sphere_renderer = commons.create_lit_meshe( rg, 'texture_pass', 'planet.ac',0, 'marbre.jpg',TRUE)
+
+sphere_entity_config = 
+{ 
+	texture_pass = 
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='lit.vso',mode=SHADER_COMPILED },
+				{ path='lit.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true"	}		
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+			}
+		},
+		textures =
+		{
+			{ path='marbre.jpg', stage=0}
+		},
+		shaders_params =
+		{
+			{ param_name = "ambient_color", shader_index = 1, register = 0 }
+		}
+	}
+}
+sphere_entity,sphere_renderer = commons.create_rendered_meshe(rg, sphere_entity_config, 'planet.ac', 0, FALSE)
 eg:add_child('root','sphere_entity',sphere_entity)
 
 sphere_renderer:set_shaderrealvector( 'texture_pass', 'ambient_color', ambient_light.r, ambient_light.g, ambient_light.b, ambient_light.a )
