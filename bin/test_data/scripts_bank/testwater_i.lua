@@ -243,9 +243,74 @@ eg:add_child('root','skybox_entity',skybox_entity)
 skybox_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
 skybox_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_normale', 0.0, 1.0, 0.0, 1.0)
 
-
-
-land_entity, land_renderer = commons.create_unlit_landmeshe_mirror(rg, 'texture_pass', 'texturemirror_pass', 'land.ac',0, '012b2su2.jpg', 'hm.jpg')
+land_entity_config = 
+{ 
+	texture_pass = 
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='heightmap.vso',mode=SHADER_COMPILED },
+				{ path='heightmap.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true"	}		
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+			}
+		},
+		textures =
+		{
+			{ path='012b2su2.jpg', stage=0 }
+		},
+		vertex_textures =
+		{
+			{ path='hm.jpg', stage=0 }
+		},
+		shaders_params =
+		{
+		}
+	},
+	texturemirror_pass = 
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='heightmap_mirror.vso',mode=SHADER_COMPILED },
+				{ path='heightmap_mirror.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" },
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="ccw" },		
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
+			}
+		},
+		textures =
+		{
+			{ path='012b2su2.jpg', stage=0 }
+		},
+		vertex_textures =
+		{
+			{ path='hm.jpg', stage=0 }
+		},
+		shaders_params =
+		{
+			{ param_name = "reflector_pos", shader_index = 0, register = 24 },
+			{ param_name = "reflector_normale", shader_index = 0, register = 25 }
+		}	
+	}
+}
+land_entity, land_renderer = commons.create_rendered_meshe( rg, land_entity_config, 'land.ac', 0, FALSE )
 eg:add_child('root','land_entity',land_entity)
 
 land_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
