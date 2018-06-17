@@ -178,8 +178,7 @@ commons.create_rendered_meshe = function(p_rendergraph, p_config, p_meshefile, p
 	renderer:attach_toentity(meshe_entity)
 
 	for k, v in pairs(p_config) do
-		g:print(k)
-
+		--g:print(k)
 		local rendercontext = RenderContext(k)
 
 		local fxparams = FxParams()
@@ -217,6 +216,14 @@ commons.create_rendered_meshe = function(p_rendergraph, p_config, p_meshefile, p
 			textures:set_texturefiletostage(tx['path'], tx['stage'])
 		end
 
+		local vtextures = TexturesSet()
+		local vtx_config = v['vertex_textures']
+		for k2, v2 in pairs(vtx_config) do
+			local vtx = v2
+			--g:print(vtx['path']..'->'..vtx['stage'])
+			vtextures:set_texturefiletostage(vtx['path'], vtx['stage'])
+		end
+
 		local shaderparams_config = v['shaders_params']
 		for k2, v2 in pairs(shaderparams_config) do
 			local param = v2
@@ -226,6 +233,7 @@ commons.create_rendered_meshe = function(p_rendergraph, p_config, p_meshefile, p
 
 		rendercontext:add_fxparams(fxparams)
 		rendercontext:add_texturesset(textures)
+		rendercontext:add_vertextexturesset(vtextures)
 
 		renderconfig:add_rendercontext(rendercontext)
 	end
@@ -235,210 +243,6 @@ commons.create_rendered_meshe = function(p_rendergraph, p_config, p_meshefile, p
 	renderer:register_to_rendering(p_rendergraph)
 
 	return meshe_entity, renderer
-end
-
-
-commons.create_unlit_meshe = function( p_rendergraph, p_passname, p_meshefile, p_meshe_index, p_texturefile)
-	
-	local meshe_entity=Entity()
-	meshe_entity:add_aspect(RENDERING_ASPECT)
-	meshe_entity:add_aspect(TRANSFORM_ASPECT)
-
-	local rss=RenderStatesSet()
-	rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
-	rss:add_renderstate_out(RENDERSTATE_OPE_ENABLEZBUFFER, "false")
-
-
-	local textures = TexturesSet()
-	textures:set_texturefiletostage(p_texturefile, 0)
-
-	local fxparams = FxParams()
-	fxparams:add_shaderfile('texture.vso',SHADER_COMPILED)
-	fxparams:add_shaderfile('texture.pso',SHADER_COMPILED)
-	fxparams:set_renderstatesset(rss)
-
-	local rendercontext = RenderContext(p_passname)
-
-	rendercontext:add_fxparams(fxparams)
-	rendercontext:add_texturesset(textures)
-
-	local renderconfig=RenderConfig()
-	renderconfig:add_rendercontext(rendercontext)
-
-	local renderer=MesheRendering()
-	renderer:attach_toentity(meshe_entity)
-
-
-	renderer:configure(renderconfig,p_meshefile,p_meshe_index)
-
-	renderer:register_to_rendering(p_rendergraph)
-
-	return meshe_entity, renderer
-
-end
-
-commons.create_lit_meshe = function( p_rendergraph, p_passname, p_meshefile, p_meshe_index, p_texturefile, p_spherical_normales)
-	
-	local meshe_entity=Entity()
-	meshe_entity:add_aspect(RENDERING_ASPECT)
-	meshe_entity:add_aspect(TRANSFORM_ASPECT)
-
-	local rss=RenderStatesSet()
-	rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
-	rss:add_renderstate_out(RENDERSTATE_OPE_ENABLEZBUFFER, "false")
-
-
-	local textures = TexturesSet()
-	textures:set_texturefiletostage(p_texturefile, 0)
-
-	local fxparams = FxParams()
-	fxparams:add_shaderfile('lit.vso',SHADER_COMPILED)
-	fxparams:add_shaderfile('lit.pso',SHADER_COMPILED)
-	fxparams:set_renderstatesset(rss)
-
-
-	local rendercontext = RenderContext(p_passname)
-
-	rendercontext:add_fxparams(fxparams)
-	rendercontext:add_texturesset(textures)
-
-	rendercontext:add_shaderparam("ambient_color", 1, 0)
-
-	local renderconfig=RenderConfig()
-	renderconfig:add_rendercontext(rendercontext)
-
-	local renderer=MesheRendering()
-	renderer:attach_toentity(meshe_entity)
-
-
-	renderer:configure(renderconfig,p_meshefile,p_meshe_index,p_spherical_normales)
-
-	renderer:register_to_rendering(p_rendergraph)
-
-	return meshe_entity, renderer
-
-end
-
-
-
-commons.create_colored_meshe = function( p_rendergraph, p_passname, p_meshefile, p_meshe_index)
-	
-	local meshe_entity=Entity()
-	meshe_entity:add_aspect(RENDERING_ASPECT)
-	meshe_entity:add_aspect(TRANSFORM_ASPECT)
-
-	local rss=RenderStatesSet()
-	rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
-	rss:add_renderstate_out(RENDERSTATE_OPE_ENABLEZBUFFER, "false")
-
-
-	local textures = TexturesSet()
-
-	local fxparams = FxParams()
-	fxparams:add_shaderfile('color.vso',SHADER_COMPILED)
-	fxparams:add_shaderfile('color.pso',SHADER_COMPILED)
-	fxparams:set_renderstatesset(rss)
-
-	local rendercontext = RenderContext(p_passname)
-
-	rendercontext:add_fxparams(fxparams)
-	rendercontext:add_texturesset(textures)
-
-	local renderconfig=RenderConfig()
-	renderconfig:add_rendercontext(rendercontext)
-
-
-	rendercontext:add_shaderparam( "color", 1, 0 )
-
-	local renderer=MesheRendering()
-	renderer:attach_toentity(meshe_entity)
-
-
-	renderer:configure(renderconfig,p_meshefile,p_meshe_index)
-
-	renderer:register_to_rendering(p_rendergraph)
-
-
-	renderer:set_shaderrealvector(p_passname, "color", 1.0, 0.0, 1.0, 1.0 )
-
-	return meshe_entity, renderer
-
-end
-
-
-
-
-commons.create_unlit_meshe_mirror = function( p_rendergraph, p_passname, p_mirrorpassname, p_meshefile, p_meshe_index, p_texturefile)
-	
-	local meshe_entity=Entity()
-	meshe_entity:add_aspect(RENDERING_ASPECT)
-	meshe_entity:add_aspect(TRANSFORM_ASPECT)
-
-
-	local textures = TexturesSet()
-	textures:set_texturefiletostage(p_texturefile, 0)
-
-
-
-
-
-	local rss=RenderStatesSet()
-	rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
-	rss:add_renderstate_out(RENDERSTATE_OPE_ENABLEZBUFFER, "false")
-
-
-
-
-	local fxparams = FxParams()
-	fxparams:add_shaderfile('texture.vso',SHADER_COMPILED)
-	fxparams:add_shaderfile('texture.pso',SHADER_COMPILED)
-	fxparams:set_renderstatesset(rss)
-
-	local rendercontext = RenderContext(p_passname)
-
-	rendercontext:add_fxparams(fxparams)
-	rendercontext:add_texturesset(textures)
-
-
-
-
-
-	local mirror_rss=RenderStatesSet()
-
-	mirror_rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
-	mirror_rss:add_renderstate_in(RENDERSTATE_OPE_SETCULLING, "ccw")
-	mirror_rss:add_renderstate_out(RENDERSTATE_OPE_ENABLEZBUFFER, "false")
-	mirror_rss:add_renderstate_out(RENDERSTATE_OPE_SETCULLING, "cw")
-
-
-	local fxparams_mirror = FxParams()
-	fxparams_mirror:add_shaderfile('texture_mirror.vso',SHADER_COMPILED)
-	fxparams_mirror:add_shaderfile('texture_mirror.pso',SHADER_COMPILED)
-	fxparams_mirror:set_renderstatesset(mirror_rss)
-
-	rendercontext_mirror = RenderContext(p_mirrorpassname)
-	rendercontext_mirror:add_fxparams(fxparams_mirror)
-	rendercontext_mirror:add_texturesset(textures)
-
-	rendercontext_mirror:add_shaderparam("reflector_pos", 0, 24)
-	rendercontext_mirror:add_shaderparam("reflector_normale", 0, 25)
-
-
-
-	local renderconfig=RenderConfig()
-	renderconfig:add_rendercontext(rendercontext)
-	renderconfig:add_rendercontext(rendercontext_mirror)
-
-	local renderer=MesheRendering()
-	renderer:attach_toentity(meshe_entity)
-
-
-	renderer:configure(renderconfig,p_meshefile,p_meshe_index)
-
-	renderer:register_to_rendering(p_rendergraph)
-
-	return meshe_entity, renderer
-
 end
 
 

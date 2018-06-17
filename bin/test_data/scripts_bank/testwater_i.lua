@@ -46,75 +46,81 @@ waves_renderconfig:add_rendercontext(wave_rendercontext)
 rg:configure_pass_viewportquad_resources('wave_pass',waves_renderconfig)
 
 
-
-
-
-
-
 text_renderer=TextRendering()
 text_renderer:configure(root_entity, "fps", 320, 30, 255, 0, 255, "??? fps")
 
-
-
 root_entity:add_aspect(PHYSICS_ASPECT)
 root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
-
-
-
 
 
 camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 0.0, viewport_width, viewport_height)
 eg:add_child('root','camera_entity',camera_entity)
 
 
+ground_entity_config = 
+{ 
+	texture_pass = 
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='color.vso',mode=SHADER_COMPILED },
+				{ path='color.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true"	}		
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+			}
+		},
+		textures =
+		{
+		},
+		vertex_textures =
+		{
+		},
+		shaders_params =
+		{
+			{ param_name = "color", shader_index = 1, register = 0 }
+		}
+	},
+	bump_pass = 
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='water_bump.vso',mode=SHADER_COMPILED },
+				{ path='water_bump.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true"	}		
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+			}
+		},
+		textures =
+		{
+		},
+		vertex_textures =
+		{
+		},
+		shaders_params =
+		{
+		}	
+	}
+}
 
-ground_entity=Entity()
-ground_entity:add_aspect(RENDERING_ASPECT)
-ground_entity:add_aspect(TRANSFORM_ASPECT)
-
-color_rss=RenderStatesSet()
-color_rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
-color_rss:add_renderstate_out(RENDERSTATE_OPE_ENABLEZBUFFER, "false")
-color_textures = TexturesSet()
-color_fxparams = FxParams()
-color_fxparams:add_shaderfile('color.vso',SHADER_COMPILED)
-color_fxparams:add_shaderfile('color.pso',SHADER_COMPILED)
-color_fxparams:set_renderstatesset(color_rss)
-
-color_rendercontext = RenderContext('texture_pass')
-color_rendercontext:add_fxparams(color_fxparams)
-color_rendercontext:add_texturesset(color_textures)
-color_rendercontext:add_shaderparam( "color", 1, 0 )
-
-
-bump_rss=RenderStatesSet()
-bump_rss:add_renderstate_in(RENDERSTATE_OPE_ENABLEZBUFFER, "true")
-bump_rss:add_renderstate_out(RENDERSTATE_OPE_ENABLEZBUFFER, "false")
-bump_textures = TexturesSet()
-bump_fxparams = FxParams()
-bump_fxparams:add_shaderfile('water_bump.vso',SHADER_COMPILED)
-bump_fxparams:add_shaderfile('water_bump.pso',SHADER_COMPILED)
-bump_fxparams:set_renderstatesset(bump_rss)
-bump_rendercontext = RenderContext('bump_pass')
-bump_rendercontext:add_fxparams(bump_fxparams)
-bump_rendercontext:add_texturesset(bump_textures)
-
-
-ground_renderconfig=RenderConfig()
-ground_renderconfig:add_rendercontext(color_rendercontext)
-ground_renderconfig:add_rendercontext(bump_rendercontext)
-
-ground_renderer=MesheRendering()
-ground_renderer:attach_toentity(ground_entity)
-
-ground_renderer:configure(ground_renderconfig,'water.ac',0)
-
-ground_renderer:register_to_rendering(rg)
-
+ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'water.ac', 0, FALSE)
 ground_renderer:set_shaderrealvector('texture_pass', "color", 1.0, 0.0, 1.0, 1.0 )
-
 ground_renderer:set_passnodetexturefrompass(rg, 'wave_pass', 'bump_pass', 0)
-
 eg:add_child('root','ground_entity',ground_entity)
 
 ground_entity:add_aspect(BODY_ASPECT)
@@ -129,10 +135,72 @@ ground_body:configure_mode(COLLIDER_MODE)
 
 ground_body:configure_state(TRUE)
 
-
-
-
-cube_entity, cube_renderer = commons.create_unlit_meshe_mirror( rg, 'texture_pass', 'texturemirror_pass', 'object.ac',0, 'mars.jpg')
+cube_entity_config = 
+{ 
+	texture_pass = 
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='texture.vso',mode=SHADER_COMPILED },
+				{ path='texture.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true"	}		
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+			}
+		},
+		textures =
+		{
+			{ path='mars.jpg', stage=0 }
+		},
+		vertex_textures =
+		{
+		},
+		shaders_params =
+		{
+		}
+	},
+	texturemirror_pass = 
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='texture_mirror.vso',mode=SHADER_COMPILED },
+				{ path='texture_mirror.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" },
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="ccw" },		
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
+			}
+		},
+		textures =
+		{
+			{ path='mars.jpg', stage=0 }
+		},
+		vertex_textures =
+		{
+		},
+		shaders_params =
+		{
+			{ param_name = "reflector_pos", shader_index = 0, register = 24 },
+			{ param_name = "reflector_normale", shader_index = 0, register = 25 }
+		}	
+	}
+}
+cube_entity, cube_renderer = commons.create_rendered_meshe(rg, cube_entity_config, 'object.ac', 0, FALSE)
 eg:add_child('root','cube_entity',cube_entity)
 
 cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
@@ -387,8 +455,72 @@ add_cube = function()
 	local cube_entity
 	local cube_renderer
 
-	cube_entity, cube_renderer = commons.create_unlit_meshe_mirror( rg, 'texture_pass', 'texturemirror_pass', 'object.ac',0, 'Bloc1.jpg')
-
+	local cube_entity_config = 
+	{ 
+		texture_pass = 
+		{
+			fx = 
+			{
+				shaders = 
+				{
+					{ path='texture.vso',mode=SHADER_COMPILED },
+					{ path='texture.pso',mode=SHADER_COMPILED }
+				},
+				rs_in = 
+				{
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true"	}		
+				},
+				rs_out =
+				{
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+				}
+			},
+			textures =
+			{
+				{ path='Bloc1.jpg', stage=0 }
+			},
+			vertex_textures =
+			{
+			},
+			shaders_params =
+			{
+			}
+		},
+		texturemirror_pass = 
+		{
+			fx = 
+			{
+				shaders = 
+				{
+					{ path='texture_mirror.vso',mode=SHADER_COMPILED },
+					{ path='texture_mirror.pso',mode=SHADER_COMPILED }
+				},
+				rs_in = 
+				{
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" },
+					{ ope=RENDERSTATE_OPE_SETCULLING, value="ccw" },
+				},
+				rs_out =
+				{
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+					{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
+				}
+			},
+			textures =
+			{
+				{ path='Bloc1.jpg', stage=0 }
+			},
+			vertex_textures =
+			{
+			},
+			shaders_params =
+			{
+				{ param_name = "reflector_pos", shader_index = 0, register = 24 },
+				{ param_name = "reflector_normale", shader_index = 0, register = 25 }
+			}	
+		}
+	}
+	cube_entity, cube_renderer = commons.create_rendered_meshe(rg, cube_entity_config, 'object.ac', 0, FALSE)
 	eg:add_child('root',cube_name,cube_entity)
 
 	cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)

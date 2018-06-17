@@ -44,7 +44,10 @@ ground_entity_config =
 		},
 		textures =
 		{
-			{ path='bloc1.jpg', stage=0}
+			{ path='bloc1.jpg', stage=0 }
+		},
+		vertex_textures =
+		{
 		},
 		shaders_params =
 		{
@@ -81,6 +84,9 @@ clothbox_entity_config =
 		textures =
 		{
 			{ path='clothbox.jpg', stage=0}
+		},
+		vertex_textures =
+		{
 		},
 		shaders_params =
 		{
@@ -133,6 +139,9 @@ sphere_entity_config =
 		textures =
 		{
 			{ path='marbre.jpg', stage=0}
+		},
+		vertex_textures =
+		{
 		},
 		shaders_params =
 		{
