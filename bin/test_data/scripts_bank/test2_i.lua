@@ -8,7 +8,7 @@ lights =
 	light0 = 
 	{
 		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-		direction = { x = 1.0, y = -1.0, z = 0.0, w = 1.0 },
+		direction = { x = 1.0, y = -1.0, z = -6.0, w = 1.0 },
 	}
 }
 
@@ -27,6 +27,10 @@ update_lights = function( p_pass_id, p_lights_table, p_renderer_tables )
 		renderer:set_shaderrealvector( p_pass_id, 'lights_enabled', p_lights_table.lights_enabled.x, p_lights_table.lights_enabled.y, p_lights_table.lights_enabled.z, lights.lights_enabled.w )
 		renderer:set_shaderrealvector( p_pass_id, 'light0_color', p_lights_table.light0.color.r, p_lights_table.light0.color.g, p_lights_table.light0.color.b, lights.light0.color.a )
 		renderer:set_shaderrealvector( p_pass_id, 'light0_dir', p_lights_table.light0.direction.x, p_lights_table.light0.direction.y, p_lights_table.light0.direction.z, lights.light0.direction.w )
+
+		renderer:set_shaderrealvector( p_pass_id, 'light0_dir_v', p_lights_table.light0.direction.x, p_lights_table.light0.direction.y, p_lights_table.light0.direction.z, lights.light0.direction.w )
+		renderer:set_shaderrealvector( p_pass_id, 'lights_enabled_v', p_lights_table.lights_enabled.x, p_lights_table.lights_enabled.y, p_lights_table.lights_enabled.z, lights.lights_enabled.w )
+
 
 	end
 end
@@ -82,10 +86,13 @@ ground_entity_config =
 		},
 		shaders_params =
 		{
+		    { param_name = "lights_enabled_v", shader_index = 0, register = 24 },
+			{ param_name = "light0_dir_v", shader_index = 0, register = 25 },
 			{ param_name = "ambient_color", shader_index = 1, register = 0 },
 			{ param_name = "lights_enabled", shader_index = 1, register = 1 },
 			{ param_name = "light0_color", shader_index = 1, register = 2 },
-			{ param_name = "light0_dir", shader_index = 1, register = 3 }
+			{ param_name = "light0_dir", shader_index = 1, register = 3 },
+			{ param_name = "specular_flags", shader_index = 1, register = 7 }
 		}
 	}
 }
@@ -93,6 +100,7 @@ ground_entity_config =
 ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'water.ac', 0, FALSE)
 eg:add_child('root','ground_entity',ground_entity)
 
+ground_renderer:set_shaderrealvector( 'texture_pass', 'specular_flags', 0.0, 1050.0, 0.0, 0.0 )
 
 renderers[nb_renderers] = ground_renderer
 nb_renderers = nb_renderers + 1
@@ -126,10 +134,13 @@ clothbox_entity_config =
 		},
 		shaders_params =
 		{
+		    { param_name = "lights_enabled_v", shader_index = 0, register = 24 },
+			{ param_name = "light0_dir_v", shader_index = 0, register = 25 },
 			{ param_name = "ambient_color", shader_index = 1, register = 0 },
 			{ param_name = "lights_enabled", shader_index = 1, register = 1 },
 			{ param_name = "light0_color", shader_index = 1, register = 2 },
-			{ param_name = "light0_dir", shader_index = 1, register = 3 }
+			{ param_name = "light0_dir", shader_index = 1, register = 3 },
+			{ param_name = "specular_flags", shader_index = 1, register = 7 }
 		}
 	}
 }
@@ -137,6 +148,7 @@ clothbox_entity_config =
 clothbox_entity,clothbox_renderer = commons.create_rendered_meshe(rg, clothbox_entity_config, 'mythcloth.ac', 0, FALSE)
 eg:add_child('root','clothbox_entity',clothbox_entity)
 
+clothbox_renderer:set_shaderrealvector( 'texture_pass', 'specular_flags', 1.0, 35.0, 0.0, 0.0 )
 
 renderers[nb_renderers] = clothbox_renderer
 nb_renderers = nb_renderers + 1
@@ -187,17 +199,20 @@ sphere_entity_config =
 		},
 		shaders_params =
 		{
+		    { param_name = "lights_enabled_v", shader_index = 0, register = 24 },
+			{ param_name = "light0_dir_v", shader_index = 0, register = 25 },
 			{ param_name = "ambient_color", shader_index = 1, register = 0 },
 			{ param_name = "lights_enabled", shader_index = 1, register = 1 },
 			{ param_name = "light0_color", shader_index = 1, register = 2 },
-			{ param_name = "light0_dir", shader_index = 1, register = 3 }
+			{ param_name = "light0_dir", shader_index = 1, register = 3 },
+			{ param_name = "specular_flags", shader_index = 1, register = 7 }
 		}
 	}
 }
-sphere_entity,sphere_renderer = commons.create_rendered_meshe(rg, sphere_entity_config, 'planet.ac', 0, TRUE)
+sphere_entity,sphere_renderer = commons.create_rendered_meshe(rg, sphere_entity_config, 'sphere.ac', 0, TRUE)
 eg:add_child('root','sphere_entity',sphere_entity)
 
-
+sphere_renderer:set_shaderrealvector( 'texture_pass', 'specular_flags', 1.0, 100.0, 0.0, 0.0 )
 
 renderers[nb_renderers] = sphere_renderer
 nb_renderers = nb_renderers + 1
