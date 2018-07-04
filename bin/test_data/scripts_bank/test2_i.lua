@@ -92,7 +92,11 @@ ground_entity_config =
 			{ param_name = "lights_enabled", shader_index = 1, register = 1 },
 			{ param_name = "light0_color", shader_index = 1, register = 2 },
 			{ param_name = "light0_dir", shader_index = 1, register = 3 },
-			{ param_name = "specular_flags", shader_index = 1, register = 7 }
+			{ param_name = "specular_flags", shader_index = 1, register = 7 },
+			{ param_name = "self_emmissive", shader_index = 1, register = 8 },
+			{ param_name = "absorption", shader_index = 1, register = 9 },
+			{ param_name = "color", shader_index = 1, register = 10 },
+			{ param_name = "color_source", shader_index = 1, register = 11 }
 		}
 	}
 }
@@ -101,6 +105,10 @@ ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity
 eg:add_child('root','ground_entity',ground_entity)
 
 ground_renderer:set_shaderrealvector( 'texture_pass', 'specular_flags', 0.0, 1050.0, 0.0, 0.0 )
+ground_renderer:set_shaderrealvector( 'texture_pass', 'self_emmissive', 0.0, 1050.0, 0.0, 0.0 )
+ground_renderer:set_shaderrealvector( 'texture_pass', 'absorption', 0.0, 0.0, 0.0, 0.0 )
+ground_renderer:set_shaderrealvector( 'texture_pass', 'self_emmissive', 0.0, 0.0, 0.0, 0.0 )
+ground_renderer:set_shaderrealvector( 'texture_pass', 'color_source', 1.0, 1.0, 1.0, 1.0 )
 
 renderers[nb_renderers] = ground_renderer
 nb_renderers = nb_renderers + 1
@@ -140,7 +148,11 @@ clothbox_entity_config =
 			{ param_name = "lights_enabled", shader_index = 1, register = 1 },
 			{ param_name = "light0_color", shader_index = 1, register = 2 },
 			{ param_name = "light0_dir", shader_index = 1, register = 3 },
-			{ param_name = "specular_flags", shader_index = 1, register = 7 }
+			{ param_name = "specular_flags", shader_index = 1, register = 7 },
+			{ param_name = "self_emmissive", shader_index = 1, register = 8 },
+			{ param_name = "absorption", shader_index = 1, register = 9 },
+			{ param_name = "color", shader_index = 1, register = 10 },
+			{ param_name = "color_source", shader_index = 1, register = 11 }
 		}
 	}
 }
@@ -149,6 +161,11 @@ clothbox_entity,clothbox_renderer = commons.create_rendered_meshe(rg, clothbox_e
 eg:add_child('root','clothbox_entity',clothbox_entity)
 
 clothbox_renderer:set_shaderrealvector( 'texture_pass', 'specular_flags', 1.0, 35.0, 0.0, 0.0 )
+clothbox_renderer:set_shaderrealvector( 'texture_pass', 'absorption', 0.0, 0.0, 0.0, 0.0 )
+clothbox_renderer:set_shaderrealvector( 'texture_pass', 'self_emmissive', 0.0, 0.0, 0.0, 0.0 )
+clothbox_renderer:set_shaderrealvector( 'texture_pass', 'color_source', 1.0, 1.0, 1.0, 1.0 )
+
+
 
 renderers[nb_renderers] = clothbox_renderer
 nb_renderers = nb_renderers + 1
@@ -205,7 +222,11 @@ sphere_entity_config =
 			{ param_name = "lights_enabled", shader_index = 1, register = 1 },
 			{ param_name = "light0_color", shader_index = 1, register = 2 },
 			{ param_name = "light0_dir", shader_index = 1, register = 3 },
-			{ param_name = "specular_flags", shader_index = 1, register = 7 }
+			{ param_name = "specular_flags", shader_index = 1, register = 7 },
+			{ param_name = "self_emmissive", shader_index = 1, register = 8 },
+			{ param_name = "absorption", shader_index = 1, register = 9 },
+			{ param_name = "color", shader_index = 1, register = 10 },
+			{ param_name = "color_source", shader_index = 1, register = 11 }
 		}
 	}
 }
@@ -213,6 +234,12 @@ sphere_entity,sphere_renderer = commons.create_rendered_meshe(rg, sphere_entity_
 eg:add_child('root','sphere_entity',sphere_entity)
 
 sphere_renderer:set_shaderrealvector( 'texture_pass', 'specular_flags', 1.0, 100.0, 0.0, 0.0 )
+sphere_renderer:set_shaderrealvector( 'texture_pass', 'absorption', 0.0, 0.0, 0.0, 0.0 )
+sphere_renderer:set_shaderrealvector( 'texture_pass', 'self_emmissive', 0.0, 0.0, 0.0, 0.0 )
+sphere_renderer:set_shaderrealvector( 'texture_pass', 'color', 0.0, 0.0, 0.0, 0.0 )
+sphere_renderer:set_shaderrealvector( 'texture_pass', 'color_source', 1.0, 1.0, 1.0, 1.0 )
+
+
 
 renderers[nb_renderers] = sphere_renderer
 nb_renderers = nb_renderers + 1
