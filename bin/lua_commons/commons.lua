@@ -245,6 +245,70 @@ commons.create_rendered_meshe = function(p_rendergraph, p_config, p_meshefile, p
 	return meshe_entity, renderer
 end
 
+commons.update_lights = function( p_pass_id, p_lights_table, p_renderer_tables )
+
+	for k, v in pairs(p_renderer_tables) do
+		
+		local renderer = v
+
+		renderer:set_shaderrealvector( p_pass_id, 'ambient_color', p_lights_table.ambient_light.r, p_lights_table.ambient_light.g, p_lights_table.ambient_light.b, p_lights_table.ambient_light.a )
+		renderer:set_shaderrealvector( p_pass_id, 'lights_enabled', p_lights_table.lights_enabled.x, p_lights_table.lights_enabled.y, p_lights_table.lights_enabled.z, lights.lights_enabled.w )
+		renderer:set_shaderrealvector( p_pass_id, 'light0_color', p_lights_table.light0.color.r, p_lights_table.light0.color.g, p_lights_table.light0.color.b, lights.light0.color.a )
+		renderer:set_shaderrealvector( p_pass_id, 'light0_dir', p_lights_table.light0.direction.x, p_lights_table.light0.direction.y, p_lights_table.light0.direction.z, lights.light0.direction.w )
+
+		renderer:set_shaderrealvector( p_pass_id, 'light0_dir_v', p_lights_table.light0.direction.x, p_lights_table.light0.direction.y, p_lights_table.light0.direction.z, lights.light0.direction.w )
+		renderer:set_shaderrealvector( p_pass_id, 'lights_enabled_v', p_lights_table.lights_enabled.x, p_lights_table.lights_enabled.y, p_lights_table.lights_enabled.z, lights.lights_enabled.w )
+
+
+	end
+end
+
+-- create a table with all required parameters for lit vertex and pixel shaders (lit.vso, lit.pso)
+commons.setup_lit_shader_params = function()
+
+	shaders_params_table = {}
+	
+	shaders_params_table[0] = { param_name = "lights_enabled_v", shader_index = 0, register = 24 }
+	shaders_params_table[1] = { param_name = "light0_dir_v", shader_index = 0, register = 25 }
+	shaders_params_table[2] = { param_name = "ambient_color", shader_index = 1, register = 0 }
+	shaders_params_table[3] = { param_name = "lights_enabled", shader_index = 1, register = 1 }
+	shaders_params_table[4] = { param_name = "light0_color", shader_index = 1, register = 2 }
+	shaders_params_table[5] = { param_name = "light0_dir", shader_index = 1, register = 3 }
+	shaders_params_table[6] = { param_name = "specular_flags", shader_index = 1, register = 7 }
+	shaders_params_table[7] = { param_name = "self_emissive", shader_index = 1, register = 8 }
+	shaders_params_table[8] = { param_name = "absorption", shader_index = 1, register = 9 }
+	shaders_params_table[9] = { param_name = "color", shader_index = 1, register = 10 }
+	shaders_params_table[10] = { param_name = "color_source", shader_index = 1, register = 11 }
+
+	return shaders_params_table
+end
+
+
+commons.apply_material = function(p_material, p_renderer, p_pass_id)
+	
+	if p_material['specular_power'] ~= nil then
+		p_renderer:set_shaderrealvector( p_pass_id, 'specular_flags', 1.0, p_material['specular_power'], 0.0, 0.0 )
+	else
+		p_renderer:set_shaderrealvector( p_pass_id, 'specular_flags', 0.0, 0.0, 0.0, 0.0 )
+	end
+
+	if p_material['color_source'] ~= nil then
+		p_renderer:set_shaderrealvector( p_pass_id, 'color_source', p_material['color_source']['r'], p_material['color_source']['g'], p_material['color_source']['b'], p_material['color_source']['a'] )
+	end
+
+	if p_material['simple_color'] ~= nil then
+		p_renderer:set_shaderrealvector( p_pass_id, 'color', p_material['simple_color']['r'], p_material['simple_color']['g'], p_material['simple_color']['b'], p_material['simple_color']['a'] )
+	end
+
+	if p_material['self_emissive'] ~= nil then
+		p_renderer:set_shaderrealvector( p_pass_id, 'self_emissive', p_material['self_emissive']['r'], p_material['self_emissive']['g'], p_material['self_emissive']['b'], p_material['self_emissive']['a'] )
+	end
+
+	if p_material['light_absorption'] ~= nil then
+		p_renderer:set_shaderrealvector( p_pass_id, 'absorption', p_material['light_absorption']['r'], p_material['light_absorption']['g'], p_material['light_absorption']['b'], p_material['light_absorption']['a'] )
+	end
+end
+
 
 commons.trash.skybox = function(p_rendergraph, p_module, p_entity, p_renderer, p_transform)
 

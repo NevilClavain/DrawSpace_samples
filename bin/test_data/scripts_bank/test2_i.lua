@@ -8,7 +8,7 @@ lights =
 	light0 = 
 	{
 		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-		direction = { x = 100.0, y = -1.0, z = 0.0, w = 1.0 },
+		direction = { x = -1.0, y = 0.0, z = 0.0, w = 1.0 },
 	}
 }
 
@@ -17,43 +17,6 @@ renderers =
 }
 nb_renderers = 0;
 
-update_lights = function( p_pass_id, p_lights_table, p_renderer_tables )
-
-	for k, v in pairs(p_renderer_tables) do
-		
-		local renderer = v
-
-		renderer:set_shaderrealvector( p_pass_id, 'ambient_color', p_lights_table.ambient_light.r, p_lights_table.ambient_light.g, p_lights_table.ambient_light.b, p_lights_table.ambient_light.a )
-		renderer:set_shaderrealvector( p_pass_id, 'lights_enabled', p_lights_table.lights_enabled.x, p_lights_table.lights_enabled.y, p_lights_table.lights_enabled.z, lights.lights_enabled.w )
-		renderer:set_shaderrealvector( p_pass_id, 'light0_color', p_lights_table.light0.color.r, p_lights_table.light0.color.g, p_lights_table.light0.color.b, lights.light0.color.a )
-		renderer:set_shaderrealvector( p_pass_id, 'light0_dir', p_lights_table.light0.direction.x, p_lights_table.light0.direction.y, p_lights_table.light0.direction.z, lights.light0.direction.w )
-
-		renderer:set_shaderrealvector( p_pass_id, 'light0_dir_v', p_lights_table.light0.direction.x, p_lights_table.light0.direction.y, p_lights_table.light0.direction.z, lights.light0.direction.w )
-		renderer:set_shaderrealvector( p_pass_id, 'lights_enabled_v', p_lights_table.lights_enabled.x, p_lights_table.lights_enabled.y, p_lights_table.lights_enabled.z, lights.lights_enabled.w )
-
-
-	end
-end
-
--- create a table with all required parameters for lit vertex and pixel shaders (lit.vso, lit.pso)
-setup_lit_shader_params = function()
-
-	shaders_params_table = {}
-	
-	shaders_params_table[0] = { param_name = "lights_enabled_v", shader_index = 0, register = 24 }
-	shaders_params_table[1] = { param_name = "light0_dir_v", shader_index = 0, register = 25 }
-	shaders_params_table[2] = { param_name = "ambient_color", shader_index = 1, register = 0 }
-	shaders_params_table[3] = { param_name = "lights_enabled", shader_index = 1, register = 1 }
-	shaders_params_table[4] = { param_name = "light0_color", shader_index = 1, register = 2 }
-	shaders_params_table[5] = { param_name = "light0_dir", shader_index = 1, register = 3 }
-	shaders_params_table[6] = { param_name = "specular_flags", shader_index = 1, register = 7 }
-	shaders_params_table[7] = { param_name = "self_emissive", shader_index = 1, register = 8 }
-	shaders_params_table[8] = { param_name = "absorption", shader_index = 1, register = 9 }
-	shaders_params_table[9] = { param_name = "color", shader_index = 1, register = 10 }
-	shaders_params_table[10] = { param_name = "color_source", shader_index = 1, register = 11 }
-
-	return shaders_params_table
-end
 
 
 ctrl_key = FALSE
@@ -104,17 +67,22 @@ ground_entity_config =
 		{
 		},
 
-		shaders_params = setup_lit_shader_params()
+		shaders_params = commons.setup_lit_shader_params()
 	}
 }
 
 ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'water.ac', 0, FALSE)
 eg:add_child('root','ground_entity',ground_entity)
 
-ground_renderer:set_shaderrealvector( 'texture_pass', 'specular_flags', 0.0, 1050.0, 0.0, 0.0 )
-ground_renderer:set_shaderrealvector( 'texture_pass', 'absorption', 0.0, 0.0, 0.0, 0.0 )
-ground_renderer:set_shaderrealvector( 'texture_pass', 'self_emissive', 0.0, 0.0, 0.0, 0.0 )
-ground_renderer:set_shaderrealvector( 'texture_pass', 'color_source', 1.0, 1.0, 1.0, 1.0 )
+ground_material =
+{
+	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
+	simple_color = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+}
+
+commons.apply_material( ground_material, ground_renderer, 'texture_pass')
 
 renderers[nb_renderers] = ground_renderer
 nb_renderers = nb_renderers + 1
@@ -147,7 +115,7 @@ clothbox_entity_config =
 		{
 		},
 
-		shaders_params = setup_lit_shader_params()
+		shaders_params = commons.setup_lit_shader_params()
 	}
 }
 
@@ -156,12 +124,16 @@ clothbox_entity_config =
 clothbox_entity,clothbox_renderer = commons.create_rendered_meshe(rg, clothbox_entity_config, 'mythcloth.ac', 0, FALSE)
 eg:add_child('root','clothbox_entity',clothbox_entity)
 
-clothbox_renderer:set_shaderrealvector( 'texture_pass', 'specular_flags', 1.0, 35.0, 0.0, 0.0 )
-clothbox_renderer:set_shaderrealvector( 'texture_pass', 'absorption', 0.0, 0.0, 0.0, 0.0 )
-clothbox_renderer:set_shaderrealvector( 'texture_pass', 'self_emissive', 0.0, 0.0, 0.0, 0.0 )
-clothbox_renderer:set_shaderrealvector( 'texture_pass', 'color_source', 1.0, 1.0, 1.0, 1.0 )
+clothbox_material =
+{
+	specular_power = 35.0,
+	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
+	simple_color = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+}
 
-
+commons.apply_material( clothbox_material, clothbox_renderer, 'texture_pass')
 
 renderers[nb_renderers] = clothbox_renderer
 nb_renderers = nb_renderers + 1
@@ -211,7 +183,7 @@ sphere_entity_config =
 		{
 		},
 
-		shaders_params = setup_lit_shader_params()
+		shaders_params = commons.setup_lit_shader_params()
 	}
 }
 sphere_entity,sphere_renderer = commons.create_rendered_meshe(rg, sphere_entity_config, 'sphere.ac', 0, TRUE)
@@ -221,33 +193,13 @@ eg:add_child('root','sphere_entity',sphere_entity)
 sphere_material =
 {
 	specular_power = 100.0,
-	color_source = { 0.0, 0.0, 0.0, 0.0 },
-	color = { 1.0, 0.0, 1.0, 0.0 },
+	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
+	simple_color = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 }
 
-apply_material = function(p_material, p_renderer, p_pass_id)
-	
-	if p_material['specular_power'] ~= nil then
-
-		sphere_renderer:set_shaderrealvector( p_pass_id, 'specular_flags', 1.0, p_material['specular_power'], 0.0, 0.0 )
-
-	else
-		sphere_renderer:set_shaderrealvector( p_pass_id, 'specular_flags', 0.0, 0.0, 0.0, 0.0 )
-		
-	end
-
-end
-
-apply_material( sphere_material, sphere_renderer, 'texture_pass')
-
---[[
-sphere_renderer:set_shaderrealvector( 'texture_pass', 'specular_flags', 1.0, 100.0, 0.0, 0.0 )
-sphere_renderer:set_shaderrealvector( 'texture_pass', 'absorption', 0.0, 0.0, 0.0, 0.0 )
-sphere_renderer:set_shaderrealvector( 'texture_pass', 'self_emissive', 0.0, 0.0, 0.0, 0.0 )
-sphere_renderer:set_shaderrealvector( 'texture_pass', 'color', 0.0, 0.0, 0.0, 0.0 )
-sphere_renderer:set_shaderrealvector( 'texture_pass', 'color_source', 1.0, 1.0, 1.0, 1.0 )
-]]
-
+commons.apply_material( sphere_material, sphere_renderer, 'texture_pass')
 
 renderers[nb_renderers] = sphere_renderer
 nb_renderers = nb_renderers + 1
@@ -260,7 +212,7 @@ sphere_transform:configure(sphere_entity)
 sphere_transform:add_matrix( "pos", sphere_pos_mat )
 
 
-update_lights( 'texture_pass', lights, renderers )
+commons.update_lights( 'texture_pass', lights, renderers )
 
 
 -- ///////////////////////////////
