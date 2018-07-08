@@ -118,7 +118,7 @@ ground_entity_config =
 	}
 }
 
-ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'water.ac', 0, FALSE)
+ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'water.ac', 0)
 ground_renderer:set_shaderrealvector('texture_pass', "color", 1.0, 0.0, 1.0, 1.0 )
 ground_renderer:set_passnodetexturefrompass(rg, 'wave_pass', 'bump_pass', 0)
 eg:add_child('root','ground_entity',ground_entity)
@@ -200,7 +200,7 @@ cube_entity_config =
 		}	
 	}
 }
-cube_entity, cube_renderer = commons.create_rendered_meshe(rg, cube_entity_config, 'object.ac', 0, FALSE)
+cube_entity, cube_renderer = commons.create_rendered_meshe(rg, cube_entity_config, 'object.ac', 0)
 eg:add_child('root','cube_entity',cube_entity)
 
 cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
@@ -310,7 +310,7 @@ land_entity_config =
 		}	
 	}
 }
-land_entity, land_renderer = commons.create_rendered_meshe( rg, land_entity_config, 'land.ac', 0, FALSE )
+land_entity, land_renderer = commons.create_rendered_meshe( rg, land_entity_config, 'land.ac', 0)
 eg:add_child('root','land_entity',land_entity)
 
 land_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
@@ -585,7 +585,7 @@ add_cube = function()
 			}	
 		}
 	}
-	cube_entity, cube_renderer = commons.create_rendered_meshe(rg, cube_entity_config, 'object.ac', 0, FALSE)
+	cube_entity, cube_renderer = commons.create_rendered_meshe(rg, cube_entity_config, 'object.ac', 0)
 	eg:add_child('root',cube_name,cube_entity)
 
 	cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)

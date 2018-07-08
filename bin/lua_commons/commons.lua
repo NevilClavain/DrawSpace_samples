@@ -166,7 +166,7 @@ commons.create_skybox_with_mirror = function(p_passid, p_mirrorpassid, p_renderg
 	return skybox_entity, skybox_renderer, sb_transform
 end
 
-commons.create_rendered_meshe = function(p_rendergraph, p_config, p_meshefile, p_meshe_index, p_spherical_normales)
+commons.create_rendered_meshe = function(p_rendergraph, p_config, p_meshefile, p_meshe_index)
 
 	local meshe_entity=Entity()
 	meshe_entity:add_aspect(RENDERING_ASPECT)
@@ -238,7 +238,7 @@ commons.create_rendered_meshe = function(p_rendergraph, p_config, p_meshefile, p
 		renderconfig:add_rendercontext(rendercontext)
 	end
 
-	renderer:configure(renderconfig, p_meshefile, p_meshe_index, p_spherical_normales)
+	renderer:configure(renderconfig, p_meshefile, p_meshe_index)
 
 	renderer:register_to_rendering(p_rendergraph)
 

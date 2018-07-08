@@ -18,7 +18,6 @@ renderers =
 nb_renderers = 0;
 
 
-
 ctrl_key = FALSE
 last_key = 0
 
@@ -71,7 +70,7 @@ ground_entity_config =
 	}
 }
 
-ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'water.ac', 0, FALSE)
+ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'water.ac', 0)
 eg:add_child('root','ground_entity',ground_entity)
 
 ground_material =
@@ -121,7 +120,7 @@ clothbox_entity_config =
 
 
 
-clothbox_entity,clothbox_renderer = commons.create_rendered_meshe(rg, clothbox_entity_config, 'mythcloth.ac', 0, FALSE)
+clothbox_entity,clothbox_renderer = commons.create_rendered_meshe(rg, clothbox_entity_config, 'mythcloth.ac', 0)
 eg:add_child('root','clothbox_entity',clothbox_entity)
 
 clothbox_material =
@@ -186,7 +185,7 @@ sphere_entity_config =
 		shaders_params = commons.setup_lit_shader_params()
 	}
 }
-sphere_entity,sphere_renderer = commons.create_rendered_meshe(rg, sphere_entity_config, 'sphere.ac', 0, TRUE)
+sphere_entity,sphere_renderer = commons.create_rendered_meshe(rg, sphere_entity_config, 'sphere.ac', 0)
 eg:add_child('root','sphere_entity',sphere_entity)
 
 
