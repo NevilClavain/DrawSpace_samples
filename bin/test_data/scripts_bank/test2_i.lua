@@ -8,7 +8,7 @@ lights =
 	light0 = 
 	{
 		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-		direction = { x = -1.0, y = 0.0, z = 0.0, w = 1.0 },
+		direction = { x = 1.0, y = -0.50, z = 0.0, w = 1.0 },
 	}
 }
 
@@ -176,7 +176,8 @@ sphere_entity_config =
 		},
 		textures =
 		{
-			{ path='marbre.jpg', stage=0}
+			{ path='marbre.jpg', stage=0},
+			{ path='bump.bmp', stage=1}
 		},
 		vertex_textures =
 		{
