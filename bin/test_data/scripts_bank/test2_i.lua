@@ -4,7 +4,7 @@
 lights = 
 {
 	ambient_light = {r = 0.15, g = 0.0, b = 0.0, a = 0.0 },
-	lights_enabled = {x = 1.0, y = 0.0, z = 0.0 },
+	lights_enabled = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
 	light0 = 
 	{
 		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
@@ -192,11 +192,12 @@ eg:add_child('root','sphere_entity',sphere_entity)
 
 sphere_material =
 {
-	specular_power = 100.0,
+	specular_power = 200.0,
 	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-	simple_color = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	simple_color = { r = 1.0, g = 0.0, b = 0.0, a = 0.0 },
 	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 	self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	bump_mapping = { texture_size = 512, bias = 0.45 }
 }
 
 commons.apply_material( sphere_material, sphere_renderer, 'texture_pass')

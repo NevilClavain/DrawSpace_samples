@@ -274,7 +274,7 @@ commons.setup_lit_shader_params = function()
 	shaders_params_table[3] = { param_name = "lights_enabled", shader_index = 1, register = 1 }
 	shaders_params_table[4] = { param_name = "light0_color", shader_index = 1, register = 2 }
 	shaders_params_table[5] = { param_name = "light0_dir", shader_index = 1, register = 3 }
-	shaders_params_table[6] = { param_name = "specular_flags", shader_index = 1, register = 7 }
+	shaders_params_table[6] = { param_name = "flags", shader_index = 1, register = 7 }
 	shaders_params_table[7] = { param_name = "self_emissive", shader_index = 1, register = 8 }
 	shaders_params_table[8] = { param_name = "absorption", shader_index = 1, register = 9 }
 	shaders_params_table[9] = { param_name = "color", shader_index = 1, register = 10 }
@@ -286,11 +286,21 @@ end
 
 commons.apply_material = function(p_material, p_renderer, p_pass_id)
 	
-	if p_material['specular_power'] ~= nil then
-		p_renderer:set_shaderrealvector( p_pass_id, 'specular_flags', 1.0, p_material['specular_power'], 0.0, 0.0 )
-	else
-		p_renderer:set_shaderrealvector( p_pass_id, 'specular_flags', 0.0, 0.0, 0.0, 0.0 )
+	local texture_size = 512.0
+	local bump_bias = -1.0
+	local specular_power = -1.0;
+
+
+	if p_material['bump_mapping'] ~= nil then
+	  bump_bias = p_material['bump_mapping']['bias']
+	  texture_size = p_material['bump_mapping']['texture_size']
 	end
+
+	if p_material['specular_power'] ~= nil then
+		specular_power = p_material['specular_power']
+	end
+
+	p_renderer:set_shaderrealvector( p_pass_id, 'flags', specular_power, bump_bias, texture_size, 0.0 )
 
 	if p_material['color_source'] ~= nil then
 		p_renderer:set_shaderrealvector( p_pass_id, 'color_source', p_material['color_source']['r'], p_material['color_source']['g'], p_material['color_source']['b'], p_material['color_source']['a'] )
