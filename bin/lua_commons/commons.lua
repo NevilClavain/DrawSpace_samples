@@ -358,3 +358,20 @@ commons.trash.final_pass = function(p_rendergraph, p_passid)
 	p_rendergraph:remove_pass_viewportquad(p_passid)
 end
 
+-- ready-to-use materials
+
+commons.unlit_texture_material =
+{
+	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
+	simple_color = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	light_absorption = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
+	self_emissive = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
+}
+
+commons.unlit_color_material =
+{
+	color_source = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	simple_color = { r = 0.0, g = 1.0, b = 0.0, a = 0.0 },
+	light_absorption = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
+	self_emissive = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
+}

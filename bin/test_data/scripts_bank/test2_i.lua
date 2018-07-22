@@ -108,7 +108,8 @@ clothbox_entity_config =
 		},
 		textures =
 		{
-			{ path='clothbox.jpg', stage=0}
+			{ path='clothbox.jpg', stage=0},
+			{ path='box_bump.bmp', stage=1}
 		},
 		vertex_textures =
 		{
@@ -125,11 +126,12 @@ eg:add_child('root','clothbox_entity',clothbox_entity)
 
 clothbox_material =
 {
-	specular_power = 35.0,
+	specular_power = 180.0,
 	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
 	simple_color = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 	self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	bump_mapping = { texture_size = 2800, bias = 0.1 }
 }
 
 commons.apply_material( clothbox_material, clothbox_renderer, 'texture_pass')
