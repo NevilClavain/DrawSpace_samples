@@ -3,7 +3,7 @@
 
 lights = 
 {
-	ambient_light = {r = 0.15, g = 0.0, b = 0.0, a = 0.0 },
+	ambient_light = {r = 0.33, g = 0.33, b = 0.33, a = 0.0 },
 	lights_enabled = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
 	light0 = 
 	{
@@ -213,6 +213,64 @@ sphere_pos_mat:translation( -5.0, 2.0, -20.0 )
 sphere_transform = RawTransform()
 sphere_transform:configure(sphere_entity)
 sphere_transform:add_matrix( "pos", sphere_pos_mat )
+
+
+rock_entity_config = 
+{ 
+	texture_pass = 
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='lit.vso',mode=SHADER_COMPILED },
+				{ path='lit.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true"	}		
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+			}
+		},
+		textures =
+		{
+			{ path='rock08.bmp', stage=0}
+		},
+		vertex_textures =
+		{
+		},
+
+		shaders_params = commons.setup_lit_shader_params()
+	}
+}
+rock_entity,rock_renderer = commons.create_rendered_meshe(rg, rock_entity_config, 'rock.ac', 0)
+eg:add_child('root','rock_entity',rock_entity)
+
+rock_material =
+{
+	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
+	simple_color = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+}
+
+commons.apply_material( rock_material, rock_renderer, 'texture_pass')
+
+
+renderers[nb_renderers] = rock_renderer
+nb_renderers = nb_renderers + 1
+
+rock_pos_mat = Matrix()
+rock_pos_mat:translation( -9.0, 6.0, -20.0 )
+
+rock_transform = RawTransform()
+rock_transform:configure(rock_entity)
+rock_transform:add_matrix( "pos", rock_pos_mat )
+
+
 
 
 commons.update_lights( 'texture_pass', lights, renderers )
