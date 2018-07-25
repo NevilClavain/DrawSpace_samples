@@ -34,7 +34,12 @@ text_renderer=TextRendering()
 text_renderer:configure(root_entity, "fps", 10, 40, 255, 0, 255, "??? fps")
 
 
-camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 0.0, renderer_infos[5],renderer_infos[6])
+root_entity:add_aspect(PHYSICS_ASPECT)
+root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
+
+
+
+camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 20.0, renderer_infos[5],renderer_infos[6])
 eg:add_child('root','camera_entity',camera_entity)
 
 
@@ -72,6 +77,18 @@ ground_entity_config =
 
 ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'water.ac', 0)
 eg:add_child('root','ground_entity',ground_entity)
+
+ground_entity:add_aspect(BODY_ASPECT)
+ground_body=Body()
+
+ground_body:attach_toentity(ground_entity)
+
+ground_body:configure_shape( SHAPE_BOX, 100, 0.0, 100.0)
+
+
+ground_body:configure_mode(COLLIDER_MODE)
+
+ground_body:configure_state(TRUE)
 
 ground_material =
 {
@@ -192,6 +209,27 @@ sphere_entity,sphere_renderer = commons.create_rendered_meshe(rg, sphere_entity_
 eg:add_child('root','sphere_entity',sphere_entity)
 
 
+sphere_entity:add_aspect(BODY_ASPECT)
+local sphere_body=Body()
+
+sphere_body:attach_toentity(sphere_entity)
+
+sphere_body:configure_shape( SHAPE_SPHERE, 1.0)
+
+
+sphere_pos_mat = Matrix()
+
+sphere_pos_mat:translation( 0.0, 20.0, 0.0 )
+
+sphere_body:configure_attitude(sphere_pos_mat)
+
+sphere_body:configure_mass(80.0)
+
+sphere_body:configure_mode(BODY_MODE)
+
+sphere_body:configure_state(TRUE)
+
+
 sphere_material =
 {
 	specular_power = 200.0,
@@ -206,14 +244,6 @@ commons.apply_material( sphere_material, sphere_renderer, 'texture_pass')
 
 renderers[nb_renderers] = sphere_renderer
 nb_renderers = nb_renderers + 1
-
-sphere_pos_mat = Matrix()
-sphere_pos_mat:translation( -5.0, 2.0, -20.0 )
-
-sphere_transform = RawTransform()
-sphere_transform:configure(sphere_entity)
-sphere_transform:add_matrix( "pos", sphere_pos_mat )
-
 
 rock_entity_config = 
 { 
@@ -263,6 +293,8 @@ commons.apply_material( rock_material, rock_renderer, 'texture_pass')
 renderers[nb_renderers] = rock_renderer
 nb_renderers = nb_renderers + 1
 
+
+--[[
 rock_pos_mat = Matrix()
 rock_pos_mat:translation( -9.0, 6.0, -20.0 )
 
@@ -270,7 +302,7 @@ rock_transform = RawTransform()
 rock_transform:configure(rock_entity)
 rock_transform:add_matrix( "pos", rock_pos_mat )
 
-
+]]
 
 
 commons.update_lights( 'texture_pass', lights, renderers )
