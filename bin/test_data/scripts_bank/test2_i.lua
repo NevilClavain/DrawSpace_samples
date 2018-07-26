@@ -219,7 +219,7 @@ sphere_body:configure_shape( SHAPE_SPHERE, 1.0)
 
 sphere_pos_mat = Matrix()
 
-sphere_pos_mat:translation( 0.0, 20.0, 0.0 )
+sphere_pos_mat:translation( 0.0, 7.0, 0.0 )
 
 sphere_body:configure_attitude(sphere_pos_mat)
 
@@ -227,7 +227,7 @@ sphere_body:configure_mass(80.0)
 
 sphere_body:configure_mode(BODY_MODE)
 
-sphere_body:configure_state(TRUE)
+sphere_body:configure_state(FALSE)
 
 
 sphere_material =
@@ -278,6 +278,27 @@ rock_entity_config =
 }
 rock_entity,rock_renderer = commons.create_rendered_meshe(rg, rock_entity_config, 'rock.ac', 0)
 eg:add_child('root','rock_entity',rock_entity)
+
+
+rock_entity:add_aspect(BODY_ASPECT)
+local rock_body=Body()
+
+rock_body:attach_toentity(rock_entity)
+
+rock_body:configure_shape(SHAPE_SPHERE, 3.0)
+
+
+rock_pos_mat = Matrix()
+
+rock_pos_mat:translation( 1.0, 0.0, 0.0 )
+
+rock_body:configure_attitude(rock_pos_mat)
+
+
+rock_body:configure_mode(COLLIDER_MODE)
+
+rock_body:configure_state(TRUE)
+
 
 rock_material =
 {
@@ -400,6 +421,10 @@ function( key )
  
   elseif key == 17 then
     ctrl_key = FALSE
+
+    -- VK_F1
+  elseif key == 112 then
+	sphere_body:update_state(TRUE)
   end
 
 end)
