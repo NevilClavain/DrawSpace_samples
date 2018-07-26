@@ -210,7 +210,7 @@ eg:add_child('root','sphere_entity',sphere_entity)
 
 
 sphere_entity:add_aspect(BODY_ASPECT)
-local sphere_body=Body()
+sphere_body=Body()
 
 sphere_body:attach_toentity(sphere_entity)
 
@@ -281,7 +281,7 @@ eg:add_child('root','rock_entity',rock_entity)
 
 
 rock_entity:add_aspect(BODY_ASPECT)
-local rock_body=Body()
+rock_body=Body()
 
 rock_body:attach_toentity(rock_entity)
 
