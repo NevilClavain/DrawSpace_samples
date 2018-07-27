@@ -3,7 +3,7 @@
 
 lights = 
 {
-	ambient_light = {r = 0.33, g = 0.33, b = 0.33, a = 0.0 },
+	ambient_light = {r = 0.23, g = 0.23, b = 0.23, a = 0.0 },
 	lights_enabled = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
 	light0 = 
 	{
@@ -219,7 +219,7 @@ sphere_body:configure_shape( SHAPE_SPHERE, 1.0)
 
 sphere_pos_mat = Matrix()
 
-sphere_pos_mat:translation( 0.0, 7.0, 0.0 )
+sphere_pos_mat:translation( 10.0, 7.0, 0.8 )
 
 sphere_body:configure_attitude(sphere_pos_mat)
 
@@ -267,7 +267,8 @@ rock_entity_config =
 		},
 		textures =
 		{
-			{ path='rock08.bmp', stage=0}
+			{ path='rock08.bmp', stage=0},
+			{ path='rock_bump.jpg', stage=1}
 		},
 		vertex_textures =
 		{
@@ -285,12 +286,13 @@ rock_body=Body()
 
 rock_body:attach_toentity(rock_entity)
 
-rock_body:configure_shape(SHAPE_SPHERE, 3.0)
+--rock_body:configure_shape(SHAPE_SPHERE, 3.0)
+rock_body:configure_shape(SHAPE_MESHE, 'rock.ac', 0)
 
 
 rock_pos_mat = Matrix()
 
-rock_pos_mat:translation( 1.0, 0.0, 0.0 )
+rock_pos_mat:translation( 10.0, 1.0, 0.0 )
 
 rock_body:configure_attitude(rock_pos_mat)
 
@@ -306,6 +308,7 @@ rock_material =
 	simple_color = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 	self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	bump_mapping = { texture_size = 512, bias = 0.65 }
 }
 
 commons.apply_material( rock_material, rock_renderer, 'texture_pass')
@@ -315,15 +318,6 @@ renderers[nb_renderers] = rock_renderer
 nb_renderers = nb_renderers + 1
 
 
---[[
-rock_pos_mat = Matrix()
-rock_pos_mat:translation( -9.0, 6.0, -20.0 )
-
-rock_transform = RawTransform()
-rock_transform:configure(rock_entity)
-rock_transform:add_matrix( "pos", rock_pos_mat )
-
-]]
 
 
 commons.update_lights( 'texture_pass', lights, renderers )
