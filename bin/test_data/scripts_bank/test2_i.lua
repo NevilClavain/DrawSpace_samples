@@ -65,7 +65,8 @@ ground_entity_config =
 		},
 		textures =
 		{
-			{ path='012b2su2.jpg', stage=0 }
+			{ path='012b2su2.jpg', stage=0 },
+			{ path='grass_bump.bmp', stage=1 }
 		},
 		vertex_textures =
 		{
@@ -76,7 +77,6 @@ ground_entity_config =
 }
 
 ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'land2.ac', 0)
---ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'water.ac', 0)
 eg:add_child('root','ground_entity',ground_entity)
 
 ground_entity:add_aspect(BODY_ASPECT)
@@ -84,7 +84,6 @@ ground_body=Body()
 
 ground_body:attach_toentity(ground_entity)
 
---ground_body:configure_shape( SHAPE_BOX, 100, 0.0, 100.0)
 ground_body:configure_shape(SHAPE_MESHE, 'land2.ac', 0)
 
 
@@ -98,6 +97,7 @@ ground_material =
 	simple_color = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 	self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	bump_mapping = { texture_size = 1024, bias = 0.333 }
 }
 
 commons.apply_material( ground_material, ground_renderer, 'texture_pass')
