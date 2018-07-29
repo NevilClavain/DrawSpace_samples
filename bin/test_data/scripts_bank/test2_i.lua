@@ -75,8 +75,8 @@ ground_entity_config =
 	}
 }
 
---ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'land2.ac', 0)
-ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'water.ac', 0)
+ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'land2.ac', 0)
+--ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'water.ac', 0)
 eg:add_child('root','ground_entity',ground_entity)
 
 ground_entity:add_aspect(BODY_ASPECT)
