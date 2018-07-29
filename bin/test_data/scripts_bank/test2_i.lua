@@ -65,7 +65,7 @@ ground_entity_config =
 		},
 		textures =
 		{
-			{ path='bloc1.jpg', stage=0 }
+			{ path='012b2su2.jpg', stage=0 }
 		},
 		vertex_textures =
 		{
@@ -75,6 +75,7 @@ ground_entity_config =
 	}
 }
 
+--ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'land2.ac', 0)
 ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'water.ac', 0)
 eg:add_child('root','ground_entity',ground_entity)
 
@@ -83,7 +84,8 @@ ground_body=Body()
 
 ground_body:attach_toentity(ground_entity)
 
-ground_body:configure_shape( SHAPE_BOX, 100, 0.0, 100.0)
+--ground_body:configure_shape( SHAPE_BOX, 100, 0.0, 100.0)
+ground_body:configure_shape(SHAPE_MESHE, 'land2.ac', 0)
 
 
 ground_body:configure_mode(COLLIDER_MODE)
@@ -214,7 +216,7 @@ sphere_body=Body()
 
 sphere_body:attach_toentity(sphere_entity)
 
-sphere_body:configure_shape( SHAPE_SPHERE, 1.0)
+sphere_body:configure_shape(SHAPE_SPHERE, 1.0)
 
 
 sphere_pos_mat = Matrix()
@@ -418,7 +420,13 @@ function( key )
 
     -- VK_F1
   elseif key == 112 then
+    
 	sphere_body:update_state(TRUE)
+
+    -- VK_F2
+  elseif key == 113 then
+    
+	sphere_body:update_state(FALSE)
   end
 
 end)
@@ -444,6 +452,7 @@ end)
 
 g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
+
 
 
 
