@@ -17,6 +17,11 @@ renderers =
 }
 nb_renderers = 0;
 
+renderers2 =
+{
+}
+nb_renderers2 = 0;
+
 hmi_mode=FALSE
 
 renderer_descr, renderer_width, renderer_height, renderer_fullscreen, viewport_width, viewport_height = renderer:descr()
@@ -559,8 +564,8 @@ add_cube = function()
 			{
 				shaders = 
 				{
-					{ path='texture.vso',mode=SHADER_COMPILED },
-					{ path='texture.pso',mode=SHADER_COMPILED }
+					{ path='lit.vso',mode=SHADER_COMPILED },
+					{ path='lit.pso',mode=SHADER_COMPILED }
 				},
 				rs_in = 
 				{
@@ -578,10 +583,10 @@ add_cube = function()
 			vertex_textures =
 			{
 			},
-			shaders_params =
-			{
-			}
-		},
+
+			shaders_params = commons.setup_lit_shader_params()
+		}
+		--[[,
 		texturemirror_pass = 
 		{
 			fx = 
@@ -615,12 +620,13 @@ add_cube = function()
 				{ param_name = "reflector_normale", shader_index = 0, register = 25 }
 			}	
 		}
+		]]
 	}
 	cube_entity, cube_renderer = commons.create_rendered_meshe(rg, cube_entity_config, 'object.ac', 0)
 	eg:add_child('root',cube_name,cube_entity)
 
-	cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
-	cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_normale', 0.0, 1.0, 0.0, 1.0)
+	--cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
+	--cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_normale', 0.0, 1.0, 0.0, 1.0)
 
 	cube_entity:add_aspect(BODY_ASPECT)
 	local cube_body=Body()
@@ -640,6 +646,23 @@ add_cube = function()
 	cube_body:configure_mode(BODY_MODE)
 
 	cube_body:configure_state(TRUE)
+
+
+	local cube_material =
+	{
+		color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
+		simple_color = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+		light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+		self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 }
+	}
+
+	commons.apply_material( cube_material, cube_renderer, 'texture_pass')
+
+
+
+	renderers2[nb_renderers2] = cube_renderer
+	nb_renderers2 = nb_renderers2 + 1
+	commons.update_lights( 'texture_pass', lights, renderers2 )
 
 	cube_infos['renderer'] = cube_renderer
 	cube_infos['entity'] = cube_entity
@@ -676,6 +699,13 @@ destroy_all_cubes = function()
 		eg:remove(cube_name)
 
 	end	
+
+	renderers2 = nil
+	renderers2 =
+	{
+	}
+	nb_renderers2 = 0;
+
 end
 
 
