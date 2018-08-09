@@ -145,12 +145,15 @@ ground_entity_config =
 		},
 		shaders_params =
 		{
+			{ param_name = 'bump_bias', shader_index = 1, register = 0 }
 		}	
 	}
 }
 
 ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'water.ac', 0)
 ground_renderer:set_shaderrealvector('texture_pass', "color", 1.0, 0.0, 1.0, 1.0 )
+ground_renderer:set_shaderrealvector('bump_pass', 'bump_bias', 1.0, 0.0, 0.0, 0.0)
+
 ground_renderer:set_passnodetexturefrompass(rg, 'wave_pass', 'bump_pass', 0)
 eg:add_child('root','ground_entity',ground_entity)
 
@@ -165,7 +168,6 @@ ground_body:configure_shape( SHAPE_BOX, 100, 0.0, 100.0)
 ground_body:configure_mode(COLLIDER_MODE)
 
 ground_body:configure_state(TRUE)
-
 
 
 
@@ -896,6 +898,9 @@ function( layout, widget )
 end)
 
 
+set_water_bump = function(bias)
+	ground_renderer:set_shaderrealvector('bump_pass', 'bump_bias', bias, 0.0, 0.0, 0.0)
+end
 
 
 
