@@ -1,14 +1,26 @@
 
+reflectorPos = 
+{
+	x = 0.0,
+	y = 0.0,
+	z = 0.0, 
+}
 
+reflectorNormale = 
+{
+	x = 0.0,
+	y = 1.0,
+	z = 0.0, 
+}
 
 lights = 
 {
-	ambient_light = {r = 0.1, g = 0.1, b = 0.1, a = 0.0 },
+	ambient_light = {r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 	lights_enabled = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
 	light0 = 
 	{
 		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-		direction = { x = 1.0, y = -0.50, z = 0.0, w = 1.0 },
+		direction = { x = 1.0, y = -1.0, z = 0.0, w = 1.0 },
 	}
 }
 
@@ -154,6 +166,14 @@ ground_body:configure_mode(COLLIDER_MODE)
 
 ground_body:configure_state(TRUE)
 
+
+
+
+
+
+
+
+
 cube_entity_config = 
 { 
 	texture_pass = 
@@ -183,16 +203,15 @@ cube_entity_config =
 		},
 
 		shaders_params = commons.setup_lit_shader_params()
-	}
-	--[[,
+	},
 	texturemirror_pass = 
 	{
 		fx = 
 		{
 			shaders = 
 			{
-				{ path='texture_mirror.vso',mode=SHADER_COMPILED },
-				{ path='texture_mirror.pso',mode=SHADER_COMPILED }
+				{ path='lit.vso',mode=SHADER_COMPILED },
+				{ path='lit.pso',mode=SHADER_COMPILED }
 			},
 			rs_in = 
 			{
@@ -212,19 +231,13 @@ cube_entity_config =
 		vertex_textures =
 		{
 		},
-		shaders_params =
-		{
-			{ param_name = "reflector_pos", shader_index = 0, register = 24 },
-			{ param_name = "reflector_normale", shader_index = 0, register = 25 }
-		}	
+
+		shaders_params = commons.setup_lit_shader_params()
 	}
-	]]
 }
 cube_entity, cube_renderer = commons.create_rendered_meshe(rg, cube_entity_config, 'object.ac', 0)
 eg:add_child('root','cube_entity',cube_entity)
 
---cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
---cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_normale', 0.0, 1.0, 0.0, 1.0)
 
 
 
@@ -263,11 +276,123 @@ cube_material =
 	self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 }
 }
 
-commons.apply_material( cube_material, cube_renderer, 'texture_pass')
-
+commons.apply_material(cube_material, cube_renderer, 'texture_pass')
+commons.apply_material(cube_material, cube_renderer, 'texturemirror_pass')
 
 renderers[nb_renderers] = cube_renderer
 nb_renderers = nb_renderers + 1
+
+
+
+
+
+
+
+sphere_entity_config = 
+{ 
+	texture_pass = 
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='lit.vso',mode=SHADER_COMPILED },
+				{ path='lit.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true"	}		
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+			}
+		},
+		textures =
+		{
+			{ path='marbre.jpg', stage=0},
+			{ path='bump.bmp', stage=1}
+		},
+		vertex_textures =
+		{
+		},
+
+		shaders_params = commons.setup_lit_shader_params()
+	},
+	texturemirror_pass = 
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='lit.vso',mode=SHADER_COMPILED },
+				{ path='lit.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" },
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="ccw" },		
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
+			}
+		},
+		textures =
+		{
+			{ path='marbre.jpg', stage=0},
+			{ path='bump.bmp', stage=1}
+		},
+		vertex_textures =
+		{
+		},
+
+		shaders_params = commons.setup_lit_shader_params()
+	}
+}
+sphere_entity,sphere_renderer = commons.create_rendered_meshe(rg, sphere_entity_config, 'sphere.ac', 0)
+eg:add_child('root','sphere_entity',sphere_entity)
+
+
+sphere_entity:add_aspect(BODY_ASPECT)
+sphere_body=Body()
+
+sphere_body:attach_toentity(sphere_entity)
+
+sphere_body:configure_shape(SHAPE_SPHERE, 1.0)
+
+
+sphere_pos_mat = Matrix()
+
+sphere_pos_mat:translation( -2.0, 3.0, -2.8 )
+
+sphere_body:configure_attitude(sphere_pos_mat)
+
+sphere_body:configure_mass(80.0)
+
+sphere_body:configure_mode(BODY_MODE)
+
+sphere_body:configure_state(FALSE)
+
+
+sphere_material =
+{
+	specular_power = 200.0,
+	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
+	simple_color = { r = 1.0, g = 0.0, b = 0.0, a = 0.0 },
+	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	bump_mapping = { texture_size = 512, bias = 0.45 }
+}
+
+commons.apply_material(sphere_material, sphere_renderer, 'texture_pass')
+commons.apply_material(sphere_material, sphere_renderer, 'texturemirror_pass')
+
+renderers[nb_renderers] = sphere_renderer
+nb_renderers = nb_renderers + 1
+
+
 
 
 
@@ -292,6 +417,37 @@ land_entity_config =
 			rs_out =
 			{
 				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+			}
+		},
+		textures =
+		{
+			{ path='012b2su2.jpg', stage=0 },
+			{ path='grass_bump.bmp', stage=1 }
+		},
+		vertex_textures =
+		{
+		},
+
+		shaders_params = commons.setup_lit_shader_params()
+	},
+	texturemirror_pass = 
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='lit.vso',mode=SHADER_COMPILED },
+				{ path='lit.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" },
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="ccw" },		
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
 			}
 		},
 		textures =
@@ -332,15 +488,23 @@ land_material =
 }
 
 commons.apply_material( land_material, land_renderer, 'texture_pass')
+commons.apply_material(land_material, land_renderer, 'texturemirror_pass')
 
 renderers[nb_renderers] = land_renderer
 nb_renderers = nb_renderers + 1
 
 
+
+
+
+
+
 commons.update_lights( 'texture_pass', lights, renderers )
+commons.update_lights( 'texturemirror_pass', lights, renderers )
 
 
-
+commons.setup_mirror_off( 'texture_pass', renderers )
+commons.setup_mirror_on( 'texturemirror_pass', renderers, reflectorPos, reflectorNormale )
 
 
 
@@ -586,15 +750,15 @@ add_cube = function()
 
 			shaders_params = commons.setup_lit_shader_params()
 		}
-		--[[,
+		,
 		texturemirror_pass = 
 		{
 			fx = 
 			{
 				shaders = 
 				{
-					{ path='texture_mirror.vso',mode=SHADER_COMPILED },
-					{ path='texture_mirror.pso',mode=SHADER_COMPILED }
+					{ path='lit.vso',mode=SHADER_COMPILED },
+					{ path='lit.pso',mode=SHADER_COMPILED }
 				},
 				rs_in = 
 				{
@@ -614,19 +778,13 @@ add_cube = function()
 			vertex_textures =
 			{
 			},
-			shaders_params =
-			{
-				{ param_name = "reflector_pos", shader_index = 0, register = 24 },
-				{ param_name = "reflector_normale", shader_index = 0, register = 25 }
-			}	
+
+			shaders_params = commons.setup_lit_shader_params()	
 		}
-		]]
 	}
 	cube_entity, cube_renderer = commons.create_rendered_meshe(rg, cube_entity_config, 'object.ac', 0)
 	eg:add_child('root',cube_name,cube_entity)
 
-	--cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
-	--cube_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_normale', 0.0, 1.0, 0.0, 1.0)
 
 	cube_entity:add_aspect(BODY_ASPECT)
 	local cube_body=Body()
@@ -657,12 +815,19 @@ add_cube = function()
 	}
 
 	commons.apply_material( cube_material, cube_renderer, 'texture_pass')
+	commons.apply_material(cube_material, cube_renderer, 'texturemirror_pass')
 
 
 
 	renderers2[nb_renderers2] = cube_renderer
 	nb_renderers2 = nb_renderers2 + 1
+
 	commons.update_lights( 'texture_pass', lights, renderers2 )
+	commons.update_lights( 'texturemirror_pass', lights, renderers2 )
+
+	commons.setup_mirror_off( 'texture_pass', renderers2 )
+	commons.setup_mirror_on( 'texturemirror_pass', renderers2, reflectorPos, reflectorNormale )
+
 
 	cube_infos['renderer'] = cube_renderer
 	cube_infos['entity'] = cube_entity

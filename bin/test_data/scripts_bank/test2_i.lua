@@ -323,6 +323,7 @@ nb_renderers = nb_renderers + 1
 
 
 commons.update_lights( 'texture_pass', lights, renderers )
+commons.setup_mirror_off( 'texture_pass', renderers )
 
 
 -- ///////////////////////////////

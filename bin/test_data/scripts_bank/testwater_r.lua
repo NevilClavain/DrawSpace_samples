@@ -14,12 +14,25 @@ commons.trash.meshe(rg, ground_entity, ground_renderer)
 eg:remove('ground_entity')
 
 
+sphere_body:release()
+sphere_body:detach_fromentity(sphere_entity)
+sphere_entity:remove_aspect(BODY_ASPECT)
+commons.trash.meshe(rg, sphere_entity, sphere_renderer)
+eg:remove('sphere_entity')
 
 cube_body:release()
 cube_body:detach_fromentity(cube_entity)
 cube_entity:remove_aspect(BODY_ASPECT)
 commons.trash.meshe(rg, cube_entity, cube_renderer)
 eg:remove('cube_entity')
+
+
+
+land_body:release()
+land_body:detach_fromentity(land_entity)
+land_entity:remove_aspect(BODY_ASPECT)
+commons.trash.meshe(rg, land_entity, land_renderer)
+eg:remove('land_entity')
 
 
 
