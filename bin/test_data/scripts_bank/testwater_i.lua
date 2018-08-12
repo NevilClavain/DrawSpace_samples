@@ -902,6 +902,6 @@ set_water_bump = function(bias)
 	ground_renderer:set_shaderrealvector('bump_pass', 'bump_bias', bias, 0.0, 0.0, 0.0)
 end
 
-
+g:signal_renderscenebegin("eg")
 
 

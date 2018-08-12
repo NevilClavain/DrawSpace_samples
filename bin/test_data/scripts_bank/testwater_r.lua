@@ -1,6 +1,6 @@
 
 
-
+g:signal_rendersceneend("eg")
 
 
 commons.trash.skybox(rg, sb_mod, skybox_entity, skybox_renderer, sb_transform)
