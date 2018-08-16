@@ -167,13 +167,6 @@ ground_body:configure_shape( SHAPE_BOX, 100, 0.0, 100.0)
 
 ground_body:configure_mode(COLLIDER_MODE)
 
-ground_body:configure_state(TRUE)
-
-
-
-
-
-
 
 
 cube_entity_config = 
@@ -251,8 +244,6 @@ cube_body:attach_toentity(cube_entity)
 cube_body:configure_shape( SHAPE_BOX, 0.5, 0.5, 0.5)
 
 cube_body:configure_mode(COLLIDER_MODE)
-
-cube_body:configure_state(TRUE)
 
 
 cube_rot_mat = Matrix()
@@ -375,8 +366,6 @@ sphere_body:configure_mass(80.0)
 
 sphere_body:configure_mode(BODY_MODE)
 
-sphere_body:configure_state(FALSE)
-
 
 sphere_material =
 {
@@ -477,8 +466,6 @@ land_body:configure_shape(SHAPE_MESHE, 'land2.ac', 0)
 
 
 land_body:configure_mode(COLLIDER_MODE)
-
-land_body:configure_state(TRUE)
 
 land_material =
 {
@@ -804,9 +791,6 @@ add_cube = function()
 	cube_body:configure_mass(7.0)
 
 	cube_body:configure_mode(BODY_MODE)
-
-	cube_body:configure_state(TRUE)
-
 
 	local cube_material =
 	{

@@ -1,5 +1,7 @@
 
 
+g:signal_rendersceneend("eg")
+
 clothbox_transform:release()
 
 commons.trash.meshe(rg, clothbox_entity, clothbox_renderer)

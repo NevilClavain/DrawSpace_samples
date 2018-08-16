@@ -89,7 +89,6 @@ ground_body:configure_shape(SHAPE_MESHE, 'land2.ac', 0)
 
 ground_body:configure_mode(COLLIDER_MODE)
 
-ground_body:configure_state(TRUE)
 
 ground_material =
 {
@@ -229,8 +228,6 @@ sphere_body:configure_mass(80.0)
 
 sphere_body:configure_mode(BODY_MODE)
 
-sphere_body:configure_state(FALSE)
-
 
 sphere_material =
 {
@@ -301,7 +298,6 @@ rock_body:configure_attitude(rock_pos_mat)
 
 rock_body:configure_mode(COLLIDER_MODE)
 
-rock_body:configure_state(TRUE)
 
 
 rock_material =
@@ -422,14 +418,10 @@ function( key )
     -- VK_F1
   elseif key == 112 then
     
-	sphere_body:update_state(TRUE)
-
     -- VK_F2
   elseif key == 113 then
     
-	sphere_body:update_state(FALSE)
   end
-
 end)
 
 
@@ -454,7 +446,4 @@ end)
 g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
 
-
-
-
-
+g:signal_renderscenebegin("eg")
