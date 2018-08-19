@@ -6,6 +6,10 @@ commons.trash = {}
 
 commons.utils.PI = 3.1415927
 
+REFLECTIONS_OFF=0
+REFLECTIONS_ON=1
+
+
 commons.utils.deg_to_rad = function(angle)
 	return ( ( angle * commons.utils.PI ) / 180.0 );
 end
@@ -264,6 +268,7 @@ commons.setup_lit_shader_params = function()
 	shaders_params_table[11] = { param_name = "absorption", shader_index = 1, register = 9 }
 	shaders_params_table[12] = { param_name = "color", shader_index = 1, register = 10 }
 	shaders_params_table[13] = { param_name = "color_source", shader_index = 1, register = 11 }
+	shaders_params_table[14] = { param_name = "fog_color", shader_index = 1, register = 12 }
 
 	return shaders_params_table
 end
@@ -286,19 +291,23 @@ commons.update_lights = function( p_pass_id, p_lights_table, p_renderer_tables )
 	end
 end
 
-commons.setup_mirror_off = function( p_pass_id, p_renderer_tables )
+
+commons.setup_lit_flags = function( p_pass_id, p_renderer_tables, p_mirror, p_reflector_pos, p_reflector_normale, p_fog_intensity, p_fog_color )
 	for k, v in pairs(p_renderer_tables) do
 		local renderer = v
-		renderer:set_shaderrealvector( p_pass_id, 'flags_v', 0.0, 0.0, 0.0, 0.0 )
+		renderer:set_shaderrealvector( p_pass_id, 'flags_v', p_mirror, p_fog_intensity, 0.0, 0.0 )
+		renderer:set_shaderrealvector( p_pass_id, 'fog_color', p_fog_color.r, p_fog_color.g, p_fog_color.b, 1.0 )
+		
+		renderer:set_shaderrealvector( p_pass_id, 'reflectorPos', p_reflector_pos.x, p_reflector_pos.y, p_reflector_pos.z, 0.0 )
+		renderer:set_shaderrealvector( p_pass_id, 'reflectorNormale', p_reflector_normale.x, p_reflector_normale.y, p_reflector_normale.z, 0.0 )
 	end
 end
 
-commons.setup_mirror_on = function( p_pass_id, p_renderer_tables, p_reflector_pos, p_reflector_normale )
+commons.setup_lit_flags_simple = function( p_pass_id, p_renderer_tables, p_fog_intensity, p_fog_color )
 	for k, v in pairs(p_renderer_tables) do
 		local renderer = v
-		renderer:set_shaderrealvector( p_pass_id, 'flags_v', 1.0, 0.0, 0.0, 0.0 )
-		renderer:set_shaderrealvector( p_pass_id, 'reflectorPos', p_reflector_pos.x, p_reflector_pos.y, p_reflector_pos.z, 0.0 )
-		renderer:set_shaderrealvector( p_pass_id, 'reflectorNormale', p_reflector_normale.x, p_reflector_normale.y, p_reflector_normale.z, 0.0 )
+		renderer:set_shaderrealvector( p_pass_id, 'flags_v', 0.0, p_fog_intensity, 0.0, 0.0 )
+		renderer:set_shaderrealvector( p_pass_id, 'fog_color', p_fog_color.r, p_fog_color.g, p_fog_color.b, 1.0 )
 	end
 end
 

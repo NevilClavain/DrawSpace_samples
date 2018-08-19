@@ -1,5 +1,12 @@
 
+fog_intensity = 0.05
 
+fog_color = 
+{
+	r = 0.75,
+	g = 0.75,
+	b = 0.99, 
+}
 
 lights = 
 {
@@ -28,6 +35,8 @@ g:print('Current renderer is '..renderer_infos[1]..', '..renderer_infos[2]..'x'.
 
 commons.init_final_pass(rg, 'final_pass')
 rg:create_child('final_pass', 'texture_pass', 0)
+
+rg:set_pass_targetclearcolor('texture_pass', 192, 192, 255)
 
 
 text_renderer=TextRendering()
@@ -319,7 +328,9 @@ nb_renderers = nb_renderers + 1
 
 
 commons.update_lights( 'texture_pass', lights, renderers )
-commons.setup_mirror_off( 'texture_pass', renderers )
+--commons.setup_mirror_off( 'texture_pass', renderers )
+commons.setup_lit_flags_simple( 'texture_pass', renderers, fog_intensity, fog_color)
+
 
 
 -- ///////////////////////////////

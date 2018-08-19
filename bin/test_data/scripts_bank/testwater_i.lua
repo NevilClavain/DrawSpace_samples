@@ -13,6 +13,15 @@ reflectorNormale =
 	z = 0.0, 
 }
 
+fog_intensity = 0.05
+
+fog_color = 
+{
+	r = 0.75,
+	g = 0.75,
+	b = 0.99, 
+}
+
 lights = 
 {
 	ambient_light = {r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
@@ -476,7 +485,7 @@ land_material =
 	bump_mapping = { texture_size = 1024, bias = 0.333 }
 }
 
-commons.apply_material( land_material, land_renderer, 'texture_pass')
+commons.apply_material(land_material, land_renderer, 'texture_pass')
 commons.apply_material(land_material, land_renderer, 'texturemirror_pass')
 
 renderers[nb_renderers] = land_renderer
@@ -492,8 +501,8 @@ commons.update_lights( 'texture_pass', lights, renderers )
 commons.update_lights( 'texturemirror_pass', lights, renderers )
 
 
-commons.setup_mirror_off( 'texture_pass', renderers )
-commons.setup_mirror_on( 'texturemirror_pass', renderers, reflectorPos, reflectorNormale )
+commons.setup_lit_flags( 'texture_pass', renderers, REFLECTIONS_OFF, reflectorPos, reflectorNormale, fog_intensity, fog_color)
+commons.setup_lit_flags( 'texturemirror_pass', renderers, REFLECTIONS_ON, reflectorPos, reflectorNormale, fog_intensity, fog_color)
 
 
 
@@ -811,9 +820,8 @@ add_cube = function()
 	commons.update_lights( 'texture_pass', lights, renderers2 )
 	commons.update_lights( 'texturemirror_pass', lights, renderers2 )
 
-	commons.setup_mirror_off( 'texture_pass', renderers2 )
-	commons.setup_mirror_on( 'texturemirror_pass', renderers2, reflectorPos, reflectorNormale )
-
+	commons.setup_lit_flags( 'texture_pass', renderers2, REFLECTIONS_OFF, reflectorPos, reflectorNormale, fog_intensity, fog_color)
+	commons.setup_lit_flags( 'texturemirror_pass', renderers2, REFLECTIONS_ON, reflectorPos, reflectorNormale, fog_intensity, fog_color)
 
 	cube_infos['renderer'] = cube_renderer
 	cube_infos['entity'] = cube_entity
