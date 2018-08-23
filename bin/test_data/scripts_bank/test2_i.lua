@@ -1,5 +1,5 @@
 
-fog_intensity = 0.05
+fog_intensity = 0.10
 
 fog_color = 
 {
@@ -10,7 +10,7 @@ fog_color =
 
 lights = 
 {
-	ambient_light = {r = 0.23, g = 0.23, b = 0.23, a = 0.0 },
+	ambient_light = {r = 0.05, g = 0.05, b = 0.05, a = 0.0 },
 	lights_enabled = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
 	light0 = 
 	{
@@ -113,6 +113,12 @@ commons.apply_material( ground_material, ground_renderer, 'texture_pass')
 renderers[nb_renderers] = ground_renderer
 nb_renderers = nb_renderers + 1
 
+
+
+
+
+
+
 clothbox_entity_config = 
 { 
 	texture_pass = 
@@ -135,8 +141,9 @@ clothbox_entity_config =
 		},
 		textures =
 		{
-			{ path='clothbox.jpg', stage=0},
-			{ path='box_bump.bmp', stage=1}
+			{ path='tech_color.jpg', stage=0},
+			{ path='tech_bump.jpg', stage=1},
+			{ path='tech_mask.bmp', stage=2}
 		},
 		vertex_textures =
 		{
@@ -148,11 +155,12 @@ clothbox_entity_config =
 
 
 
-clothbox_entity,clothbox_renderer = commons.create_rendered_meshe(rg, clothbox_entity_config, 'mythcloth.ac', 0)
+clothbox_entity,clothbox_renderer = commons.create_rendered_meshe(rg, clothbox_entity_config, 'tech.ac', 0)
 eg:add_child('root','clothbox_entity',clothbox_entity)
 
 clothbox_material =
 {
+    mask_mode = 1,
 	specular_power = 180.0,
 	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
 	simple_color = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
