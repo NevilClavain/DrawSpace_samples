@@ -32,6 +32,10 @@ renderer_infos = {renderer:descr()}
 g:print('Current renderer is '..renderer_infos[1]..', '..renderer_infos[2]..'x'..renderer_infos[3])
 
 
+mvt_mod = Module("mvtmod", "mvts")
+mvt_mod:load()
+g:print(mvt_mod:get_descr().. ' loaded')
+
 
 commons.init_final_pass(rg, 'final_pass')
 rg:create_child('final_pass', 'texture_pass', 0)
@@ -48,7 +52,7 @@ root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
 
 
 
-camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 20.0, renderer_infos[5],renderer_infos[6])
+camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 20.0, renderer_infos[5],renderer_infos[6], mvt_mod)
 eg:add_child('root','camera_entity',camera_entity)
 
 

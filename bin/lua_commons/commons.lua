@@ -68,15 +68,18 @@ commons.init_final_pass_water_mask = function(p_rendergraph, p_passid)
 
 end
 
-commons.create_fps_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewport_height)
+commons.create_fps_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewport_height, p_module)
 
 	local camera_entity=Entity()
 	camera_entity:add_aspect(TRANSFORM_ASPECT)
 	camera_entity:add_aspect(CAMERA_ASPECT)
 
+
+	
 	camera_entity:configure_camera(p_viewport_width,p_viewport_height, 1.0, 1000000.0)
 
 	local fps_transfo=FPSTransform()
+	fps_transfo:instanciate_transformimpl(p_module)
 	fps_transfo:configure(camera_entity,0,0,p_x,p_y,p_z,TRUE)
 
 	return camera_entity, fps_transfo

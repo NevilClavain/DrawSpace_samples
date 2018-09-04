@@ -53,6 +53,10 @@ sb_mod = Module("skyboxmod", "skybox")
 sb_mod:load()
 g:print(sb_mod:get_descr().. ' loaded')
 
+mvt_mod = Module("mvtmod", "mvts")
+mvt_mod:load()
+g:print(mvt_mod:get_descr().. ' loaded')
+
 
 commons.init_final_pass_water_mask(rg, 'final_pass')
 
@@ -93,7 +97,7 @@ root_entity:add_aspect(PHYSICS_ASPECT)
 root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
 
 
-camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 0.0, viewport_width, viewport_height)
+camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 0.0, viewport_width, viewport_height, mvt_mod)
 eg:add_child('root','camera_entity',camera_entity)
 
 
