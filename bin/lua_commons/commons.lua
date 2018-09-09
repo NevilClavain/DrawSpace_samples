@@ -74,8 +74,6 @@ commons.create_fps_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewport
 	camera_entity:add_aspect(TRANSFORM_ASPECT)
 	camera_entity:add_aspect(CAMERA_ASPECT)
 
-
-	
 	camera_entity:configure_camera(p_viewport_width,p_viewport_height, 1.0, 1000000.0)
 
 	local fps_transfo=FPSTransform()
@@ -83,6 +81,20 @@ commons.create_fps_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewport
 	fps_transfo:configure(camera_entity,0,0,p_x,p_y,p_z,TRUE)
 
 	return camera_entity, fps_transfo
+end
+
+commons.create_free_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewport_height, p_module)
+	local camera_entity=Entity()
+	camera_entity:add_aspect(TRANSFORM_ASPECT)
+	camera_entity:add_aspect(CAMERA_ASPECT)
+
+	camera_entity:configure_camera(p_viewport_width,p_viewport_height, 1.0, 1000000.0)
+
+	local free_transfo=FreeTransform()
+	free_transfo:instanciate_transformimpl(p_module)
+	free_transfo:configure(camera_entity,0,p_x, p_y, p_z)
+
+	return camera_entity, free_transfo
 end
 
 

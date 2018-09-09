@@ -28,6 +28,8 @@ nb_renderers = 0;
 ctrl_key = FALSE
 last_key = 0
 
+mouse_right = FALSE
+
 renderer_infos = {renderer:descr()}
 g:print('Current renderer is '..renderer_infos[1]..', '..renderer_infos[2]..'x'..renderer_infos[3])
 
@@ -52,7 +54,8 @@ root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
 
 
 
-camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 20.0, renderer_infos[5],renderer_infos[6], mvt_mod)
+--camera_entity, camera_mvt=commons.create_fps_camera(0.0, 3.0, 20.0, renderer_infos[5],renderer_infos[6], mvt_mod)
+camera_entity, camera_mvt=commons.create_free_camera(0.0, 5.5, 28.0, renderer_infos[5],renderer_infos[6], mvt_mod)
 eg:add_child('root','camera_entity',camera_entity)
 
 
@@ -306,7 +309,6 @@ rock_body=Body()
 
 rock_body:attach_toentity(rock_entity)
 
---rock_body:configure_shape(SHAPE_SPHERE, 3.0)
 rock_body:configure_shape(SHAPE_MESHE, 'rock.ac', 0)
 
 
@@ -369,6 +371,8 @@ cube_rot_y:init_fromtimeaspectof(root_entity,0.0)
 
 
 
+
+
 g:add_mousemovecb( "onmousemove",
 function( xm, ym, dx, dy )  
 
@@ -380,18 +384,33 @@ function( xm, ym, dx, dy )
 
   else
   
-    fps_yaw:inc(-dx / 1.0)
+    --fps_yaw:inc(-dx / 1.0)
 
-    fps_pitch:inc(-dy / 1.0)
+    --fps_pitch:inc(-dy / 1.0)
 
-    fps_infos = { fps_transfo:read() }
-    fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], fps_infos[9]) 
+    local mvt_info = { camera_mvt:read() }
+    --camera_mvt:update(fps_yaw:get_value(),fps_pitch:get_value(),mvt_info[3],mvt_info[4],mvt_info[5],mvt_info[6], mvt_info[7], mvt_info[8], mvt_info[9]) 
 
+	if mouse_right == FALSE then
+	  camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],-dy / 4.0,-dx / 4.0, 0)
+	else
+	  camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,-dx)
+	end
   end
 
 end)
 
 
+g:add_mouserightbuttondowncb( "onmouserightbuttondown", 
+function( xm, ym )
+  mouse_right = TRUE
+end)
+
+
+g:add_mouserightbuttonupcb( "onmouserightbuttonup", 
+function( xm, ym )
+  mouse_right = FALSE
+end)
 
 g:add_keydowncb( "keydown",
 function( key )
@@ -400,16 +419,18 @@ function( key )
 
   --Q key
   if key == 81 then 
-    fps_infos = { fps_transfo:read() }
-    fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], 12.0) 
+    local mvt_info = { camera_mvt:read() }
+    --camera_mvt:update(fps_yaw:get_value(),fps_pitch:get_value(),mvt_info[3],mvt_info[4],mvt_info[5],mvt_info[6], mvt_info[7], mvt_info[8], 12.0) 
 
-  
+	camera_mvt:update(12.0,mvt_info[1],mvt_info[2],mvt_info[3],fps_yaw:get_value(),fps_pitch:get_value(), 0)
       
   --W key
   elseif key == 87 then
 
-    fps_infos = { fps_transfo:read() }
-    fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], -12.0) 
+    local mvt_info = { camera_mvt:read() }
+    --camera_mvt:update(fps_yaw:get_value(),fps_pitch:get_value(),mvt_info[3],mvt_info[4],mvt_info[5],mvt_info[6], mvt_info[7], mvt_info[8], -12.0) 
+
+	camera_mvt:update(-12.0,mvt_info[1],mvt_info[2],mvt_info[3],fps_yaw:get_value(),fps_pitch:get_value(), 0)
 
   elseif key == 17 then
     ctrl_key = TRUE
@@ -426,14 +447,18 @@ function( key )
 
   --Q key
   if key == 81 then
-    fps_infos = { fps_transfo:read() }
-    fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], 0.0) 
+    local mvt_info = { camera_mvt:read() }
+    --camera_mvt:update(fps_yaw:get_value(),fps_pitch:get_value(),mvt_info[3],mvt_info[4],mvt_info[5],mvt_info[6], mvt_info[7], mvt_info[8], 0.0) 
+
+	camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],fps_yaw:get_value(),fps_pitch:get_value(), 0)
 
     
   --W key
   elseif key == 87 then
-    fps_infos = { fps_transfo:read() }
-    fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], 0.0) 
+    local mvt_info = { camera_mvt:read() }
+    --camera_mvt:update(fps_yaw:get_value(),fps_pitch:get_value(),mvt_info[3],mvt_info[4],mvt_info[5],mvt_info[6], mvt_info[7], mvt_info[8], 0.0) 
+
+	camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],fps_yaw:get_value(),fps_pitch:get_value(), 0)
  
   elseif key == 17 then
     ctrl_key = FALSE
@@ -463,6 +488,8 @@ function()
   cube_rotx_mat:rotation( 1.0, 0.0, 0.0, commons.utils.deg_to_rad( cube_rot_x:get_value() ) )
   clothbox_transform:update_matrix("rotx",cube_rotx_mat)
 
+  local mvt_info = { camera_mvt:read() }
+  camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
 end)
 
@@ -470,3 +497,8 @@ g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
 
 g:signal_renderscenebegin("eg")
+
+fog = function(p_intensity)
+  fog_intensity = p_intensity
+  commons.setup_lit_flags_simple( 'texture_pass', renderers, fog_intensity, fog_color)
+end
