@@ -168,8 +168,9 @@ commons.create_skybox_with_mirror = function(p_passid, p_mirrorpassid, p_renderg
 	end
 
 
-	local skybox_renderer = SkyboxRendering()
-	skybox_renderer:instanciate_renderingimpl(p_module)
+	--local skybox_renderer = SkyboxRendering()
+	local skybox_renderer = Rendering()
+	skybox_renderer:instanciate_renderingimpl(p_module,"skyboxRender")
 	skybox_renderer:attach_toentity(skybox_entity)
 	skybox_renderer:configure(skybox_renderconfig)
 
