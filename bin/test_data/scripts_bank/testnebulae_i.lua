@@ -1,0 +1,158 @@
+
+
+renderers =
+{
+}
+nb_renderers = 0;
+
+renderers2 =
+{
+}
+nb_renderers2 = 0;
+
+
+renderer_descr, renderer_width, renderer_height, renderer_fullscreen, viewport_width, viewport_height = renderer:descr()
+
+g:print('rendering infos : '..renderer_descr..', '..renderer_width..'x'..renderer_height..' fullscreen='..renderer_fullscreen..' viewport='..viewport_width..'x'..viewport_height)
+
+sb_mod = Module("skyboxmod", "skybox")
+sb_mod:load()
+g:print(sb_mod:get_descr().. ' loaded')
+
+mvt_mod = Module("mvtmod", "mvts")
+mvt_mod:load()
+g:print(mvt_mod:get_descr().. ' loaded')
+
+
+commons.init_final_pass(rg, 'final_pass')
+
+rg:create_child('final_pass', 'texture_pass', 0)
+
+
+
+text_renderer=TextRendering()
+text_renderer:configure(root_entity, "fps", 320, 30, 255, 0, 255, "??? fps")
+
+
+camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 0.0, viewport_width, viewport_height, mvt_mod)
+eg:add_child('root','camera_entity',camera_entity)
+
+
+
+
+
+commons.update_lights( 'texture_pass', lights, renderers )
+
+
+commons.setup_lit_flags( 'texture_pass', renderers, REFLECTIONS_OFF, reflectorPos, reflectorNormale, fog_intensity, fog_color)
+
+
+skybox_entity, skybox_renderer, sb_transform = commons.create_skybox_with_mirror( 'texture_pass', '', rg, sb_mod, "neb_front5.png", "neb_back6.png", "neb_left2.png", "neb_right1.png", "neb_top3.png", "neb_bottom4.png", 1000.0)
+eg:add_child('root','skybox_entity',skybox_entity)
+
+
+
+-- ///////////////////////////////
+
+eg:set_camera(camera_entity)
+
+rg:update_renderingqueues()
+
+
+
+fps_yaw=SyncAngle()
+fps_pitch=SyncAngle()
+
+
+fps_yaw:init_fromtimeaspectof(root_entity, 0.0)
+fps_pitch:init_fromtimeaspectof(root_entity,0.0)
+
+
+
+g:add_mousemovecb( "onmousemove",
+function( xm, ym, dx, dy )  
+
+  
+	fps_yaw:inc(-dx / 1.0)
+
+	fps_pitch:inc(-dy / 1.0)
+
+	fps_infos = { fps_transfo:read() }
+	fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], fps_infos[9]) 
+
+end)
+
+g:add_mouseleftbuttondowncb( "onmouselbdown",
+function( xm, ym )
+end)
+
+g:add_mouseleftbuttonupcb( "onmouselbup",
+function( xm, ym )
+end)
+
+
+g:add_mouserightbuttondowncb( "onmouserbdown",
+function( xm, ym )
+end)
+
+g:add_mouserightbuttonupcb( "onmouserbup",
+function( xm, ym )
+end)
+
+g:add_keydowncb( "keydown",
+function( key )
+
+  --Q key
+  if key == 81 then 
+    fps_infos = { fps_transfo:read() }
+    fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], 12.0) 
+  --W key
+  elseif key == 87 then
+    fps_infos = { fps_transfo:read() }
+    fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], -12.0) 
+  end
+
+end)
+
+g:add_keyupcb( "keyup",
+function( key )  
+
+  --Q key
+  if key == 81 then
+
+    fps_infos = { fps_transfo:read() }
+    fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], 0.0) 
+    
+  --W key
+  elseif key == 87 then
+
+    fps_infos = { fps_transfo:read() }
+    fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], 0.0) 
+  -- VK_F1
+  elseif key == 112 then  
+  end
+
+end)
+
+
+g:add_appruncb( "run",
+function()  
+
+	time_infos = { root_entity:read_timemanager() }
+	output_infos = renderer:descr() .." "..time_infos[3].. " fps"
+
+	--text_renderer:update(520, 30, 255, 0, 0, output_infos)
+
+end)
+
+
+
+
+
+g:show_mousecursor(FALSE)
+g:set_mousecursorcircularmode(TRUE)
+
+
+g:signal_renderscenebegin("eg")
+
+
