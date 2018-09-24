@@ -186,6 +186,85 @@ commons.create_skybox_with_mirror = function(p_passid, p_mirrorpassid, p_renderg
 	return skybox_entity, skybox_renderer, sb_transform
 end
 
+commons.create_rendering_from_module = function(p_rendergraph, p_config, p_module, p_rendering_impl_id)
+
+	local renderconfig=RenderConfig()
+
+	local entity=Entity()
+	entity:add_aspect(RENDERING_ASPECT)
+	
+	for k, v in pairs(p_config) do
+		--g:print(k)
+		local rendercontext = RenderContext(k)
+
+		local fxparams = FxParams()
+		local fx_config = v['fx']
+
+		local rss=RenderStatesSet()
+
+		local rs_in_config = fx_config['rs_in']
+		for k2, v2 in pairs(rs_in_config) do
+			local curr_rs_in = v2
+			--g:print(curr_rs_in['ope']..'->'..curr_rs_in['value'])
+			rss:add_renderstate_in(curr_rs_in['ope'], curr_rs_in['value'])
+		end
+
+		local rs_out_config = fx_config['rs_out']
+		for k2, v2 in pairs(rs_out_config) do
+			local curr_rs_out = v2
+			--g:print(curr_rs_out['ope']..'->'..curr_rs_out['value'])
+			rss:add_renderstate_out(curr_rs_out['ope'], curr_rs_out['value'])
+		end
+		fxparams:set_renderstatesset(rss)
+
+		local shaders_config = fx_config['shaders']
+		for k2, v2 in pairs(shaders_config) do
+			local curr_shader = v2
+			--g:print(curr_shader['path']..'->'..curr_shader['mode'])
+			fxparams:add_shaderfile(curr_shader['path'],curr_shader['mode'])
+		end
+
+		local textures = TexturesSet()
+		local tx_config = v['textures']
+		for k2, v2 in pairs(tx_config) do
+			local tx = v2
+			--g:print(tx['path']..'->'..tx['stage'])
+			textures:set_texturefiletostage(tx['path'], tx['stage'])
+		end
+
+		local vtextures = TexturesSet()
+		local vtx_config = v['vertex_textures']
+		for k2, v2 in pairs(vtx_config) do
+			local vtx = v2
+			--g:print(vtx['path']..'->'..vtx['stage'])
+			vtextures:set_texturefiletostage(vtx['path'], vtx['stage'])
+		end
+
+		local shaderparams_config = v['shaders_params']
+		for k2, v2 in pairs(shaderparams_config) do
+			local param = v2
+			--g:print(param['param_name']..'->'..param['shader_index']..','..param['register'])
+			rendercontext:add_shaderparam(param['param_name'], param['shader_index'], param['register'])
+		end
+
+		rendercontext:add_fxparams(fxparams)
+		rendercontext:add_texturesset(textures)
+		rendercontext:add_vertextexturesset(vtextures)
+
+		renderconfig:add_rendercontext(rendercontext)
+	end
+
+	local rendering=Rendering()
+	rendering:instanciate_renderingimpl(p_module,p_rendering_impl_id)
+	rendering:attach_toentity(entity)
+	rendering:configure(renderconfig)
+
+	rendering:register_to_rendering(p_rendergraph)
+
+	return entity,rendering
+
+end
+
 commons.create_rendered_meshe = function(p_rendergraph, p_config, p_meshefile, p_meshe_index)
 
 	local meshe_entity=Entity()

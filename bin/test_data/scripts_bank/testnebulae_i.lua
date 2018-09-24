@@ -23,6 +23,12 @@ mvt_mod = Module("mvtmod", "mvts")
 mvt_mod:load()
 g:print(mvt_mod:get_descr().. ' loaded')
 
+vol_mod = Module("volumetricsmod", "volums")
+vol_mod:load()
+g:print(vol_mod:get_descr().. ' loaded')
+
+
+
 
 commons.init_final_pass(rg, 'final_pass')
 
@@ -34,7 +40,7 @@ text_renderer=TextRendering()
 text_renderer:configure(root_entity, "fps", 320, 30, 255, 0, 255, "??? fps")
 
 
-camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 0.0, viewport_width, viewport_height, mvt_mod)
+camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 10.0, viewport_width, viewport_height, mvt_mod)
 eg:add_child('root','camera_entity',camera_entity)
 
 
@@ -50,6 +56,58 @@ commons.setup_lit_flags( 'texture_pass', renderers, REFLECTIONS_OFF, reflectorPo
 skybox_entity, skybox_renderer, sb_transform = commons.create_skybox_with_mirror( 'texture_pass', '', rg, sb_mod, "neb_front5.png", "neb_back6.png", "neb_left2.png", "neb_right1.png", "neb_top3.png", "neb_bottom4.png", 1000.0)
 eg:add_child('root','skybox_entity',skybox_entity)
 
+
+-- ///////////////////////////////
+
+neb_entity_config = 
+{ 
+	texture_pass = 
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='color.vso',mode=SHADER_COMPILED },
+				{ path='color.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false"	}
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+			}
+		},
+		textures =
+		{
+			{path='star_far.bmp', stage=0}
+		},
+		vertex_textures =
+		{
+		},
+
+		shaders_params = 
+		{
+			{ param_name = "color", shader_index = 1, register = 0 }
+		}
+	}
+}
+
+neb_entity,neb_renderer=commons.create_rendering_from_module(rg,neb_entity_config,vol_mod,"nebulaeRender")
+eg:add_child('root','nebulae_entity',neb_entity)
+
+
+neb_entity:add_aspect(TRANSFORM_ASPECT)
+
+neb_scale = Matrix();
+neb_scale:scale(10.0, 10.0, 10.0)
+
+neb_transform = RawTransform()
+neb_transform:configure(neb_entity)
+neb_transform:add_matrix("neb_scaling",neb_scale)
+
+neb_renderer:set_shaderrealvector('texture_pass', "color", 1.0, 0.0, 1.0, 1.0 )
 
 
 -- ///////////////////////////////
@@ -138,15 +196,12 @@ end)
 g:add_appruncb( "run",
 function()  
 
-	time_infos = { root_entity:read_timemanager() }
-	output_infos = renderer:descr() .." "..time_infos[3].. " fps"
+  time_infos = { root_entity:read_timemanager() }
+  output_infos = renderer:descr() .." "..time_infos[3].. " fps "
 
-	--text_renderer:update(520, 30, 255, 0, 0, output_infos)
+  text_renderer:update(10, 30, 255, 0, 0, output_infos)
 
 end)
-
-
-
 
 
 g:show_mousecursor(FALSE)
