@@ -67,21 +67,30 @@ neb_entity_config =
 		{
 			shaders = 
 			{
-				{ path='color.vso',mode=SHADER_COMPILED },
-				{ path='color.pso',mode=SHADER_COMPILED }
+				{ path='nebulae.vso',mode=SHADER_COMPILED },
+				{ path='nebulae.pso',mode=SHADER_COMPILED }
 			},
 			rs_in = 
 			{
-				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false"	}
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false"	},
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="none" },
+				{ ope=RENDERSTATE_OPE_ALPHABLENDENABLE, value="true" },
+				{ ope=RENDERSTATE_OPE_ALPHABLENDOP, value="add" },
+				{ ope=RENDERSTATE_OPE_ALPHABLENDFUNC, value="always" },
+				{ ope=RENDERSTATE_OPE_ALPHABLENDDEST, value="one" },
+				{ ope=RENDERSTATE_OPE_ALPHABLENDSRC, value="srcalpha" }
 			},
 			rs_out =
 			{
-				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
+				{ ope=RENDERSTATE_OPE_ALPHABLENDENABLE, value="false" },
 			}
 		},
 		textures =
 		{
-			{path='star_far.bmp', stage=0}
+			{path='vn0.png', stage=0},
+			{path='nebulae_mask.jpg', stage=1},
 		},
 		vertex_textures =
 		{
@@ -107,7 +116,12 @@ neb_transform = RawTransform()
 neb_transform:configure(neb_entity)
 neb_transform:add_matrix("neb_scaling",neb_scale)
 
-neb_renderer:set_shaderrealvector('texture_pass', "color", 1.0, 0.0, 1.0, 1.0 )
+neb_renderer:set_shaderrealvector( 'texture_pass', 'color', 0.0, 1.0, 0.0, 1.0 )
+
+
+n0 = function(p_a)
+	neb_renderer:set_shaderrealvector( 'texture_pass', 'color', 1.0, 1.0, 1.0, p_a )
+end
 
 
 -- ///////////////////////////////
