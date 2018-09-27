@@ -116,7 +116,7 @@ neb_transform = RawTransform()
 neb_transform:configure(neb_entity)
 neb_transform:add_matrix("neb_scaling",neb_scale)
 
-neb_renderer:set_shaderrealvector( 'texture_pass', 'color', 0.0, 1.0, 0.0, 1.0 )
+neb_renderer:set_shaderrealvector( 'texture_pass', 'color', 1.0, 1.0, 1.0, 1.0 )
 
 
 n0 = function(p_a)
