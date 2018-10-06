@@ -5,11 +5,8 @@ renderers =
 }
 nb_renderers = 0;
 
-renderers2 =
-{
-}
-nb_renderers2 = 0;
 
+ctrl_key = FALSE
 
 renderer_descr, renderer_width, renderer_height, renderer_fullscreen, viewport_width, viewport_height = renderer:descr()
 
@@ -79,17 +76,18 @@ neb_entity_config =
 				{ ope=RENDERSTATE_OPE_ALPHABLENDFUNC, value="always" },
 				{ ope=RENDERSTATE_OPE_ALPHABLENDDEST, value="one" },
 				{ ope=RENDERSTATE_OPE_ALPHABLENDSRC, value="srcalpha" }
+								
 			},
 			rs_out =
 			{
 				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
 				{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
-				{ ope=RENDERSTATE_OPE_ALPHABLENDENABLE, value="false" },
+				{ ope=RENDERSTATE_OPE_ALPHABLENDENABLE, value="false" },				
 			}
 		},
 		textures =
 		{
-			{path='vn0.png', stage=0},
+			{path='nebulae_atlas.jpg', stage=0},
 			{path='nebulae_mask.jpg', stage=1},
 		},
 		vertex_textures =
@@ -110,13 +108,27 @@ eg:add_child('root','nebulae_entity',neb_entity)
 neb_entity:add_aspect(TRANSFORM_ASPECT)
 
 neb_scale = Matrix();
-neb_scale:scale(10.0, 10.0, 10.0)
+neb_scale:scale(1000.0, 1000.0, 1000.0)
+
+neb_roty_mat = Matrix()
+
+neb_rotx_mat = Matrix()
+
+neb_pos_mat = Matrix()
+neb_pos_mat:translation( 0.0, 0.0, -2000.0 )
+
 
 neb_transform = RawTransform()
 neb_transform:configure(neb_entity)
 neb_transform:add_matrix("neb_scaling",neb_scale)
+neb_transform:add_matrix( "roty", neb_roty_mat )
+neb_transform:add_matrix( "rotx", neb_rotx_mat )
+neb_transform:add_matrix( "pos", neb_pos_mat )
 
-neb_renderer:set_shaderrealvector( 'texture_pass', 'color', 1.0, 1.0, 1.0, 1.0 )
+neb_renderer:set_shaderrealvector('texture_pass', "color", 0.45, 1.0, 0.45, 1.0 )
+
+
+
 
 
 n0 = function(p_a)
@@ -140,17 +152,32 @@ fps_yaw:init_fromtimeaspectof(root_entity, 0.0)
 fps_pitch:init_fromtimeaspectof(root_entity,0.0)
 
 
+cube_rot_y=SyncAngle()
+cube_rot_x=SyncAngle()
+
+cube_rot_x:init_fromtimeaspectof(root_entity,0.0)
+cube_rot_y:init_fromtimeaspectof(root_entity,0.0)
+
+
 
 g:add_mousemovecb( "onmousemove",
 function( xm, ym, dx, dy )  
 
   
+  if ctrl_key == TRUE then
+    
+    cube_rot_y:inc(20.0 * dx)
+    cube_rot_x:inc(20.0 * dy)
+
+  else
+
 	fps_yaw:inc(-dx / 1.0)
 
 	fps_pitch:inc(-dy / 1.0)
 
 	fps_infos = { fps_transfo:read() }
 	fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], fps_infos[9]) 
+  end
 
 end)
 
@@ -177,11 +204,15 @@ function( key )
   --Q key
   if key == 81 then 
     fps_infos = { fps_transfo:read() }
-    fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], 12.0) 
+    fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], 1200.0) 
   --W key
   elseif key == 87 then
     fps_infos = { fps_transfo:read() }
-    fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], -12.0) 
+    fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], -1200.0) 
+  
+   
+  elseif key == 17 then
+    ctrl_key = TRUE
   end
 
 end)
@@ -202,18 +233,32 @@ function( key )
     fps_transfo:update(fps_yaw:get_value(),fps_pitch:get_value(),fps_infos[3],fps_infos[4],fps_infos[5],fps_infos[6], fps_infos[7], fps_infos[8], 0.0) 
   -- VK_F1
   elseif key == 112 then  
+
+  
+  elseif key == 17 then
+    ctrl_key = FALSE
+
   end
 
 end)
 
 
 g:add_appruncb( "run",
-function()  
+function()
+
 
   time_infos = { root_entity:read_timemanager() }
   output_infos = renderer:descr() .." "..time_infos[3].. " fps "
 
   text_renderer:update(10, 30, 255, 0, 0, output_infos)
+
+
+  neb_roty_mat:rotation( 0.0, 1.0, 0.0, commons.utils.deg_to_rad( cube_rot_y:get_value() ) )
+  neb_transform:update_matrix("roty",neb_roty_mat)
+
+  neb_rotx_mat:rotation( 1.0, 0.0, 0.0, commons.utils.deg_to_rad( cube_rot_x:get_value() ) )
+  neb_transform:update_matrix("rotx",neb_rotx_mat)
+
 
 end)
 
