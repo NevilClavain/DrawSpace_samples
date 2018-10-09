@@ -81,13 +81,16 @@ ground_entity_config =
 		},
 		textures =
 		{
-			{ path='012b2su2.jpg', stage=0 },
-			{ path='grass_bump.bmp', stage=1 }
+			[1] = 
+			{
+				{ path='012b2su2.jpg', stage=0 },
+				{ path='grass_bump.bmp', stage=1 }
+			}
 		},
 		vertex_textures =
 		{
 		},
-
+		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
 	}
 }
@@ -148,14 +151,17 @@ clothbox_entity_config =
 		},
 		textures =
 		{
-			{ path='tech_color.jpg', stage=0},
-			{ path='tech_bump.jpg', stage=1},
-			{ path='tech_mask.bmp', stage=2}
+			[1] = 
+			{
+				{ path='tech_color.jpg', stage=0},
+				{ path='tech_bump.jpg', stage=1},
+				{ path='tech_mask.bmp', stage=2}
+			}
 		},
 		vertex_textures =
 		{
 		},
-
+		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
 	}
 }
@@ -220,13 +226,16 @@ sphere_entity_config =
 		},
 		textures =
 		{
-			{ path='marbre.jpg', stage=0},
-			{ path='bump.bmp', stage=1}
+			[1] = 
+			{
+				{ path='marbre.jpg', stage=0},
+				{ path='bump.bmp', stage=1}
+			}
 		},
 		vertex_textures =
 		{
 		},
-
+		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
 	}
 }
@@ -290,13 +299,16 @@ rock_entity_config =
 		},
 		textures =
 		{
-			{ path='rock08.bmp', stage=0},
-			{ path='rock_bump.jpg', stage=1}
+			[1] = 
+			{
+				{ path='rock08.bmp', stage=0},
+				{ path='rock_bump.jpg', stage=1}
+			}
 		},
 		vertex_textures =
 		{
 		},
-
+		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
 	}
 }

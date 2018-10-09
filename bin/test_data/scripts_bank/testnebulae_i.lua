@@ -50,9 +50,72 @@ commons.update_lights( 'texture_pass', lights, renderers )
 commons.setup_lit_flags( 'texture_pass', renderers, REFLECTIONS_OFF, reflectorPos, reflectorNormale, fog_intensity, fog_color)
 
 
-skybox_entity, skybox_renderer, sb_transform = commons.create_skybox_with_mirror( 'texture_pass', '', rg, sb_mod, "neb_front5.png", "neb_back6.png", "neb_left2.png", "neb_right1.png", "neb_top3.png", "neb_bottom4.png", 1000.0)
+skybox_config =
+{
+	texture_pass =	
+	{
+		fx =
+		{
+			shaders = 
+			{
+				{ path='texture.vso',mode=SHADER_COMPILED },
+				{ path='texture.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+			},
+			rs_out =
+			{
+			}		
+		},
+		textures =
+		{
+			[1] = 
+			{
+				{path='neb_front5.png', stage=0}
+			},
+			[2] = 
+			{
+				{path='neb_back6.png', stage=0}
+			},
+			[3] = 
+			{
+				{path='neb_left2.png', stage=0}
+			},
+			[4] = 
+			{
+				{path='neb_right1.png', stage=0}
+			},
+			[5] = 
+			{
+				{path='neb_top3.png', stage=0}
+			},
+			[6] = 
+			{
+				{path='neb_bottom4.png', stage=0}
+			}
+		},
+		vertex_textures =
+		{
+		},
+		shaders_params = 
+		{
+		},
+		rendering_order = 10000
+	}
+}
+
+skybox_entity,skybox_renderer=commons.create_rendering_from_module(rg,skybox_config,sb_mod,"skyboxRender")
 eg:add_child('root','skybox_entity',skybox_entity)
 
+
+skybox_entity:add_aspect(TRANSFORM_ASPECT)
+sb_scale = Matrix();
+sb_scale:scale(1000.0, 1000.0, 1000.0)
+
+sb_transform = RawTransform()
+sb_transform:configure(skybox_entity)
+sb_transform:add_matrix("sb_scaling",sb_scale)
 
 -- ///////////////////////////////
 
@@ -87,8 +150,11 @@ neb_entity_config =
 		},
 		textures =
 		{
-			{path='nebulae_atlas.jpg', stage=0},
-			{path='nebulae_mask.jpg', stage=1},
+			[1] = 
+			{
+				{path='nebulae_atlas.jpg', stage=0},
+				{path='nebulae_mask.jpg', stage=1},
+			}
 		},
 		vertex_textures =
 		{
@@ -97,7 +163,9 @@ neb_entity_config =
 		shaders_params = 
 		{
 			{ param_name = "color", shader_index = 1, register = 0 }
-		}
+		},
+
+		rendering_order = 10000
 	}
 }
 

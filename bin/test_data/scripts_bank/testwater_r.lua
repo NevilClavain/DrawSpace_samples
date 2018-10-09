@@ -3,7 +3,9 @@
 g:signal_rendersceneend("eg")
 
 
-commons.trash.skybox(rg, sb_mod, skybox_entity, skybox_renderer, sb_transform)
+sb_transform:release()
+skybox_entity:remove_aspect(TRANSFORM_ASPECT)
+commons.trash.rendering(rg, sb_mod, skybox_entity, skybox_renderer)
 eg:remove('skybox_entity')
 
 

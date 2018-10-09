@@ -64,6 +64,8 @@ rg:create_child('final_pass', 'texture_pass', 0)
 rg:create_child('final_pass', 'texturemirror_pass', 1)
 
 
+
+
 rg:create_child('final_pass', 'bump_pass', 2, RENDERPURPOSE_FLOATVECTOR)
 rg:set_pass_depthclearstate('bump_pass', TRUE)
 rg:set_pass_targetclearstate('bump_pass', TRUE)
@@ -123,6 +125,7 @@ ground_entity_config =
 		},
 		textures =
 		{
+		
 		},
 		vertex_textures =
 		{
@@ -130,7 +133,8 @@ ground_entity_config =
 		shaders_params =
 		{
 			{ param_name = "color", shader_index = 1, register = 0 }
-		}
+		},
+		rendering_order = 10000
 	},
 	bump_pass = 
 	{
@@ -159,7 +163,8 @@ ground_entity_config =
 		shaders_params =
 		{
 			{ param_name = 'bump_bias', shader_index = 1, register = 0 }
-		}	
+		},
+		rendering_order = 10000
 	}
 }
 
@@ -204,11 +209,15 @@ cube_entity_config =
 		},
 		textures =
 		{
-			{ path='mars.jpg', stage=0 }
+			[1] =
+			{
+				{ path='mars.jpg', stage=0 }
+			}
 		},
 		vertex_textures =
 		{
 		},
+		rendering_order = 10000,
 
 		shaders_params = commons.setup_lit_shader_params()
 	},
@@ -234,11 +243,15 @@ cube_entity_config =
 		},
 		textures =
 		{
-			{ path='mars.jpg', stage=0 }
+			[1] =
+			{
+				{ path='mars.jpg', stage=0 }
+			}
 		},
 		vertex_textures =
 		{
-		},
+		},		
+		rendering_order = 10000,
 
 		shaders_params = commons.setup_lit_shader_params()
 	}
@@ -316,13 +329,16 @@ sphere_entity_config =
 		},
 		textures =
 		{
-			{ path='marbre.jpg', stage=0},
-			{ path='bump.bmp', stage=1}
+			[1] = 
+			{
+				{ path='marbre.jpg', stage=0},
+				{ path='bump.bmp', stage=1}
+			}
 		},
 		vertex_textures =
 		{
-		},
-
+		},		
+		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
 	},
 	texturemirror_pass = 
@@ -347,13 +363,16 @@ sphere_entity_config =
 		},
 		textures =
 		{
-			{ path='marbre.jpg', stage=0},
-			{ path='bump.bmp', stage=1}
+			[1] =
+			{
+				{ path='marbre.jpg', stage=0},
+				{ path='bump.bmp', stage=1}
+			}
 		},
 		vertex_textures =
 		{
 		},
-
+		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
 	}
 }
@@ -425,13 +444,16 @@ land_entity_config =
 		},
 		textures =
 		{
-			{ path='012b2su2.jpg', stage=0 },
-			{ path='grass_bump.bmp', stage=1 }
+			[1] = 
+			{
+				{ path='012b2su2.jpg', stage=0 },
+				{ path='grass_bump.bmp', stage=1 }
+			}
 		},
 		vertex_textures =
 		{
 		},
-
+		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
 	},
 	texturemirror_pass = 
@@ -456,13 +478,16 @@ land_entity_config =
 		},
 		textures =
 		{
-			{ path='012b2su2.jpg', stage=0 },
-			{ path='grass_bump.bmp', stage=1 }
+			[1] = 
+			{
+				{ path='012b2su2.jpg', stage=0 },
+				{ path='grass_bump.bmp', stage=1 }
+			}
 		},
 		vertex_textures =
 		{
 		},
-
+		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
 	}
 }
@@ -511,11 +536,135 @@ commons.setup_lit_flags( 'texturemirror_pass', renderers, REFLECTIONS_ON, reflec
 
 
 
-skybox_entity, skybox_renderer, sb_transform = commons.create_skybox_with_mirror( 'texture_pass', 'texturemirror_pass', rg, sb_mod, "sb0.bmp", "sb2.bmp", "sb3.bmp", "sb1.bmp", "sb4.bmp", "sb4.bmp", 1000.0)
+
+skybox_config =
+{
+	texture_pass =	
+	{
+		fx =
+		{
+			shaders = 
+			{
+				{ path='texture.vso',mode=SHADER_COMPILED },
+				{ path='texture.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+			},
+			rs_out =
+			{
+			}		
+		},
+		textures =
+		{
+			[1] = 
+			{
+				{path='sb0.bmp', stage=0}
+			},
+			[2] = 
+			{
+				{path='sb2.bmp', stage=0}
+			},
+			[3] = 
+			{
+				{path='sb3.bmp', stage=0}
+			},
+			[4] = 
+			{
+				{path='sb1.bmp', stage=0}
+			},
+			[5] = 
+			{
+				{path='sb4.bmp', stage=0}
+			},
+			[6] = 
+			{
+				{path='sb4.bmp', stage=0}
+			}
+		},
+		vertex_textures =
+		{
+		},
+		shaders_params = 
+		{
+		},
+		rendering_order = 10000
+	},
+
+	texturemirror_pass =	
+	{
+		fx =
+		{
+			shaders = 
+			{
+				{ path='texture_mirror.vso',mode=SHADER_COMPILED },
+				{ path='texture_mirror.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" },
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="ccw" },		
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
+			}		
+		},
+		textures =
+		{
+			[1] = 
+			{
+				{path='sb0.bmp', stage=0}
+			},
+			[2] = 
+			{
+				{path='sb2.bmp', stage=0}
+			},
+			[3] = 
+			{
+				{path='sb3.bmp', stage=0}
+			},
+			[4] = 
+			{
+				{path='sb1.bmp', stage=0}
+			},
+			[5] = 
+			{
+				{path='sb4.bmp', stage=0}
+			},
+			[6] = 
+			{
+				{path='sb4.bmp', stage=0}
+			}
+		},
+		vertex_textures =
+		{
+		},
+		shaders_params = 
+		{
+			{ param_name = "reflector_pos", shader_index = 0, register = 24 },
+			{ param_name = "reflector_normale", shader_index = 0, register = 25 },
+		},
+		rendering_order = 10000
+	}
+}
+
+
+skybox_entity,skybox_renderer=commons.create_rendering_from_module(rg,skybox_config,sb_mod,"skyboxRender")
 eg:add_child('root','skybox_entity',skybox_entity)
+
+skybox_entity:add_aspect(TRANSFORM_ASPECT)
+sb_scale = Matrix();
+sb_scale:scale(1000.0, 1000.0, 1000.0)
+
+sb_transform = RawTransform()
+sb_transform:configure(skybox_entity)
+sb_transform:add_matrix("sb_scaling",sb_scale)
 
 skybox_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
 skybox_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_normale', 0.0, 1.0, 0.0, 1.0)
+
 
 
 -- ///////////////////////////////
@@ -666,7 +815,6 @@ function()
 	cube_rot:inc( 10.0 )
 	
 	cube_rot_mat:rotation( 0.0, 0.0, 1.0, commons.utils.deg_to_rad( cube_rot:get_value() ) )
-	--cube_transform:update_matrix("cube_rot",cube_rot_mat)
 
 	cube_final_mat:set_product( cube_rot_mat, cube_pos_mat)
 
@@ -744,12 +892,15 @@ add_cube = function()
 			},
 			textures =
 			{
-				{ path='Bloc1.jpg', stage=0 }
+				[1] = 
+				{
+					{ path='Bloc1.jpg', stage=0 }
+				}
 			},
 			vertex_textures =
 			{
 			},
-
+			rendering_order = 10000,
 			shaders_params = commons.setup_lit_shader_params()
 		}
 		,
@@ -775,12 +926,15 @@ add_cube = function()
 			},
 			textures =
 			{
-				{ path='Bloc1.jpg', stage=0 }
+				[1] = 
+				{
+					{ path='Bloc1.jpg', stage=0 }
+				}
 			},
 			vertex_textures =
 			{
 			},
-
+			rendering_order = 10000,
 			shaders_params = commons.setup_lit_shader_params()	
 		}
 	}
@@ -899,5 +1053,4 @@ set_water_bump = function(bias)
 end
 
 g:signal_renderscenebegin("eg")
-
 
