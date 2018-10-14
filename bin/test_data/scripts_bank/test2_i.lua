@@ -95,7 +95,8 @@ ground_entity_config =
 	}
 }
 
-ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'land2.ac', 0)
+ground_entity, ground_renderer = commons.create_rendered_meshe(ground_entity_config, 'land2.ac', 0)
+ground_renderer:register_to_rendering(rg)
 eg:add_child('root','ground_entity',ground_entity)
 
 ground_entity:add_aspect(BODY_ASPECT)
@@ -168,7 +169,8 @@ clothbox_entity_config =
 
 
 
-clothbox_entity,clothbox_renderer = commons.create_rendered_meshe(rg, clothbox_entity_config, 'tech.ac', 0)
+clothbox_entity,clothbox_renderer = commons.create_rendered_meshe(clothbox_entity_config, 'tech.ac', 0)
+clothbox_renderer:register_to_rendering(rg)
 eg:add_child('root','clothbox_entity',clothbox_entity)
 
 clothbox_material =
@@ -239,7 +241,8 @@ sphere_entity_config =
 		shaders_params = commons.setup_lit_shader_params()
 	}
 }
-sphere_entity,sphere_renderer = commons.create_rendered_meshe(rg, sphere_entity_config, 'sphere.ac', 0)
+sphere_entity,sphere_renderer = commons.create_rendered_meshe(sphere_entity_config, 'sphere.ac', 0)
+sphere_renderer:register_to_rendering(rg)
 eg:add_child('root','sphere_entity',sphere_entity)
 
 
@@ -312,7 +315,8 @@ rock_entity_config =
 		shaders_params = commons.setup_lit_shader_params()
 	}
 }
-rock_entity,rock_renderer = commons.create_rendered_meshe(rg, rock_entity_config, 'rock.ac', 0)
+rock_entity,rock_renderer = commons.create_rendered_meshe(rock_entity_config, 'rock.ac', 0)
+rock_renderer:register_to_rendering(rg)
 eg:add_child('root','rock_entity',rock_entity)
 
 

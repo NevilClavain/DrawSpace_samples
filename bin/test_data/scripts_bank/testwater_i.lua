@@ -168,7 +168,8 @@ ground_entity_config =
 	}
 }
 
-ground_entity, ground_renderer = commons.create_rendered_meshe(rg, ground_entity_config, 'water.ac', 0)
+ground_entity, ground_renderer = commons.create_rendered_meshe(ground_entity_config, 'water.ac', 0)
+ground_renderer:register_to_rendering(rg)
 ground_renderer:set_shaderrealvector('texture_pass', "color", 1.0, 0.0, 1.0, 1.0 )
 ground_renderer:set_shaderrealvector('bump_pass', 'bump_bias', 1.0, 0.0, 0.0, 0.0)
 
@@ -256,7 +257,8 @@ cube_entity_config =
 		shaders_params = commons.setup_lit_shader_params()
 	}
 }
-cube_entity, cube_renderer = commons.create_rendered_meshe(rg, cube_entity_config, 'object.ac', 0)
+cube_entity, cube_renderer = commons.create_rendered_meshe(cube_entity_config, 'object.ac', 0)
+cube_renderer:register_to_rendering(rg)
 eg:add_child('root','cube_entity',cube_entity)
 
 
@@ -376,7 +378,8 @@ sphere_entity_config =
 		shaders_params = commons.setup_lit_shader_params()
 	}
 }
-sphere_entity,sphere_renderer = commons.create_rendered_meshe(rg, sphere_entity_config, 'sphere.ac', 0)
+sphere_entity,sphere_renderer = commons.create_rendered_meshe(sphere_entity_config, 'sphere.ac', 0)
+sphere_renderer:register_to_rendering(rg)
 eg:add_child('root','sphere_entity',sphere_entity)
 
 
@@ -492,7 +495,8 @@ land_entity_config =
 	}
 }
 
-land_entity, land_renderer = commons.create_rendered_meshe(rg, land_entity_config, 'land2.ac', 0)
+land_entity, land_renderer = commons.create_rendered_meshe(land_entity_config, 'land2.ac', 0)
+land_renderer:register_to_rendering(rg)
 eg:add_child('root','land_entity',land_entity)
 
 land_entity:add_aspect(BODY_ASPECT)
@@ -651,7 +655,8 @@ skybox_config =
 }
 
 
-skybox_entity,skybox_renderer=commons.create_rendering_from_module(rg,skybox_config,sb_mod,"skyboxRender")
+skybox_entity,skybox_renderer=commons.create_rendering_from_module(skybox_config,sb_mod,"skyboxRender")
+skybox_renderer:register_to_rendering(rg)
 eg:add_child('root','skybox_entity',skybox_entity)
 
 skybox_entity:add_aspect(TRANSFORM_ASPECT)
@@ -938,7 +943,8 @@ add_cube = function()
 			shaders_params = commons.setup_lit_shader_params()	
 		}
 	}
-	cube_entity, cube_renderer = commons.create_rendered_meshe(rg, cube_entity_config, 'object.ac', 0)
+	cube_entity, cube_renderer = commons.create_rendered_meshe(cube_entity_config, 'object.ac', 0)
+	cube_renderer:register_to_rendering(rg)
 	eg:add_child('root',cube_name,cube_entity)
 
 

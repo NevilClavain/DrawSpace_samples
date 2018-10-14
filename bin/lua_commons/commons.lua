@@ -97,7 +97,7 @@ commons.create_free_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewpor
 	return camera_entity, free_transfo
 end
 
-commons.create_rendering_from_module = function(p_rendergraph, p_config, p_module, p_rendering_impl_id)
+commons.create_rendering_from_module = function(p_config, p_module, p_rendering_impl_id, p_specific_config)
 
 	local renderconfig=RenderConfig()
 
@@ -181,13 +181,10 @@ commons.create_rendering_from_module = function(p_rendergraph, p_config, p_modul
 	rendering:attach_toentity(entity)
 	rendering:configure(renderconfig)
 
-	rendering:register_to_rendering(p_rendergraph)
-
 	return entity,rendering
-
 end
 
-commons.create_rendered_meshe = function(p_rendergraph, p_config, p_meshefile, p_meshe_index)
+commons.create_rendered_meshe = function(p_config, p_meshefile, p_meshe_index)
 
 	local meshe_entity=Entity()
 	meshe_entity:add_aspect(RENDERING_ASPECT)
@@ -272,7 +269,7 @@ commons.create_rendered_meshe = function(p_rendergraph, p_config, p_meshefile, p
 
 	renderer:configure(renderconfig, p_meshefile, p_meshe_index)
 
-	renderer:register_to_rendering(p_rendergraph)
+	
 
 	return meshe_entity, renderer
 end

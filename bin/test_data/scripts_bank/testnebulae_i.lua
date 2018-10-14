@@ -105,7 +105,8 @@ skybox_config =
 	}
 }
 
-skybox_entity,skybox_renderer=commons.create_rendering_from_module(rg,skybox_config,sb_mod,"skyboxRender")
+skybox_entity,skybox_renderer=commons.create_rendering_from_module(skybox_config,sb_mod,"skyboxRender")
+skybox_renderer:register_to_rendering(rg)
 eg:add_child('root','skybox_entity',skybox_entity)
 
 
@@ -169,7 +170,11 @@ neb_entity_config =
 	}
 }
 
-neb_entity,neb_renderer=commons.create_rendering_from_module(rg,neb_entity_config,vol_mod,"nebulaeRender")
+neb_entity,neb_renderer=commons.create_rendering_from_module(neb_entity_config,vol_mod,"nebulaeRender")
+nebulae_specific_config = NebulaeSpecificConfig()
+nebulae_specific_config:apply(neb_renderer)
+neb_renderer:register_to_rendering(rg)
+
 eg:add_child('root','nebulae_entity',neb_entity)
 
 
