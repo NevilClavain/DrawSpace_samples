@@ -133,13 +133,16 @@ neb_entity_config =
 			},
 			rs_in = 
 			{
-				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false"	},
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
 				{ ope=RENDERSTATE_OPE_SETCULLING, value="none" },
+				
+				
 				{ ope=RENDERSTATE_OPE_ALPHABLENDENABLE, value="true" },
 				{ ope=RENDERSTATE_OPE_ALPHABLENDOP, value="add" },
 				{ ope=RENDERSTATE_OPE_ALPHABLENDFUNC, value="always" },
-				{ ope=RENDERSTATE_OPE_ALPHABLENDDEST, value="one" },
+				{ ope=RENDERSTATE_OPE_ALPHABLENDDEST, value="invsrcalpha" },
 				{ ope=RENDERSTATE_OPE_ALPHABLENDSRC, value="srcalpha" }
+				
 								
 			},
 			rs_out =
@@ -198,7 +201,7 @@ neb_transform:add_matrix( "roty", neb_roty_mat )
 neb_transform:add_matrix( "rotx", neb_rotx_mat )
 neb_transform:add_matrix( "pos", neb_pos_mat )
 
-neb_renderer:set_shaderrealvector('texture_pass', "color", 0.45, 1.0, 0.45, 1.0 )
+neb_renderer:set_shaderrealvector('texture_pass', "color", 0.99, 0.00, 0.00, 1.0)
 
 
 
