@@ -163,10 +163,8 @@ neb_entity_config =
 		vertex_textures =
 		{
 		},
-
 		shaders_params = 
 		{
-			{ param_name = "color", shader_index = 1, register = 0 }
 		},
 
 		rendering_order = 10000
