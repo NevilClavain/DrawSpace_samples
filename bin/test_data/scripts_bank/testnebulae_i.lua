@@ -157,7 +157,7 @@ neb_entity_config =
 			[1] = 
 			{
 				{path='nebulae_atlas.jpg', stage=0},
-				{path='nebulae_mask.jpg', stage=1},
+				{path='nebulae_mask_atlas.jpg', stage=1},
 			}
 		},
 		vertex_textures =
