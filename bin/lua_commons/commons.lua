@@ -4,6 +4,11 @@ commons = {}
 commons.utils = {}
 commons.trash = {}
 
+commons.procedural = {}
+
+commons.procedural.nebulae = {}
+
+
 commons.utils.PI = 3.1415927
 
 REFLECTIONS_OFF=0
@@ -376,6 +381,38 @@ commons.apply_material = function(p_material, p_renderer, p_pass_id)
 	end
 end
 
+
+
+
+
+commons.procedural.nebulae.generate_texture_uv_coords = function(nebulae_specific_configuration, bloc_index, random_engine, min, max)
+  
+  local distr=Distribution("uniform_int_distribution", min, max)
+
+  for i = 0, 100, 1 do
+    local u = distr:generate(random_engine)
+	local v = distr:generate(random_engine)
+	nebulae_specific_configuration:add_bloctextureuvpair(bloc_index, u, v)
+  end  
+end
+
+commons.procedural.nebulae.generate_mask_uv_coords = function(nebulae_specific_configuration, bloc_index, random_engine, min, max)
+  
+  local distr=Distribution("uniform_int_distribution", min, max)
+
+  for i = 0, 100, 1 do
+    local u = distr:generate(random_engine)
+	local v = distr:generate(random_engine)
+	nebulae_specific_configuration:add_blocmaskuvpair(bloc_index, u, v)
+  end  
+end
+
+
+
+
+
+
+
 commons.trash.rendering = function(p_rendergraph, p_module, p_entity, p_renderer)
 
 	p_renderer:unregister_from_rendering(p_rendergraph)
@@ -430,3 +467,5 @@ commons.unlit_color_material =
 	light_absorption = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
 	self_emissive = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
 }
+
+
