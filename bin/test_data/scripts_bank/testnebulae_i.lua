@@ -176,6 +176,8 @@ rand_engine=RandomEngine(53434)
 neb_entity,neb_renderer=commons.create_rendering_from_module(neb_entity_config,vol_mod,"nebulaeRender")
 nebulae_specific_config = NebulaeSpecificConfig()
 
+nebulae_specific_config:set_texturesresolutions( 8, 4 )
+
 nebulae_specific_config:create_bloc()
 nebulae_specific_config:set_bloccolor(0, 0.9, 0.2, 0.3)
 nebulae_specific_config:set_blocposition(0, 0.0, 0.0, 0.0)
