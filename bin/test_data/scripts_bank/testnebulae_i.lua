@@ -178,13 +178,14 @@ nebulae_specific_config = NebulaeSpecificConfig()
 
 nebulae_specific_config:set_texturesresolutions( 8, 4 )
 
+
 nebulae_specific_config:create_bloc()
 nebulae_specific_config:set_bloccolor(0, 0.9, 0.2, 0.3)
 nebulae_specific_config:set_blocposition(0, 0.0, 0.0, 0.0)
 nebulae_specific_config:set_blocscale(0, 2.0)
 
-commons.procedural.nebulae.generate_texture_uv_coords(nebulae_specific_config, 0, rand_engine, 0, 7)
-commons.procedural.nebulae.generate_mask_uv_coords(nebulae_specific_config, 0, rand_engine, 0, 3)
+commons.procedural.nebulae.generate_texture_uv_coords(nebulae_specific_config, 0, rand_engine, 100, 0, 7)
+commons.procedural.nebulae.generate_mask_uv_coords(nebulae_specific_config, 0, rand_engine, 100, 0, 3)
 
 
 nebulae_specific_config:create_bloc()
@@ -192,8 +193,8 @@ nebulae_specific_config:set_bloccolor(1, 0.9, 0.2, 0.3)
 nebulae_specific_config:set_blocposition(1, 0.43, 0.7, 0.0)
 nebulae_specific_config:set_blocscale(1, 1.3)
 
-commons.procedural.nebulae.generate_texture_uv_coords(nebulae_specific_config, 1, rand_engine, 0, 7)
-commons.procedural.nebulae.generate_mask_uv_coords(nebulae_specific_config, 1, rand_engine, 0, 3)
+commons.procedural.nebulae.generate_texture_uv_coords(nebulae_specific_config, 1, rand_engine, 100, 0, 7)
+commons.procedural.nebulae.generate_mask_uv_coords(nebulae_specific_config, 1, rand_engine, 100, 0, 3)
 
 
 nebulae_specific_config:create_bloc()
@@ -201,11 +202,13 @@ nebulae_specific_config:set_bloccolor(2, 0.0, 0.0, 0.0)
 nebulae_specific_config:set_blocposition(2, 0.0, 0.0, 0.4)
 nebulae_specific_config:set_blocscale(2, 0.6)
 
-commons.procedural.nebulae.generate_texture_uv_coords(nebulae_specific_config, 2, rand_engine, 0, 7)
-commons.procedural.nebulae.generate_mask_uv_coords(nebulae_specific_config, 2, rand_engine, 0, 3)
+commons.procedural.nebulae.generate_texture_uv_coords(nebulae_specific_config, 2, rand_engine, 100, 0, 7)
+commons.procedural.nebulae.generate_mask_uv_coords(nebulae_specific_config, 2, rand_engine, 100, 0, 3)
 
 
 nebulae_specific_config:apply(neb_renderer)
+
+
 neb_renderer:register_to_rendering(rg)
 
 eg:add_child('root','nebulae_entity',neb_entity)

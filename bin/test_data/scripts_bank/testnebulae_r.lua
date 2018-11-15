@@ -13,6 +13,7 @@ eg:remove('skybox_entity')
 
 neb_transform:release()
 neb_entity:remove_aspect(TRANSFORM_ASPECT)
+nebulae_specific_config:cleanup(neb_renderer)
 commons.trash.rendering(rg, vol_mod, neb_entity, neb_renderer)
 eg:remove('nebulae_entity')
 

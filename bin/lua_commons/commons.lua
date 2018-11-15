@@ -385,22 +385,22 @@ end
 
 
 
-commons.procedural.nebulae.generate_texture_uv_coords = function(nebulae_specific_configuration, bloc_index, random_engine, min, max)
+commons.procedural.nebulae.generate_texture_uv_coords = function(nebulae_specific_configuration, bloc_index, random_engine, list_size, min, max)
   
   local distr=Distribution("uniform_int_distribution", min, max)
 
-  for i = 0, 100, 1 do
+  for i = 0, list_size - 1, 1 do
     local u = distr:generate(random_engine)
 	local v = distr:generate(random_engine)
 	nebulae_specific_configuration:add_bloctextureuvpair(bloc_index, u, v)
   end  
 end
 
-commons.procedural.nebulae.generate_mask_uv_coords = function(nebulae_specific_configuration, bloc_index, random_engine, min, max)
+commons.procedural.nebulae.generate_mask_uv_coords = function(nebulae_specific_configuration, bloc_index, random_engine, list_size, min, max)
   
   local distr=Distribution("uniform_int_distribution", min, max)
 
-  for i = 0, 100, 1 do
+  for i = 0, list_size - 1, 1 do
     local u = distr:generate(random_engine)
 	local v = distr:generate(random_engine)
 	nebulae_specific_configuration:add_blocmaskuvpair(bloc_index, u, v)
