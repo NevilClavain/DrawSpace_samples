@@ -382,18 +382,60 @@ commons.apply_material = function(p_material, p_renderer, p_pass_id)
 end
 
 
+commons.procedural.nebulae.build_specific_config=function(nebulae_specific_configuration,random_engine)
 
+   -- generation du vecteur direction
+
+   local dir_vector_distr=Distribution("uniform_real_distribution", -1.0, 1.0)
+
+   local xdir = dir_vector_distr:generate(random_engine)
+   local ydir = dir_vector_distr:generate(random_engine)
+   local zdir = dir_vector_distr:generate(random_engine)
+
+   local dir_vector = Vector(xdir, ydir, zdir, 1.0)
+   dir_vector:normalize()
+   g:print('dir_vector : '..dir_vector:get_x().. ' '..dir_vector:get_y().. ' '..dir_vector:get_z())
+
+   local pos_vector = Vector()
+
+	-- nbre de blocs sur la branche
+	local distr1=Distribution("uniform_int_distribution", 4, 8)
+	local nb_blocs_branches = distr1:generate(random_engine)
+
+	local step_distr=Distribution("uniform_real_distribution", 0.3, 0.6)
+	g:print('nb blocs par branches : '..nb_blocs_branches)
+
+	local branch_scale = 0.0
+	for i = 0, nb_blocs_branches - 1, 1 do		
+		local step=step_distr:generate(random_engine)
+		branch_scale = branch_scale + step
+
+		--g:print('branch_scale : '..branch_scale)
+
+		pos_vector:set_x(dir_vector:get_x())
+		pos_vector:set_y(dir_vector:get_y())
+		pos_vector:set_z(dir_vector:get_z())
+
+		pos_vector:scale(branch_scale)
+
+		g:print('pos_vector : '..pos_vector:get_x().. ' '..pos_vector:get_y().. ' '..pos_vector:get_z())
+
+	end
+
+end
 
 
 commons.procedural.nebulae.generate_texture_uv_coords = function(nebulae_specific_configuration, bloc_index, random_engine, list_size, min, max)
   
-  local distr=Distribution("uniform_int_distribution", min, max)
+	local distr=Distribution("uniform_int_distribution", min, max)
 
-  for i = 0, list_size - 1, 1 do
-    local u = distr:generate(random_engine)
-	local v = distr:generate(random_engine)
-	nebulae_specific_configuration:add_bloctextureuvpair(bloc_index, u, v)
-  end  
+	for i = 0, list_size - 1, 1 do
+		local u = distr:generate(random_engine)
+		local v = distr:generate(random_engine)
+		nebulae_specific_configuration:add_bloctextureuvpair(bloc_index, u, v)
+	end
+
+	distr=0;
 end
 
 commons.procedural.nebulae.generate_mask_uv_coords = function(nebulae_specific_configuration, bloc_index, random_engine, list_size, min, max)
@@ -404,7 +446,8 @@ commons.procedural.nebulae.generate_mask_uv_coords = function(nebulae_specific_c
     local u = distr:generate(random_engine)
 	local v = distr:generate(random_engine)
 	nebulae_specific_configuration:add_blocmaskuvpair(bloc_index, u, v)
-  end  
+  end
+  distr = 0;
 end
 
 

@@ -171,14 +171,14 @@ neb_entity_config =
 	}
 }
 
-rand_engine=RandomEngine(53434)
+rand_engine=RandomEngine(1898)
 
 neb_entity,neb_renderer=commons.create_rendering_from_module(neb_entity_config,vol_mod,"nebulaeRender")
 nebulae_specific_config = NebulaeSpecificConfig()
 
 nebulae_specific_config:set_texturesresolutions( 8, 4 )
 
-
+--[[
 nebulae_specific_config:create_bloc()
 nebulae_specific_config:set_bloccolor(0, 0.9, 0.2, 0.3)
 nebulae_specific_config:set_blocposition(0, 0.0, 0.0, 0.0)
@@ -204,6 +204,13 @@ nebulae_specific_config:set_blocscale(2, 0.6)
 
 commons.procedural.nebulae.generate_texture_uv_coords(nebulae_specific_config, 2, rand_engine, 100, 0, 7)
 commons.procedural.nebulae.generate_mask_uv_coords(nebulae_specific_config, 2, rand_engine, 100, 0, 3)
+]]
+
+
+
+commons.procedural.nebulae.build_specific_config(nebulae_specific_config,rand_engine)
+
+
 
 
 nebulae_specific_config:apply(neb_renderer)
