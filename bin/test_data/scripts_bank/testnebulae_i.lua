@@ -37,7 +37,7 @@ text_renderer=TextRendering()
 text_renderer:configure(root_entity, "fps", 320, 30, 255, 0, 255, "??? fps")
 
 
-camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 10.0, viewport_width, viewport_height, mvt_mod)
+camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 30.0, viewport_width, viewport_height, mvt_mod)
 eg:add_child('root','camera_entity',camera_entity)
 
 
@@ -171,7 +171,7 @@ neb_entity_config =
 	}
 }
 
-rand_engine=RandomEngine(1898)
+rand_engine=RandomEngine(3360669)
 
 neb_entity,neb_renderer=commons.create_rendering_from_module(neb_entity_config,vol_mod,"nebulaeRender")
 nebulae_specific_config = NebulaeSpecificConfig()
@@ -209,6 +209,7 @@ commons.procedural.nebulae.generate_mask_uv_coords(nebulae_specific_config, 2, r
 
 
 commons.procedural.nebulae.build_specific_config(nebulae_specific_config,rand_engine)
+
 
 
 

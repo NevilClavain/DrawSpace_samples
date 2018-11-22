@@ -382,47 +382,146 @@ commons.apply_material = function(p_material, p_renderer, p_pass_id)
 end
 
 
+commons.print_vector=function(msg,vector)
+	g:print(msg..vector:get_x().. ' '..vector:get_y().. ' '..vector:get_z())	
+end
+
+-- find random vector perpendicular to vec_in (dot product vec_in * res_vec equals 0)
+commons.procedural.find_normal_vector=function(vec_in,random_engine,vec_out)
+
+	local real_distr=Distribution("uniform_real_distribution", -1.0, 1.0)
+
+	local xp = 0.0
+	local yp = 0.0
+
+	while xp == 0.0 and yp == 0.0 do
+		xp = real_distr:generate(random_engine)
+		yp = real_distr:generate(random_engine)
+	end
+	local zp = (-1.0 / vec_in:get_z()) * ((xp * vec_in:get_x()) + (yp * vec_in:get_y()))
+
+	vec_out:set_x(xp)
+	vec_out:set_y(yp)
+	vec_out:set_z(zp)
+end
+
+
+
+
+
 commons.procedural.nebulae.build_specific_config=function(nebulae_specific_configuration,random_engine)
 
+	local color_distr=Distribution("uniform_real_distribution", 0.1, 0.8)
+
+	local nb_color_distr=Distribution("uniform_int_distribution", 0, 1)
+	
+	local nb_branches_distr=Distribution("uniform_int_distribution", 1, 5)
+	local nb_branches = nb_branches_distr:generate(random_engine)
+
+
+	local mono_color = nb_color_distr:generate(random_engine)
+	local mono_base_color_r = color_distr:generate(random_engine)	
+	local mono_base_color_g = color_distr:generate(random_engine)
+	local mono_base_color_b = color_distr:generate(random_engine)
+
+    for i = 0, nb_branches - 1, 1 do	
+
+		local base_color_r = color_distr:generate(random_engine)	
+		local base_color_g = color_distr:generate(random_engine)
+		local base_color_b = color_distr:generate(random_engine)
+
+		local color_vector;
+
+		if mono_color == 0 then 
+			color_vector = Vector(base_color_r, base_color_g, base_color_b, 1.0)
+		else
+			color_vector = Vector(mono_base_color_r, mono_base_color_g, mono_base_color_b, 1.0)
+		end
+
+		commons.procedural.nebulae.build_branche(nebulae_specific_configuration,random_engine,color_vector)
+	end
+end
+
+
+commons.procedural.nebulae.build_branche=function(nebulae_specific_configuration,random_engine,base_color_vector)
    -- generation du vecteur direction
 
-   local dir_vector_distr=Distribution("uniform_real_distribution", -1.0, 1.0)
+	local dir_vector_distr=Distribution("uniform_real_distribution", -1.0, 1.0)
 
-   local xdir = dir_vector_distr:generate(random_engine)
-   local ydir = dir_vector_distr:generate(random_engine)
-   local zdir = dir_vector_distr:generate(random_engine)
+	local xdir = 0.0
+	local ydir = 0.0
+	local zdir = 0.0
 
-   local dir_vector = Vector(xdir, ydir, zdir, 1.0)
-   dir_vector:normalize()
-   g:print('dir_vector : '..dir_vector:get_x().. ' '..dir_vector:get_y().. ' '..dir_vector:get_z())
+	while xdir == 0.0 and ydir == 0.0 and zdir == 0.0 do
+		xdir = dir_vector_distr:generate(random_engine)
+		ydir = dir_vector_distr:generate(random_engine)
+		zdir = dir_vector_distr:generate(random_engine)
+	end
 
-   local pos_vector = Vector()
+	local dir_vector = Vector(xdir, ydir, zdir, 1.0)
+	dir_vector:normalize()
 
-	-- nbre de blocs sur la branche
-	local distr1=Distribution("uniform_int_distribution", 4, 8)
+	commons.print_vector('dir_vector : ', dir_vector)
+
+	local pos_vector = Vector()
+	local prev_pos_vector = Vector(0.0, 0.0, 0.0, 0.0)
+	local diff_pos_vector = Vector(0.0, 0.0, 0.0, 0.0)
+
+		-- nbre de blocs sur la branche
+	local distr1=Distribution("uniform_int_distribution", 2, 5)
 	local nb_blocs_branches = distr1:generate(random_engine)
 
-	local step_distr=Distribution("uniform_real_distribution", 0.3, 0.6)
+	local step_distr=Distribution("uniform_real_distribution", 0.1, 1.9)
 	g:print('nb blocs par branches : '..nb_blocs_branches)
+
+	local delta_distr=Distribution("uniform_real_distribution", 0.15, 0.533)
+
+	commons.print_vector('base_color_vector : ', base_color_vector)
+
+	local black_bloc_distr=Distribution("uniform_int_distribution", 0, 7)
 
 	local branch_scale = 0.0
 	for i = 0, nb_blocs_branches - 1, 1 do		
 		local step=step_distr:generate(random_engine)
 		branch_scale = branch_scale + step
 
-		--g:print('branch_scale : '..branch_scale)
-
-		pos_vector:set_x(dir_vector:get_x())
-		pos_vector:set_y(dir_vector:get_y())
-		pos_vector:set_z(dir_vector:get_z())
-
+		pos_vector:copy(dir_vector)
 		pos_vector:scale(branch_scale)
 
-		g:print('pos_vector : '..pos_vector:get_x().. ' '..pos_vector:get_y().. ' '..pos_vector:get_z())
+		commons.print_vector('pos_vector : ', pos_vector)
+
+		diff_pos_vector:copy(pos_vector)
+		diff_pos_vector:sub_with(prev_pos_vector)
+		commons.print_vector('diff_pos_vector : ', diff_pos_vector)
+		prev_pos_vector:copy(pos_vector)
+
+
+		local delta_vector=Vector()	
+		commons.procedural.find_normal_vector(dir_vector,random_engine,delta_vector)
+		delta_vector:scale(delta_distr:generate(random_engine))
+
+		local bloc_index = nebulae_specific_configuration:create_bloc()
+
+		local set_black_color = black_bloc_distr:generate(random_engine)
+
+		if set_black_color == 0 then 
+			nebulae_specific_configuration:set_bloccolor(bloc_index, 0, 0, 0)
+		else
+			nebulae_specific_configuration:set_bloccolor(bloc_index, base_color_vector:get_x(), base_color_vector:get_y(), base_color_vector:get_z())
+		end
+
+		nebulae_specific_configuration:set_blocscale(bloc_index, 3.0 * diff_pos_vector:length())
+		nebulae_specific_config:set_blocposition(bloc_index, pos_vector:get_x() + delta_vector:get_x(), 
+													pos_vector:get_y() + delta_vector:get_y(), 
+													pos_vector:get_z() + delta_vector:get_z())
+
+		commons.procedural.nebulae.generate_texture_uv_coords(nebulae_specific_configuration, bloc_index, random_engine, 100, 0, 7)
+		commons.procedural.nebulae.generate_mask_uv_coords(nebulae_specific_configuration, bloc_index, random_engine, 100, 0, 3)
 
 	end
-
 end
+
+
 
 
 commons.procedural.nebulae.generate_texture_uv_coords = function(nebulae_specific_configuration, bloc_index, random_engine, list_size, min, max)
