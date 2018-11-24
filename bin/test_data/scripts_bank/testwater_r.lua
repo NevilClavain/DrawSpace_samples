@@ -38,7 +38,7 @@ eg:remove('land_entity')
 
 
 
-commons.trash.fps_camera( camera_entity, fps_transfo)
+commons.trash.camera( camera_entity, fps_transfo)
 eg:remove('camera_entity')
 
 destroy_all_cubes()

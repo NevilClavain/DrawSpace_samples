@@ -579,9 +579,9 @@ end
 
 
 
-commons.trash.fps_camera = function(p_camera_entity, p_fps_transfo)
-	p_fps_transfo:release()
+commons.trash.camera = function(p_camera_entity, p_mvt_transfo)
 
+	p_mvt_transfo:release()
 	p_camera_entity:release_camera()
 	p_camera_entity:remove_aspect(TRANSFORM_ASPECT)
 	p_camera_entity:remove_aspect(CAMERA_ASPECT)

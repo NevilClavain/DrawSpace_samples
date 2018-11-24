@@ -29,7 +29,7 @@ rock_entity:remove_aspect(BODY_ASPECT)
 commons.trash.meshe(rg, rock_entity, rock_renderer)
 eg:remove('rock_entity')
 
-commons.trash.fps_camera( camera_entity, fps_transfo)
+commons.trash.camera(camera_entity, camera_mvt)
 eg:remove('camera_entity')
 
 text_renderer:release()
