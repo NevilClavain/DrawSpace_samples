@@ -11,13 +11,6 @@ commons.trash.rendering(rg, sb_mod, skybox_entity, skybox_renderer)
 eg:remove('skybox_entity')
 
 
-neb_transform:release()
-neb_entity:remove_aspect(TRANSFORM_ASPECT)
-nebulae_specific_config:cleanup(neb_renderer)
-commons.trash.rendering(rg, vol_mod, neb_entity, neb_renderer)
-eg:remove('nebulae_entity')
-
-
 
 commons.trash.camera( camera_entity, camera_mvt)
 eg:remove('camera_entity')
@@ -45,13 +38,13 @@ g:show_mousecursor(TRUE)
 g:set_mousecursorcircularmode(FALSE)
 
 
-sb_mod:unload()
+
 mvt_mod:unload()
 
 
 -- classes instances cleanup
 
-sb_mod = nil
+
 text_renderer = nil
 
 camera_entity = nil

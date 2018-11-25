@@ -375,12 +375,6 @@ cube_rot_x=SyncAngle()
 
 
 
-fps_yaw=SyncAngle()
-fps_pitch=SyncAngle()
-
-
-fps_yaw:init_fromtimeaspectof(root_entity, 0.0)
-fps_pitch:init_fromtimeaspectof(root_entity,0.0)
 
 cube_rot_x:init_fromtimeaspectof(root_entity,0.0)
 cube_rot_y:init_fromtimeaspectof(root_entity,0.0)
@@ -399,13 +393,7 @@ function( xm, ym, dx, dy )
 	cube_rot_x:inc(20.0 * dy)
 
   else
-  
-    --fps_yaw:inc(-dx / 1.0)
-
-    --fps_pitch:inc(-dy / 1.0)
-
-    local mvt_info = { camera_mvt:read() }
-    --camera_mvt:update(fps_yaw:get_value(),fps_pitch:get_value(),mvt_info[3],mvt_info[4],mvt_info[5],mvt_info[6], mvt_info[7], mvt_info[8], mvt_info[9]) 
+      local mvt_info = { camera_mvt:read() }
 
 	if mouse_right == FALSE then
 	  camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],-dy / 4.0,-dx / 4.0, 0)
@@ -436,17 +424,15 @@ function( key )
   --Q key
   if key == 81 then 
     local mvt_info = { camera_mvt:read() }
-    --camera_mvt:update(fps_yaw:get_value(),fps_pitch:get_value(),mvt_info[3],mvt_info[4],mvt_info[5],mvt_info[6], mvt_info[7], mvt_info[8], 12.0) 
 
-	camera_mvt:update(12.0,mvt_info[1],mvt_info[2],mvt_info[3],fps_yaw:get_value(),fps_pitch:get_value(), 0)
+	camera_mvt:update(12.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
       
   --W key
   elseif key == 87 then
 
     local mvt_info = { camera_mvt:read() }
-    --camera_mvt:update(fps_yaw:get_value(),fps_pitch:get_value(),mvt_info[3],mvt_info[4],mvt_info[5],mvt_info[6], mvt_info[7], mvt_info[8], -12.0) 
 
-	camera_mvt:update(-12.0,mvt_info[1],mvt_info[2],mvt_info[3],fps_yaw:get_value(),fps_pitch:get_value(), 0)
+	camera_mvt:update(-12.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
   elseif key == 17 then
     ctrl_key = TRUE
@@ -464,17 +450,15 @@ function( key )
   --Q key
   if key == 81 then
     local mvt_info = { camera_mvt:read() }
-    --camera_mvt:update(fps_yaw:get_value(),fps_pitch:get_value(),mvt_info[3],mvt_info[4],mvt_info[5],mvt_info[6], mvt_info[7], mvt_info[8], 0.0) 
 
-	camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],fps_yaw:get_value(),fps_pitch:get_value(), 0)
+	camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
     
   --W key
   elseif key == 87 then
     local mvt_info = { camera_mvt:read() }
-    --camera_mvt:update(fps_yaw:get_value(),fps_pitch:get_value(),mvt_info[3],mvt_info[4],mvt_info[5],mvt_info[6], mvt_info[7], mvt_info[8], 0.0) 
 
-	camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],fps_yaw:get_value(),fps_pitch:get_value(), 0)
+	camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
  
   elseif key == 17 then
     ctrl_key = FALSE
