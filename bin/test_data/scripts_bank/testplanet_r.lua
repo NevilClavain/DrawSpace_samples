@@ -12,8 +12,16 @@ eg:remove('skybox_entity')
 
 
 
+
+planet_entity:remove_aspect(TRANSFORM_ASPECT)
+commons.trash.rendering(rg, pl_mod, planet_entity, planet_renderer)
+eg:remove('planet_entity')
+
+
 commons.trash.camera( camera_entity, camera_mvt)
 eg:remove('camera_entity')
+
+
 
 
 text_renderer:release()
@@ -40,6 +48,7 @@ g:set_mousecursorcircularmode(FALSE)
 
 
 mvt_mod:unload()
+pl_mod:unload()
 
 
 -- classes instances cleanup

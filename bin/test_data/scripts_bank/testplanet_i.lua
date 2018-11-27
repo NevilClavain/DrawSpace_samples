@@ -20,6 +20,9 @@ mvt_mod = Module("mvtmod", "mvts")
 mvt_mod:load()
 g:print(mvt_mod:get_descr().. ' loaded')
 
+pl_mod = Module("planetsmod", "planets")
+pl_mod:load()
+g:print(pl_mod:get_descr().. ' loaded')
 
 
 commons.init_final_pass(rg, 'final_pass')
@@ -115,7 +118,18 @@ sb_transform:add_matrix("sb_scaling",sb_scale)
 
 -- ///////////////////////////////
 
+planet_entity_config = 
+{ 
 
+}
+
+planet_entity,planet_renderer=commons.create_rendering_from_module(planet_entity_config,pl_mod,"planetsRender")
+
+planet_renderer:register_to_rendering(rg)
+
+eg:add_child('root','planet_entity',planet_entity)
+
+planet_entity:add_aspect(TRANSFORM_ASPECT)
 
 -- ///////////////////////////////
 
