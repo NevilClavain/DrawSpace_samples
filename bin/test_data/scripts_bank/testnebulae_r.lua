@@ -44,7 +44,7 @@ g:remove_keyupcb("keyup")
 g:show_mousecursor(TRUE)
 g:set_mousecursorcircularmode(FALSE)
 
-
+vol_mod:unload()
 sb_mod:unload()
 mvt_mod:unload()
 
