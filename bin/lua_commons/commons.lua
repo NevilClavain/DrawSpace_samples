@@ -344,8 +344,8 @@ end
 commons.apply_material = function(p_material, p_renderer, p_pass_id)
 	
 	local texture_size = 512.0
-	local bump_bias = -1.0
-	local specular_power = -1.0
+	local bump_bias = 0.0
+	local specular_power = 0.0
 	local mask_mode = 0
 
 
@@ -361,6 +361,11 @@ commons.apply_material = function(p_material, p_renderer, p_pass_id)
 	if p_material['mask_mode'] ~= nil then
 		mask_mode = p_material['mask_mode']
 	end
+
+	g:print( 'specular_power ='..specular_power )
+	g:print( 'bump_bias ='..bump_bias )
+	g:print( 'texture_size ='..texture_size )
+	g:print( 'mask_mode ='..mask_mode )
 
 	p_renderer:set_shaderrealvector( p_pass_id, 'flags', specular_power, bump_bias, texture_size, mask_mode )
 

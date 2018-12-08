@@ -11,6 +11,20 @@ commons.trash.rendering(rg, sb_mod, skybox_entity, skybox_renderer)
 eg:remove('skybox_entity')
 
 
+sphere_body:release()
+sphere_body:detach_fromentity(sphere_entity)
+sphere_entity:remove_aspect(BODY_ASPECT)
+commons.trash.meshe(rg, sphere_entity, sphere_renderer)
+eg:remove('sphere_entity')
+
+
+
+ship_body:release()
+ship_body:detach_fromentity(ship_entity)
+ship_entity:remove_aspect(BODY_ASPECT)
+commons.trash.meshe(rg, ship_entity, ship_renderer)
+eg:remove('ship_entity')
+
 
 
 planet_entity:remove_aspect(TRANSFORM_ASPECT)
@@ -45,6 +59,9 @@ g:remove_keyupcb("keyup")
 g:show_mousecursor(TRUE)
 g:set_mousecursorcircularmode(FALSE)
 
+
+root_entity:release_world()
+root_entity:remove_aspect(PHYSICS_ASPECT)
 
 
 mvt_mod:unload()
