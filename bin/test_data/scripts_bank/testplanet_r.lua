@@ -35,6 +35,8 @@ eg:remove('planet_entity')
 commons.trash.camera( camera_entity, camera_mvt)
 eg:remove('camera_entity')
 
+commons.trash.camera( camera2_entity, camera2_pos)
+eg:remove('camera2_entity')
 
 
 

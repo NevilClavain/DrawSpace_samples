@@ -1,11 +1,22 @@
 
 
-renderers =
-{
-}
-nb_renderers = 0;
+renderers = {}
+nb_renderers = 0
 
 
+set_camera = function(camera)
+
+  if camera == free_cam then
+    eg:set_camera(camera_entity)
+  elseif camera == ship_cam then
+    eg:set_camera(camera2_entity)
+  end
+end
+
+free_cam = 0
+ship_cam = 1
+
+current_cam = free_cam
 
 fog_intensity = 0.0
 
@@ -23,11 +34,9 @@ lights =
 	light0 = 
 	{
 		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-		direction = { x = 0.0, y = 1.0, z = 0.0, w = 1.0 },
+		direction = { x = 3.0, y = 1.0, z = 0.0, w = 1.0 },
 	}
 }
-
-
 
 mouse_right = FALSE
 
@@ -64,8 +73,6 @@ root_entity:configure_world(GRAVITY_DISABLED)
 
 camera_entity, camera_mvt=commons.create_free_camera(0.0, 0.0, 0.0, viewport_width,viewport_height, mvt_mod)
 eg:add_child('root','camera_entity',camera_entity)
-
-
 
 
 
@@ -304,6 +311,11 @@ nb_renderers = nb_renderers + 1
 
 -- ///////////////////////////////
 
+camera2_entity, camera2_pos=commons.create_static_camera(0.0, 110.0, 300.0, viewport_width,viewport_height, mvt_mod)
+eg:add_child('ship_entity','camera2_entity',camera2_entity)
+
+-- ///////////////////////////////
+
 planet_entity_config = 
 { 
 
@@ -329,7 +341,10 @@ commons.setup_lit_flags_simple( 'texture_pass', renderers, fog_intensity, fog_co
 
 
 
-eg:set_camera(camera_entity)
+--eg:set_camera(camera_entity)
+--eg:set_camera(camera2_entity)
+
+set_camera(current_cam)
 
 rg:update_renderingqueues()
 
@@ -408,8 +423,12 @@ function( key )
   -- VK_F1
   elseif key == 112 then  
 
- 
+    current_cam = current_cam + 1
+	if current_cam == 2 then
+	  current_cam = 0
+	end
 
+	set_camera(current_cam)
   end
 
 end)
@@ -429,6 +448,9 @@ function()
 
 
 end)
+
+
+
 
 
 g:show_mousecursor(FALSE)

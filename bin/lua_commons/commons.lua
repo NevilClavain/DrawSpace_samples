@@ -73,6 +73,25 @@ commons.init_final_pass_water_mask = function(p_rendergraph, p_passid)
 
 end
 
+commons.create_static_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewport_height, p_module)
+
+	local camera_entity=Entity()
+	camera_entity:add_aspect(TRANSFORM_ASPECT)
+	camera_entity:add_aspect(CAMERA_ASPECT)
+
+	camera_entity:configure_camera(p_viewport_width,p_viewport_height, 1.0, 1000000.0)
+
+	local pos = Matrix();
+	pos:translation(p_x, p_y, p_z)
+
+	local cam_transform = RawTransform()
+	cam_transform:configure(camera_entity)
+	cam_transform:add_matrix("pos",pos)
+
+	return camera_entity, cam_transform
+end
+
+
 commons.create_fps_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewport_height, p_module)
 
 	local camera_entity=Entity()
