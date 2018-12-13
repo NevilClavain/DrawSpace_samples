@@ -19,6 +19,9 @@ eg:remove('sphere_entity')
 
 
 
+commons.trash.camera( camera2_entity, camera2_pos)
+eg:remove('camera2_entity')
+
 ship_body:release()
 ship_body:detach_fromentity(ship_entity)
 ship_entity:remove_aspect(BODY_ASPECT)
@@ -35,8 +38,6 @@ eg:remove('planet_entity')
 commons.trash.camera( camera_entity, camera_mvt)
 eg:remove('camera_entity')
 
-commons.trash.camera( camera2_entity, camera2_pos)
-eg:remove('camera2_entity')
 
 
 
