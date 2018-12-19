@@ -54,8 +54,8 @@ root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
 
 
 
---camera_entity, camera_mvt=commons.create_fps_camera(0.0, 3.0, 20.0, renderer_infos[5],renderer_infos[6], mvt_mod)
-camera_entity, camera_mvt=commons.create_free_camera(0.0, 5.5, 28.0, renderer_infos[5],renderer_infos[6], mvt_mod)
+--camera_entity, camera_mvt=commons.create_fps_camera(0.0, 3.0, 20.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
+camera_entity, camera_mvt=commons.create_free_camera(0.0, 5.5, 28.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
 eg:add_child('root','camera_entity',camera_entity)
 
 

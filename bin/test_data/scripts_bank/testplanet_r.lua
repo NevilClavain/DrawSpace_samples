@@ -3,8 +3,6 @@
 g:signal_rendersceneend("eg")
 
 
-
-
 sb_transform:release()
 skybox_entity:remove_aspect(TRANSFORM_ASPECT)
 commons.trash.rendering(rg, sb_mod, skybox_entity, skybox_renderer)
@@ -53,6 +51,9 @@ commons.trash.final_pass(rg, 'final_pass')
 
 
 rg:update_renderingqueues()
+
+
+eg:unset_camera()
 
 g:remove_mousemovecb("onmousemove")
 g:remove_keydowncb("keydown")

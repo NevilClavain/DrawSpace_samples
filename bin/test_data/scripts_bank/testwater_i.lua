@@ -99,7 +99,7 @@ root_entity:add_aspect(PHYSICS_ASPECT)
 root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
 
 
-camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 0.0, viewport_width, viewport_height, mvt_mod)
+camera_entity, fps_transfo=commons.create_fps_camera(0.0, 3.0, 0.0, viewport_width, viewport_height, mvt_mod, "camera")
 eg:add_child('root','camera_entity',camera_entity)
 
 

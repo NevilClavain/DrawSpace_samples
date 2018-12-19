@@ -39,7 +39,7 @@ text_renderer=TextRendering()
 text_renderer:configure(root_entity, "fps", 320, 30, 255, 0, 255, "??? fps")
 
 
-camera_entity, camera_mvt=commons.create_free_camera(0.0, 5.5, 28.0, viewport_width,viewport_height, mvt_mod)
+camera_entity, camera_mvt=commons.create_free_camera(0.0, 5.5, 28.0, viewport_width,viewport_height, mvt_mod, "camera")
 eg:add_child('root','camera_entity',camera_entity)
 
 
