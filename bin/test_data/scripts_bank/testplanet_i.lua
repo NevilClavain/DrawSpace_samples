@@ -44,6 +44,10 @@ create_sphere = function()
 	local entity = nil
 	local renderer = nil
 	entity,renderer = commons.create_rendered_meshe(entity_config, 'sphere.ac', 0)
+
+	entity:add_aspect(INFOS_ASPECT)
+	entity:setup_info( "entity_name", "bump mapped sphere" )
+
 	renderer:register_to_rendering(rg)
 	eg:add_child('root','sphere_entity',entity)
 
@@ -128,6 +132,9 @@ create_ship = function()
 
 	--entity,renderer = commons.create_rendered_meshe(ship_entity_config, 'survey.ac', 0)
 	entity,renderer = commons.create_rendered_meshe(entity_config, 'bellerophon.ac', 0)
+	entity:add_aspect(INFOS_ASPECT)
+	entity:setup_info( "entity_name", "Space Ship" )
+
 	renderer:register_to_rendering(rg)
 	eg:add_child('root','ship_entity',entity)
 
@@ -227,6 +234,10 @@ create_skybox = function()
 	local renderer = nil
 
 	entity,renderer=commons.create_rendering_from_module(entity_config,sb_mod,"skyboxRender")
+
+	entity:add_aspect(INFOS_ASPECT)
+	entity:setup_info( "entity_name", "skybox" )
+
 	renderer:register_to_rendering(rg)
 	eg:add_child('root','skybox_entity',entity)
 
@@ -253,6 +264,10 @@ create_planet = function()
 	local renderer = nil
 
 	entity,renderer=commons.create_rendering_from_module(entity_config,pl_mod,"planetsRender")
+
+	entity:add_aspect(INFOS_ASPECT)
+	entity:setup_info( "entity_name", "test planet" )
+
 
 	renderer:register_to_rendering(rg)
 

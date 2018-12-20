@@ -78,8 +78,11 @@ commons.create_static_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewp
 	local camera_entity=Entity()
 	camera_entity:add_aspect(TRANSFORM_ASPECT)
 	camera_entity:add_aspect(CAMERA_ASPECT)
-
+	
 	camera_entity:configure_camera(p_viewport_width,p_viewport_height, 1.0, 1000000.0, p_name)
+
+	camera_entity:add_aspect(INFOS_ASPECT)
+	camera_entity:setup_info( "entity_name", p_name )
 
 	local pos = Matrix();
 	pos:translation(p_x, p_y, p_z)
@@ -100,6 +103,10 @@ commons.create_fps_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewport
 
 	camera_entity:configure_camera(p_viewport_width,p_viewport_height, 1.0, 1000000.0, p_name)
 
+	camera_entity:add_aspect(INFOS_ASPECT)
+	camera_entity:setup_info( "entity_name", p_name )
+
+
 	local fps_transfo=FPSTransform()
 	fps_transfo:instanciate_transformimpl(p_module)
 	fps_transfo:configure(camera_entity,0,0,p_x,p_y,p_z,TRUE)
@@ -113,6 +120,10 @@ commons.create_free_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewpor
 	camera_entity:add_aspect(CAMERA_ASPECT)
 
 	camera_entity:configure_camera(p_viewport_width,p_viewport_height, 1.0, 1000000.0, p_name)
+
+	camera_entity:add_aspect(INFOS_ASPECT)
+	camera_entity:setup_info( "entity_name", p_name )
+
 
 	local free_transfo=FreeTransform()
 	free_transfo:instanciate_transformimpl(p_module)
@@ -609,6 +620,9 @@ commons.trash.camera = function(p_camera_entity, p_mvt_transfo)
 	p_camera_entity:release_camera()
 	p_camera_entity:remove_aspect(TRANSFORM_ASPECT)
 	p_camera_entity:remove_aspect(CAMERA_ASPECT)
+
+	p_camera_entity:release_info("entity_name")
+	p_camera_entity:remove_aspect(INFOS_ASPECT)
 end
 
 commons.trash.final_pass = function(p_rendergraph, p_passid)

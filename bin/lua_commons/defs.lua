@@ -23,7 +23,7 @@ RENDERING_ASPECT=3
 SERVICE_ASPECT=4
 TIME_ASPECT=5
 TRANSFORM_ASPECT=6
-INFOS_ASPECT=6
+INFOS_ASPECT=7
 
 -- args loading shaders
 SHADER_COMPILED=1
@@ -69,6 +69,11 @@ root_entity=Entity()
 root_entity:add_aspect(RENDERING_ASPECT)
 root_entity:add_aspect(TIME_ASPECT)
 root_entity:configure_timemanager(NORMAL_TIME)
+
+root_entity:add_aspect(INFOS_ASPECT)
+root_entity:setup_info( "entity_name", "root_entity" )
+
+
 
 root_entity:connect_renderingaspect_rendergraph(rg)
 eg:set_root('root', root_entity )

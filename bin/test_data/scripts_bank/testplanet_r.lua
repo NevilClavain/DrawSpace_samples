@@ -3,38 +3,54 @@
 g:signal_rendersceneend("eg")
 
 
+eg:remove('skybox_entity')
 sb_transform:release()
 skybox_entity:remove_aspect(TRANSFORM_ASPECT)
+skybox_entity:release_info("entity_name")
+skybox_entity:remove_aspect(INFOS_ASPECT)
 commons.trash.rendering(rg, sb_mod, skybox_entity, skybox_renderer)
-eg:remove('skybox_entity')
 
 
+
+eg:remove('sphere_entity')
 sphere_body:release()
 sphere_body:detach_fromentity(sphere_entity)
 sphere_entity:remove_aspect(BODY_ASPECT)
+sphere_entity:release_info("entity_name")
+sphere_entity:remove_aspect(INFOS_ASPECT)
 commons.trash.meshe(rg, sphere_entity, sphere_renderer)
-eg:remove('sphere_entity')
 
 
 
-commons.trash.camera( camera2_entity, camera2_pos)
+
 eg:remove('camera2_entity')
+commons.trash.camera( camera2_entity, camera2_pos)
 
+
+
+eg:remove('ship_entity')
 ship_body:release()
 ship_body:detach_fromentity(ship_entity)
 ship_entity:remove_aspect(BODY_ASPECT)
+ship_entity:release_info("entity_name")
+ship_entity:remove_aspect(INFOS_ASPECT)
 commons.trash.meshe(rg, ship_entity, ship_renderer)
-eg:remove('ship_entity')
 
+
+
+
+
+eg:remove('camera_entity')
+commons.trash.camera( camera_entity, camera_mvt)
 
 
 planet_entity:remove_aspect(TRANSFORM_ASPECT)
+planet_entity:release_info("entity_name")
+planet_entity:remove_aspect(INFOS_ASPECT)
 commons.trash.rendering(rg, pl_mod, planet_entity, planet_renderer)
 eg:remove('planet_entity')
 
 
-commons.trash.camera( camera_entity, camera_mvt)
-eg:remove('camera_entity')
 
 
 
