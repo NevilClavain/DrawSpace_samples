@@ -358,13 +358,11 @@ commons.setup_lit_flags( 'texture_pass', renderers, REFLECTIONS_OFF, reflectorPo
 
 
 planet_entity,planet_renderer = create_planet()
-renderers[nb_renderers] = skybox_renderer
-nb_renderers = nb_renderers + 1
 
 
 skybox_entity,skybox_renderer,sb_transform = create_skybox()
-renderers[nb_renderers] = skybox_renderer
-nb_renderers = nb_renderers + 1
+
+
 
 sphere_entity, sphere_renderer, sphere_body = create_sphere()
 renderers[nb_renderers] = sphere_renderer

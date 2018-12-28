@@ -216,16 +216,13 @@ neb_transform:add_matrix( "roty", neb_roty_mat )
 neb_transform:add_matrix( "rotx", neb_rotx_mat )
 neb_transform:add_matrix( "pos", neb_pos_mat )
 
-neb_renderer:set_shaderrealvector('texture_pass', "color", 0.99, 0.00, 0.00, 1.0)
-
-
+neb_renderer:set_shaderrealvector( 0, 'texture_pass', "color", 0.99, 0.00, 0.00, 1.0 )
 
 
 
 n0 = function(p_a)
-	neb_renderer:set_shaderrealvector( 'texture_pass', 'color', 1.0, 1.0, 1.0, p_a )
+	neb_renderer:set_shaderrealvector( 0, 'texture_pass', 'color', 1.0, 1.0, 1.0, p_a, 0 )
 end
-
 
 -- ///////////////////////////////
 

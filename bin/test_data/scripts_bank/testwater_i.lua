@@ -667,8 +667,8 @@ sb_transform = RawTransform()
 sb_transform:configure(skybox_entity)
 sb_transform:add_matrix("sb_scaling",sb_scale)
 
-skybox_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
-skybox_renderer:set_shaderrealvector( 'texturemirror_pass', 'reflector_normale', 0.0, 1.0, 0.0, 1.0)
+skybox_renderer:set_shaderrealvector( 0, 'texturemirror_pass', 'reflector_pos', 0.0, 0.0, 0.0, 1.0)
+skybox_renderer:set_shaderrealvector( 0, 'texturemirror_pass', 'reflector_normale', 0.0, 1.0, 0.0, 1.0)
 
 
 
