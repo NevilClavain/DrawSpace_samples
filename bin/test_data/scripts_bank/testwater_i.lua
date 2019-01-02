@@ -541,121 +541,124 @@ commons.setup_lit_flags( 'texturemirror_pass', renderers, REFLECTIONS_ON, reflec
 
 
 
-skybox_config =
+skybox_layer =
 {
-	texture_pass =	
+	layer_0 = 
 	{
-		fx =
+		texture_pass =	
 		{
-			shaders = 
+			fx =
 			{
-				{ path='texture.vso',mode=SHADER_COMPILED },
-				{ path='texture.pso',mode=SHADER_COMPILED }
+				shaders = 
+				{
+					{ path='texture.vso',mode=SHADER_COMPILED },
+					{ path='texture.pso',mode=SHADER_COMPILED }
+				},
+				rs_in = 
+				{
+				},
+				rs_out =
+				{
+				}		
 			},
-			rs_in = 
+			textures =
+			{
+				[1] = 
+				{
+					{path='sb0.bmp', stage=0}
+				},
+				[2] = 
+				{
+					{path='sb2.bmp', stage=0}
+				},
+				[3] = 
+				{
+					{path='sb3.bmp', stage=0}
+				},
+				[4] = 
+				{
+					{path='sb1.bmp', stage=0}
+				},
+				[5] = 
+				{
+					{path='sb4.bmp', stage=0}
+				},
+				[6] = 
+				{
+					{path='sb4.bmp', stage=0}
+				}
+			},
+			vertex_textures =
 			{
 			},
-			rs_out =
+			shaders_params = 
 			{
-			}		
+			},
+			rendering_order = 10000
 		},
-		textures =
-		{
-			[1] = 
-			{
-				{path='sb0.bmp', stage=0}
-			},
-			[2] = 
-			{
-				{path='sb2.bmp', stage=0}
-			},
-			[3] = 
-			{
-				{path='sb3.bmp', stage=0}
-			},
-			[4] = 
-			{
-				{path='sb1.bmp', stage=0}
-			},
-			[5] = 
-			{
-				{path='sb4.bmp', stage=0}
-			},
-			[6] = 
-			{
-				{path='sb4.bmp', stage=0}
-			}
-		},
-		vertex_textures =
-		{
-		},
-		shaders_params = 
-		{
-		},
-		rendering_order = 10000
-	},
 
-	texturemirror_pass =	
-	{
-		fx =
+		texturemirror_pass =	
 		{
-			shaders = 
+			fx =
 			{
-				{ path='texture_mirror.vso',mode=SHADER_COMPILED },
-				{ path='texture_mirror.pso',mode=SHADER_COMPILED }
+				shaders = 
+				{
+					{ path='texture_mirror.vso',mode=SHADER_COMPILED },
+					{ path='texture_mirror.pso',mode=SHADER_COMPILED }
+				},
+				rs_in = 
+				{
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" },
+					{ ope=RENDERSTATE_OPE_SETCULLING, value="ccw" },		
+				},
+				rs_out =
+				{
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+					{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
+				}		
 			},
-			rs_in = 
+			textures =
 			{
-				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" },
-				{ ope=RENDERSTATE_OPE_SETCULLING, value="ccw" },		
+				[1] = 
+				{
+					{path='sb0.bmp', stage=0}
+				},
+				[2] = 
+				{
+					{path='sb2.bmp', stage=0}
+				},
+				[3] = 
+				{
+					{path='sb3.bmp', stage=0}
+				},
+				[4] = 
+				{
+					{path='sb1.bmp', stage=0}
+				},
+				[5] = 
+				{
+					{path='sb4.bmp', stage=0}
+				},
+				[6] = 
+				{
+					{path='sb4.bmp', stage=0}
+				}
 			},
-			rs_out =
+			vertex_textures =
 			{
-				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
-				{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
-			}		
-		},
-		textures =
-		{
-			[1] = 
-			{
-				{path='sb0.bmp', stage=0}
 			},
-			[2] = 
+			shaders_params = 
 			{
-				{path='sb2.bmp', stage=0}
+				{ param_name = "reflector_pos", shader_index = 0, register = 24 },
+				{ param_name = "reflector_normale", shader_index = 0, register = 25 },
 			},
-			[3] = 
-			{
-				{path='sb3.bmp', stage=0}
-			},
-			[4] = 
-			{
-				{path='sb1.bmp', stage=0}
-			},
-			[5] = 
-			{
-				{path='sb4.bmp', stage=0}
-			},
-			[6] = 
-			{
-				{path='sb4.bmp', stage=0}
-			}
-		},
-		vertex_textures =
-		{
-		},
-		shaders_params = 
-		{
-			{ param_name = "reflector_pos", shader_index = 0, register = 24 },
-			{ param_name = "reflector_normale", shader_index = 0, register = 25 },
-		},
-		rendering_order = 10000
+			rendering_order = 10000
+		}
 	}
 }
 
 
-skybox_entity,skybox_renderer=commons.create_rendering_from_module(skybox_config,sb_mod,"skyboxRender")
+skybox_entity,skybox_renderer=commons.create_rendering_from_module(skybox_layer,sb_mod,"skyboxRender")
 skybox_renderer:register_to_rendering(rg)
 eg:add_child('root','skybox_entity',skybox_entity)
 

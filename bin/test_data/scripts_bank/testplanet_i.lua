@@ -175,65 +175,68 @@ end
 
 create_skybox = function()
 
-	local entity_config =
+	local entity_layers =
 	{
-		texture_pass =	
+		layer_0 = 
 		{
-			fx =
+			texture_pass =	
 			{
-				shaders = 
+				fx =
 				{
-					{ path='texture.vso',mode=SHADER_COMPILED },
-					{ path='texture.pso',mode=SHADER_COMPILED }
+					shaders = 
+					{
+						{ path='texture.vso',mode=SHADER_COMPILED },
+						{ path='texture.pso',mode=SHADER_COMPILED }
+					},
+					rs_in = 
+					{
+					},
+					rs_out =
+					{
+					}		
 				},
-				rs_in = 
+				textures =
+				{
+					[1] = 
+					{
+						{path='neb_front5.png', stage=0}
+					},
+					[2] = 
+					{
+						{path='neb_back6.png', stage=0}
+					},
+					[3] = 
+					{
+						{path='neb_left2.png', stage=0}
+					},
+					[4] = 
+					{
+						{path='neb_right1.png', stage=0}
+					},
+					[5] = 
+					{
+						{path='neb_top3.png', stage=0}
+					},
+					[6] = 
+					{
+						{path='neb_bottom4.png', stage=0}
+					}
+				},
+				vertex_textures =
 				{
 				},
-				rs_out =
+				shaders_params = 
 				{
-				}		
-			},
-			textures =
-			{
-				[1] = 
-				{
-					{path='neb_front5.png', stage=0}
 				},
-				[2] = 
-				{
-					{path='neb_back6.png', stage=0}
-				},
-				[3] = 
-				{
-					{path='neb_left2.png', stage=0}
-				},
-				[4] = 
-				{
-					{path='neb_right1.png', stage=0}
-				},
-				[5] = 
-				{
-					{path='neb_top3.png', stage=0}
-				},
-				[6] = 
-				{
-					{path='neb_bottom4.png', stage=0}
-				}
-			},
-			vertex_textures =
-			{
-			},
-			shaders_params = 
-			{
-			},
-			rendering_order = 10000
+				rendering_order = 10000
+			}
 		}
 	}
 
 	local entity = nil
 	local renderer = nil
 
-	entity,renderer=commons.create_rendering_from_module(entity_config,sb_mod,"skyboxRender")
+	entity,renderer=commons.create_rendering_from_module(entity_layers,sb_mod,"skyboxRender")
 
 	entity:add_aspect(INFOS_ASPECT)
 	entity:setup_info( "entity_name", "skybox" )
@@ -255,15 +258,75 @@ end
 
 create_planet = function()
 
-	local entity_config =
+	local entity_layers =
 	{ 
+		surface_layer = 
+		{
+			texture_pass =	
+			{
+				fx =
+				{
+					shaders = 
+					{
+						{ path='texture.vso',mode=SHADER_COMPILED },
+						{ path='texture.pso',mode=SHADER_COMPILED }
+					},
+					rs_in = 
+					{
+					},
+					rs_out =
+					{
+					}		
+				},
+				textures =
+				{
+				},
+				vertex_textures =
+				{
+				},
+				shaders_params = 
+				{
+				},
+				rendering_order = 10000
+			}
+		},
 
+		atmo_layer = 
+		{
+			texture_pass =	
+			{
+				fx =
+				{
+					shaders = 
+					{
+						{ path='texture.vso',mode=SHADER_COMPILED },
+						{ path='texture.pso',mode=SHADER_COMPILED }
+					},
+					rs_in = 
+					{
+					},
+					rs_out =
+					{
+					}		
+				},
+				textures =
+				{
+				},
+				vertex_textures =
+				{
+				},
+				shaders_params = 
+				{
+				},
+				rendering_order = 10000
+			}
+		}
 	}
 
 	local entity = nil
 	local renderer = nil
 
-	entity,renderer=commons.create_rendering_from_module(entity_config,pl_mod,"planetsRender")
+	entity,renderer=commons.create_rendering_from_module(entity_layers,pl_mod,"planetsRender")
 
 	entity:add_aspect(INFOS_ASPECT)
 	entity:setup_info( "entity_name", "test planet" )

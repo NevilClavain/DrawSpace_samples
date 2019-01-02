@@ -52,62 +52,65 @@ commons.update_lights( 'texture_pass', lights, renderers )
 commons.setup_lit_flags( 'texture_pass', renderers, REFLECTIONS_OFF, reflectorPos, reflectorNormale, fog_intensity, fog_color)
 
 
-skybox_config =
+skybox_layer =
 {
-	texture_pass =	
+	layer_0 = 
 	{
-		fx =
+		texture_pass =	
 		{
-			shaders = 
+			fx =
 			{
-				{ path='texture.vso',mode=SHADER_COMPILED },
-				{ path='texture.pso',mode=SHADER_COMPILED }
+				shaders = 
+				{
+					{ path='texture.vso',mode=SHADER_COMPILED },
+					{ path='texture.pso',mode=SHADER_COMPILED }
+				},
+				rs_in = 
+				{
+				},
+				rs_out =
+				{
+				}		
 			},
-			rs_in = 
+			textures =
+			{
+				[1] = 
+				{
+					{path='neb_front5.png', stage=0}
+				},
+				[2] = 
+				{
+					{path='neb_back6.png', stage=0}
+				},
+				[3] = 
+				{
+					{path='neb_left2.png', stage=0}
+				},
+				[4] = 
+				{
+					{path='neb_right1.png', stage=0}
+				},
+				[5] = 
+				{
+					{path='neb_top3.png', stage=0}
+				},
+				[6] = 
+				{
+					{path='neb_bottom4.png', stage=0}
+				}
+			},
+			vertex_textures =
 			{
 			},
-			rs_out =
+			shaders_params = 
 			{
-			}		
-		},
-		textures =
-		{
-			[1] = 
-			{
-				{path='neb_front5.png', stage=0}
 			},
-			[2] = 
-			{
-				{path='neb_back6.png', stage=0}
-			},
-			[3] = 
-			{
-				{path='neb_left2.png', stage=0}
-			},
-			[4] = 
-			{
-				{path='neb_right1.png', stage=0}
-			},
-			[5] = 
-			{
-				{path='neb_top3.png', stage=0}
-			},
-			[6] = 
-			{
-				{path='neb_bottom4.png', stage=0}
-			}
-		},
-		vertex_textures =
-		{
-		},
-		shaders_params = 
-		{
-		},
-		rendering_order = 10000
+			rendering_order = 10000
+		}
 	}
 }
 
-skybox_entity,skybox_renderer=commons.create_rendering_from_module(skybox_config,sb_mod,"skyboxRender")
+skybox_entity,skybox_renderer=commons.create_rendering_from_module(skybox_layer,sb_mod,"skyboxRender")
 skybox_renderer:register_to_rendering(rg)
 eg:add_child('root','skybox_entity',skybox_entity)
 
@@ -122,61 +125,64 @@ sb_transform:add_matrix("sb_scaling",sb_scale)
 
 -- ///////////////////////////////
 
-neb_entity_config = 
+neb_entity_layer = 
 { 
-	texture_pass = 
+	layer_0 =
 	{
-		fx = 
+		texture_pass = 
 		{
-			shaders = 
+			fx = 
 			{
-				{ path='nebulae.vso',mode=SHADER_COMPILED },
-				{ path='nebulae.pso',mode=SHADER_COMPILED }
-			},
-			rs_in = 
-			{
-				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
-				{ ope=RENDERSTATE_OPE_SETCULLING, value="none" },
+				shaders = 
+				{
+					{ path='nebulae.vso',mode=SHADER_COMPILED },
+					{ path='nebulae.pso',mode=SHADER_COMPILED }
+				},
+				rs_in = 
+				{
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+					{ ope=RENDERSTATE_OPE_SETCULLING, value="none" },
 				
 				
-				{ ope=RENDERSTATE_OPE_ALPHABLENDENABLE, value="true" },
-				{ ope=RENDERSTATE_OPE_ALPHABLENDOP, value="add" },
-				{ ope=RENDERSTATE_OPE_ALPHABLENDFUNC, value="always" },
-				{ ope=RENDERSTATE_OPE_ALPHABLENDDEST, value="invsrcalpha" },
-				{ ope=RENDERSTATE_OPE_ALPHABLENDSRC, value="srcalpha" }
+					{ ope=RENDERSTATE_OPE_ALPHABLENDENABLE, value="true" },
+					{ ope=RENDERSTATE_OPE_ALPHABLENDOP, value="add" },
+					{ ope=RENDERSTATE_OPE_ALPHABLENDFUNC, value="always" },
+					{ ope=RENDERSTATE_OPE_ALPHABLENDDEST, value="invsrcalpha" },
+					{ ope=RENDERSTATE_OPE_ALPHABLENDSRC, value="srcalpha" }
 				
 								
+				},
+				rs_out =
+				{
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+					{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
+					{ ope=RENDERSTATE_OPE_ALPHABLENDENABLE, value="false" },				
+				}
 			},
-			rs_out =
+			textures =
 			{
-				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
-				{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
-				{ ope=RENDERSTATE_OPE_ALPHABLENDENABLE, value="false" },				
-			}
-		},
-		textures =
-		{
-			[1] = 
+				[1] = 
+				{
+					{path='nebulae_atlas.jpg', stage=0},
+					{path='nebulae_mask_atlas.jpg', stage=1},
+				}
+			},
+			vertex_textures =
 			{
-				{path='nebulae_atlas.jpg', stage=0},
-				{path='nebulae_mask_atlas.jpg', stage=1},
-			}
-		},
-		vertex_textures =
-		{
-		},
-		shaders_params = 
-		{
-		},
+			},
+			shaders_params = 
+			{
+			},
 
-		rendering_order = 10000
+			rendering_order = 10000
+		}
 	}
 }
 
 rand_engine=RandomEngine()
 rand_engine:set_seedfromtime()
 
-neb_entity,neb_renderer=commons.create_rendering_from_module(neb_entity_config,vol_mod,"nebulaeRender")
+neb_entity,neb_renderer=commons.create_rendering_from_module(neb_entity_layer,vol_mod,"nebulaeRender")
 nebulae_specific_config = NebulaeSpecificConfig()
 
 nebulae_specific_config:set_texturesresolutions( 8, 4 )
