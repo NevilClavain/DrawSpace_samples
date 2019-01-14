@@ -323,10 +323,35 @@ create_planet = function()
 		}
 	}
 
+	local planet_specific_config_descr =
+	{
+		planet_ray							= 6502.0,
+		plains_amplitude					= 600.0,
+		mountains_amplitude					= 16000.0,
+		vertical_offset						= 20.0,
+		mountains_offset					= 0.0,
+		plains_seed1						= 1.0,
+		plains_seed2						= 2.0,
+		mix_seed1							= 3.0,
+		mix_seed2							= 4.0,
+		terrainbump_factor					= 16.0,
+		splat_transition_up_relative_alt	= 1.095,
+		splat_transition_down_relative_alt	= 1.0040,
+		splat_texture_resol					= 16,
+		atmo_kr								= 0.0038,
+		fog_alt_limit						= 30000.0,
+		fog_density							= 0.000032
+	}
+
 	local entity = nil
 	local renderer = nil
 
 	entity,renderer=commons.create_rendering_from_module(entity_layers,pl_mod,"planetsRender")
+
+	local specific_config = PlanetSpecificConfig()
+	commons.procedural.planet.setup_specific_config(planet_specific_config_descr, specific_config)
+	specific_config:apply(renderer)
+
 
 	entity:add_aspect(INFOS_ASPECT)
 	entity:setup_info( "entity_name", "test planet" )
@@ -338,7 +363,7 @@ create_planet = function()
 
 	entity:add_aspect(TRANSFORM_ASPECT)
 
-	return entity,renderer
+	return entity,renderer,specific_config
 end
 
 set_camera = function(camera)
@@ -346,7 +371,7 @@ set_camera = function(camera)
   if camera == free_cam then
     eg:set_camera(camera_entity)
   elseif camera == ship_cam then
-    eg:set_camera(camera2_entity)
+    --eg:set_camera(camera2_entity) temporaire !
   end
 end
 
@@ -420,13 +445,13 @@ commons.setup_lit_flags( 'texture_pass', renderers, REFLECTIONS_OFF, reflectorPo
 
 
 
-planet_entity,planet_renderer = create_planet()
+planet_entity,planet_renderer,planet_specific_config = create_planet()
 
 
 skybox_entity,skybox_renderer,sb_transform = create_skybox()
 
 
-
+--[[
 sphere_entity, sphere_renderer, sphere_body = create_sphere()
 renderers[nb_renderers] = sphere_renderer
 nb_renderers = nb_renderers + 1
@@ -437,7 +462,7 @@ nb_renderers = nb_renderers + 1
 
 camera2_entity, camera2_pos=commons.create_static_camera(0.0, 110.0, 300.0, viewport_width,viewport_height, mvt_mod, "ship_camera")
 eg:add_child('ship_entity','camera2_entity',camera2_entity)
-
+]]
 
 
 

@@ -7,6 +7,7 @@ commons.trash = {}
 commons.procedural = {}
 
 commons.procedural.nebulae = {}
+commons.procedural.planet = {}
 
 
 commons.utils.PI = 3.1415927
@@ -319,6 +320,7 @@ commons.create_rendered_meshe = function(p_config, p_meshefile, p_meshe_index)
 	return meshe_entity, renderer
 end
 
+
 -- create a table with all required parameters for lit vertex and pixel shaders (lit.vso, lit.pso)
 commons.setup_lit_shader_params = function()
 
@@ -451,7 +453,56 @@ commons.procedural.find_normal_vector=function(vec_in,random_engine,vec_out)
 end
 
 
+commons.procedural.planet.setup_specific_config=function(config_description, planet_specific_configuration)
 
+	if config_description['planet_ray'] ~= nil then
+		planet_specific_configuration:set_planetray(config_description['planet_ray'])
+	end
+
+	if config_description['plains_amplitude'] ~= nil and config_description['mountains_amplitude'] ~= nil then
+		planet_specific_configuration:set_amplitudes(config_description['plains_amplitude'], config_description['mountains_amplitude'])
+	end
+
+	if config_description['vertical_offset'] ~= nil and config_description['mountains_offset'] ~= nil then
+		planet_specific_configuration:set_offsets(config_description['vertical_offset'], config_description['mountains_offset'])
+	end
+
+	if config_description['plains_seed1'] ~= nil and 
+	   config_description['plains_seed2'] ~= nil and 
+	   config_description['mix_seed1'] ~= nil and 
+	   config_description['mix_seed2'] ~= nil then
+
+	   planet_specific_configuration:set_seeds(config_description['plains_seed1'],
+												config_description['plains_seed2'],
+												config_description['mix_seed1'],
+												config_description['mix_seed2'])
+
+	end
+
+	if config_description['terrainbump_factor'] ~= nil then
+		planet_specific_configuration:set_terrainbumpfactor(config_description['terrainbump_factor'])
+	end
+
+	if config_description['splat_transition_up_relative_alt'] ~= nil and 
+	   config_description['splat_transition_down_relative_alt'] ~= nil and
+	   config_description['splat_texture_resol'] ~= nil then
+
+	   planet_specific_configuration:set_splattingparams(config_description['splat_transition_up_relative_alt'],
+												config_description['splat_transition_down_relative_alt'],
+												config_description['splat_texture_resol'])
+
+	end
+
+	if config_description['atmo_kr'] ~= nil and 
+	   config_description['fog_alt_limit'] ~= nil and
+	   config_description['fog_density'] ~= nil then
+
+	   planet_specific_configuration:set_fogandatmoparams(config_description['atmo_kr'],
+												config_description['fog_alt_limit'],
+												config_description['fog_density'])
+
+	end
+end
 
 
 commons.procedural.nebulae.build_specific_config=function(nebulae_specific_configuration,random_engine)

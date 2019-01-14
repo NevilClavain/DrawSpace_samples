@@ -11,7 +11,7 @@ skybox_entity:remove_aspect(INFOS_ASPECT)
 commons.trash.rendering(rg, sb_mod, skybox_entity, skybox_renderer)
 
 
-
+--[[
 eg:remove('sphere_entity')
 sphere_body:release()
 sphere_body:detach_fromentity(sphere_entity)
@@ -35,7 +35,7 @@ ship_entity:remove_aspect(BODY_ASPECT)
 ship_entity:release_info("entity_name")
 ship_entity:remove_aspect(INFOS_ASPECT)
 commons.trash.meshe(rg, ship_entity, ship_renderer)
-
+]]
 
 
 
@@ -43,6 +43,7 @@ commons.trash.meshe(rg, ship_entity, ship_renderer)
 eg:remove('camera_entity')
 commons.trash.camera( camera_entity, camera_mvt)
 
+planet_specific_config:cleanup(planet_renderer)
 
 planet_entity:remove_aspect(TRANSFORM_ASPECT)
 planet_entity:release_info("entity_name")
