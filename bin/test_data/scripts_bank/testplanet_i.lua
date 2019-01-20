@@ -280,6 +280,11 @@ create_planet = function()
 				},
 				textures =
 				{
+					[1] = 
+					{
+						{ path='earth_th_pixels_16.jpg', stage=0 },
+						{ path='earth_th_splatting_16.jpg', stage=1 },
+					}
 				},
 				vertex_textures =
 				{
@@ -289,8 +294,9 @@ create_planet = function()
 				},
 				rendering_order = 10000
 			}
-		},
-
+		}
+		--[[ -- pour plus tard...
+		,		
 		atmo_layer = 
 		{
 			texture_pass =	
@@ -321,6 +327,7 @@ create_planet = function()
 				rendering_order = 10000
 			}
 		}
+		]]
 	}
 
 	local planet_specific_config_descr =
