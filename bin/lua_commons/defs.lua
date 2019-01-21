@@ -93,6 +93,13 @@ RENDERSTATE_OPE_ALPHABLENDDEST=9
 RENDERSTATE_OPE_ALPHABLENDSRC=10
 
 
+-- log levels
+TRACE=0
+DEBUG=1
+WARN=2
+ERROR=3
+FATAL=4
+
 print_memsize=function() 
 	g:print('Total mem = '..g:total_mem()..' byte(s)') 
 end
