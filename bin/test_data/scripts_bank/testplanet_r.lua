@@ -87,6 +87,7 @@ root_entity:remove_aspect(PHYSICS_ASPECT)
 
 mvt_mod:unload()
 pl_mod:unload()
+sb_mod:unload()
 
 
 -- classes instances cleanup
