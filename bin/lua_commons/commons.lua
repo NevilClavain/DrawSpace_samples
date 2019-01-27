@@ -16,6 +16,29 @@ REFLECTIONS_OFF=0
 REFLECTIONS_ON=1
 
 
+commons.utils.startup=function(startup_lua_file)
+
+    g:log(DEBUG,"STARTUP BEGIN")
+	g:dump_mem()
+	gameroom_mem_alloc_size = g:total_mem()
+	g:do_file(startup_lua_file)
+	g:log(DEBUG,"STARTUP END")
+
+end
+
+commons.utils.shutdown=function(shutdown_lua_file)
+
+    g:log(DEBUG,"SHUTDOWN BEGIN")
+	g:do_file(shutdown_lua_file)
+	g:dump_mem()
+	if gameroom_mem_alloc_size ~= g:total_mem() then
+	  g:log(FATAL,"GAMEROOM MEM LEAK DETECTED")
+	  g:ds_exception( "GAMEROOM MEM LEAK DETECTED !" )
+	end
+	g:log(DEBUG,"SHUTDOWN END")
+
+end
+
 commons.utils.deg_to_rad = function(angle)
 	return ( ( angle * commons.utils.PI ) / 180.0 );
 end
