@@ -18,7 +18,7 @@ REFLECTIONS_ON=1
 
 commons.utils.startup=function(startup_lua_file)
 
-    g:log(DEBUG,"STARTUP BEGIN")
+	g:log(DEBUG,"STARTUP BEGIN")
 	g:dump_mem()
 	gameroom_mem_alloc_size = g:total_mem()
 	g:do_file(startup_lua_file)
@@ -28,7 +28,7 @@ end
 
 commons.utils.shutdown=function(shutdown_lua_file)
 
-    g:log(DEBUG,"SHUTDOWN BEGIN")
+	g:log(DEBUG,"SHUTDOWN BEGIN")
 	g:do_file(shutdown_lua_file)
 	g:dump_mem()
 	if gameroom_mem_alloc_size ~= g:total_mem() then
