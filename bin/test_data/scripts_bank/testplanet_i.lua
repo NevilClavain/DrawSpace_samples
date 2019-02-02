@@ -345,9 +345,10 @@ create_planet = function()
 		splat_transition_up_relative_alt	= 1.095,
 		splat_transition_down_relative_alt	= 1.0040,
 		splat_texture_resol					= 16,
-		atmo_kr								= 0.0038,
+		atmo_kr								= 0.0033,
 		fog_alt_limit						= 30000.0,
-		fog_density							= 0.000032
+		fog_density							= 0.000031,
+		landplace_patch						= FALSE
 	}
 
 	local entity = nil
@@ -453,6 +454,15 @@ commons.setup_lit_flags( 'texture_pass', renderers, REFLECTIONS_OFF, reflectorPo
 
 
 planet_entity,planet_renderer,planet_specific_config = create_planet()
+planet_transform = RawTransform()
+planet_transform:configure(planet_entity)
+
+planet_pos_mat = Matrix()
+planet_pos_mat:translation( 0.0, 0.0, -20000000.0 )
+planet_transform:add_matrix( "pos", planet_pos_mat )
+
+
+
 
 
 skybox_entity,skybox_renderer,sb_transform = create_skybox()

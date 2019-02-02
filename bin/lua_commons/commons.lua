@@ -525,6 +525,11 @@ commons.procedural.planet.setup_specific_config=function(config_description, pla
 												config_description['fog_density'])
 
 	end
+
+	if config_description['landplace_patch'] ~= nil then
+		planet_specific_configuration:enable_landplacepatch(config_description['landplace_patch'])
+	end
+
 end
 
 
