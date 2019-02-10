@@ -2228,6 +2228,8 @@ void dsAppClient::init_ship( void )
 
 void dsAppClient::init_cameras( void )
 {
+
+    /* ECH 2019 
     m_camera3 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
     m_camera3->Lock( m_ship_node );
     m_camera3->SetReferentBody( m_ship );
@@ -2259,13 +2261,12 @@ void dsAppClient::init_cameras( void )
 
 
     m_camera3_node->LinkTo( m_circmvt_node );
-
-    //m_camera3_node->LinkTo( m_camera_transfo_node );
     
-
+  
     m_circmvt_node->LinkTo( m_ship_node );
+    */
 
-
+    /* ECH 2019 temporaire
     m_camera_occ = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
 
     
@@ -2277,11 +2278,38 @@ void dsAppClient::init_cameras( void )
 
     // TEMPORAIRE
     m_camera_occ->Lock( m_star_impostor_node );
+    */
+
+    /////////// ECH 2019 Ajout
+
+    m_camera0 = _DRAWSPACE_NEW_(DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint);
+    m_camera0_node = _DRAWSPACE_NEW_(SceneNode<DrawSpace::Dynamics::CameraPoint>, SceneNode<DrawSpace::Dynamics::CameraPoint>("camera0"));
+    m_camera0_node->SetContent(m_camera0);
+    m_scenenodegraph.RegisterNode(m_camera0_node);
+
+
+    m_camera0_transfo_node = _DRAWSPACE_NEW_(DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>, DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>("camera0_pos"));
+    m_camera0_transfo_node->SetContent(_DRAWSPACE_NEW_(Transformation, Transformation));
+
+
+    Matrix cam0_pos;
+    cam0_pos.Translation(269000000.0, 0.0, 5902400.0);
+
+    m_camera0_transfo_node->GetContent()->PushMatrix(cam0_pos);
+
+    m_scenenodegraph.AddNode(m_camera0_transfo_node);
+    m_scenenodegraph.RegisterNode(m_camera0_transfo_node);
+
+
+    m_camera0_node->LinkTo(m_camera0_transfo_node);
+
+
+
 
 
     /////////////////////////////////////////////////////////
 
-
+    /* ECH 2019
     m_camera5 = _DRAWSPACE_NEW_( DrawSpace::Dynamics::CameraPoint, DrawSpace::Dynamics::CameraPoint );
 
     m_camera5->SetReferentBody( m_planet );
@@ -2319,6 +2347,7 @@ void dsAppClient::init_cameras( void )
 
     m_fpsmvt_node->LinkTo( m_longlatmvt_node );
     m_longlatmvt_node->LinkTo( m_planet_node );
+    */
 }
 
 
@@ -2359,7 +2388,7 @@ void dsAppClient::init_planet_noise( void )
 
 void dsAppClient::render_universe( void )
 {
-    dsreal ship_ground_alt;
+    //dsreal ship_ground_alt;
     dsreal cam_ground_alt;
 
     DrawSpace::Interface::Renderer* renderer = DrawSpace::Core::SingletonPlugin<DrawSpace::Interface::Renderer>::GetInstance()->m_interface;
@@ -2370,21 +2399,29 @@ void dsAppClient::render_universe( void )
 
     m_planet_node->GetFinalTransform( planet_transf );
 
+    if (m_curr_camera == m_camera5)
+    {
+        cam_ground_alt = m_planet->GetLayerFromCamera( "camera5", 0 )->GetCurrentHeight();
+    }
+    //ship_ground_alt = m_planet->GetLayerFromInertBody( m_ship, 0 )->GetCurrentHeight();
 
-    cam_ground_alt = m_planet->GetLayerFromCamera( "camera5", 0 )->GetCurrentHeight();
-    ship_ground_alt = m_planet->GetLayerFromInertBody( m_ship, 0 )->GetCurrentHeight();
-
-    m_longlat_mvt->SetAlt( ( PLANET_RAY * 1000 ) + cam_ground_alt + 4.0 );
+    if (m_curr_camera == m_camera5)
+    {
+        m_longlat_mvt->SetAlt( ( PLANET_RAY * 1000 ) + cam_ground_alt + 4.0 );
+    }
 
 
 
     //////////////////////////////////////////////////////////////////////
-
-    Vector view_patch_coords;
-    m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetFace( m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetCurrentFace() )->GetCurrentPatchViewCoords( view_patch_coords );
-
+    if (m_curr_camera == m_camera5)
+    {
+        Vector view_patch_coords;
+        m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetFace( m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetCurrentFace() )->GetCurrentPatchViewCoords( view_patch_coords );
+    }
     //////////////////////////////////////////////////////////////////////
 
+
+    /* ECH 2019 
     Vector shippos;
 
     Vector invariantPos;
@@ -2422,7 +2459,6 @@ void dsAppClient::render_universe( void )
         m_playerpos_longlatalt[2] = DrawSpace::Utils::Maths::RadToDeg( m_shippos_longlatalt[2] );    
     }
 
-
     //////////////////////////////////////////////////////////////////////
 
 
@@ -2437,7 +2473,7 @@ void dsAppClient::render_universe( void )
 
     //m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "view_pos", invariantPos );
     //m_ship_drawable->GetNodeFromPass( m_texturemirrorpass )->SetShaderRealVector( "planet_pos", planet_pos );
-
+    */
     
     for( int i = 0; i < 6; i++ )
     {
@@ -2467,6 +2503,10 @@ void dsAppClient::render_universe( void )
     {
         m_planet->GetCameraRelativeAltitude( "camera5", rel_alt );
     }
+    else if (m_curr_camera == m_camera0)
+    {
+        m_planet->GetCameraRelativeAltitude("camera0", rel_alt);
+    }
     else
     {
         m_planet->GetInertBodyRelativeAltitude( m_ship, rel_alt );
@@ -2489,11 +2529,11 @@ void dsAppClient::render_universe( void )
     m_texturepass->GetRenderingQueue()->Draw();
     m_texturemirrorpass->GetRenderingQueue()->Draw();
 
-
+    /* ECH 2019 temporaire
     m_scenenodegraph.SetCurrentCamera( "camera_occ" );
     m_occlusionpass->GetRenderingQueue()->Draw();    
     m_zoompass->GetRenderingQueue()->Draw();
-
+    */
     
 
     
@@ -2504,6 +2544,7 @@ void dsAppClient::render_universe( void )
 
     m_finalpass2->GetRenderingQueue()->Draw();
 
+    /* ECH 2019
     bool haslanded = m_ship->HasLanded();
     
     if( haslanded != m_haslanded )
@@ -2524,6 +2565,7 @@ void dsAppClient::render_universe( void )
 
         }
     }
+    */
 
 
     // distance au vaisseau, en degres
@@ -2611,6 +2653,11 @@ void dsAppClient::render_universe( void )
         alt = m_planet->GetLayerFromCamera( "camera5", 0 )->GetBody()->GetHotPointAltitud();
         hotstate = m_planet->GetLayerFromCamera( "camera5", 0 )->GetHotState();
     }
+    else if (m_curr_camera == m_camera0)
+    {
+        alt = m_planet->GetLayerFromCamera("camera0", 0)->GetBody()->GetHotPointAltitud();
+        hotstate = m_planet->GetLayerFromCamera("camera0", 0)->GetHotState();
+    }
     else
     {
         alt = m_planet->GetLayerFromInertBody( m_ship, 0 )->GetBody()->GetHotPointAltitud();
@@ -2637,7 +2684,7 @@ void dsAppClient::render_universe( void )
     long current_fps = m_timer.GetFPS();
     renderer->DrawText( 0, 255, 0, 10, 35, "%d fps", current_fps );
 
-    dsreal speed = m_ship->GetLinearSpeedMagnitude();
+    dsreal speed = 0.0;// = m_ship->GetLinearSpeedMagnitude(); ECH 2019
     /*
     if( m_showinfos )
     {
@@ -2817,16 +2864,19 @@ void dsAppClient::render_universe( void )
 
         ///////////////////////////////////////////
 
-        dsreal walk_longit_speed, walk_latit_speed;
+        if (m_curr_camera == m_camera5)
+        {
+            dsreal walk_longit_speed, walk_latit_speed;
 
-        walk_longit_speed = -m_walking_speed * sin( m_fps_mvt->GetCurrentYaw() );
-        walk_latit_speed = m_walking_speed * cos( m_fps_mvt->GetCurrentYaw() );
+            walk_longit_speed = -m_walking_speed * sin( m_fps_mvt->GetCurrentYaw() );
+            walk_latit_speed = m_walking_speed * cos( m_fps_mvt->GetCurrentYaw() );
 
-        m_calendar->TranslationSpeedInc( &m_walking_long, walk_longit_speed );
-        m_calendar->TranslationSpeedInc( &m_walking_lat, walk_latit_speed );
+            m_calendar->TranslationSpeedInc( &m_walking_long, walk_longit_speed );
+            m_calendar->TranslationSpeedInc( &m_walking_lat, walk_latit_speed );
 
-        m_longlat_mvt->SetLongitud( m_walking_long );
-        m_longlat_mvt->SetLatitud( m_walking_lat );
+            m_longlat_mvt->SetLongitud( m_walking_long );
+            m_longlat_mvt->SetLatitud( m_walking_lat );
+        }
 
     }
 
@@ -2922,7 +2972,7 @@ void dsAppClient::OnRenderFrame( void )
 
             case 8:
                 print_init_trace( "ship creation..." );
-                init_ship();
+                //init_ship();
                 break;
 
             case 9:
@@ -2967,11 +3017,17 @@ void dsAppClient::OnRenderFrame( void )
             case 17:
                 print_init_trace( "launching simulation..." );
 
+                // ECH 2019
 
-                
+                m_curr_camera = m_camera0;
+                m_curr_camera_name = "camera0";
+                m_walking = false;
+
+                /*
                 m_curr_camera = m_camera3; 
                 m_curr_camera_name = "camera3";
                 m_walking = false;
+                */
                 
 
                 //m_mouse_circularmode = true;

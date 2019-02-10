@@ -102,11 +102,11 @@ create_ship = function()
 				},
 				rs_in = 
 				{
-					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true"	}		
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" }
 				},
 				rs_out =
 				{
-					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false"}
 				}
 			},
 			textures =
@@ -228,7 +228,7 @@ create_skybox = function()
 				shaders_params = 
 				{
 				},
-				rendering_order = 10000
+				rendering_order = 1000
 			}
 		}
 	}
@@ -268,14 +268,19 @@ create_planet = function()
 				{
 					shaders = 
 					{
-						{ path='texture.vso',mode=SHADER_COMPILED },
-						{ path='texture.pso',mode=SHADER_COMPILED }
+						{ path='planet_surface.vso',mode=SHADER_COMPILED },
+						{ path='planet_surface.pso',mode=SHADER_COMPILED }
 					},
 					rs_in = 
 					{
+						{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+						{ ope=RENDERSTATE_OPE_SETFILLMODE, value="line" }
+						
 					},
 					rs_out =
 					{
+						{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false"},
+						{ ope=RENDERSTATE_OPE_SETFILLMODE, value="solid" }
 					}		
 				},
 				textures =
@@ -292,7 +297,7 @@ create_planet = function()
 				shaders_params = 
 				{
 				},
-				rendering_order = 10000
+				rendering_order = 5000
 			}
 		}
 		--[[ -- pour plus tard...
@@ -332,7 +337,7 @@ create_planet = function()
 
 	local planet_specific_config_descr =
 	{
-		planet_ray							= 6502.0,
+		planet_ray							= 1.0,
 		plains_amplitude					= 600.0,
 		mountains_amplitude					= 16000.0,
 		vertical_offset						= 20.0,
@@ -458,7 +463,7 @@ planet_transform = RawTransform()
 planet_transform:configure(planet_entity)
 
 planet_pos_mat = Matrix()
-planet_pos_mat:translation( 0.0, 0.0, -20000000.0 )
+planet_pos_mat:translation( 0.0, 0.0, -2400.0 )
 planet_transform:add_matrix( "pos", planet_pos_mat )
 
 
@@ -468,7 +473,7 @@ planet_transform:add_matrix( "pos", planet_pos_mat )
 skybox_entity,skybox_renderer,sb_transform = create_skybox()
 
 
---[[
+
 sphere_entity, sphere_renderer, sphere_body = create_sphere()
 renderers[nb_renderers] = sphere_renderer
 nb_renderers = nb_renderers + 1
@@ -477,6 +482,8 @@ ship_entity, ship_renderer, ship_body = create_ship()
 renderers[nb_renderers] = ship_renderer
 nb_renderers = nb_renderers + 1
 
+
+--[[
 camera2_entity, camera2_pos=commons.create_static_camera(0.0, 110.0, 300.0, viewport_width,viewport_height, mvt_mod, "ship_camera")
 eg:add_child('ship_entity','camera2_entity',camera2_entity)
 ]]
@@ -545,13 +552,13 @@ function( key )
   if key == 81 then 
     
     local mvt_info = { camera_mvt:read() }
-	camera_mvt:update(120.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	camera_mvt:update(12.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
   --W key
   elseif key == 87 then
     
     local mvt_info = { camera_mvt:read() }
-	camera_mvt:update(-120.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	camera_mvt:update(-12.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
   
   end
 

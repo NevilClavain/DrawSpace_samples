@@ -43,6 +43,9 @@ commons.trash.meshe(rg, ship_entity, ship_renderer)
 eg:remove('camera_entity')
 commons.trash.camera( camera_entity, camera_mvt)
 
+
+planet_transform:release()
+
 planet_specific_config:cleanup(planet_renderer)
 
 planet_entity:remove_aspect(TRANSFORM_ASPECT)

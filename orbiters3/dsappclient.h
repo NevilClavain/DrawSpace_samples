@@ -303,7 +303,12 @@ protected:
     DrawSpace::Dynamics::CameraPoint*           m_camera3;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera3_node;
 
-    
+
+    DrawSpace::Dynamics::CameraPoint*           m_camera0;
+    DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera0_node;
+    DrawSpace::Core::SceneNode<DrawSpace::Core::Transformation>*        m_camera0_transfo_node;
+
+
 
     DrawSpace::Dynamics::CameraPoint*           m_camera5;
     DrawSpace::Core::SceneNode<DrawSpace::Dynamics::CameraPoint>*       m_camera5_node;
