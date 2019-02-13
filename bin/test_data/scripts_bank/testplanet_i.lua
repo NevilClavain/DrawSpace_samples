@@ -373,7 +373,8 @@ create_planet = function()
 		atmo_kr								= 0.0033,
 		fog_alt_limit						= 30000.0,
 		fog_density							= 0.000031,
-		landplace_patch						= FALSE
+		beach_limit							= 25.0,
+		landplace_patch						= FALSE,
 	}
 
 	local entity = nil

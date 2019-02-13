@@ -526,10 +526,13 @@ commons.procedural.planet.setup_specific_config=function(config_description, pla
 
 	end
 
+	if config_description['beach_limit'] ~= nil then
+		planet_specific_configuration:set_beachlimit(config_description['beach_limit'])
+	end
+
 	if config_description['landplace_patch'] ~= nil then
 		planet_specific_configuration:enable_landplacepatch(config_description['landplace_patch'])
 	end
-
 end
 
 
