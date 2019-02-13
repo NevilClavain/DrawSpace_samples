@@ -19,11 +19,14 @@ create_sphere = function()
 				},
 				rs_in = 
 				{
-					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true"	}		
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+					{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" }
+					
 				},
 				rs_out =
 				{
-					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+					{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" }
 				}
 			},
 			textures =
@@ -51,24 +54,40 @@ create_sphere = function()
 	renderer:register_to_rendering(rg)
 	eg:add_child('root','sphere_entity',entity)
 
-
+	--[[
 	entity:add_aspect(BODY_ASPECT)
 	local body=Body()
 
 	body:attach_toentity(entity)
 
-	body:configure_shape(SHAPE_SPHERE, 1.0)
+	body:configure_shape(SHAPE_SPHERE, 20.0)
 
 
 	local sphere_pos_mat = Matrix()
-
+	
 	sphere_pos_mat:translation( 0.0, 0.0, -60.0 )
+	
 
 	body:configure_attitude(sphere_pos_mat)
 
 	body:configure_mass(80.0)
 
 	body:configure_mode(BODY_MODE)
+	]]
+
+
+	local scale = Matrix();
+	scale:scale(1.0, 1.0, 1.0)
+
+	local pos_mat = Matrix()
+	pos_mat:translation( 0.0, 0.0, -62.0 )
+
+
+	local transform = RawTransform()
+	transform:configure(entity)
+	transform:add_matrix("scaling",scale)
+	transform:add_matrix( "pos", pos_mat )
+
 
 	local sphere_material =
 	{
@@ -82,7 +101,8 @@ create_sphere = function()
 
 	commons.apply_material( sphere_material, renderer, 'texture_pass')
 
-	return entity,renderer,body
+	--return entity,renderer,body
+	return entity,renderer,transform
 end
 
 
@@ -273,14 +293,14 @@ create_planet = function()
 					},
 					rs_in = 
 					{
-						{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
-						{ ope=RENDERSTATE_OPE_SETFILLMODE, value="line" }
+						{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }--[[,
+						{ ope=RENDERSTATE_OPE_SETFILLMODE, value="line" }]]
 						
 					},
 					rs_out =
 					{
-						{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false"},
-						{ ope=RENDERSTATE_OPE_SETFILLMODE, value="solid" }
+						{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false"}--[[,
+						{ ope=RENDERSTATE_OPE_SETFILLMODE, value="solid" }]]
 					}		
 				},
 				textures =
@@ -337,7 +357,7 @@ create_planet = function()
 
 	local planet_specific_config_descr =
 	{
-		planet_ray							= 1.0,
+		planet_ray							= 6500.0,
 		plains_amplitude					= 600.0,
 		mountains_amplitude					= 16000.0,
 		vertical_offset						= 20.0,
@@ -415,6 +435,7 @@ lights =
 
 mouse_right = FALSE
 
+
 renderer_descr, renderer_width, renderer_height, renderer_fullscreen, viewport_width, viewport_height = renderer:descr()
 
 g:print('rendering infos : '..renderer_descr..', '..renderer_width..'x'..renderer_height..' fullscreen='..renderer_fullscreen..' viewport='..viewport_width..'x'..viewport_height)
@@ -435,6 +456,8 @@ g:print(pl_mod:get_descr().. ' loaded')
 commons.init_final_pass(rg, 'final_pass')
 
 rg:create_child('final_pass', 'texture_pass', 0)
+rg:set_pass_targetclearstate( 'texture_pass', FALSE )
+rg:set_pass_depthclearstate( 'texture_pass', TRUE )
 
 
 
@@ -463,7 +486,7 @@ planet_transform = RawTransform()
 planet_transform:configure(planet_entity)
 
 planet_pos_mat = Matrix()
-planet_pos_mat:translation( 0.0, 0.0, -2400.0 )
+planet_pos_mat:translation( 0.0, 0.0, -40620000.0 )
 planet_transform:add_matrix( "pos", planet_pos_mat )
 
 
@@ -474,13 +497,13 @@ skybox_entity,skybox_renderer,sb_transform = create_skybox()
 
 
 
-sphere_entity, sphere_renderer, sphere_body = create_sphere()
-renderers[nb_renderers] = sphere_renderer
-nb_renderers = nb_renderers + 1
+--sphere_entity, sphere_renderer, sphere_transform = create_sphere()
+--renderers[nb_renderers] = sphere_renderer
+--nb_renderers = nb_renderers + 1
 
-ship_entity, ship_renderer, ship_body = create_ship()
-renderers[nb_renderers] = ship_renderer
-nb_renderers = nb_renderers + 1
+--ship_entity, ship_renderer, ship_body = create_ship()
+--renderers[nb_renderers] = ship_renderer
+--nb_renderers = nb_renderers + 1
 
 
 --[[

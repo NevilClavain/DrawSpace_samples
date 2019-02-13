@@ -13,21 +13,19 @@ commons.trash.rendering(rg, sb_mod, skybox_entity, skybox_renderer)
 
 --[[
 eg:remove('sphere_entity')
-sphere_body:release()
-sphere_body:detach_fromentity(sphere_entity)
-sphere_entity:remove_aspect(BODY_ASPECT)
+sphere_transform:release()
 sphere_entity:release_info("entity_name")
 sphere_entity:remove_aspect(INFOS_ASPECT)
 commons.trash.meshe(rg, sphere_entity, sphere_renderer)
+]]
 
 
-
-
+--[[
 eg:remove('camera2_entity')
 commons.trash.camera( camera2_entity, camera2_pos)
+]]
 
-
-
+--[[
 eg:remove('ship_entity')
 ship_body:release()
 ship_body:detach_fromentity(ship_entity)
@@ -36,7 +34,6 @@ ship_entity:release_info("entity_name")
 ship_entity:remove_aspect(INFOS_ASPECT)
 commons.trash.meshe(rg, ship_entity, ship_renderer)
 ]]
-
 
 
 

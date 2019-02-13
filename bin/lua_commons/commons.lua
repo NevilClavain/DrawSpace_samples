@@ -103,7 +103,7 @@ commons.create_static_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewp
 	camera_entity:add_aspect(TRANSFORM_ASPECT)
 	camera_entity:add_aspect(CAMERA_ASPECT)
 	
-	camera_entity:configure_camera(p_viewport_width,p_viewport_height, 1.0, 1000000.0, p_name)
+	camera_entity:configure_camera(p_viewport_width,p_viewport_height, 1.0, 90000000000.0, p_name)
 
 	camera_entity:add_aspect(INFOS_ASPECT)
 	camera_entity:setup_info( "entity_name", p_name )
@@ -125,7 +125,7 @@ commons.create_fps_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewport
 	camera_entity:add_aspect(TRANSFORM_ASPECT)
 	camera_entity:add_aspect(CAMERA_ASPECT)
 
-	camera_entity:configure_camera(p_viewport_width,p_viewport_height, 1.0, 1000000.0, p_name)
+	camera_entity:configure_camera(p_viewport_width,p_viewport_height, 1.0, 90000000000.0, p_name)
 
 	camera_entity:add_aspect(INFOS_ASPECT)
 	camera_entity:setup_info( "entity_name", p_name )
@@ -143,7 +143,7 @@ commons.create_free_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewpor
 	camera_entity:add_aspect(TRANSFORM_ASPECT)
 	camera_entity:add_aspect(CAMERA_ASPECT)
 
-	camera_entity:configure_camera(p_viewport_width,p_viewport_height, 1.0, 1000000.0, p_name)
+	camera_entity:configure_camera(p_viewport_width,p_viewport_height, 1.0, 90000000000.0, p_name)
 
 	camera_entity:add_aspect(INFOS_ASPECT)
 	camera_entity:setup_info( "entity_name", p_name )
