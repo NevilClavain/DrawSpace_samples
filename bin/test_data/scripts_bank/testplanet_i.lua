@@ -357,6 +357,7 @@ create_planet = function()
 
 	local planet_specific_config_descr =
 	{
+		resources_path						= "test_data/shaders_bank",
 		planet_ray							= 6500.0,
 		plains_amplitude					= 600.0,
 		mountains_amplitude					= 16000.0,
@@ -375,6 +376,8 @@ create_planet = function()
 		fog_density							= 0.000031,
 		beach_limit							= 25.0,
 		landplace_patch						= FALSE,
+		climate_vshader						= "planet_ht.vso",
+		climate_pshader						= "planet_ht.pso",
 	}
 
 	local entity = nil
