@@ -3,6 +3,16 @@
 renderers = {}
 nb_renderers = 0
 
+lights = 
+{
+	ambient_light = {r = 0.05, g = 0.05, b = 0.05, a = 0.0 },
+	lights_enabled = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
+	light0 = 
+	{
+		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
+		direction = { x = 3.0, y = 1.0, z = 0.0, w = 1.0 },
+	}
+}
 
 create_sphere = function()
 
@@ -393,7 +403,6 @@ create_planet = function()
 	entity:add_aspect(INFOS_ASPECT)
 	entity:setup_info( "entity_name", "test planet" )
 
-
 	renderer:register_to_rendering(rg)
 
 	eg:add_child('root','planet_entity',entity)
@@ -426,16 +435,7 @@ fog_color =
 	b = 0.99, 
 }
 
-lights = 
-{
-	ambient_light = {r = 0.05, g = 0.05, b = 0.05, a = 0.0 },
-	lights_enabled = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
-	light0 = 
-	{
-		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-		direction = { x = 3.0, y = 1.0, z = 0.0, w = 1.0 },
-	}
-}
+
 
 mouse_right = FALSE
 
@@ -492,7 +492,6 @@ planet_transform:configure(planet_entity)
 planet_pos_mat = Matrix()
 planet_pos_mat:translation( 0.0, 0.0, -40620000.0 )
 planet_transform:add_matrix( "pos", planet_pos_mat )
-
 
 
 
@@ -635,6 +634,7 @@ function()
 
   local mvt_info = { camera_mvt:read() }
   camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+
 
 
 end)

@@ -43,7 +43,7 @@ commons.trash.camera( camera_entity, camera_mvt)
 
 planet_transform:release()
 
-planet_specific_config:cleanup(planet_renderer)
+planet_specific_config:cleanup()
 
 planet_entity:remove_aspect(TRANSFORM_ASPECT)
 planet_entity:release_info("entity_name")
