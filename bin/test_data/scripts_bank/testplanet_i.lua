@@ -368,15 +368,17 @@ create_planet = function()
 	local planet_specific_config_descr =
 	{
 		resources_path						= "test_data/shaders_bank",
+		climate_vshader						= "planet_ht.vso",
+		climate_pshader						= "planet_ht.pso",
 		planet_ray							= 6500.0,
 		plains_amplitude					= 600.0,
 		mountains_amplitude					= 16000.0,
 		vertical_offset						= 20.0,
 		mountains_offset					= 0.0,
-		plains_seed1						= 1.0,
-		plains_seed2						= 2.0,
-		mix_seed1							= 3.0,
-		mix_seed2							= 4.0,
+		plains_seed1						= 8099.0,
+		plains_seed2						= 5662.0,
+		mix_seed1							= 3111.0,
+		mix_seed2							= 498.0,
 		terrainbump_factor					= 16.0,
 		splat_transition_up_relative_alt	= 1.095,
 		splat_transition_down_relative_alt	= 1.0040,
@@ -386,8 +388,68 @@ create_planet = function()
 		fog_density							= 0.000031,
 		beach_limit							= 25.0,
 		landplace_patch						= FALSE,
-		climate_vshader						= "planet_ht.vso",
-		climate_pshader						= "planet_ht.pso",
+
+		ambient_light = 
+		{
+			state = FALSE,
+			color = 
+			{
+				r = 1.0,
+				g = 0.0,
+				b = 0.0
+			}
+		},
+
+		light0 = 
+		{
+			state = TRUE,
+			color = 
+			{
+				r = 1.0,
+				g = 0.9,
+				b = 1.0
+			},
+			dir = 
+			{
+				x = 0.0,
+				y = 1.0,
+				z = 0.5
+			}
+		},
+
+		light1= 
+		{
+			state = FALSE,
+			color = 
+			{
+				r = 0.0,
+				g = 0.0,
+				b = 0.0
+			},
+			dir = 
+			{
+				x = 0.0,
+				y = 0.0,
+				z = 1.0
+			}
+		},
+
+		light2 = 
+		{
+			state = FALSE,
+			color = 
+			{
+				r = 0.0,
+				g = 0.0,
+				b = 0.0
+			},
+			dir = 
+			{
+				x = 0.0,
+				y = 0.0,
+				z = 1.0
+			}
+		}
 	}
 
 	local entity = nil

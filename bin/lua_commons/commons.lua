@@ -543,6 +543,89 @@ commons.procedural.planet.setup_specific_config=function(config_description, pla
 		planet_specific_configuration:set_climateshaders(config_description['climate_vshader'], config_description['climate_pshader'])
 	end
 
+	if config_description['ambient_light'] ~= nil then
+
+		if config_description['ambient_light']['state'] ~= nil then
+			planet_specific_configuration:enable_light( 0, config_description['ambient_light']['state'])
+		end
+
+		if config_description['ambient_light']['color'] ~= nil then
+
+			local r = config_description['ambient_light']['color']['r']
+			local g = config_description['ambient_light']['color']['g']
+			local b = config_description['ambient_light']['color']['b']
+			planet_specific_configuration:set_lightcolor( 0, r, g, b)
+		end
+	end
+
+	if config_description['light0'] ~= nil then
+
+		if config_description['light0']['state'] ~= nil then
+			planet_specific_configuration:enable_light( 1, config_description['light0']['state'])	
+		end	
+
+		if config_description['light0']['color'] ~= nil then
+
+			local r = config_description['light0']['color']['r']
+			local g = config_description['light0']['color']['g']
+			local b = config_description['light0']['color']['b']
+			planet_specific_configuration:set_lightcolor( 1, r, g, b)
+		end
+
+		if config_description['light0']['dir'] ~= nil then
+
+			local r = config_description['light0']['dir']['x']
+			local g = config_description['light0']['dir']['y']
+			local b = config_description['light0']['dir']['z']
+			planet_specific_configuration:set_lightdir( 1, r, g, b)
+		end
+	end
+
+	if config_description['light1'] ~= nil then
+
+		if config_description['light1']['state'] ~= nil then
+			planet_specific_configuration:enable_light( 2, config_description['light1']['state'])
+		end	
+
+		if config_description['light1']['color'] ~= nil then
+
+			local r = config_description['light1']['color']['r']
+			local g = config_description['light1']['color']['g']
+			local b = config_description['light1']['color']['b']
+			planet_specific_configuration:set_lightcolor( 2, r, g, b)
+		end
+
+		if config_description['light0']['dir'] ~= nil then
+
+			local r = config_description['light0']['dir']['x']
+			local g = config_description['light0']['dir']['y']
+			local b = config_description['light0']['dir']['z']
+			planet_specific_configuration:set_lightdir( 2, r, g, b)
+		end
+	end
+
+	if config_description['light2'] ~= nil then
+
+		if config_description['light2']['state'] ~= nil then
+			planet_specific_configuration:enable_light( 3, config_description['light2']['state'])
+		end	
+
+		if config_description['light2']['color'] ~= nil then
+
+			local r = config_description['light2']['color']['r']
+			local g = config_description['light2']['color']['g']
+			local b = config_description['light2']['color']['b']
+			planet_specific_configuration:set_lightcolor( 3, r, g, b)
+		end
+
+		if config_description['light2']['dir'] ~= nil then
+
+			local r = config_description['light2']['dir']['x']
+			local g = config_description['light2']['dir']['y']
+			local b = config_description['light2']['dir']['z']
+			planet_specific_configuration:set_lightdir( 3, r, g, b)
+		end
+	end
 end
 
 
