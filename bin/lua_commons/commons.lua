@@ -597,9 +597,9 @@ commons.procedural.planet.setup_specific_config=function(config_description, pla
 
 		if config_description['light0']['dir'] ~= nil then
 
-			local r = config_description['light0']['dir']['x']
-			local g = config_description['light0']['dir']['y']
-			local b = config_description['light0']['dir']['z']
+			local r = config_description['light1']['dir']['x']
+			local g = config_description['light1']['dir']['y']
+			local b = config_description['light1']['dir']['z']
 			planet_specific_configuration:set_lightdir( 2, r, g, b)
 		end
 	end

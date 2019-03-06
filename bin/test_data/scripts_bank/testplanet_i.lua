@@ -422,15 +422,15 @@ create_planet = function()
 			state = FALSE,
 			color = 
 			{
-				r = 0.0,
+				r = 1.0,
 				g = 0.0,
 				b = 0.0
 			},
 			dir = 
 			{
-				x = 0.0,
+				x = 1.0,
 				y = 0.0,
-				z = 1.0
+				z = 0.0
 			}
 		},
 
