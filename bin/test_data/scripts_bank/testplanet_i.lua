@@ -411,8 +411,8 @@ create_planet = function()
 			},
 			dir = 
 			{
-				x = 0.0,
-				y = 1.0,
+				x = -1.0,
+				y = 0.0,
 				z = 0.5
 			}
 		},
@@ -470,6 +470,8 @@ create_planet = function()
 	eg:add_child('root','planet_entity',entity)
 
 	entity:add_aspect(TRANSFORM_ASPECT)
+
+	specific_config:updated()
 
 	return entity,renderer,specific_config
 end
