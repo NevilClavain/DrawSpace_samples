@@ -538,6 +538,11 @@ commons.procedural.planet.setup_specific_config=function(config_description, pla
 		planet_specific_configuration:enable_landplacepatch(config_description['landplace_patch'])
 	end
 
+	if config_description['enable_atmosphere'] ~= nil then
+		planet_specific_configuration:enable_atmosphere(config_description['enable_atmosphere'])
+	end
+
+
 	if config_description['climate_vshader'] ~= nil and 
 	   config_description['climate_pshader'] ~= nil then
 		planet_specific_configuration:set_climateshaders(config_description['climate_vshader'], config_description['climate_pshader'])

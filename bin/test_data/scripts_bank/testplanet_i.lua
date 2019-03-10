@@ -388,6 +388,7 @@ create_planet = function()
 		fog_density							= 0.000031,
 		beach_limit							= 25.0,
 		landplace_patch						= FALSE,
+		enable_atmosphere					= TRUE,
 
 		ambient_light = 
 		{
@@ -704,7 +705,10 @@ function()
 end)
 
 
-
+atmo = function( state )
+	planet_specific_config:enable_atmosphere( state )
+	planet_specific_config:updated()
+end
 
 
 g:show_mousecursor(FALSE)
