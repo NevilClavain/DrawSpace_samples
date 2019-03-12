@@ -303,13 +303,21 @@ create_planet = function()
 					},
 					rs_in = 
 					{
-						{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }--[[,
+						{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+						{ ope=RENDERSTATE_OPE_SETTEXTUREFILTERTYPE, value="linear" },
+						{ ope=RENDERSTATE_OPE_SETVERTEXTEXTUREFILTERTYPE, value="linear" }
+						
+						--[[,
 						{ ope=RENDERSTATE_OPE_SETFILLMODE, value="line" }]]
 						
 					},
 					rs_out =
 					{
-						{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false"}--[[,
+						{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false"},
+						{ ope=RENDERSTATE_OPE_SETTEXTUREFILTERTYPE, value="none" },
+						{ ope=RENDERSTATE_OPE_SETVERTEXTEXTUREFILTERTYPE, value="none" }
+						
+						--[[,
 						{ ope=RENDERSTATE_OPE_SETFILLMODE, value="solid" }]]
 					}		
 				},
@@ -329,10 +337,8 @@ create_planet = function()
 				},
 				rendering_order = 5000
 			}
-		}
-		--[[ -- pour plus tard...
-		,		
-		atmo_layer = 
+		},
+		atmosphere_layer =
 		{
 			texture_pass =	
 			{
@@ -340,15 +346,25 @@ create_planet = function()
 				{
 					shaders = 
 					{
-						{ path='texture.vso',mode=SHADER_COMPILED },
-						{ path='texture.pso',mode=SHADER_COMPILED }
+						{ path='planet_atmosphere.vso',mode=SHADER_COMPILED },
+						{ path='planet_atmosphere.pso',mode=SHADER_COMPILED }
 					},
 					rs_in = 
 					{
+						{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+						{ ope=RENDERSTATE_OPE_ALPHABLENDENABLE, value="true" },
+						{ ope=RENDERSTATE_OPE_ALPHABLENDOP, value="add" },
+						{ ope=RENDERSTATE_OPE_ALPHABLENDFUNC, value="always" },
+						{ ope=RENDERSTATE_OPE_ALPHABLENDDEST, value="invsrcalpha" },
+						{ ope=RENDERSTATE_OPE_ALPHABLENDSRC, value="srcalpha" },
+						{ ope=RENDERSTATE_OPE_SETCULLING, value="ccw" }
 					},
 					rs_out =
 					{
-					}		
+						{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+						{ ope=RENDERSTATE_OPE_ALPHABLENDENABLE, value="false" },
+						{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" }
+					}
 				},
 				textures =
 				{
@@ -359,10 +375,9 @@ create_planet = function()
 				shaders_params = 
 				{
 				},
-				rendering_order = 10000
+				rendering_order = 4500		
 			}
 		}
-		]]
 	}
 
 	local planet_specific_config_descr =
@@ -643,13 +658,13 @@ function( key )
   if key == 81 then 
     
     local mvt_info = { camera_mvt:read() }
-	camera_mvt:update(12.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	camera_mvt:update(1200000.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
   --W key
   elseif key == 87 then
     
     local mvt_info = { camera_mvt:read() }
-	camera_mvt:update(-12.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	camera_mvt:update(-1200000.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
   
   end
 
