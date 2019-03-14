@@ -11,13 +11,12 @@ skybox_entity:remove_aspect(INFOS_ASPECT)
 commons.trash.rendering(rg, sb_mod, skybox_entity, skybox_renderer)
 
 
---[[
+
 eg:remove('sphere_entity')
 sphere_transform:release()
 sphere_entity:release_info("entity_name")
 sphere_entity:remove_aspect(INFOS_ASPECT)
 commons.trash.meshe(rg, sphere_entity, sphere_renderer)
-]]
 
 
 --[[

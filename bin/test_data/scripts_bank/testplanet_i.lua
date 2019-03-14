@@ -1,7 +1,10 @@
 
 
+local speed_factor = 12.0 -- 1200000.0
+
 renderers = {}
 nb_renderers = 0
+
 
 lights = 
 {
@@ -30,13 +33,14 @@ create_sphere = function()
 				rs_in = 
 				{
 					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
-					{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" }
-					
+					{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
+					{ ope=RENDERSTATE_OPE_SETTEXTUREFILTERTYPE, value="linear" }					
 				},
 				rs_out =
 				{
 					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
-					{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" }
+					{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
+					{ ope=RENDERSTATE_OPE_SETTEXTUREFILTERTYPE, value="none" }
 				}
 			},
 			textures =
@@ -405,6 +409,70 @@ create_planet = function()
 		landplace_patch						= FALSE,
 		enable_atmosphere					= TRUE,
 
+
+		ambient_light = 
+		{
+			state = FALSE,
+			color = 
+			{
+				r = 0.0,
+				g = 0.0,
+				b = 0.0
+			}
+		},
+
+		light0 = 
+		{
+			state = FALSE,
+			color = 
+			{
+				r = 0.0,
+				g = 0.0,
+				b = 0.0
+			},
+			dir = 
+			{
+				x = 0.0,
+				y = 1.0,
+				z = 0.0
+			}
+		},
+
+		light1= 
+		{
+			state = FALSE,
+			color = 
+			{
+				r = 0.0,
+				g = 0.0,
+				b = 0.0
+			},
+			dir = 
+			{
+				x = 0.0,
+				y = 1.0,
+				z = 0.0
+			}
+		},
+
+		light2 = 
+		{
+			state = FALSE,
+			color = 
+			{
+				r = 0.0,
+				g = 0.0,
+				b = 0.0
+			},
+			dir = 
+			{
+				x = 0.0,
+				y = 1.0,
+				z = 0.0
+			}
+		}
+
+		--[[
 		ambient_light = 
 		{
 			state = FALSE,
@@ -422,14 +490,14 @@ create_planet = function()
 			color = 
 			{
 				r = 1.0,
-				g = 0.9,
+				g = 1.0,
 				b = 1.0
 			},
 			dir = 
 			{
-				x = -1.0,
-				y = 0.0,
-				z = 0.5
+				x = -3.0,
+				y = -1.0,
+				z = 0.0
 			}
 		},
 
@@ -466,6 +534,8 @@ create_planet = function()
 				z = 1.0
 			}
 		}
+		]]
+
 	}
 
 	local entity = nil
@@ -580,9 +650,9 @@ skybox_entity,skybox_renderer,sb_transform = create_skybox()
 
 
 
---sphere_entity, sphere_renderer, sphere_transform = create_sphere()
---renderers[nb_renderers] = sphere_renderer
---nb_renderers = nb_renderers + 1
+sphere_entity, sphere_renderer, sphere_transform = create_sphere()
+renderers[nb_renderers] = sphere_renderer
+nb_renderers = nb_renderers + 1
 
 --ship_entity, ship_renderer, ship_body = create_ship()
 --renderers[nb_renderers] = ship_renderer
@@ -658,14 +728,19 @@ function( key )
   if key == 81 then 
     
     local mvt_info = { camera_mvt:read() }
-	camera_mvt:update(1200000.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	camera_mvt:update(speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
   --W key
   elseif key == 87 then
     
     local mvt_info = { camera_mvt:read() }
-	camera_mvt:update(-1200000.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	camera_mvt:update(-speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
   
+  elseif key == 16 then -- left shift
+    g:print('key code down = '..key)
+    speed_factor = 2000000.0
+  else
+	--g:print('key code = '..key)
   end
 
 end)
@@ -698,6 +773,10 @@ function( key )
 	end
 
 	set_camera(current_cam)
+
+  elseif key == 16 then -- left shift
+    --g:print('key code up = '..key)
+    speed_factor = 12.0
   end
 
 end)
@@ -731,6 +810,14 @@ g:set_mousecursorcircularmode(TRUE)
 
 
 g:signal_renderscenebegin("eg")
+
+
+
+
+planet_specific_config:enable_light( 1, lights.lights_enabled.x )
+planet_specific_config:set_lightcolor( 1, lights.light0.color.r, lights.light0.color.g, lights.light0.color.b )
+planet_specific_config:set_lightdir( 1, lights.light0.direction.x, lights.light0.direction.y, lights.light0.direction.z )
+planet_specific_config:updated()
 
 
 
