@@ -12,8 +12,8 @@ lights =
 	lights_enabled = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
 	light0 = 
 	{
-		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-		direction = { x = 3.0, y = 1.0, z = 0.0, w = 1.0 },
+		color = { r = 1.0, g = 0.0, b = 0.0, a = 1.0 },
+		direction = { x = 3.0, y = -1.0, z = 0.0, w = 1.0 },
 	}
 }
 
@@ -410,68 +410,6 @@ create_planet = function()
 		enable_atmosphere					= TRUE,
 
 
-		ambient_light = 
-		{
-			state = FALSE,
-			color = 
-			{
-				r = 0.0,
-				g = 0.0,
-				b = 0.0
-			}
-		},
-
-		light0 = 
-		{
-			state = FALSE,
-			color = 
-			{
-				r = 0.0,
-				g = 0.0,
-				b = 0.0
-			},
-			dir = 
-			{
-				x = 0.0,
-				y = 1.0,
-				z = 0.0
-			}
-		},
-
-		light1= 
-		{
-			state = FALSE,
-			color = 
-			{
-				r = 0.0,
-				g = 0.0,
-				b = 0.0
-			},
-			dir = 
-			{
-				x = 0.0,
-				y = 1.0,
-				z = 0.0
-			}
-		},
-
-		light2 = 
-		{
-			state = FALSE,
-			color = 
-			{
-				r = 0.0,
-				g = 0.0,
-				b = 0.0
-			},
-			dir = 
-			{
-				x = 0.0,
-				y = 1.0,
-				z = 0.0
-			}
-		}
-
 		--[[
 		ambient_light = 
 		{
@@ -737,7 +675,7 @@ function( key )
 	camera_mvt:update(-speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
   
   elseif key == 16 then -- left shift
-    g:print('key code down = '..key)
+    
     speed_factor = 2000000.0
   else
 	--g:print('key code = '..key)
@@ -775,7 +713,7 @@ function( key )
 	set_camera(current_cam)
 
   elseif key == 16 then -- left shift
-    --g:print('key code up = '..key)
+    
     speed_factor = 12.0
   end
 
@@ -804,6 +742,40 @@ atmo = function( state )
 	planet_specific_config:updated()
 end
 
+lA = function()
+
+  lights.light0.color.r = 1.0
+  lights.light0.color.g = 1.0
+  lights.light0.color.b = 1.0
+
+  lights.light0.direction.x = 3.0
+  lights.light0.direction.y = -1.0
+  lights.light0.direction.z = 0.0
+
+  commons.update_lights( 'texture_pass', lights, renderers )
+
+  commons.update_planet_lights( lights, planet_specific_config)
+  planet_specific_config:updated()
+
+end
+
+lB = function()
+
+  lights.light0.color.r = 1.0
+  lights.light0.color.g = 0.0
+  lights.light0.color.b = 0.0
+
+  lights.light0.direction.x = 0.0
+  lights.light0.direction.y = -1.0
+  lights.light0.direction.z = 0.0
+
+  commons.update_lights( 'texture_pass', lights, renderers )
+
+  commons.update_planet_lights( lights, planet_specific_config)
+  planet_specific_config:updated()
+
+end
+
 
 g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
@@ -811,13 +783,11 @@ g:set_mousecursorcircularmode(TRUE)
 
 g:signal_renderscenebegin("eg")
 
+lA()
 
-
-
-planet_specific_config:enable_light( 1, lights.lights_enabled.x )
-planet_specific_config:set_lightcolor( 1, lights.light0.color.r, lights.light0.color.g, lights.light0.color.b )
-planet_specific_config:set_lightdir( 1, lights.light0.direction.x, lights.light0.direction.y, lights.light0.direction.z )
+commons.update_planet_lights( lights, planet_specific_config)
 planet_specific_config:updated()
+
 
 
 
