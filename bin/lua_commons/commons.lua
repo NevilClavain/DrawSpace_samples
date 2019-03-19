@@ -515,6 +515,11 @@ commons.procedural.planet.setup_specific_config=function(config_description, pla
 		planet_specific_configuration:set_planetray(config_description['planet_ray'])
 	end
 
+    if config_description['atmo_thickness'] ~= nil then
+		planet_specific_configuration:set_atmothickness(config_description['atmo_thickness'])
+	end
+
+
 	if config_description['plains_amplitude'] ~= nil and config_description['mountains_amplitude'] ~= nil then
 		planet_specific_configuration:set_amplitudes(config_description['plains_amplitude'], config_description['mountains_amplitude'])
 	end

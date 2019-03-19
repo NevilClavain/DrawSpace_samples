@@ -408,71 +408,7 @@ create_planet = function()
 		beach_limit							= 25.0,
 		landplace_patch						= FALSE,
 		enable_atmosphere					= TRUE,
-
-
-		--[[
-		ambient_light = 
-		{
-			state = FALSE,
-			color = 
-			{
-				r = 1.0,
-				g = 0.0,
-				b = 0.0
-			}
-		},
-
-		light0 = 
-		{
-			state = TRUE,
-			color = 
-			{
-				r = 1.0,
-				g = 1.0,
-				b = 1.0
-			},
-			dir = 
-			{
-				x = -3.0,
-				y = -1.0,
-				z = 0.0
-			}
-		},
-
-		light1= 
-		{
-			state = FALSE,
-			color = 
-			{
-				r = 1.0,
-				g = 0.0,
-				b = 0.0
-			},
-			dir = 
-			{
-				x = 1.0,
-				y = 0.0,
-				z = 0.0
-			}
-		},
-
-		light2 = 
-		{
-			state = FALSE,
-			color = 
-			{
-				r = 0.0,
-				g = 0.0,
-				b = 0.0
-			},
-			dir = 
-			{
-				x = 0.0,
-				y = 0.0,
-				z = 1.0
-			}
-		}
-		]]
+		atmo_thickness                      = 260.0
 
 	}
 
