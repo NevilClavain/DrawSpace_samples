@@ -169,8 +169,6 @@ create_ship = function()
 	entity:add_aspect(INFOS_ASPECT)
 	entity:setup_info( "entity_name", "Space Ship" )
 
-	renderer:register_to_rendering(rg)
-	eg:add_child('root','ship_entity',entity)
 
 
 	entity:add_aspect(BODY_ASPECT)
@@ -190,6 +188,11 @@ create_ship = function()
 	body:configure_mass(50.0)
 
 	body:configure_mode(BODY_MODE)
+
+
+	renderer:register_to_rendering(rg)
+	eg:add_child('root','ship_entity',entity)
+
 
 
 	ship_material =
@@ -441,14 +444,15 @@ set_camera = function(camera)
   if camera == free_cam then
     eg:set_camera(camera_entity)
   elseif camera == ship_cam then
-    --eg:set_camera(camera2_entity) temporaire !
+    eg:set_camera(camera2_entity)
   end
 end
 
 free_cam = 0
 ship_cam = 1
 
-current_cam = free_cam
+--current_cam = free_cam
+current_cam = ship_cam
 
 fog_intensity = 0.0
 
@@ -497,8 +501,8 @@ root_entity:add_aspect(PHYSICS_ASPECT)
 root_entity:configure_world(GRAVITY_DISABLED)
 
 
-camera_entity, camera_mvt=commons.create_free_camera(0.0, 0.0, 0.0, viewport_width,viewport_height, mvt_mod, "free_camera")
-eg:add_child('root','camera_entity',camera_entity)
+--camera_entity, camera_mvt=commons.create_free_camera(0.0, 0.0, 0.0, viewport_width,viewport_height, mvt_mod, "free_camera")
+--eg:add_child('root','camera_entity',camera_entity)
 
 
 
@@ -524,19 +528,22 @@ skybox_entity,skybox_renderer,sb_transform = create_skybox()
 
 
 
-sphere_entity, sphere_renderer, sphere_transform = create_sphere()
-renderers[nb_renderers] = sphere_renderer
-nb_renderers = nb_renderers + 1
-
---ship_entity, ship_renderer, ship_body = create_ship()
---renderers[nb_renderers] = ship_renderer
+--sphere_entity, sphere_renderer, sphere_transform = create_sphere()
+--renderers[nb_renderers] = sphere_renderer
 --nb_renderers = nb_renderers + 1
 
+ship_entity, ship_renderer, ship_body = create_ship()
+renderers[nb_renderers] = ship_renderer
+nb_renderers = nb_renderers + 1
 
---[[
+
+
 camera2_entity, camera2_pos=commons.create_static_camera(0.0, 110.0, 300.0, viewport_width,viewport_height, mvt_mod, "ship_camera")
+
+camera2_entity:setup_info( "referent_body", "plop" )
+
 eg:add_child('ship_entity','camera2_entity',camera2_entity)
-]]
+
 
 
 
@@ -566,6 +573,7 @@ rg:update_renderingqueues()
 g:add_mousemovecb( "onmousemove",
 function( xm, ym, dx, dy )  
 
+	--[[
 	local mvt_info = { camera_mvt:read() }
 
 	if mouse_right == FALSE then
@@ -573,6 +581,7 @@ function( xm, ym, dx, dy )
 	else
 	  camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,-dx)
 	end
+	]]
 
 end)
 
@@ -601,14 +610,14 @@ function( key )
   --Q key
   if key == 81 then 
     
-    local mvt_info = { camera_mvt:read() }
-	camera_mvt:update(speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+    --local mvt_info = { camera_mvt:read() }
+	--camera_mvt:update(speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
   --W key
   elseif key == 87 then
     
-    local mvt_info = { camera_mvt:read() }
-	camera_mvt:update(-speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+    --local mvt_info = { camera_mvt:read() }
+	--camera_mvt:update(-speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
   
   elseif key == 16 then -- left shift
     
@@ -625,17 +634,17 @@ function( key )
   --Q key
   if key == 81 then
     
-    local mvt_info = { camera_mvt:read() }
+    --local mvt_info = { camera_mvt:read() }
 
-	camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	--camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
 
   --W key
   elseif key == 87 then
 
-    local mvt_info = { camera_mvt:read() }
+    --local mvt_info = { camera_mvt:read() }
 
-	camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	--camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
 
   -- VK_F1
@@ -665,8 +674,8 @@ function()
 
   text_renderer:update(10, 30, 255, 0, 0, output_infos)
 
-  local mvt_info = { camera_mvt:read() }
-  camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+  --local mvt_info = { camera_mvt:read() }
+  --camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
 
 
