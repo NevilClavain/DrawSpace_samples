@@ -167,7 +167,7 @@ create_ship = function()
 	--entity,renderer = commons.create_rendered_meshe(ship_entity_config, 'survey.ac', 0)
 	entity,renderer = commons.create_rendered_meshe(entity_config, 'bellerophon.ac', 0)
 	entity:add_aspect(INFOS_ASPECT)
-	entity:setup_info( "entity_name", "Space Ship" )
+	entity:setup_info( "entity_name", "Bellorophon" )
 
 
 
@@ -411,7 +411,7 @@ create_planet = function()
 		beach_limit							= 25.0,
 		landplace_patch						= FALSE,
 		enable_atmosphere					= TRUE,
-		atmo_thickness                      = 260.0
+		atmo_thickness                      = 160.0
 
 	}
 
@@ -501,8 +501,8 @@ root_entity:add_aspect(PHYSICS_ASPECT)
 root_entity:configure_world(GRAVITY_DISABLED)
 
 
---camera_entity, camera_mvt=commons.create_free_camera(0.0, 0.0, 0.0, viewport_width,viewport_height, mvt_mod, "free_camera")
---eg:add_child('root','camera_entity',camera_entity)
+camera_entity, camera_mvt=commons.create_free_camera(0.0, 0.0, 0.0, viewport_width,viewport_height, mvt_mod, "free_camera")
+eg:add_child('root','camera_entity',camera_entity)
 
 
 
@@ -540,7 +540,7 @@ nb_renderers = nb_renderers + 1
 
 camera2_entity, camera2_pos=commons.create_static_camera(0.0, 110.0, 300.0, viewport_width,viewport_height, mvt_mod, "ship_camera")
 
-camera2_entity:setup_info( "referent_body", "plop" )
+camera2_entity:setup_info( "referent_body", "Bellorophon" )
 
 eg:add_child('ship_entity','camera2_entity',camera2_entity)
 
@@ -573,7 +573,7 @@ rg:update_renderingqueues()
 g:add_mousemovecb( "onmousemove",
 function( xm, ym, dx, dy )  
 
-	--[[
+	
 	local mvt_info = { camera_mvt:read() }
 
 	if mouse_right == FALSE then
@@ -581,7 +581,7 @@ function( xm, ym, dx, dy )
 	else
 	  camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,-dx)
 	end
-	]]
+	
 
 end)
 
@@ -610,14 +610,14 @@ function( key )
   --Q key
   if key == 81 then 
     
-    --local mvt_info = { camera_mvt:read() }
-	--camera_mvt:update(speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+    local mvt_info = { camera_mvt:read() }
+	camera_mvt:update(speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
   --W key
   elseif key == 87 then
     
-    --local mvt_info = { camera_mvt:read() }
-	--camera_mvt:update(-speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+    local mvt_info = { camera_mvt:read() }
+	camera_mvt:update(-speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
   
   elseif key == 16 then -- left shift
     
@@ -634,17 +634,17 @@ function( key )
   --Q key
   if key == 81 then
     
-    --local mvt_info = { camera_mvt:read() }
+    local mvt_info = { camera_mvt:read() }
 
-	--camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
 
   --W key
   elseif key == 87 then
 
-    --local mvt_info = { camera_mvt:read() }
+    local mvt_info = { camera_mvt:read() }
 
-	--camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
 
   -- VK_F1
@@ -674,8 +674,8 @@ function()
 
   text_renderer:update(10, 30, 255, 0, 0, output_infos)
 
-  --local mvt_info = { camera_mvt:read() }
-  --camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+  local mvt_info = { camera_mvt:read() }
+  camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
 
 
