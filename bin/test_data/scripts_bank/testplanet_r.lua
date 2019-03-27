@@ -19,7 +19,7 @@ sphere_entity:remove_aspect(INFOS_ASPECT)
 commons.trash.meshe(rg, sphere_entity, sphere_renderer)
 ]]
 
-
+camera2_entity:release_info("referent_body")
 eg:remove('camera2_entity')
 commons.trash.camera( camera2_entity, camera2_pos)
 
