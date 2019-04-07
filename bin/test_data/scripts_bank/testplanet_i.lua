@@ -189,6 +189,10 @@ create_ship = function()
 
 	body:configure_mode(BODY_MODE)
 
+	local main_prop_dir = Vector(0.0, 0.0, -5000.0, 0.0)
+
+	body:configure_force("main prop", main_prop_dir, LOCALE_FORCE, FALSE)
+
 
 	renderer:register_to_rendering(rg)
 	eg:add_child('root','ship_entity',entity)
@@ -573,7 +577,7 @@ rg:update_renderingqueues()
 g:add_mousemovecb( "onmousemove",
 function( xm, ym, dx, dy )  
 
-	
+  if current_cam == free_cam then
 	local mvt_info = { camera_mvt:read() }
 
 	if mouse_right == FALSE then
@@ -581,6 +585,7 @@ function( xm, ym, dx, dy )
 	else
 	  camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,-dx)
 	end
+  end
 	
 
 end)
@@ -610,18 +615,27 @@ function( key )
   --Q key
   if key == 81 then 
     
-    local mvt_info = { camera_mvt:read() }
-	camera_mvt:update(speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
-
+    if current_cam == free_cam then
+      local mvt_info = { camera_mvt:read() }
+	  camera_mvt:update(speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	end
   --W key
   elseif key == 87 then
     
-    local mvt_info = { camera_mvt:read() }
-	camera_mvt:update(-speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+    if current_cam == free_cam then
+      local mvt_info = { camera_mvt:read() }
+	  camera_mvt:update(-speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	end
   
   elseif key == 16 then -- left shift
-    
-    speed_factor = 2000000.0
+    if current_cam == free_cam then
+      speed_factor = 2000000.0
+	end
+
+  elseif key == 17 then
+
+    ship_body:update_forcestate("main prop", TRUE)
+
   else
 	--g:print('key code = '..key)
   end
@@ -634,18 +648,18 @@ function( key )
   --Q key
   if key == 81 then
     
-    local mvt_info = { camera_mvt:read() }
-
-	camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
-
+	if current_cam == free_cam then
+      local mvt_info = { camera_mvt:read() }
+	  camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	end
 
   --W key
   elseif key == 87 then
 
-    local mvt_info = { camera_mvt:read() }
-
-	camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
-
+    if current_cam == free_cam then
+      local mvt_info = { camera_mvt:read() }
+	  camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	end
 
   -- VK_F1
   elseif key == 112 then  
@@ -659,7 +673,16 @@ function( key )
 
   elseif key == 16 then -- left shift
     
-    speed_factor = 12.0
+    if current_cam == free_cam then
+      speed_factor = 12.0
+	end
+
+  elseif key == 17 then
+
+    ship_body:update_forcestate("main prop", FALSE)
+
+  else
+    --g:print('key code = '..key) 
   end
 
 end)

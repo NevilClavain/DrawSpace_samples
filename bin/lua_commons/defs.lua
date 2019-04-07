@@ -100,6 +100,9 @@ WARN=2
 ERROR=3
 FATAL=4
 
+GLOBALE_FORCE = 0
+LOCALE_FORCE = 1
+
 print_memsize=function() 
 	g:print('Total mem = '..g:total_mem()..' byte(s)') 
 end
