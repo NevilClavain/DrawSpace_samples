@@ -1,6 +1,6 @@
 
 
-local speed_factor = 12.0 -- 1200000.0
+local speed_factor = 90.0
 
 renderers = {}
 nb_renderers = 0
@@ -189,9 +189,17 @@ create_ship = function()
 
 	body:configure_mode(BODY_MODE)
 
-	local main_prop_dir = Vector(0.0, 0.0, -5000.0, 0.0)
+	body:configure_force("main prop", Vector(0.0, 0.0, -5000.0, 0.0), LOCALE_FORCE, FALSE)
+	body:configure_force("reverse prop", Vector(0.0, 0.0, 5000.0, 0.0), LOCALE_FORCE, FALSE)
 
-	body:configure_force("main prop", main_prop_dir, LOCALE_FORCE, FALSE)
+	body:configure_torque("pitch_down", Vector(-150000.0, 0.0, 0.0, 0.0), LOCALE_FORCE, FALSE)
+	body:configure_torque("pitch_up", Vector(150000.0, 0.0, 0.0, 0.0), LOCALE_FORCE, FALSE)
+
+	body:configure_torque("roll_left", Vector(0.0, 0.0, 150000.0, 0.0), LOCALE_FORCE, FALSE)
+	body:configure_torque("roll_right", Vector(0.0, 0.0, -150000.0, 0.0), LOCALE_FORCE, FALSE)
+
+	body:configure_torque("yaw_left", Vector(0.0, 150000.0, 0.0, 0.0), LOCALE_FORCE, FALSE)
+	body:configure_torque("yaw_right", Vector(0.0, -150000.0, 0.0, 0.0), LOCALE_FORCE, FALSE)
 
 
 	renderer:register_to_rendering(rg)
@@ -632,12 +640,32 @@ function( key )
       speed_factor = 2000000.0
 	end
 
-  elseif key == 17 then
-
+  elseif key == 83 then --'S'
     ship_body:update_forcestate("main prop", TRUE)
 
+  elseif key == 88 then --'X'
+    ship_body:update_forcestate("reverse prop", TRUE)
+
+  elseif key == 68 then --'D'
+    ship_body:update_torquestate("pitch_down", TRUE)
+
+  elseif key == 67 then --'C'
+    ship_body:update_torquestate("pitch_up", TRUE)
+
+  elseif key == 70 then --'F'
+    ship_body:update_torquestate("roll_left", TRUE)
+
+  elseif key == 71 then --'G'
+    ship_body:update_torquestate("roll_right", TRUE)
+
+  elseif key == 86 then --'V'
+    ship_body:update_torquestate("yaw_left", TRUE)
+
+  elseif key == 66 then --'B'
+    ship_body:update_torquestate("yaw_right", TRUE)
+
   else
-	--g:print('key code = '..key)
+	g:print('key code = '..key)
   end
 
 end)
@@ -674,15 +702,44 @@ function( key )
   elseif key == 16 then -- left shift
     
     if current_cam == free_cam then
-      speed_factor = 12.0
+      speed_factor = 90.0
 	end
 
-  elseif key == 17 then
+  elseif key == 83 then -- 'S'
 
     ship_body:update_forcestate("main prop", FALSE)
 
+  elseif key == 88 then --'X'
+    ship_body:update_forcestate("reverse prop", FALSE)
+
+  elseif key == 76 then --'L'
+
+    ship_body:zero_speed()
+
+elseif key == 77 then --'M'
+
+    ship_body:zero_angularespeed()
+
+  elseif key == 68 then --'D'
+    ship_body:update_torquestate("pitch_down", FALSE)
+
+  elseif key == 67 then --'C'
+    ship_body:update_torquestate("pitch_up", FALSE)
+
+  elseif key == 70 then --'F'
+    ship_body:update_torquestate("roll_left", FALSE)
+
+  elseif key == 71 then --'G'
+    ship_body:update_torquestate("roll_right", FALSE)
+
+  elseif key == 86 then --'V'
+    ship_body:update_torquestate("yaw_left", FALSE)
+
+  elseif key == 66 then --'B'
+    ship_body:update_torquestate("yaw_right", FALSE)
+
   else
-    --g:print('key code = '..key) 
+    g:print('key code = '..key) 
   end
 
 end)
