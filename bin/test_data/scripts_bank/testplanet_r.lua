@@ -1,5 +1,24 @@
 
 
+gui:show_mousecursor(FALSE)
+gui:show_gui(FALSE)
+gui:unload_alllayouts()
+gui:unload_allschemes()
+gui:release()
+
+g:remove_keydowncb("keydown")
+g:remove_keyupcb("keyup")
+g:remove_mousemovecb("onmousemove")
+g:remove_mouseleftbuttondowncb("onmouselbdown")
+g:remove_mouseleftbuttonupcb("onmouselbup")
+g:remove_mouserightbuttondowncb("onmouserbdown")
+g:remove_mouserightbuttonupcb("onmouserbup")
+
+
+g:show_mousecursor(TRUE)
+
+gui:remove_buttonclickedcb("onpushbutton")
+
 g:signal_rendersceneend("eg")
 
 
@@ -68,11 +87,6 @@ rg:update_renderingqueues()
 
 
 eg:unset_camera()
-
-g:remove_mousemovecb("onmousemove")
-g:remove_keydowncb("keydown")
-g:remove_keyupcb("keyup")
-
 
 g:show_mousecursor(TRUE)
 g:set_mousecursorcircularmode(FALSE)

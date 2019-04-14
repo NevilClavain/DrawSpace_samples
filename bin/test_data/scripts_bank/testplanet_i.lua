@@ -455,8 +455,13 @@ set_camera = function(camera)
 
   if camera == free_cam then
     eg:set_camera(camera_entity)
+    gui:show_mousecursor(FALSE)
+    g:set_mousecursorcircularmode(TRUE)
+
   elseif camera == ship_cam then
     eg:set_camera(camera2_entity)
+    gui:show_mousecursor(TRUE)
+	g:set_mousecursorcircularmode(FALSE)
   end
 end
 
@@ -576,7 +581,7 @@ commons.setup_lit_flags_simple( 'texture_pass', renderers, fog_intensity, fog_co
 
 
 
-set_camera(current_cam)
+--set_camera(current_cam)
 
 rg:update_renderingqueues()
 
@@ -594,27 +599,32 @@ function( xm, ym, dx, dy )
 	  camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,-dx)
 	end
   end
-	
 
+  gui:on_mousemove( xm, ym, dx, dy )
+	
 end)
 
 g:add_mouseleftbuttondowncb( "onmouselbdown",
 function( xm, ym )
+  gui:on_mouseleftbuttondown()
 end)
 
 g:add_mouseleftbuttonupcb( "onmouselbup",
 function( xm, ym )
+  gui:on_mouseleftbuttonup()
 end)
 
 
 g:add_mouserightbuttondowncb( "onmouserbdown",
 function( xm, ym )
-	mouse_right = TRUE
+  mouse_right = TRUE
+  gui:on_mouserightbuttondown()
 end)
 
 g:add_mouserightbuttonupcb( "onmouserbup",
 function( xm, ym )
-	mouse_right = FALSE
+  mouse_right = FALSE
+  gui:on_mouserightbuttonup()
 end)
 
 g:add_keydowncb( "keydown",
@@ -665,9 +675,10 @@ function( key )
     ship_body:update_torquestate("yaw_right", TRUE)
 
   else
-	g:print('key code = '..key)
+	--g:print('key code = '..key)
   end
 
+  gui:on_keydown( key )
 end)
 
 g:add_keyupcb( "keyup",
@@ -739,9 +750,10 @@ elseif key == 77 then --'M'
     ship_body:update_torquestate("yaw_right", FALSE)
 
   else
-    g:print('key code = '..key) 
+    --g:print('key code = '..key) 
   end
 
+  gui:on_keyup( key )
 end)
 
 
@@ -802,8 +814,8 @@ lB = function()
 end
 
 
-g:show_mousecursor(FALSE)
-g:set_mousecursorcircularmode(TRUE)
+--g:show_mousecursor(FALSE)
+--g:set_mousecursorcircularmode(TRUE)
 
 
 g:signal_renderscenebegin("eg")
@@ -813,6 +825,30 @@ lA()
 commons.update_planet_lights( lights, planet_specific_config)
 planet_specific_config:updated()
 
+gui=Gui()
+gui:init()
 
+gui:set_resourcespath("./xfskin2")
+gui:load_scheme("xfskin.scheme")
+gui:load_layout("timecontrol.layout","xfskin2/layouts/timecontrol_widgets.conf")
+
+gui:set_layout("timecontrol.layout")
+gui:show_gui(TRUE)
+
+
+gui:add_pushbuttonclickedcb( "onpushbutton",
+function( layout, widget )
+  
+  g:print("button clicked = "..layout.." "..widget)
+
+end)
+
+
+gui:set_mousecursorimage("xfskin/MouseCursor")
+
+g:show_mousecursor(FALSE)
+
+
+set_camera(current_cam)
 
 
