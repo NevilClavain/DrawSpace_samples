@@ -661,26 +661,43 @@ function( key )
       speed_factor = 2000000.0
 	end
 
-  elseif key == 68 then --'D'
-    ship_body:update_torquestate("pitch_down", TRUE)
-
-  elseif key == 67 then --'C'
-    ship_body:update_torquestate("pitch_up", TRUE)
-
-  elseif key == 70 then --'F'
+  elseif key == 65 then --'A'
     ship_body:update_torquestate("roll_left", TRUE)
 
-  elseif key == 71 then --'G'
+  elseif key == 90 then --'Z'
     ship_body:update_torquestate("roll_right", TRUE)
 
-  elseif key == 86 then --'V'
+  elseif key == 37 then --VK_LEFT
     ship_body:update_torquestate("yaw_left", TRUE)
 
-  elseif key == 66 then --'B'
+  elseif key == 38 then --VK_UP
+    ship_body:update_torquestate("pitch_down", TRUE)
+
+  elseif key == 39 then --VK_RIGHT
     ship_body:update_torquestate("yaw_right", TRUE)
 
+  elseif key == 40 then --VK_DOWN
+    ship_body:update_torquestate("pitch_up", TRUE)
+
+  elseif key == 68 then --'D'
+    
+
+  elseif key == 67 then --'C'
+    
+
+  elseif key == 70 then --'F'
+
+
+  elseif key == 71 then --'G'
+
+
+  elseif key == 86 then --'V'
+    
+
+  elseif key == 66 then --'B'
+    
   else
-	--g:print('key code = '..key)
+	g:print('key code = '..key)
   end
 
   gui:on_keydown( key )
@@ -729,30 +746,47 @@ function( key )
 
     ship_body:zero_speed()
 
-elseif key == 77 then --'M'
+  elseif key == 77 then --'M'
 
     ship_body:zero_angularespeed()
 
-  elseif key == 68 then --'D'
-    ship_body:update_torquestate("pitch_down", FALSE)
-
-  elseif key == 67 then --'C'
-    ship_body:update_torquestate("pitch_up", FALSE)
-
-  elseif key == 70 then --'F'
+  elseif key == 65 then --'A'
     ship_body:update_torquestate("roll_left", FALSE)
 
-  elseif key == 71 then --'G'
+  elseif key == 90 then --'Z'
     ship_body:update_torquestate("roll_right", FALSE)
 
-  elseif key == 86 then --'V'
+  elseif key == 37 then --VK_LEFT
     ship_body:update_torquestate("yaw_left", FALSE)
 
-  elseif key == 66 then --'B'
+  elseif key == 38 then --VK_UP
+    ship_body:update_torquestate("pitch_down", FALSE)
+
+  elseif key == 39 then --VK_RIGHT
     ship_body:update_torquestate("yaw_right", FALSE)
 
+  elseif key == 40 then --VK_DOWN
+    ship_body:update_torquestate("pitch_up", FALSE)
+
+  elseif key == 68 then --'D'
+    
+
+  elseif key == 67 then --'C'
+    
+
+  elseif key == 70 then --'F'
+
+
+  elseif key == 71 then --'G'
+
+
+  elseif key == 86 then --'V'
+    
+
+  elseif key == 66 then --'B'
+    
   else
-    --g:print('key code = '..key) 
+    g:print('key code = '..key) 
   end
 
   gui:on_keyup( key )
