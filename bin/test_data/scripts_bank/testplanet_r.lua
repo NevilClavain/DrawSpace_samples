@@ -74,6 +74,10 @@ eg:remove('planet_entity')
 
 text_renderer:release()
 
+text2_renderer:release()
+
+text3_renderer:release()
+
 g:remove_appruncb('run')
 
 

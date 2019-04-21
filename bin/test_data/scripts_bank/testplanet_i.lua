@@ -513,6 +513,13 @@ rg:set_pass_depthclearstate( 'texture_pass', TRUE )
 text_renderer=TextRendering()
 text_renderer:configure(root_entity, "fps", 320, 30, 255, 0, 255, "??? fps")
 
+text2_renderer=TextRendering()
+text2_renderer:configure(root_entity, "datetime", 320, 70, 255, 0, 255, "xxxxxxx")
+
+
+text3_renderer=TextRendering()
+text3_renderer:configure(root_entity, "timescale", 320, 110, 255, 0, 255, "xxxxxxx")
+
 
 root_entity:add_aspect(PHYSICS_ASPECT)
 root_entity:configure_world(GRAVITY_DISABLED)
@@ -636,6 +643,8 @@ function( key )
     if current_cam == free_cam then
       local mvt_info = { camera_mvt:read() }
 	  camera_mvt:update(speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	else
+	  ship_body:update_forcestate("main prop", TRUE)
 	end
   --W key
   elseif key == 87 then
@@ -643,18 +652,14 @@ function( key )
     if current_cam == free_cam then
       local mvt_info = { camera_mvt:read() }
 	  camera_mvt:update(-speed_factor,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	else
+	  ship_body:update_forcestate("reverse prop", TRUE)
 	end
   
   elseif key == 16 then -- left shift
     if current_cam == free_cam then
       speed_factor = 2000000.0
 	end
-
-  elseif key == 83 then --'S'
-    ship_body:update_forcestate("main prop", TRUE)
-
-  elseif key == 88 then --'X'
-    ship_body:update_forcestate("reverse prop", TRUE)
 
   elseif key == 68 then --'D'
     ship_body:update_torquestate("pitch_down", TRUE)
@@ -690,6 +695,8 @@ function( key )
 	if current_cam == free_cam then
       local mvt_info = { camera_mvt:read() }
 	  camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	else
+	  ship_body:update_forcestate("main prop", FALSE)
 	end
 
   --W key
@@ -698,6 +705,8 @@ function( key )
     if current_cam == free_cam then
       local mvt_info = { camera_mvt:read() }
 	  camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	else
+	  ship_body:update_forcestate("reverse prop", FALSE)
 	end
 
   -- VK_F1
@@ -715,13 +724,6 @@ function( key )
     if current_cam == free_cam then
       speed_factor = 90.0
 	end
-
-  elseif key == 83 then -- 'S'
-
-    ship_body:update_forcestate("main prop", FALSE)
-
-  elseif key == 88 then --'X'
-    ship_body:update_forcestate("reverse prop", FALSE)
 
   elseif key == 76 then --'L'
 
@@ -757,14 +759,22 @@ elseif key == 77 then --'M'
 end)
 
 
+
 g:add_appruncb( "run",
 function()
 
 
-  time_infos = { root_entity:read_timemanager() }
+  local time_infos = { root_entity:read_timemanager() }
   output_infos = renderer:descr() .." "..time_infos[3].. " fps "
 
   text_renderer:update(10, 30, 255, 0, 0, output_infos)
+
+  text2_renderer:update(10, 70, 255, 0, 0, time_infos[2])
+
+  local timescale = commons.print_timescale(time_infos[1])
+
+  text3_renderer:update(10, 110, 255, 0, 0, timescale)
+
 
   local mvt_info = { camera_mvt:read() }
   camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
@@ -839,7 +849,47 @@ gui:show_gui(TRUE)
 gui:add_pushbuttonclickedcb( "onpushbutton",
 function( layout, widget )
   
-  g:print("button clicked = "..layout.." "..widget)
+  if widget == "Button_Pause" then
+
+
+	root_entity:update_timescale(FREEZE)
+
+  elseif widget == "Button_x1" then
+
+
+	root_entity:update_timescale(NORMAL_TIME)
+
+  elseif widget == "Button_x10" then
+
+
+	root_entity:update_timescale(MUL10_TIME)
+
+  elseif widget == "Button_x100" then
+
+
+	root_entity:update_timescale(MUL100_TIME)
+
+  elseif widget == "Button_1sec_1day" then
+
+
+	root_entity:update_timescale(SEC_1DAY_TIME)
+
+  elseif widget == "Button_1sec_1hour" then
+
+
+	root_entity:update_timescale(SEC_1HOUR_TIME)
+
+  elseif widget == "Button_0Rots" then
+
+    ship_body:zero_angularespeed()
+
+  elseif widget == "Button_0Transl" then
+    
+	ship_body:zero_speed()
+
+  end
+
+  
 
 end)
 
@@ -850,5 +900,8 @@ g:show_mousecursor(FALSE)
 
 
 set_camera(current_cam)
+
+
+root_entity:update_time(280)
 
 

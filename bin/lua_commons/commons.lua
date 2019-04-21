@@ -485,6 +485,20 @@ commons.print_vector=function(msg,vector)
 	g:print(msg..vector:get_x().. ' '..vector:get_y().. ' '..vector:get_z())	
 end
 
+
+commons.print_timescale = function(timescale)
+
+  text_timescale = { [NORMAL_TIME] = "x1", [MUL2_TIME] = "x2", [MUL4_TIME] = "x4", [MUL10_TIME] = "x10",
+	
+				     [MUL100_TIME] = "x100", [MUL500_TIME] = "x500", [SEC_1HOUR_TIME] = "1s = 1h", 
+					 [SEC_1DAY_TIME] = "1s = 1d", [SEC_30DAYS_TIME] = "1s = 30d", [SEC_1YEAR_TIME] = "1s = 1y", 
+					 [DIV2_TIME] = " x0.5", [DIV4_TIME] = " x0.25", [DIV10_TIME] = " x0.1", [FREEZE] = "PAUSED"
+				   }
+
+  return text_timescale[timescale]
+
+end
+
 -- find random vector perpendicular to vec_in (dot product vec_in * res_vec equals 0)
 commons.procedural.find_normal_vector=function(vec_in,random_engine,vec_out)
 
