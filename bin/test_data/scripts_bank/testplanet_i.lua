@@ -285,7 +285,7 @@ create_skybox = function()
 	local entity = nil
 	local renderer = nil
 
-	entity,renderer=commons.create_rendering_from_module(entity_layers,sb_mod,"skyboxRender")
+	entity,renderer=commons.create_rendering_from_module(entity_layers,sb_mod,"skyboxRender",create_rendering_from_module)
 
 	entity:add_aspect(INFOS_ASPECT)
 	entity:setup_info( "entity_name", "skybox" )
@@ -326,8 +326,7 @@ create_planet = function()
 						{ ope=RENDERSTATE_OPE_SETTEXTUREFILTERTYPE, value="linear" },
 						{ ope=RENDERSTATE_OPE_SETVERTEXTEXTUREFILTERTYPE, value="linear" }
 						
-						--[[,
-						{ ope=RENDERSTATE_OPE_SETFILLMODE, value="line" }]]
+						--,{ ope=RENDERSTATE_OPE_SETFILLMODE, value="line" }
 						
 					},
 					rs_out =
@@ -336,8 +335,7 @@ create_planet = function()
 						{ ope=RENDERSTATE_OPE_SETTEXTUREFILTERTYPE, value="none" },
 						{ ope=RENDERSTATE_OPE_SETVERTEXTEXTUREFILTERTYPE, value="none" }
 						
-						--[[,
-						{ ope=RENDERSTATE_OPE_SETFILLMODE, value="solid" }]]
+						--,{ ope=RENDERSTATE_OPE_SETFILLMODE, value="solid" }
 					}		
 				},
 				textures =
@@ -430,7 +428,7 @@ create_planet = function()
 	local entity = nil
 	local renderer = nil
 
-	entity,renderer=commons.create_rendering_from_module(entity_layers,pl_mod,"planetsRender")
+	entity,renderer=commons.create_rendering_from_module(entity_layers,pl_mod,"planetsRender",root_tm_ref)
 
 	local specific_config = PlanetSpecificConfig()
 	commons.procedural.planet.setup_specific_config(planet_specific_config_descr, specific_config)
@@ -697,7 +695,7 @@ function( key )
   elseif key == 66 then --'B'
     
   else
-	g:print('key code = '..key)
+	--g:print('key code = '..key)
   end
 
   gui:on_keydown( key )
@@ -786,7 +784,7 @@ function( key )
   elseif key == 66 then --'B'
     
   else
-    g:print('key code = '..key) 
+    --g:print('key code = '..key) 
   end
 
   gui:on_keyup( key )

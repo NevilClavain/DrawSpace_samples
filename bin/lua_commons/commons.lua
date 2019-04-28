@@ -156,7 +156,7 @@ commons.create_free_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewpor
 	return camera_entity, free_transfo
 end
 
-commons.create_rendering_from_module = function(p_layers, p_module, p_rendering_impl_id, p_specific_config)
+commons.create_rendering_from_module = function(p_layers, p_module, p_rendering_impl_id)
 
 	local entity=Entity()
 	entity:add_aspect(RENDERING_ASPECT)
@@ -245,7 +245,7 @@ commons.create_rendering_from_module = function(p_layers, p_module, p_rendering_
 		renderlayer:add_renderconfig(renderconfig)
 	end
 
-	local rendering=Rendering()
+	local rendering=Rendering(TimeManagerRef(root_entity))
 	rendering:instanciate_renderingimpl(p_module,p_rendering_impl_id)
 	rendering:attach_toentity(entity)
 	rendering:configure(renderlayer)
