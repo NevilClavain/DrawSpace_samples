@@ -5,7 +5,6 @@ local speed_factor = 90.0
 renderers = {}
 nb_renderers = 0
 
-
 lights = 
 {
 	ambient_light = {r = 0.05, g = 0.05, b = 0.05, a = 0.0 },
@@ -487,14 +486,18 @@ renderer_descr, renderer_width, renderer_height, renderer_fullscreen, viewport_w
 
 g:print('rendering infos : '..renderer_descr..', '..renderer_width..'x'..renderer_height..' fullscreen='..renderer_fullscreen..' viewport='..viewport_width..'x'..viewport_height)
 
+g:print("Skybox module loading begin...")
 sb_mod = Module("skyboxmod", "skybox")
 sb_mod:load()
 g:print(sb_mod:get_descr().. ' loaded')
 
+g:print("Mvt module loading begin...")
 mvt_mod = Module("mvtmod", "mvts")
 mvt_mod:load()
 g:print(mvt_mod:get_descr().. ' loaded')
 
+
+g:print("Planets module loading begin...")
 pl_mod = Module("planetsmod", "planets")
 pl_mod:load()
 g:print(pl_mod:get_descr().. ' loaded')
@@ -519,6 +522,9 @@ text3_renderer=TextRendering()
 text3_renderer:configure(root_entity, "timescale", 320, 110, 255, 0, 255, "xxxxxxx")
 
 
+text4_renderer=TextRendering()
+text4_renderer:configure(root_entity, "planets_infos", 320, 150, 255, 0, 255, "xxxxxxx")
+
 root_entity:add_aspect(PHYSICS_ASPECT)
 root_entity:configure_world(GRAVITY_DISABLED)
 
@@ -534,7 +540,7 @@ commons.update_lights( 'texture_pass', lights, renderers )
 commons.setup_lit_flags( 'texture_pass', renderers, REFLECTIONS_OFF, reflectorPos, reflectorNormale, fog_intensity, fog_color)
 
 
-
+g:print("Planet creation begin...")
 planet_entity,planet_renderer,planet_specific_config = create_planet()
 planet_transform = RawTransform()
 planet_transform:configure(planet_entity)
@@ -542,7 +548,7 @@ planet_transform:configure(planet_entity)
 planet_pos_mat = Matrix()
 planet_pos_mat:translation( 0.0, 0.0, -40620000.0 )
 planet_transform:add_matrix( "pos", planet_pos_mat )
-
+g:print("Planet creation done...")
 
 
 
@@ -554,10 +560,11 @@ skybox_entity,skybox_renderer,sb_transform = create_skybox()
 --renderers[nb_renderers] = sphere_renderer
 --nb_renderers = nb_renderers + 1
 
+g:print("Ship creation begin...")
 ship_entity, ship_renderer, ship_body = create_ship()
 renderers[nb_renderers] = ship_renderer
 nb_renderers = nb_renderers + 1
-
+g:print("Ship creation done...")
 
 
 camera2_entity, camera2_pos=commons.create_static_camera(0.0, 110.0, 300.0, viewport_width,viewport_height, mvt_mod, "ship_camera")
@@ -588,6 +595,7 @@ commons.setup_lit_flags_simple( 'texture_pass', renderers, fog_intensity, fog_co
 
 --set_camera(current_cam)
 
+g:print("Updating rendering queues...")
 rg:update_renderingqueues()
 
 
@@ -806,6 +814,14 @@ function()
   local timescale = commons.print_timescale(time_infos[1])
 
   text3_renderer:update(10, 110, 255, 0, 0, timescale)
+
+
+
+  -- display planet infos 
+
+  local planet_infos = commons.procedural.planet.read_infos(planet_specific_config)
+
+  text4_renderer:update(10, 150, 255, 0, 0, planet_infos['test'])
 
 
   local mvt_info = { camera_mvt:read() }

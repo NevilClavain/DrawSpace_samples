@@ -499,6 +499,7 @@ commons.print_timescale = function(timescale)
 
 end
 
+
 -- find random vector perpendicular to vec_in (dot product vec_in * res_vec equals 0)
 commons.procedural.find_normal_vector=function(vec_in,random_engine,vec_out)
 
@@ -518,6 +519,14 @@ commons.procedural.find_normal_vector=function(vec_in,random_engine,vec_out)
 	vec_out:set_z(zp)
 end
 
+
+commons.procedural.planet.read_infos=function(planet_specific_configuration)
+
+	local infos_description = {}
+	infos_description['test'] = planet_specific_configuration:get_outparam("OUT_test")
+	
+	return infos_description
+end
 
 commons.procedural.planet.setup_specific_config=function(config_description, planet_specific_configuration)
 

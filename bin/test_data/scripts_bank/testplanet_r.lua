@@ -68,15 +68,10 @@ commons.trash.rendering(rg, pl_mod, planet_entity, planet_renderer)
 eg:remove('planet_entity')
 
 
-
-
-
-
 text_renderer:release()
-
 text2_renderer:release()
-
 text3_renderer:release()
+text4_renderer:release()
 
 g:remove_appruncb('run')
 
