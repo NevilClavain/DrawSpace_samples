@@ -821,7 +821,7 @@ function()
 
   local planet_infos = commons.procedural.planet.read_infos(planet_specific_config)
 
-  text4_renderer:update(10, 150, 255, 0, 0, planet_infos['test'])
+  text4_renderer:update(10, 150, 255, 0, 0, planet_infos['delayedSingleSubPassQueueSize'])
 
 
   local mvt_info = { camera_mvt:read() }

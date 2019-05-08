@@ -524,6 +524,7 @@ commons.procedural.planet.read_infos=function(planet_specific_configuration)
 
 	local infos_description = {}
 	infos_description['test'] = planet_specific_configuration:get_outparam("OUT_test")
+	infos_description['delayedSingleSubPassQueueSize'] = planet_specific_configuration:get_outparam("OUT_delayedSingleSubPassQueueSize")
 	
 	return infos_description
 end
