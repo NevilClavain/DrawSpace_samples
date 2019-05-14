@@ -523,7 +523,7 @@ text3_renderer:configure(root_entity, "timescale", 320, 110, 255, 0, 255, "xxxxx
 
 
 text4_renderer=TextRendering()
-text4_renderer:configure(root_entity, "planets_infos", 320, 150, 255, 0, 255, "xxxxxxx")
+text4_renderer:configure(root_entity, "planets_infos", 450, 70, 255, 0, 255, "xxxxxxx")
 
 root_entity:add_aspect(PHYSICS_ASPECT)
 root_entity:configure_world(GRAVITY_DISABLED)
@@ -829,7 +829,7 @@ function()
     current_cam_id = "ship_camera"
   end
 
-  text4_renderer:update(10, 150, 255, 0, 0, 'current_cam_id=' ..current_cam_id..' delayedSingleSubPassQueueSize='..planet_infos['delayedSingleSubPassQueueSize']..' currentLOD='..planet_infos["viewsInfos"][current_cam_id]["currentLOD"])
+  text4_renderer:update(300, 70, 255, 0, 0, 'cam_id=' ..current_cam_id..' subpasses='..planet_infos['delayedSingleSubPassQueueSize']..' LOD='..planet_infos["viewsInfos"][current_cam_id]["currentLOD"])
 
 
   local mvt_info = { camera_mvt:read() }
