@@ -523,8 +523,39 @@ end
 commons.procedural.planet.read_infos=function(planet_specific_configuration)
 
 	local infos_description = {}
-	infos_description['test'] = planet_specific_configuration:get_outparam("OUT_test")
+
+
+
 	infos_description['delayedSingleSubPassQueueSize'] = planet_specific_configuration:get_outparam("OUT_delayedSingleSubPassQueueSize")
+
+
+
+	local views_infos = { planet_specific_configuration:get_outparam("OUT_viewsInfos") }
+
+	local nb_views = views_infos[1]
+
+	--g:print( 'nb_views : '..nb_views )
+
+	--g:print( views_infos[1]..' '..views_infos[2]..' '..views_infos[3]..' '..views_infos[4]..' '..views_infos[5] )
+
+	local formatted_views_infos = {}
+
+	for i = 0, nb_views-1, 1 do
+		
+		local views_infos_entry = {}
+
+		local camera_name = views_infos[2 * (i + 1)]
+		local current_lod = views_infos[2 * (i + 1) + 1]
+
+		views_infos_entry['currentLOD'] = current_lod
+
+		formatted_views_infos[camera_name] = views_infos_entry
+ 
+        --g:print( 'views_infos : '..camera_name..' '..current_lod )
+	end
+
+	infos_description['viewsInfos'] = formatted_views_infos
+
 	
 	return infos_description
 end

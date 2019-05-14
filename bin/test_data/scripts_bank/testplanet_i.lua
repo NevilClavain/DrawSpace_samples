@@ -821,7 +821,15 @@ function()
 
   local planet_infos = commons.procedural.planet.read_infos(planet_specific_config)
 
-  text4_renderer:update(10, 150, 255, 0, 0, planet_infos['delayedSingleSubPassQueueSize'])
+  local current_cam_id
+
+  if current_cam == free_cam then
+    current_cam_id = "free_camera"
+  else
+    current_cam_id = "ship_camera"
+  end
+
+  text4_renderer:update(10, 150, 255, 0, 0, 'current_cam_id=' ..current_cam_id..' delayedSingleSubPassQueueSize='..planet_infos['delayedSingleSubPassQueueSize']..' currentLOD='..planet_infos["viewsInfos"][current_cam_id]["currentLOD"])
 
 
   local mvt_info = { camera_mvt:read() }
