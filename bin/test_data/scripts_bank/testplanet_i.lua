@@ -829,7 +829,17 @@ function()
     current_cam_id = "ship_camera"
   end
 
-  text4_renderer:update(300, 70, 255, 0, 0, 'cam_id=' ..current_cam_id..' subpasses='..planet_infos['delayedSingleSubPassQueueSize']..' LOD='..planet_infos["viewsInfos"][current_cam_id]["currentLOD"])
+  local relative_state
+  
+  local is_relative = planet_infos['viewsInfos']['ship_camera']['currentLOD']
+
+  if is_relative ~= 0 then
+     relative_state = "RELATIVE"
+  else
+     relative_state = ""
+  end
+
+  text4_renderer:update(300, 70, 255, 0, 0, 'cam_id=' ..current_cam_id..' subpasses='..planet_infos['delayedSingleSubPassQueueSize']..' LOD='..planet_infos["viewsInfos"][current_cam_id]["currentLOD"]..' '..relative_state)
 
 
   local mvt_info = { camera_mvt:read() }
