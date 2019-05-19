@@ -834,13 +834,14 @@ function()
   local is_relative = planet_infos['viewsInfos']['ship_camera']['relative']
 
   if is_relative ~= 0 then
-     relative_state = "RELATIVE"
+     relative_state = "RELATIVE"..' '..planet_infos["viewsInfos"][current_cam_id]["relative_altitude"]..' '..
+											planet_infos["viewsInfos"][current_cam_id]["altitude"]
   else
      relative_state = ""
   end
 
-  text4_renderer:update(300, 70, 255, 0, 0, 'cam_id=' ..current_cam_id..' subpasses='..planet_infos['delayedSingleSubPassQueueSize']..' LOD='..planet_infos["viewsInfos"][current_cam_id]["currentLOD"]..' '..relative_state)
-
+  text4_renderer:update(300, 70, 255, 0, 0, 'cam_id=' ..current_cam_id..' subpasses='..planet_infos['delayedSingleSubPassQueueSize']..
+											' LOD='..planet_infos["viewsInfos"][current_cam_id]["currentLOD"]..' '..relative_state)
 
   local mvt_info = { camera_mvt:read() }
   camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
