@@ -831,7 +831,7 @@ function()
 
   local relative_state
   
-  local is_relative = planet_infos['viewsInfos']['ship_camera']['currentLOD']
+  local is_relative = planet_infos['viewsInfos']['ship_camera']['relative']
 
   if is_relative ~= 0 then
      relative_state = "RELATIVE"
