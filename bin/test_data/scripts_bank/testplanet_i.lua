@@ -834,7 +834,7 @@ function()
   local is_relative = planet_infos['viewsInfos']['ship_camera']['relative']
 
   if is_relative ~= 0 then
-     relative_state = "RELATIVE"..' '..planet_infos["viewsInfos"][current_cam_id]["relative_altitude"]..' '..
+     relative_state = "RELATIVE"..' '..g:format_real(planet_infos["viewsInfos"][current_cam_id]["relative_altitude"],4)..' '..
 											planet_infos["viewsInfos"][current_cam_id]["altitude"]
   else
      relative_state = ""
