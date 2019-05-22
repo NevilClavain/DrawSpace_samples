@@ -815,8 +815,6 @@ function()
 
   text3_renderer:update(10, 110, 255, 0, 0, timescale)
 
-
-
   -- display planet infos 
 
   local planet_infos = commons.procedural.planet.read_infos(planet_specific_config)
@@ -834,10 +832,23 @@ function()
   local is_relative = planet_infos['viewsInfos']['ship_camera']['relative']
 
   if is_relative ~= 0 then
-     relative_state = "RELATIVE"..' '..g:format_real(planet_infos["viewsInfos"][current_cam_id]["relative_altitude"],4)..' '..
-											planet_infos["viewsInfos"][current_cam_id]["altitude"]
+
+    local altitude = planet_infos["viewsInfos"][current_cam_id]["altitude"]
+	local display_altitude
+	local altitude_units
+
+	if altitude > 5000.0 then
+	  display_altitude = g:format_real(altitude / 1000.0,2)
+	  altitude_unit = " km"
+	else
+	  display_altitude = g:format_real(altitude,1)
+	  altitude_unit = " m"
+	end
+
+    relative_state = "RELATIVE"..' '..g:format_real(planet_infos["viewsInfos"][current_cam_id]["relative_altitude"],4)..' '..display_altitude..altitude_unit
+											
   else
-     relative_state = ""
+    relative_state = ""
   end
 
   text4_renderer:update(300, 70, 255, 0, 0, 'cam_id=' ..current_cam_id..' subpasses='..planet_infos['delayedSingleSubPassQueueSize']..
@@ -845,9 +856,6 @@ function()
 
   local mvt_info = { camera_mvt:read() }
   camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
-
-
-
 end)
 
 
