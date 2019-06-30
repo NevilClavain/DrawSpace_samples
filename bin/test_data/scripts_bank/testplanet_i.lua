@@ -429,6 +429,8 @@ create_planet = function()
 
 	entity,renderer=commons.create_rendering_from_module(entity_layers,pl_mod,"planetsRender",root_tm_ref)
 
+	entity:add_aspect(RESOURCES_ASPECT)
+
 	local specific_config = PlanetSpecificConfig()
 	commons.procedural.planet.setup_specific_config(planet_specific_config_descr, specific_config)
 	specific_config:apply(renderer)
@@ -442,6 +444,7 @@ create_planet = function()
 	eg:add_child('root','planet_entity',entity)
 
 	entity:add_aspect(TRANSFORM_ASPECT)
+	
 
 	specific_config:updated()
 

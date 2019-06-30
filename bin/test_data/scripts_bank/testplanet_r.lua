@@ -61,6 +61,7 @@ planet_transform:release()
 
 planet_specific_config:cleanup()
 
+planet_entity:remove_aspect(RESOURCES_ASPECT)
 planet_entity:remove_aspect(TRANSFORM_ASPECT)
 planet_entity:release_info("entity_name")
 planet_entity:remove_aspect(INFOS_ASPECT)
