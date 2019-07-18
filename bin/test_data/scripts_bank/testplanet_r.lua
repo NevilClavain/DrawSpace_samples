@@ -30,13 +30,13 @@ skybox_entity:remove_aspect(INFOS_ASPECT)
 commons.trash.rendering(rg, sb_mod, skybox_entity, skybox_renderer)
 
 
---[[
+
 eg:remove('sphere_entity')
 sphere_transform:release()
 sphere_entity:release_info("entity_name")
 sphere_entity:remove_aspect(INFOS_ASPECT)
 commons.trash.meshe(rg, sphere_entity, sphere_renderer)
-]]
+
 
 camera2_entity:release_info("referent_body")
 eg:remove('camera2_entity')
@@ -61,11 +61,14 @@ planet_transform:release()
 
 planet_specific_config:cleanup()
 
-planet_entity:remove_aspect(RESOURCES_ASPECT)
+
 planet_entity:remove_aspect(TRANSFORM_ASPECT)
 planet_entity:release_info("entity_name")
 planet_entity:remove_aspect(INFOS_ASPECT)
 commons.trash.rendering(rg, pl_mod, planet_entity, planet_renderer)
+--planet_entity:remove_aspect(RESOURCES_ASPECT)
+g:release_assets()
+
 eg:remove('planet_entity')
 
 
@@ -75,6 +78,7 @@ text3_renderer:release()
 text4_renderer:release()
 
 g:remove_appruncb('run')
+
 
 
 

@@ -59,7 +59,7 @@ create_sphere = function()
 	}
 	local entity = nil
 	local renderer = nil
-	entity,renderer = commons.create_rendered_meshe(entity_config, 'sphere.ac', 0)
+	entity,renderer = commons.create_rendered_meshe(entity_config, 'sphere.ac', 'sphere')
 
 	entity:add_aspect(INFOS_ASPECT)
 	entity:setup_info( "entity_name", "bump mapped sphere" )
@@ -163,8 +163,8 @@ create_ship = function()
 	local entity = nil
 	local renderer = nil
 
-	--entity,renderer = commons.create_rendered_meshe(ship_entity_config, 'survey.ac', 0)
-	entity,renderer = commons.create_rendered_meshe(entity_config, 'bellerophon.ac', 0)
+	--entity,renderer = commons.create_rendered_meshe(ship_entity_config, 'survey.ac', '001_hull')
+	entity,renderer = commons.create_rendered_meshe(entity_config, 'bellerophon.ac', 'wavefront obj')
 	entity:add_aspect(INFOS_ASPECT)
 	entity:setup_info( "entity_name", "Bellorophon" )
 
@@ -429,8 +429,6 @@ create_planet = function()
 
 	entity,renderer=commons.create_rendering_from_module(entity_layers,pl_mod,"planetsRender",root_tm_ref)
 
-	entity:add_aspect(RESOURCES_ASPECT)
-
 	local specific_config = PlanetSpecificConfig()
 	commons.procedural.planet.setup_specific_config(planet_specific_config_descr, specific_config)
 	specific_config:apply(renderer)
@@ -559,15 +557,15 @@ skybox_entity,skybox_renderer,sb_transform = create_skybox()
 
 
 
---sphere_entity, sphere_renderer, sphere_transform = create_sphere()
---renderers[nb_renderers] = sphere_renderer
---nb_renderers = nb_renderers + 1
+sphere_entity, sphere_renderer, sphere_transform = create_sphere()
+renderers[nb_renderers] = sphere_renderer
+nb_renderers = nb_renderers + 1
 
-g:print("Ship creation begin...")
+
 ship_entity, ship_renderer, ship_body = create_ship()
 renderers[nb_renderers] = ship_renderer
 nb_renderers = nb_renderers + 1
-g:print("Ship creation done...")
+
 
 
 camera2_entity, camera2_pos=commons.create_static_camera(0.0, 110.0, 300.0, viewport_width,viewport_height, mvt_mod, "ship_camera")

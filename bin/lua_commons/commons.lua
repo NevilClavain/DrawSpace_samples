@@ -32,7 +32,7 @@ commons.utils.shutdown=function(shutdown_lua_file)
 	g:do_file(shutdown_lua_file)
 	g:dump_mem()
 	if gameroom_mem_alloc_size ~= g:total_mem() then
-	  g:log(FATAL,"GAMEROOM MEM LEAK DETECTED")
+	  g:log(FATAL,"GAMEROOM MEM LEAK DETECTED : "..gameroom_mem_alloc_size.. " -> " ..g:total_mem() )
 	  g:ds_exception( "GAMEROOM MEM LEAK DETECTED !" )
 	end
 	g:log(DEBUG,"SHUTDOWN END")
@@ -160,6 +160,7 @@ commons.create_rendering_from_module = function(p_layers, p_module, p_rendering_
 
 	local entity=Entity()
 	entity:add_aspect(RENDERING_ASPECT)
+	entity:add_aspect(RESOURCES_ASPECT)
 
 	local renderlayer=RenderLayer()
 	
@@ -253,11 +254,12 @@ commons.create_rendering_from_module = function(p_layers, p_module, p_rendering_
 	return entity,rendering
 end
 
-commons.create_rendered_meshe = function(p_config, p_meshefile, p_meshe_index)
+commons.create_rendered_meshe = function(p_config, p_meshefile, p_meshe_name)
 
 	local meshe_entity=Entity()
 	meshe_entity:add_aspect(RENDERING_ASPECT)
 	meshe_entity:add_aspect(TRANSFORM_ASPECT)
+	meshe_entity:add_aspect(RESOURCES_ASPECT)
 
 	local renderconfig=RenderConfig()
 
@@ -336,9 +338,7 @@ commons.create_rendered_meshe = function(p_config, p_meshefile, p_meshe_index)
 		renderconfig:add_rendercontext(rendercontext)
 	end
 
-	renderer:configure(renderconfig, p_meshefile, p_meshe_index)
-
-	
+	renderer:configure(renderconfig, p_meshefile, p_meshe_name)
 
 	return meshe_entity, renderer
 end
@@ -792,6 +792,7 @@ commons.trash.rendering = function(p_rendergraph, p_module, p_entity, p_renderer
 	p_renderer:trash_renderingimpl(p_module)
 
 	p_entity:remove_aspect(RENDERING_ASPECT)
+	p_entity:remove_aspect(RESOURCES_ASPECT)
 
 end
 
@@ -803,6 +804,7 @@ commons.trash.meshe = function(p_rendergraph, p_entity, p_renderer)
 
 	p_entity:remove_aspect(TRANSFORM_ASPECT)
 	p_entity:remove_aspect(RENDERING_ASPECT)
+	p_entity:remove_aspect(RESOURCES_ASPECT)
 
 end
 
