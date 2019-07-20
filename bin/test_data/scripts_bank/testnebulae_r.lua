@@ -35,6 +35,7 @@ commons.trash.final_pass(rg, 'final_pass')
 
 
 rg:update_renderingqueues()
+g:release_assets()
 
 g:remove_mousemovecb("onmousemove")
 g:remove_keydowncb("keydown")

@@ -67,7 +67,7 @@ planet_entity:release_info("entity_name")
 planet_entity:remove_aspect(INFOS_ASPECT)
 commons.trash.rendering(rg, pl_mod, planet_entity, planet_renderer)
 --planet_entity:remove_aspect(RESOURCES_ASPECT)
-g:release_assets()
+
 
 eg:remove('planet_entity')
 
@@ -86,8 +86,9 @@ rg:remove_pass('texture_pass')
 
 commons.trash.final_pass(rg, 'final_pass')
 
-
 rg:update_renderingqueues()
+g:release_assets()
+
 
 
 eg:unset_camera()

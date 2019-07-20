@@ -168,7 +168,7 @@ ground_entity_config =
 	}
 }
 
-ground_entity, ground_renderer = commons.create_rendered_meshe(ground_entity_config, 'water.ac', 0)
+ground_entity, ground_renderer = commons.create_rendered_meshe(ground_entity_config, 'water.ac', 'my_flat_mesh')
 ground_renderer:register_to_rendering(rg)
 ground_renderer:set_shaderrealvector('texture_pass', "color", 1.0, 0.0, 1.0, 1.0 )
 ground_renderer:set_shaderrealvector('bump_pass', 'bump_bias', 1.0, 0.0, 0.0, 0.0)
@@ -257,7 +257,7 @@ cube_entity_config =
 		shaders_params = commons.setup_lit_shader_params()
 	}
 }
-cube_entity, cube_renderer = commons.create_rendered_meshe(cube_entity_config, 'object.ac', 0)
+cube_entity, cube_renderer = commons.create_rendered_meshe(cube_entity_config, 'object.ac', 'box')
 cube_renderer:register_to_rendering(rg)
 eg:add_child('root','cube_entity',cube_entity)
 
@@ -378,7 +378,7 @@ sphere_entity_config =
 		shaders_params = commons.setup_lit_shader_params()
 	}
 }
-sphere_entity,sphere_renderer = commons.create_rendered_meshe(sphere_entity_config, 'sphere.ac', 0)
+sphere_entity,sphere_renderer = commons.create_rendered_meshe(sphere_entity_config, 'sphere.ac', 'sphere')
 sphere_renderer:register_to_rendering(rg)
 eg:add_child('root','sphere_entity',sphere_entity)
 
@@ -495,7 +495,7 @@ land_entity_config =
 	}
 }
 
-land_entity, land_renderer = commons.create_rendered_meshe(land_entity_config, 'land2.ac', 0)
+land_entity, land_renderer = commons.create_rendered_meshe(land_entity_config, 'land2.ac', 'wavefront obj')
 land_renderer:register_to_rendering(rg)
 eg:add_child('root','land_entity',land_entity)
 
@@ -504,7 +504,7 @@ land_body=Body()
 
 land_body:attach_toentity(land_entity)
 
-land_body:configure_shape(SHAPE_MESHE, 'land2.ac', 0)
+land_body:configure_shape(SHAPE_MESHE, 'land2.ac', 'wavefront obj')
 
 
 land_body:configure_mode(COLLIDER_MODE)
@@ -946,7 +946,7 @@ add_cube = function()
 			shaders_params = commons.setup_lit_shader_params()	
 		}
 	}
-	cube_entity, cube_renderer = commons.create_rendered_meshe(cube_entity_config, 'object.ac', 0)
+	cube_entity, cube_renderer = commons.create_rendered_meshe(cube_entity_config, 'object.ac', 'box')
 	cube_renderer:register_to_rendering(rg)
 	eg:add_child('root',cube_name,cube_entity)
 
