@@ -104,6 +104,19 @@ FATAL=4
 GLOBALE_FORCE = 0
 LOCALE_FORCE = 1
 
+
+NORMALES_DISCARDED = 0
+NORMALES_AUTO = 1
+NORMALES_FROMLOADER = 2
+NORMALES_COMPUTED = 3
+
+
+TB_DISCARDED = 0
+TB_AUTO = 1
+TB_FROMLOADER = 2
+TB_COMPUTED = 3
+
+
 print_memsize=function() 
 	g:print('Total mem = '..g:total_mem()..' byte(s)') 
 end
