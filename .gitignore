@@ -43,6 +43,8 @@ bin/*.vso
 bin/*.bank
 bin/*.zip
 
+bin/test_data
+
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
 
