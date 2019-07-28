@@ -267,75 +267,92 @@ commons.create_rendered_meshe = function(p_config, p_meshefile, p_meshe_name)
 	renderer:attach_toentity(meshe_entity)
 
 	for k, v in pairs(p_config) do
-		--g:print(k)
-		local rendercontext = RenderContext(k)
+		g:print(k)
 
-		local fxparams = FxParams()
-		local fx_config = v['fx']
+		if k == 'meshes_loader_params' then
+		  for k2, v2 in pairs(v) do
+		    --g:print(k2)
 
-		local rss=RenderStatesSet()
+			if k2 == 'normale_generation_mode' then
+			  renderer:set_normalegenerationmode(v2)
 
-		local rs_in_config = fx_config['rs_in']
-		for k2, v2 in pairs(rs_in_config) do
-			local curr_rs_in = v2
-			--g:print(curr_rs_in['ope']..'->'..curr_rs_in['value'])
-			rss:add_renderstate_in(curr_rs_in['ope'], curr_rs_in['value'])
-		end
-
-		local rs_out_config = fx_config['rs_out']
-		for k2, v2 in pairs(rs_out_config) do
-			local curr_rs_out = v2
-			--g:print(curr_rs_out['ope']..'->'..curr_rs_out['value'])
-			rss:add_renderstate_out(curr_rs_out['ope'], curr_rs_out['value'])
-		end
-		fxparams:set_renderstatesset(rss)
-
-		local shaders_config = fx_config['shaders']
-		for k2, v2 in pairs(shaders_config) do
-			local curr_shader = v2
-			--g:print(curr_shader['path']..'->'..curr_shader['mode'])
-			fxparams:add_shaderfile(curr_shader['path'],curr_shader['mode'])
-		end
-
-		local tx_config = v['textures']		
-		for k2, v2 in ipairs(tx_config) do
-			--g:print(k2)
-			local textures = TexturesSet()
-			for k3, v3 in pairs(v2) do
-				local tx = v3
-				--g:print(tx['path']..'->'..tx['stage'])
-				textures:set_texturefiletostage(tx['path'], tx['stage'])
+			elseif k2 == 'tb_generation_mode' then
+			  renderer:set_tbgenerationmode(v2)
 			end
-			rendercontext:add_texturesset(textures)
-		end
+		  end
+
+		else
+
+			local rendercontext = RenderContext(k)
+
+			local fxparams = FxParams()
+			local fx_config = v['fx']
+
+			local rss=RenderStatesSet()
+
+			local rs_in_config = fx_config['rs_in']
+			for k2, v2 in pairs(rs_in_config) do
+				local curr_rs_in = v2
+				--g:print(curr_rs_in['ope']..'->'..curr_rs_in['value'])
+				rss:add_renderstate_in(curr_rs_in['ope'], curr_rs_in['value'])
+			end
+
+			local rs_out_config = fx_config['rs_out']
+			for k2, v2 in pairs(rs_out_config) do
+				local curr_rs_out = v2
+				--g:print(curr_rs_out['ope']..'->'..curr_rs_out['value'])
+				rss:add_renderstate_out(curr_rs_out['ope'], curr_rs_out['value'])
+			end
+			fxparams:set_renderstatesset(rss)
+
+			local shaders_config = fx_config['shaders']
+			for k2, v2 in pairs(shaders_config) do
+				local curr_shader = v2
+				--g:print(curr_shader['path']..'->'..curr_shader['mode'])
+				fxparams:add_shaderfile(curr_shader['path'],curr_shader['mode'])
+			end
+
+			local tx_config = v['textures']		
+			for k2, v2 in ipairs(tx_config) do
+				--g:print(k2)
+				local textures = TexturesSet()
+				for k3, v3 in pairs(v2) do
+					local tx = v3
+					--g:print(tx['path']..'->'..tx['stage'])
+					textures:set_texturefiletostage(tx['path'], tx['stage'])
+				end
+				rendercontext:add_texturesset(textures)
+			end
 		
 		
-		local vtx_config = v['vertex_textures']
-		for k2, v2 in ipairs(vtx_config) do
+			local vtx_config = v['vertex_textures']
+			for k2, v2 in ipairs(vtx_config) do
 
-			local vtextures = TexturesSet()
-			for k3, v3 in pairs(v2) do
-				local tx = v3
-				--g:print(tx['path']..'->'..tx['stage'])
-				vtextures:set_texturefiletostage(tx['path'], tx['stage'])
+				local vtextures = TexturesSet()
+				for k3, v3 in pairs(v2) do
+					local tx = v3
+					--g:print(tx['path']..'->'..tx['stage'])
+					vtextures:set_texturefiletostage(tx['path'], tx['stage'])
+				end
+				rendercontext:add_vertextexturesset(vtextures)
 			end
-			rendercontext:add_vertextexturesset(vtextures)
+
+			local shaderparams_config = v['shaders_params']
+			for k2, v2 in pairs(shaderparams_config) do
+				local param = v2
+				--g:print(param['param_name']..'->'..param['shader_index']..','..param['register'])
+				rendercontext:add_shaderparam(param['param_name'], param['shader_index'], param['register'])
+			end
+
+			local ro = v['rendering_order']
+			--g:print( 'ro ='..ro )
+	
+			rendercontext:set_renderingorder(ro)
+
+			rendercontext:add_fxparams(fxparams)
+
+			renderconfig:add_rendercontext(rendercontext)
 		end
-
-		local shaderparams_config = v['shaders_params']
-		for k2, v2 in pairs(shaderparams_config) do
-			local param = v2
-			--g:print(param['param_name']..'->'..param['shader_index']..','..param['register'])
-			rendercontext:add_shaderparam(param['param_name'], param['shader_index'], param['register'])
-		end
-
-		local ro = v['rendering_order']
-		--g:print( 'ro ='..ro )
-		rendercontext:set_renderingorder(ro)
-
-		rendercontext:add_fxparams(fxparams)
-
-		renderconfig:add_rendercontext(rendercontext)
 	end
 
 	renderer:configure(renderconfig, p_meshefile, p_meshe_name)

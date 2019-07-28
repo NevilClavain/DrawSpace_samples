@@ -151,10 +151,6 @@ dino_entity_config =
 		{
 			[1] = 
 			{
-				--{ path='shark.jpg', stage=0 },
-				--{ path='dino.jpg', stage=0 },
-				--{ path='dinobump.jpg', stage=1 }
-
 				{ path='raptorDif2.png', stage=0 },
 			}
 		},
@@ -163,12 +159,16 @@ dino_entity_config =
 		},
 		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
-	}
+	},
+
+	meshes_loader_params =
+	{
+		normale_generation_mode = NORMALES_AUTO,
+		tb_generation_mode = TB_AUTO
+	},
 }
 
 dino_entity, dino_renderer = commons.create_rendered_meshe(dino_entity_config, 'raptor.fbx', 'raptorMesh')
-dino_renderer:set_normalegenerationmode(NORMALES_AUTO)
-dino_renderer:set_tbgenerationmode(TB_AUTO)
 
 
 dino_renderer:register_to_rendering(rg)
