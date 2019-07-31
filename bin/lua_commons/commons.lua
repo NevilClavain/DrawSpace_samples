@@ -40,7 +40,25 @@ commons.utils.shutdown=function(shutdown_lua_file)
 end
 
 commons.utils.deg_to_rad = function(angle)
-	return ( ( angle * commons.utils.PI ) / 180.0 );
+	return ( ( angle * commons.utils.PI ) / 180.0 )
+end
+
+commons.utils.init_matrix = function(array)
+
+    local m = Matrix()
+	local count = 0
+	for k, v in pairs(array) do
+	   --g:print(v)
+
+	   local col = count % 4
+	   local row = g:round(count / 4)
+
+	   --g:print("c,r="..col.." "..row)
+
+	   m:set_value(row, col, v)
+	   count = count + 1
+	end
+	return m
 end
 
 commons.init_final_pass = function(p_rendergraph, p_passid)
@@ -278,6 +296,10 @@ commons.create_rendered_meshe = function(p_config, p_meshefile, p_meshe_name)
 
 			elseif k2 == 'tb_generation_mode' then
 			  renderer:set_tbgenerationmode(v2)
+
+			elseif k2 == 'normales_transform' then
+			  renderer:set_setnormaletransformation(v2)
+
 			end
 		  end
 

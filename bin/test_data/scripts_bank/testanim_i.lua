@@ -164,7 +164,13 @@ dino_entity_config =
 	meshes_loader_params =
 	{
 		normale_generation_mode = NORMALES_AUTO,
-		tb_generation_mode = TB_AUTO
+		tb_generation_mode = TB_AUTO,
+		normales_transform = commons.utils.init_matrix( { 
+		                        1, 0,-1, 0,
+								0, 1, 0, 0,
+							    1, 0, 1, 0,
+							    0, 0, 0, 1 } 
+							 )
 	},
 }
 
