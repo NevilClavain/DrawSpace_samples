@@ -54,8 +54,10 @@ root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
 
 
 
---camera_entity, camera_mvt=commons.create_fps_camera(0.0, 3.0, 20.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
-camera_entity, camera_mvt=commons.create_free_camera(-200.0, 125.0, 100.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
+
+--camera_entity, camera_mvt=commons.create_free_camera(-200.0, 125.0, 100.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
+camera_entity, camera_mvt=commons.create_free_camera(0.0, 3.0, 20.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
+
 eg:add_child('root','camera_entity',camera_entity)
 
 
@@ -92,7 +94,14 @@ ground_entity_config =
 		},
 		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
-	}
+	},
+
+	meshes_loader_params =
+	{
+		normale_generation_mode = NORMALES_AUTO_SMOOTH,
+		tb_generation_mode = TB_AUTO
+	},
+
 }
 
 ground_entity, ground_renderer = commons.create_rendered_meshe(ground_entity_config, 'land2.ac', 'wavefront obj')
@@ -126,7 +135,7 @@ nb_renderers = nb_renderers + 1
 
 
 
-
+--[[
 dino_entity_config = 
 { 
 	texture_pass = 
@@ -206,8 +215,81 @@ dino_transform = RawTransform()
 dino_transform:configure(dino_entity)
 dino_transform:add_matrix( "pos", dino_pos_mat )
 
+]]
 
 
+neck_entity_config = 
+{ 
+	texture_pass = 
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='lit.vso',mode=SHADER_COMPILED },
+				{ path='lit.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" }		
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+			}
+		},
+		textures =
+		{
+			[1] = 
+			{			
+			}
+		},
+		vertex_textures =
+		{
+		},
+		rendering_order = 10000,
+		shaders_params = commons.setup_lit_shader_params()
+	},
+
+	meshes_loader_params =
+	{
+		normale_generation_mode = NORMALES_AUTO,
+		tb_generation_mode = TB_DISCARDED,
+	},
+}
+
+neck_entity, neck_renderer = commons.create_rendered_meshe(neck_entity_config, 'neck.ac', 'rect')
+
+neck_entity:add_aspect(ANIMATION_ASPECT)
+
+neck_renderer:register_to_rendering(rg)
+eg:add_child('root','neck_entity',neck_entity)
+
+neck_material =
+{
+	--specular_power = 429.0,
+	color_source = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	simple_color = { r = 1.0, g = 0.0, b = 0.0, a = 0.0 },
+	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	--bump_mapping = { texture_size = 1024, bias = 0.193 }
+}
+
+commons.apply_material( neck_material, neck_renderer, 'texture_pass')
+
+
+renderers[nb_renderers] = neck_renderer
+nb_renderers = nb_renderers + 1
+
+
+neck_pos_mat = Matrix()
+neck_pos_mat:translation( 0.0, 2.0, 0.0 )
+
+
+
+neck_transform = RawTransform()
+neck_transform:configure(neck_entity)
+neck_transform:add_matrix( "pos", neck_pos_mat )
 
 
 
@@ -279,14 +361,14 @@ function( key )
   if key == 81 then 
     local mvt_info = { camera_mvt:read() }
 
-	camera_mvt:update(120.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	camera_mvt:update(12.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
       
   --W key
   elseif key == 87 then
 
     local mvt_info = { camera_mvt:read() }
 
-	camera_mvt:update(-120.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	camera_mvt:update(-12.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
   elseif key == 17 then
     ctrl_key = TRUE
