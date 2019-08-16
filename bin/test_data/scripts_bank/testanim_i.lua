@@ -10,7 +10,7 @@ fog_color =
 
 lights = 
 {
-	ambient_light = {r = 0.05, g = 0.05, b = 0.05, a = 0.0 },
+	ambient_light = {r = 0.15, g = 0.15, b = 0.15, a = 0.0 },
 	lights_enabled = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
 	light0 = 
 	{
@@ -228,14 +228,19 @@ neck_entity_config =
 			{
 				{ path='lit.vso',mode=SHADER_COMPILED },
 				{ path='lit.pso',mode=SHADER_COMPILED }
+
 			},
 			rs_in = 
 			{
-				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" }		
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" },
+				{ ope=RENDERSTATE_OPE_SETFILLMODE, value="line" },
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="none" },
 			},
 			rs_out =
 			{
-				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+				{ ope=RENDERSTATE_OPE_SETFILLMODE, value="solid" },
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
 			}
 		},
 		textures =
@@ -269,9 +274,9 @@ neck_material =
 {
 	--specular_power = 429.0,
 	color_source = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
-	simple_color = { r = 1.0, g = 0.0, b = 0.0, a = 0.0 },
+	simple_color = { r = 1.0, g = 0.0, b = 0.0, a = 1.0 },
 	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
-	self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	self_emissive = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
 	--bump_mapping = { texture_size = 1024, bias = 0.193 }
 }
 
