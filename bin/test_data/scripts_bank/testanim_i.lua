@@ -431,8 +431,3 @@ g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
 
 g:signal_renderscenebegin("eg")
-
-fog = function(p_intensity)
-  fog_intensity = p_intensity
-  commons.setup_lit_flags_simple( 'texture_pass', renderers, fog_intensity, fog_color)
-end
