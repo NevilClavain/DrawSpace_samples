@@ -265,6 +265,9 @@ neck_entity_config =
 
 neck_entity, neck_renderer = commons.create_rendered_meshe(neck_entity_config, 'neck.ac', 'rect')
 
+--declare bone animation for neck
+neck_renderer:set_shaderrealinvector( 'texture_pass', 'flags_v', 2, 1.0)
+
 neck_entity:add_aspect(ANIMATION_ASPECT)
 
 neck_renderer:register_to_rendering(rg)

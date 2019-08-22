@@ -458,18 +458,22 @@ end
 commons.setup_lit_flags = function( p_pass_id, p_renderer_tables, p_mirror, p_reflector_pos, p_reflector_normale, p_fog_intensity, p_fog_color )
 	for k, v in pairs(p_renderer_tables) do
 		local renderer = v
-		renderer:set_shaderrealvector( p_pass_id, 'flags_v', p_mirror, p_fog_intensity, 0.0, 0.0 )
+
+		renderer:set_shaderrealinvector( p_pass_id, 'flags_v', 0, p_mirror)
+		renderer:set_shaderrealinvector( p_pass_id, 'flags_v', 1, p_fog_intensity)
+
 		renderer:set_shaderrealvector( p_pass_id, 'fog_color', p_fog_color.r, p_fog_color.g, p_fog_color.b, 1.0 )
 		
-		renderer:set_shaderrealvector( p_pass_id, 'reflectorPos', p_reflector_pos.x, p_reflector_pos.y, p_reflector_pos.z, 0.0 )
-		renderer:set_shaderrealvector( p_pass_id, 'reflectorNormale', p_reflector_normale.x, p_reflector_normale.y, p_reflector_normale.z, 0.0 )
+		renderer:set_shaderrealvector( p_pass_id, 'reflectorPos', p_reflector_pos.x, p_reflector_pos.y, p_reflector_pos.z, 1.0 )
+		renderer:set_shaderrealvector( p_pass_id, 'reflectorNormale', p_reflector_normale.x, p_reflector_normale.y, p_reflector_normale.z, 1.0 )
 	end
 end
 
 commons.setup_lit_flags_simple = function( p_pass_id, p_renderer_tables, p_fog_intensity, p_fog_color )
 	for k, v in pairs(p_renderer_tables) do
 		local renderer = v
-		renderer:set_shaderrealvector( p_pass_id, 'flags_v', 0.0, p_fog_intensity, 0.0, 0.0 )
+
+		renderer:set_shaderrealinvector( p_pass_id, 'flags_v', 1, p_fog_intensity)
 		renderer:set_shaderrealvector( p_pass_id, 'fog_color', p_fog_color.r, p_fog_color.g, p_fog_color.b, 1.0 )
 	end
 end
