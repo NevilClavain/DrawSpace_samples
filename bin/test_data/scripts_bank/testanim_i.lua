@@ -258,7 +258,7 @@ neck_entity_config =
 
 	meshes_loader_params =
 	{
-		normale_generation_mode = NORMALES_AUTO,
+		normale_generation_mode = NORMALES_AUTO_SMOOTH,
 		tb_generation_mode = TB_DISCARDED,
 	},
 }
