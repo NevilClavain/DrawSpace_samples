@@ -9,11 +9,11 @@ ground_entity:remove_aspect(BODY_ASPECT)
 commons.trash.meshe(rg, ground_entity, ground_renderer)
 eg:remove('ground_entity')
 
---[[
+
 dino_transform:release()
 commons.trash.meshe(rg, dino_entity, dino_renderer)
 eg:remove('dino_entity')
-]]
+
 
 
 neck_transform:release()

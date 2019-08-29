@@ -135,7 +135,7 @@ nb_renderers = nb_renderers + 1
 
 
 
---[[
+
 dino_entity_config = 
 { 
 	texture_pass = 
@@ -215,7 +215,7 @@ dino_transform = RawTransform()
 dino_transform:configure(dino_entity)
 dino_transform:add_matrix( "pos", dino_pos_mat )
 
-]]
+
 
 
 neck_entity_config = 
