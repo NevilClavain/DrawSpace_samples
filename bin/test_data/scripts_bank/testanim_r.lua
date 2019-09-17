@@ -11,13 +11,15 @@ eg:remove('ground_entity')
 
 
 dino_transform:release()
+dino_entity:release_animationbones()
+dino_entity:remove_aspect(ANIMATION_ASPECT)
 commons.trash.meshe(rg, dino_entity, dino_renderer)
 eg:remove('dino_entity')
 
 
 
 neck_transform:release()
-neck_entity:remove_aspect(ANIMATION_ASPECT)
+--neck_entity:remove_aspect(ANIMATION_ASPECT)
 commons.trash.meshe(rg, neck_entity, neck_renderer)
 eg:remove('neck_entity')
 

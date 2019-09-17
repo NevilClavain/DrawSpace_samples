@@ -15,7 +15,7 @@ lights =
 	light0 = 
 	{
 		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-		direction = { x = 0.0, y = 0.0, z = -1.0, w = 1.0 },
+		direction = { x = -1.0, y = 0.0, z = 0.0, w = 1.0 },
 	}
 }
 
@@ -173,18 +173,28 @@ dino_entity_config =
 	meshes_loader_params =
 	{
 		normale_generation_mode = NORMALES_AUTO,
-		tb_generation_mode = TB_AUTO,
+		tb_generation_mode = TB_AUTO
+		
+		,
+
+
 		normales_transform = commons.utils.init_matrix( { 
 		                        1, 0,-1, 0,
 								0, 1, 0, 0,
 							    1, 0, 1, 0,
 							    0, 0, 0, 1 } 
 							 )
+							 
 	},
 }
 
 dino_entity, dino_renderer = commons.create_rendered_meshe(dino_entity_config, 'raptor.fbx', 'raptorMesh')
 
+dino_renderer:set_shaderrealinvector( 'texture_pass', 'flags_v', 2, 1.0)
+dino_entity:add_aspect(ANIMATION_ASPECT)
+
+
+dino_entity:configure_animationbones()
 
 dino_renderer:register_to_rendering(rg)
 eg:add_child('root','dino_entity',dino_entity)
@@ -266,9 +276,8 @@ neck_entity_config =
 neck_entity, neck_renderer = commons.create_rendered_meshe(neck_entity_config, 'neck.ac', 'rect')
 
 --declare bone animation for neck
-neck_renderer:set_shaderrealinvector( 'texture_pass', 'flags_v', 2, 1.0)
-
-neck_entity:add_aspect(ANIMATION_ASPECT)
+--neck_renderer:set_shaderrealinvector( 'texture_pass', 'flags_v', 2, 1.0)
+--neck_entity:add_aspect(ANIMATION_ASPECT)
 
 neck_renderer:register_to_rendering(rg)
 eg:add_child('root','neck_entity',neck_entity)
@@ -369,14 +378,14 @@ function( key )
   if key == 81 then 
     local mvt_info = { camera_mvt:read() }
 
-	camera_mvt:update(12.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	camera_mvt:update(120.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
       
   --W key
   elseif key == 87 then
 
     local mvt_info = { camera_mvt:read() }
 
-	camera_mvt:update(-12.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	camera_mvt:update(-120.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
   elseif key == 17 then
     ctrl_key = TRUE
