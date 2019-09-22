@@ -418,6 +418,11 @@ function( key )
 
     -- VK_F1
   elseif key == 112 then
+
+      local jaw_mat = Matrix();
+
+	  jaw_mat:rotation(0.0, 0.0, 1.0, -0.75)
+	  dino_entity:update_bonelocaltransform("skeleton:jaw_$AssimpFbx$_Rotation", jaw_mat)
     
     -- VK_F2
   elseif key == 113 then
