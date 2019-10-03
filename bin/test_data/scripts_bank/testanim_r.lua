@@ -28,6 +28,7 @@ commons.trash.camera(camera_entity, camera_mvt)
 eg:remove('camera_entity')
 
 text_renderer:release()
+text_anim_infos:release()
 
 g:remove_appruncb('run')
 
