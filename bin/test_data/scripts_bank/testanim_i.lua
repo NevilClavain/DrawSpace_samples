@@ -163,7 +163,8 @@ dino_entity_config =
 		{
 			[1] = 
 			{
-				{ path='raptorDif2.png', stage=0 },
+				--{ path='raptorDif2.png', stage=0 },
+				{ path='Trex_difuse.png', stage=0 },
 			}
 		},
 		vertex_textures =
@@ -189,7 +190,8 @@ dino_entity_config =
 	},
 }
 
-dino_entity, dino_renderer = commons.create_rendered_meshe(dino_entity_config, 'raptor.fbx', 'raptorMesh')
+--dino_entity, dino_renderer = commons.create_rendered_meshe(dino_entity_config, 'raptor.fbx', 'raptorMesh')
+dino_entity, dino_renderer = commons.create_rendered_meshe(dino_entity_config, 'Trex.fbx', 'trexMesh')
 
 dino_renderer:set_shaderrealinvector( 'texture_pass', 'flags_v', 2, 1.0)
 dino_entity:add_aspect(ANIMATION_ASPECT)
@@ -398,14 +400,14 @@ function( key )
   if key == 81 then 
     local mvt_info = { camera_mvt:read() }
 
-	camera_mvt:update(6.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	camera_mvt:update(60.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
       
   --W key
   elseif key == 87 then
 
     local mvt_info = { camera_mvt:read() }
 
-	camera_mvt:update(-6.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	camera_mvt:update(-60.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
   elseif key == 17 then
     ctrl_key = TRUE
@@ -439,10 +441,10 @@ function( key )
     -- VK_F1
   elseif key == 112 then
 
-      local jaw_mat = Matrix();
+      --local jaw_mat = Matrix();
 
-	  jaw_mat:rotation(0.0, 0.0, 1.0, -0.75)
-	  dino_entity:update_bonelocaltransform("skeleton:jaw_$AssimpFbx$_Rotation", jaw_mat)
+	  --jaw_mat:rotation(0.0, 0.0, 1.0, -0.75)
+	  --dino_entity:update_bonelocaltransform("skeleton:jaw_$AssimpFbx$_Rotation", jaw_mat)
     
     -- VK_F2
   elseif key == 113 then
@@ -495,7 +497,7 @@ animations_list = function()
 end
 
 
-run_animation = function(i)
+ra = function(i)
 
   animations_names = {dino_entity:read_animationsnames()}
 
