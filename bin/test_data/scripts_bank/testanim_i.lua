@@ -48,6 +48,7 @@ rg:set_pass_targetclearcolor('texture_pass', 192, 192, 255)
 text_renderer=TextRendering()
 text_renderer:configure(root_entity, "fps", 10, 40, 255, 0, 255, "??? fps")
 
+
 text_anim_infos=TextRendering()
 text_anim_infos:configure(root_entity, "animation_info", 10, 70, 255, 0, 255, "...")
 
@@ -59,7 +60,7 @@ root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
 
 
 --camera_entity, camera_mvt=commons.create_free_camera(-200.0, 125.0, 100.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
-camera_entity, camera_mvt=commons.create_free_camera(0.0, 3.0, 20.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
+camera_entity, camera_mvt=commons.create_free_camera(0.0, 200.0, 700.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
 
 eg:add_child('root','camera_entity',camera_entity)
 
@@ -356,13 +357,21 @@ cube_rot_y:init_fromtimeaspectof(root_entity,0.0)
 
 
 
+g:add_animationeventcb( "onanimationevent",
+function( event, animation_name )
+  if event == 0 then
+    
+
+  end
+end)
+
+
 
 
 g:add_mousemovecb( "onmousemove",
 function( xm, ym, dx, dy )  
 
   if ctrl_key == TRUE then
-
     
     cube_rot_y:inc(20.0 * dx)
 	cube_rot_x:inc(20.0 * dy)
@@ -473,7 +482,7 @@ function()
   
   
   text_anim_infos:update(10, 70, 255, 0, 0, "anim="..current_animation_name.." ticks/s = "..current_animation_ticks_per_seconds.." "..current_animation_ticks_progress.."/"..current_animation_ticks_duration.." ticks "..
-													current_animation_seconds_progress.."/"..current_animation_seconds_duration.. " s" )
+													current_animation_seconds_progress.."/"..current_animation_seconds_duration.. " s")
 
   local mvt_info = { camera_mvt:read() }
   camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
