@@ -30,6 +30,9 @@ last_key = 0
 
 mouse_right = FALSE
 
+
+current_animation_loop = -1
+
 renderer_infos = {renderer:descr()}
 g:print('Current renderer is '..renderer_infos[1]..', '..renderer_infos[2]..'x'..renderer_infos[3])
 
@@ -360,8 +363,9 @@ cube_rot_y:init_fromtimeaspectof(root_entity,0.0)
 g:add_animationeventcb( "onanimationevent",
 function( event, animation_name )
   if event == 0 then
-    
-
+    if current_animation_loop ~= -1 then
+	  run_anim(current_animation_loop)
+	end
   end
 end)
 
@@ -506,10 +510,18 @@ animations_list = function()
 end
 
 
-ra = function(i)
+run_anim = function(i)
 
   animations_names = {dino_entity:read_animationsnames()}
-
   dino_entity:set_currentanimation(animations_names[i])
 
+end
+
+run_anim_loop = function(i)
+  current_animation_loop = i
+  run_anim(current_animation_loop)  
+end
+
+stop_anim_loop = function()
+  current_animation_loop = -1
 end
