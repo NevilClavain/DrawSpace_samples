@@ -513,7 +513,7 @@ end
 run_anim = function(i)
 
   animations_names = {dino_entity:read_animationsnames()}
-  dino_entity:set_currentanimation(animations_names[i])
+  dino_entity:push_animation(animations_names[i])
 
 end
 
@@ -524,4 +524,9 @@ end
 
 stop_anim_loop = function()
   current_animation_loop = -1
+end
+
+ra = function()  
+  run_anim(15)
+  run_anim(5)
 end
