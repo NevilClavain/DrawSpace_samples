@@ -15,7 +15,7 @@ lights =
 	light0 = 
 	{
 		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-		direction = { x = 1.0, y = 0.0, z = 0.0, w = 1.0 },
+		direction = { x = -1.0, y = -0.5, z = 0.0, w = 1.0 },
 	}
 }
 
@@ -63,7 +63,7 @@ root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
 
 
 --camera_entity, camera_mvt=commons.create_free_camera(-200.0, 125.0, 100.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
-camera_entity, camera_mvt=commons.create_free_camera(0.0, 200.0, 700.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
+camera_entity, camera_mvt=commons.create_free_camera(0.0, 1.70, 6.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
 
 eg:add_child('root','camera_entity',camera_entity)
 
@@ -224,13 +224,18 @@ nb_renderers = nb_renderers + 1
 
 
 dino_pos_mat = Matrix()
-dino_pos_mat:translation( 0.0, 0.0, 0.0 )
+dino_pos_mat:translation( -18.0, 0.0, 0.0 )
+
+dino_scale_mat = Matrix()
+dino_scale_mat:scale( 0.05, 0.05, 0.05 )
 
 
 
 dino_transform = RawTransform()
 dino_transform:configure(dino_entity)
+dino_transform:add_matrix( "scale", dino_scale_mat )
 dino_transform:add_matrix( "pos", dino_pos_mat )
+
 
 
 
@@ -362,7 +367,7 @@ cube_rot_y:init_fromtimeaspectof(root_entity,0.0)
 
 g:add_animationeventcb( "onanimationevent",
 function( event, animation_name )
-  if event == 0 then
+  if event == 1 then
     if current_animation_loop ~= -1 then
 	  run_anim(current_animation_loop)
 	end
@@ -470,7 +475,10 @@ g:add_appruncb( "run",
 function()  
 
   time_infos = { root_entity:read_timemanager() }
-  output_infos = renderer:descr() .." "..time_infos[3].. " fps "..time_infos[2].. " key = "..last_key
+
+  local timescale = commons.print_timescale(time_infos[1])
+
+  output_infos = renderer:descr() .." "..time_infos[3].. " fps "..time_infos[2].." timescale = "..timescale.." key = "..last_key
 
   text_renderer:update(10, 30, 255, 0, 0, output_infos)
 
@@ -519,7 +527,7 @@ end
 
 run_anim_loop = function(i)
   current_animation_loop = i
-  run_anim(current_animation_loop)  
+  run_anim(current_animation_loop)
 end
 
 stop_anim_loop = function()
@@ -529,4 +537,25 @@ end
 ra = function()  
   run_anim(15)
   run_anim(5)
+end
+
+pause = function()
+  root_entity:update_timescale(FREEZE)
+end
+
+
+time1x = function()
+  root_entity:update_timescale(NORMAL_TIME)
+end
+
+timediv2 = function()
+  root_entity:update_timescale(DIV2_TIME)
+end
+
+timediv4 = function()
+  root_entity:update_timescale(DIV4_TIME)
+end
+
+timediv10 = function()
+  root_entity:update_timescale(DIV10_TIME)
 end
