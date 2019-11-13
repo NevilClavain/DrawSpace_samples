@@ -507,6 +507,12 @@ g:set_mousecursorcircularmode(TRUE)
 g:signal_renderscenebegin("eg")
 
 
+rg:add_renderpasseventcb(  "render pass event", 
+function()
+  run_anim_loop(15)
+end
+)
+
 
 animations_list = function()
 
@@ -534,10 +540,6 @@ stop_anim_loop = function()
   current_animation_loop = -1
 end
 
-ra = function()  
-  run_anim(15)
-  run_anim(5)
-end
 
 pause = function()
   root_entity:update_timescale(FREEZE)
@@ -559,3 +561,4 @@ end
 timediv10 = function()
   root_entity:update_timescale(DIV10_TIME)
 end
+
