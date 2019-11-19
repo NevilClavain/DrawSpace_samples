@@ -1,4 +1,5 @@
 
+rg:remove_renderpasseventcb("render pass event")
 
 g:signal_rendersceneend("eg")
 

@@ -33,6 +33,11 @@ mouse_right = FALSE
 
 current_animation_loop = -1
 
+
+
+
+
+
 renderer_infos = {renderer:descr()}
 g:print('Current renderer is '..renderer_infos[1]..', '..renderer_infos[2]..'x'..renderer_infos[3])
 
@@ -365,18 +370,6 @@ cube_rot_y:init_fromtimeaspectof(root_entity,0.0)
 
 
 
-g:add_animationeventcb( "onanimationevent",
-function( event, animation_name )
-  if event == 1 then
-    if current_animation_loop ~= -1 then
-	  run_anim(current_animation_loop)
-	end
-  end
-end)
-
-
-
-
 g:add_mousemovecb( "onmousemove",
 function( xm, ym, dx, dy )  
 
@@ -501,17 +494,56 @@ function()
 
 end)
 
+
+
+-- random animations stuff
+
+rand_engine=RandomEngine()
+rand_engine:set_seedfromtime()
+
+
+rand_anim_mode = FALSE;
+main_idle_anim = 9
+rand_anims = {8, 10, 11, 12, 13, 14 }
+
+do_something=Distribution("uniform_int_distribution", 1, 2)
+dino_action=Distribution("uniform_int_distribution", 1, 6)
+
+
+
+
+
+
+
+
 g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
 
 g:signal_renderscenebegin("eg")
 
 
-rg:add_renderpasseventcb(  "render pass event", 
+rg:add_renderpasseventcb("render pass event", 
 function()
-  run_anim_loop(15)
+  --run_anim_loop(main_idle_anim)
+
+  run_random_anim_loop()
+
 end
 )
+
+g:add_animationeventcb( "onanimationevent",
+function( event, animation_name )
+  if event == 1 then
+
+    if rand_anim_mode == TRUE then
+	  current_animation_loop = compute_random_anim_index(do_something, dino_action, rand_engine)
+	end
+
+    if current_animation_loop ~= -1 then
+	  run_anim(current_animation_loop)
+	end
+  end
+end)
 
 
 animations_list = function()
@@ -536,7 +568,15 @@ run_anim_loop = function(i)
   run_anim(current_animation_loop)
 end
 
+run_random_anim_loop = function()
+  rand_anim_mode = TRUE
+  current_animation_loop = compute_random_anim_index(do_something, dino_action, rand_engine)
+  run_anim(current_animation_loop)
+end
+
+
 stop_anim_loop = function()
+  rand_anim_mode = FALSE
   current_animation_loop = -1
 end
 
@@ -562,3 +602,14 @@ timediv10 = function()
   root_entity:update_timescale(DIV10_TIME)
 end
 
+compute_random_anim_index = function(p_do_something_generator, p_action_generator, p_random_engine)
+  
+   index = p_do_something_generator:generate(p_random_engine)
+
+   if index == 2 then      
+	  return rand_anims[p_action_generator:generate(p_random_engine)]
+   else
+
+      return main_idle_anim 
+   end
+end
