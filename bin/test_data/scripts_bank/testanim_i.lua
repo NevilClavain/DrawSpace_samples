@@ -471,7 +471,7 @@ function()
 
   local timescale = commons.print_timescale(time_infos[1])
 
-  output_infos = renderer:descr() .." "..time_infos[3].. " fps "..time_infos[2].." timescale = "..timescale.." key = "..last_key
+  local output_infos = renderer:descr() .." "..time_infos[3].. " fps "..time_infos[2].." timescale = "..timescale.." key = "..last_key
 
   text_renderer:update(10, 30, 255, 0, 0, output_infos)
 
@@ -525,9 +525,9 @@ g:signal_renderscenebegin("eg")
 rg:add_renderpasseventcb("render pass event", 
 function()
   --run_anim_loop(main_idle_anim)
-  --run_random_anim_loop()
+  run_random_anim_loop()
 
-  dino_entity:set_animationlastkeypose("die long")
+  --dino_entity:set_animationlastkeypose("die long")
 
 end
 )
