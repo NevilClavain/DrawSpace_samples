@@ -5,6 +5,9 @@ text_renderer:configure(root_entity, "fps", 10, 40, 255, 0, 255, "??? fps")
 rg:update_renderingqueues()
 
 
+g:do_file('sandbox_init.lua')
+
+
 g:add_appruncb( "run",
 function()  
 
@@ -47,15 +50,6 @@ model.unload = function(meshe_entity)
   eg:remove(entity_name)
 end
 
-l = function()
-  e = model.load('e','Trex.fbx')
-end
-
-u = function()
-  model.unload(e)
-  e = nil
-end
-
 model.dump = function(entity)
   local list_size = entity:read_meshesfiledescriptionssize()   	
   for i = 1, list_size do
@@ -88,4 +82,14 @@ model.meshes.dump = function(entity, index, meshe_index)
   g:print('node id = '..meshe_infos[1].. ' name = ['..meshe_infos[2]..']' )
   g:print('has positions = '..meshe_infos[3]..' has faces = '..meshe_infos[4]..' has normales = '..meshe_infos[5]..' has tbn = '..meshe_infos[6] )
   g:print('num vertices = '..meshe_infos[7]..' num faces = '..meshe_infos[8]..' num uvchannels = '..meshe_infos[9]..' num bones = '..meshe_infos[10])  
+end
+
+
+l = function()
+  e = model.load('e','Trex.fbx')
+end
+
+u = function()
+  model.unload(e)
+  e = nil
 end
