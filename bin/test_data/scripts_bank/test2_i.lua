@@ -61,7 +61,7 @@ eg:add_child('root','camera_entity',camera_entity)
 
 ground_entity_config = 
 { 
-	texture_pass = 
+	ground_rendering = 
 	{
 		fx = 
 		{
@@ -92,10 +92,15 @@ ground_entity_config =
 		},
 		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
+	},
+	meshes_loader_params =
+	{
+		normale_generation_mode = NORMALES_AUTO_SMOOTH,
+		tb_generation_mode = TB_AUTO
 	}
 }
 
-ground_entity, ground_renderer = commons.create_rendered_meshe(ground_entity_config, 'land2.ac', 'wavefront obj')
+ground_entity, ground_renderer = commons.create_rendered_meshe(ground_entity_config, 'land2.ac', 'wavefront obj', {ground_rendering='texture_pass'})
 ground_renderer:register_to_rendering(rg)
 eg:add_child('root','ground_entity',ground_entity)
 
@@ -132,7 +137,7 @@ nb_renderers = nb_renderers + 1
 
 clothbox_entity_config = 
 { 
-	texture_pass = 
+	main_rendering = 
 	{
 		fx = 
 		{
@@ -164,19 +169,23 @@ clothbox_entity_config =
 		},
 		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
+	},
+	meshes_loader_params =
+	{
+		normale_generation_mode = NORMALES_AUTO_SMOOTH,
+		tb_generation_mode = TB_AUTO
 	}
 }
 
 
-
-clothbox_entity,clothbox_renderer = commons.create_rendered_meshe(clothbox_entity_config, 'tech.ac', 'box')
+clothbox_entity,clothbox_renderer = commons.create_rendered_meshe(clothbox_entity_config, 'tech.ac', 'box', {main_rendering='texture_pass'})
 clothbox_renderer:register_to_rendering(rg)
 eg:add_child('root','clothbox_entity',clothbox_entity)
 
 clothbox_material =
 {
     mask_mode = 1,
-	specular_power = 180.0,
+	specular_power = 13.0,
 	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
 	simple_color = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
@@ -208,7 +217,7 @@ clothbox_transform:add_matrix( "pos", cube_pos_mat )
 
 sphere_entity_config = 
 { 
-	texture_pass = 
+	sphere_rendering = 
 	{
 		fx = 
 		{
@@ -239,9 +248,14 @@ sphere_entity_config =
 		},
 		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
+	},
+	meshes_loader_params =
+	{
+		normale_generation_mode = NORMALES_AUTO_SMOOTH,
+		tb_generation_mode = TB_AUTO
 	}
 }
-sphere_entity,sphere_renderer = commons.create_rendered_meshe(sphere_entity_config, 'sphere.ac', 'sphere')
+sphere_entity,sphere_renderer = commons.create_rendered_meshe(sphere_entity_config, 'sphere.ac', 'sphere', {sphere_rendering='texture_pass'})
 sphere_renderer:register_to_rendering(rg)
 eg:add_child('root','sphere_entity',sphere_entity)
 
@@ -282,7 +296,7 @@ nb_renderers = nb_renderers + 1
 
 rock_entity_config = 
 { 
-	texture_pass = 
+	rock_rendering = 
 	{
 		fx = 
 		{
@@ -313,9 +327,14 @@ rock_entity_config =
 		},
 		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
+	},
+	meshes_loader_params =
+	{
+		normale_generation_mode = NORMALES_AUTO_SMOOTH,
+		tb_generation_mode = TB_AUTO
 	}
 }
-rock_entity,rock_renderer = commons.create_rendered_meshe(rock_entity_config, 'rock.ac', 'sphere')
+rock_entity,rock_renderer = commons.create_rendered_meshe(rock_entity_config, 'rock.ac', 'sphere',{rock_rendering = 'texture_pass'})
 rock_renderer:register_to_rendering(rg)
 eg:add_child('root','rock_entity',rock_entity)
 

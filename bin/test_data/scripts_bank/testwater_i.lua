@@ -13,7 +13,7 @@ reflectorNormale =
 	z = 0.0, 
 }
 
-fog_intensity = 0.05
+fog_intensity = 0.0005
 
 fog_color = 
 {
@@ -24,7 +24,7 @@ fog_color =
 
 lights = 
 {
-	ambient_light = {r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	ambient_light = {r = 0.05, g = 0.05, b = 0.05, a = 0.0 },
 	lights_enabled = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
 	light0 = 
 	{
@@ -105,7 +105,7 @@ eg:add_child('root','camera_entity',camera_entity)
 
 ground_entity_config = 
 { 
-	texture_pass = 
+	ground_rendering = 
 	{
 		fx = 
 		{
@@ -136,7 +136,7 @@ ground_entity_config =
 		},
 		rendering_order = 10000
 	},
-	bump_pass = 
+	water_bump = 
 	{
 		fx = 
 		{
@@ -168,7 +168,7 @@ ground_entity_config =
 	}
 }
 
-ground_entity, ground_renderer = commons.create_rendered_meshe(ground_entity_config, 'water.ac', 'my_flat_mesh')
+ground_entity, ground_renderer = commons.create_rendered_meshe(ground_entity_config, 'water.ac', 'my_flat_mesh', {ground_rendering='texture_pass', water_bump='bump_pass'})
 ground_renderer:register_to_rendering(rg)
 ground_renderer:set_shaderrealvector('texture_pass', "color", 1.0, 0.0, 1.0, 1.0 )
 ground_renderer:set_shaderrealvector('bump_pass', 'bump_bias', 1.0, 0.0, 0.0, 0.0)
@@ -190,7 +190,7 @@ ground_body:configure_mode(COLLIDER_MODE)
 
 cube_entity_config = 
 { 
-	texture_pass = 
+	main_rendering = 
 	{
 		fx = 
 		{
@@ -222,7 +222,7 @@ cube_entity_config =
 
 		shaders_params = commons.setup_lit_shader_params()
 	},
-	texturemirror_pass = 
+	mirror_rendering = 
 	{
 		fx = 
 		{
@@ -257,7 +257,7 @@ cube_entity_config =
 		shaders_params = commons.setup_lit_shader_params()
 	}
 }
-cube_entity, cube_renderer = commons.create_rendered_meshe(cube_entity_config, 'object.ac', 'box')
+cube_entity, cube_renderer = commons.create_rendered_meshe(cube_entity_config, 'object.ac', 'box', {main_rendering='texture_pass', mirror_rendering='texturemirror_pass'})
 cube_renderer:register_to_rendering(rg)
 eg:add_child('root','cube_entity',cube_entity)
 
@@ -311,7 +311,7 @@ nb_renderers = nb_renderers + 1
 
 sphere_entity_config = 
 { 
-	texture_pass = 
+	main_rendering = 
 	{
 		fx = 
 		{
@@ -343,7 +343,7 @@ sphere_entity_config =
 		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
 	},
-	texturemirror_pass = 
+	mirror_rendering = 
 	{
 		fx = 
 		{
@@ -376,9 +376,14 @@ sphere_entity_config =
 		},
 		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
-	}
+	},
+	meshes_loader_params =
+	{
+		normale_generation_mode = NORMALES_AUTO_SMOOTH,
+		tb_generation_mode = TB_AUTO
+	},
 }
-sphere_entity,sphere_renderer = commons.create_rendered_meshe(sphere_entity_config, 'sphere.ac', 'sphere')
+sphere_entity,sphere_renderer = commons.create_rendered_meshe(sphere_entity_config, 'sphere.ac', 'sphere', {main_rendering='texture_pass', mirror_rendering='texturemirror_pass'})
 sphere_renderer:register_to_rendering(rg)
 eg:add_child('root','sphere_entity',sphere_entity)
 
@@ -427,7 +432,7 @@ nb_renderers = nb_renderers + 1
 
 land_entity_config = 
 { 
-	texture_pass = 
+	main_rendering = 
 	{
 		fx = 
 		{
@@ -438,7 +443,7 @@ land_entity_config =
 			},
 			rs_in = 
 			{
-				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true"	}		
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" }		
 			},
 			rs_out =
 			{
@@ -459,7 +464,7 @@ land_entity_config =
 		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
 	},
-	texturemirror_pass = 
+	mirror_rendering = 
 	{
 		fx = 
 		{
@@ -492,10 +497,15 @@ land_entity_config =
 		},
 		rendering_order = 10000,
 		shaders_params = commons.setup_lit_shader_params()
-	}
+	},
+	meshes_loader_params =
+	{
+		normale_generation_mode = NORMALES_AUTO_SMOOTH,
+		tb_generation_mode = TB_AUTO
+	},
 }
 
-land_entity, land_renderer = commons.create_rendered_meshe(land_entity_config, 'land2.ac', 'wavefront obj')
+land_entity, land_renderer = commons.create_rendered_meshe(land_entity_config, 'land2.ac', 'wavefront obj', {main_rendering='texture_pass', mirror_rendering='texturemirror_pass'})
 land_renderer:register_to_rendering(rg)
 eg:add_child('root','land_entity',land_entity)
 
@@ -545,7 +555,7 @@ skybox_layer =
 {
 	layer_0 = 
 	{
-		texture_pass =	
+		layer0_rendering =	
 		{
 			fx =
 			{
@@ -597,7 +607,7 @@ skybox_layer =
 			rendering_order = 10000
 		},
 
-		texturemirror_pass =	
+		layer0_mirror_rendering =	
 		{
 			fx =
 			{
@@ -658,7 +668,7 @@ skybox_layer =
 }
 
 
-skybox_entity,skybox_renderer=commons.create_rendering_from_module(skybox_layer,sb_mod,"skyboxRender")
+skybox_entity,skybox_renderer=commons.create_rendering_from_module(skybox_layer,sb_mod,"skyboxRender", {layer0_rendering='texture_pass', layer0_mirror_rendering='texturemirror_pass'})
 skybox_renderer:register_to_rendering(rg)
 eg:add_child('root','skybox_entity',skybox_entity)
 
@@ -880,7 +890,7 @@ add_cube = function()
 
 	local cube_entity_config = 
 	{ 
-		texture_pass = 
+		main_rendering = 
 		{
 			fx = 
 			{
@@ -910,9 +920,8 @@ add_cube = function()
 			},
 			rendering_order = 10000,
 			shaders_params = commons.setup_lit_shader_params()
-		}
-		,
-		texturemirror_pass = 
+		},
+		mirror_rendering = 
 		{
 			fx = 
 			{
@@ -946,7 +955,7 @@ add_cube = function()
 			shaders_params = commons.setup_lit_shader_params()	
 		}
 	}
-	cube_entity, cube_renderer = commons.create_rendered_meshe(cube_entity_config, 'object.ac', 'box')
+	cube_entity, cube_renderer = commons.create_rendered_meshe(cube_entity_config, 'object.ac', 'box', {main_rendering='texture_pass', mirror_rendering='texturemirror_pass'})
 	cube_renderer:register_to_rendering(rg)
 	eg:add_child('root',cube_name,cube_entity)
 

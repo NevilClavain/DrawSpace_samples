@@ -56,7 +56,7 @@ skybox_layer =
 {
 	layer_0 = 
 	{
-		texture_pass =	
+		skybox_rendering =	
 		{
 			fx =
 			{
@@ -110,7 +110,7 @@ skybox_layer =
 	}
 }
 
-skybox_entity,skybox_renderer=commons.create_rendering_from_module(skybox_layer,sb_mod,"skyboxRender")
+skybox_entity,skybox_renderer=commons.create_rendering_from_module(skybox_layer,sb_mod,"skyboxRender", {skybox_rendering='texture_pass'})
 skybox_renderer:register_to_rendering(rg)
 eg:add_child('root','skybox_entity',skybox_entity)
 
@@ -129,7 +129,7 @@ neb_entity_layer =
 { 
 	layer_0 =
 	{
-		texture_pass = 
+		layer_0_rendering = 
 		{
 			fx = 
 			{
@@ -182,7 +182,7 @@ neb_entity_layer =
 rand_engine=RandomEngine()
 rand_engine:set_seedfromtime()
 
-neb_entity,neb_renderer=commons.create_rendering_from_module(neb_entity_layer,vol_mod,"nebulaeRender")
+neb_entity,neb_renderer=commons.create_rendering_from_module(neb_entity_layer,vol_mod,"nebulaeRender",{layer_0_rendering='texture_pass'})
 nebulae_specific_config = NebulaeSpecificConfig()
 
 nebulae_specific_config:set_texturesresolutions( 8, 4 )

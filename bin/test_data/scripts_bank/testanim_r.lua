@@ -19,11 +19,6 @@ eg:remove('dino_entity')
 
 
 
-neck_transform:release()
---neck_entity:remove_aspect(ANIMATION_ASPECT)
-commons.trash.meshe(rg, neck_entity, neck_renderer)
-eg:remove('neck_entity')
-
 
 commons.trash.camera(camera_entity, camera_mvt)
 eg:remove('camera_entity')

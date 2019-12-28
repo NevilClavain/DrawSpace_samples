@@ -75,7 +75,7 @@ eg:add_child('root','camera_entity',camera_entity)
 
 ground_entity_config = 
 { 
-	texture_pass = 
+    ground_rendering = 
 	{
 		fx = 
 		{
@@ -116,7 +116,7 @@ ground_entity_config =
 
 }
 
-ground_entity, ground_renderer = commons.create_rendered_meshe(ground_entity_config, 'land2.ac', 'wavefront obj')
+ground_entity, ground_renderer = commons.create_rendered_meshe(ground_entity_config, 'land2.ac', 'wavefront obj', {ground_rendering='texture_pass'})
 ground_renderer:register_to_rendering(rg)
 eg:add_child('root','ground_entity',ground_entity)
 
@@ -150,7 +150,7 @@ nb_renderers = nb_renderers + 1
 
 dino_entity_config = 
 { 
-	texture_pass = 
+	main_rendering = 
 	{
 		fx = 
 		{
@@ -200,7 +200,7 @@ dino_entity_config =
 }
 
 --dino_entity, dino_renderer = commons.create_rendered_meshe(dino_entity_config, 'raptor.fbx', 'raptorMesh')
-dino_entity, dino_renderer = commons.create_rendered_meshe(dino_entity_config, 'Trex.fbx', 'trexMesh')
+dino_entity, dino_renderer = commons.create_rendered_meshe(dino_entity_config, 'Trex.fbx', 'trexMesh', {main_rendering='texture_pass'})
 
 dino_renderer:set_shaderrealinvector( 'texture_pass', 'flags_v', 2, 1.0)
 dino_entity:add_aspect(ANIMATION_ASPECT)

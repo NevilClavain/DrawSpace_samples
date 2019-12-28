@@ -20,7 +20,7 @@ create_sphere = function()
 
 	local entity_config = 
 	{ 
-		texture_pass = 
+		main_rendering = 
 		{
 			fx = 
 			{
@@ -31,7 +31,7 @@ create_sphere = function()
 				},
 				rs_in = 
 				{
-					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" },
 					{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" },
 					{ ope=RENDERSTATE_OPE_SETTEXTUREFILTERTYPE, value="linear" }					
 				},
@@ -55,11 +55,16 @@ create_sphere = function()
 			},
 			rendering_order = 10000,
 			shaders_params = commons.setup_lit_shader_params()
+		},
+		meshes_loader_params =
+		{
+			normale_generation_mode = NORMALES_AUTO_SMOOTH,
+			tb_generation_mode = TB_AUTO
 		}
 	}
 	local entity = nil
 	local renderer = nil
-	entity,renderer = commons.create_rendered_meshe(entity_config, 'sphere.ac', 'sphere')
+	entity,renderer = commons.create_rendered_meshe(entity_config, 'sphere.ac', 'sphere', {main_rendering = 'texture_pass'})
 
 	entity:add_aspect(INFOS_ASPECT)
 	entity:setup_info( "entity_name", "bump mapped sphere" )
@@ -124,7 +129,7 @@ create_ship = function()
 
 	local entity_config = 
 	{ 
-		texture_pass = 
+		ship_rendering = 
 		{
 			fx = 
 			{
@@ -157,14 +162,19 @@ create_ship = function()
 			},
 			rendering_order = 10000,
 			shaders_params = commons.setup_lit_shader_params()
+		},
+		meshes_loader_params =
+		{
+			normale_generation_mode = NORMALES_AUTO_SMOOTH,
+			tb_generation_mode = TB_AUTO
 		}
 	}
 
 	local entity = nil
 	local renderer = nil
 
-	--entity,renderer = commons.create_rendered_meshe(ship_entity_config, 'survey.ac', '001_hull')
-	entity,renderer = commons.create_rendered_meshe(entity_config, 'bellerophon.ac', 'wavefront obj')
+	--entity,renderer = commons.create_rendered_meshe(ship_entity_config, 'survey.ac', '001_hull', {ship_rendering = 'texture_pass'})
+	entity,renderer = commons.create_rendered_meshe(entity_config, 'bellerophon.ac', 'wavefront obj', {ship_rendering = 'texture_pass'})
 	entity:add_aspect(INFOS_ASPECT)
 	entity:setup_info( "entity_name", "Bellorophon" )
 
@@ -208,9 +218,8 @@ create_ship = function()
 
 	ship_material =
 	{
-		specular_power = 200.0,
 		color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-		simple_color = { r = 1.0, g = 0.0, b = 0.0, a = 0.0 },
+		simple_color = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 		light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 		self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 		bump_mapping = { texture_size = 1024, bias = 0.45 }
@@ -227,7 +236,7 @@ create_skybox = function()
 	{
 		layer_0 = 
 		{
-			texture_pass =	
+			layer0_rendering =	
 			{
 				fx =
 				{
@@ -284,7 +293,7 @@ create_skybox = function()
 	local entity = nil
 	local renderer = nil
 
-	entity,renderer=commons.create_rendering_from_module(entity_layers,sb_mod,"skyboxRender",create_rendering_from_module)
+	entity,renderer=commons.create_rendering_from_module(entity_layers,sb_mod,"skyboxRender", {layer0_rendering = 'texture_pass'})
 
 	entity:add_aspect(INFOS_ASPECT)
 	entity:setup_info( "entity_name", "skybox" )
@@ -310,7 +319,7 @@ create_planet = function()
 	{ 
 		surface_layer = 
 		{
-			texture_pass =	
+			surface_rendering =	
 			{
 				fx =
 				{
@@ -356,7 +365,7 @@ create_planet = function()
 		},
 		atmosphere_layer =
 		{
-			texture_pass =	
+			atmo_rendering =	
 			{
 				fx =
 				{
@@ -427,7 +436,7 @@ create_planet = function()
 	local entity = nil
 	local renderer = nil
 
-	entity,renderer=commons.create_rendering_from_module(entity_layers,pl_mod,"planetsRender",root_tm_ref)
+	entity,renderer=commons.create_rendering_from_module(entity_layers,pl_mod,"planetsRender", { surface_rendering='texture_pass', atmo_rendering='texture_pass'})
 
 	local specific_config = PlanetSpecificConfig()
 	commons.procedural.planet.setup_specific_config(planet_specific_config_descr, specific_config)

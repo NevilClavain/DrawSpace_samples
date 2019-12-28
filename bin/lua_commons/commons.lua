@@ -174,7 +174,7 @@ commons.create_free_camera = function(p_x, p_y, p_z, p_viewport_width, p_viewpor
 	return camera_entity, free_transfo
 end
 
-commons.create_rendering_from_module = function(p_layers, p_module, p_rendering_impl_id)
+commons.create_rendering_from_module = function(p_layers, p_module, p_rendering_impl_id, rendering_passes_array)
 
 	local entity=Entity()
 	entity:add_aspect(RENDERING_ASPECT)
@@ -265,6 +265,11 @@ commons.create_rendering_from_module = function(p_layers, p_module, p_rendering_
 	end
 
 	local rendering=Rendering(TimeManagerRef(root_entity))
+
+    for k, v in pairs(rendering_passes_array) do
+	  rendering:set_passforrendercontext(k, v)
+	end
+
 	rendering:instanciate_renderingimpl(p_module,p_rendering_impl_id)
 	rendering:attach_toentity(entity)
 	rendering:configure(renderlayer)
@@ -272,7 +277,7 @@ commons.create_rendering_from_module = function(p_layers, p_module, p_rendering_
 	return entity,rendering
 end
 
-commons.create_rendered_meshe = function(p_config, p_meshefile, p_meshe_name)
+commons.create_rendered_meshe = function(p_config, p_meshefile, p_meshe_name, rendering_passes_array)
 
 	local meshe_entity=Entity()
 	meshe_entity:add_aspect(RENDERING_ASPECT)
@@ -283,6 +288,10 @@ commons.create_rendered_meshe = function(p_config, p_meshefile, p_meshe_name)
 
 	local renderer=MesheRendering()
 	renderer:attach_toentity(meshe_entity)
+
+    for k, v in pairs(rendering_passes_array) do
+	  renderer:set_passforrendercontext(k, v)
+	end
 
 	for k, v in pairs(p_config) do
 		g:print(k)
