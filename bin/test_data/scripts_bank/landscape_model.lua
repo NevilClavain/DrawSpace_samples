@@ -1,27 +1,13 @@
 
 
-trex = {}
-trex.modeldump = {}
+landscape = {}
 
---[[
+landscape.dump = {}
 
 
-trex.inspect = {}
-
-trex.inspect.load = function()
-  trex.inspect.entity = modeldump.load('t_rex_model_inspect_entity','Trex.fbx')
-end
-
-trex.inspect.unload = function()
-  modeldump.unload(t_rex.model_inspect.entity)
-  trex.inspect.entity = nil
-end
-
-]]
-
-trex.entity_config = 
+landscape.rendering_config = 
 { 
-	main_rendering = 
+    ground_rendering = 
 	{
 		fx = 
 		{
@@ -43,8 +29,8 @@ trex.entity_config =
 		{
 			[1] = 
 			{
-				--{ path='raptorDif2.png', stage=0 },
-				{ path='Trex_difuse.png', stage=0 },
+				{ path='012b2su2.jpg', stage=0 },
+				{ path='grass_bump.bmp', stage=1 }
 			}
 		},
 		vertex_textures =
@@ -56,21 +42,12 @@ trex.entity_config =
 
 	meshes_loader_params =
 	{
-		normale_generation_mode = NORMALES_AUTO,
-		tb_generation_mode = TB_AUTO		
-		,
-
-		normales_transform = commons.utils.init_matrix( { 
-		                        1, 0,-1, 0,
-								0, 1, 0, 0,
-							    1, 0, 1, 0,
-							    0, 0, 0, 1 } 
-							 )
-							 
+		normale_generation_mode = NORMALES_AUTO_SMOOTH,
+		tb_generation_mode = TB_AUTO
 	},
 }
 
-trex.material =
+landscape.material =
 {
 	--specular_power = 429.0,
 	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
@@ -80,5 +57,17 @@ trex.material =
 	--bump_mapping = { texture_size = 1024, bias = 0.193 }
 }
 
-trex.modeldump.entity = model.dump.load('t_rex_model_inspect_entity','Trex.fbx')
+landscape.dump.load = function()
+   landscape.dump.entity = model.dump.load('landscape_model_dump_entity','land2.ac')
+end
+
+landscape.dump.unload = function()
+   landscape.dump.entity = model.dump.unload(landscape.dump.entity)
+   landscape.dump.entity = nil;
+end
+
+landscape.dump.show = function()
+   model.dump.show(landscape.dump.entity)
+end
+
 
