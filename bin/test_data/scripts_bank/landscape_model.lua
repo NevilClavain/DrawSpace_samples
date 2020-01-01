@@ -3,11 +3,12 @@
 landscape = {}
 
 landscape.dump = {}
+landscape.view = {}
 
 
 landscape.rendering_config = 
 { 
-    ground_rendering = 
+    landscape_rendering = 
 	{
 		fx = 
 		{
@@ -58,7 +59,7 @@ landscape.material =
 }
 
 landscape.dump.load = function()
-   landscape.dump.entity = model.dump.load('landscape_model_dump_entity','land2.ac')
+   landscape.dump.entity = model.dump.load('landscape.dump.entity','land2.ac')
 end
 
 landscape.dump.unload = function()
@@ -71,3 +72,28 @@ landscape.dump.show = function()
 end
 
 
+landscape.createmodelview = function(p_rendergraph, p_entitygraph, p_pass_id)
+
+  landscape.view.entity, landscape.view.renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {landscape_rendering=p_pass_id})
+  landscape.view.renderer:register_to_rendering(p_rendergraph)
+
+  p_entitygraph:add_child('root','landscape.view.entity',landscape.view.entity)
+
+  commons.apply_material( landscape.material, landscape.view.renderer, p_pass_id)
+
+  return landscape.view.renderer  
+end
+
+landscape.trashmodelview = function(p_rendergraph, p_entitygraph)
+  commons.trash.meshe(p_rendergraph, landscape.view.entity, landscape.view.renderer)
+  p_entitygraph:remove('landscape.view.entity')
+end
+
+
+landscape.view.unload = function()
+  model.view.unload(landscape.trashmodelview)
+end
+
+landscape.view.load = function()
+  model.view.load(landscape.createmodelview)
+end
