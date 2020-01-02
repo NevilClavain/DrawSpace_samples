@@ -1,15 +1,7 @@
 
 
-fog_intensity = 0.0001
 
-fog_color = 
-{
-	r = 0.75,
-	g = 0.75,
-	b = 0.99, 
-}
-
-lights = 
+environment = 
 {
 	ambient_light = {r = 0.15, g = 0.15, b = 0.15, a = 0.0 },
 	lights_enabled = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
@@ -17,14 +9,20 @@ lights =
 	{
 		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
 		direction = { x = -1.0, y = -0.5, z = 0.0, w = 1.0 },
-	}
-}
+	},
 
-renderers =
-{
-}
-nb_renderers = 0;
+	fog_intensity = 0.0009,
+	fog_color = 
+	{
+		r = 0.75,
+		g = 0.75,
+		b = 0.99, 
+	},
 
+	mirror = 0,
+	reflector_pos = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
+	reflector_normale = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
+}
 
 ctrl_key = FALSE
 last_key = 0
@@ -56,10 +54,6 @@ camera_entity, camera_mvt=commons.create_free_camera(0.0, 1.70, 6.0, renderer_in
 
 eg:add_child('root','camera_entity',camera_entity)
 
-
-commons.update_lights( 'texture_pass', lights, renderers )
-
-commons.setup_lit_flags_simple( 'texture_pass', renderers, fog_intensity, fog_color)
 
 
 
@@ -145,11 +139,6 @@ function( key )
     -- VK_F1
   elseif key == 112 then
 
-      --local jaw_mat = Matrix();
-
-	  --jaw_mat:rotation(0.0, 0.0, 1.0, -0.75)
-	  --dino_entity:update_bonelocaltransform("skeleton:jaw_$AssimpFbx$_Rotation", jaw_mat)
-    
     -- VK_F2
   elseif key == 113 then
     
@@ -239,13 +228,10 @@ model.dump.show = function(entity)
 end
 
 
-model.view.load = function(p_modelviewload_function)
+model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function)
 
-  renderers[nb_renderers] = p_modelviewload_function(rg, eg, 'texture_pass')
-  nb_renderers = nb_renderers + 1
-
-  commons.update_lights( 'texture_pass', lights, renderers )
-  commons.setup_lit_flags_simple( 'texture_pass', renderers, fog_intensity, fog_color)
+  p_modelviewload_function(rg, eg, 'texture_pass')
+  p_update_from_scene_env_function( 'texture_pass', environment)  
   rg:update_renderingqueues()
 end
 

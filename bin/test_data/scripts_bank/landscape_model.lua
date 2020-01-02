@@ -38,7 +38,24 @@ landscape.rendering_config =
 		{
 		},
 		rendering_order = 10000,
-		shaders_params = commons.setup_lit_shader_params()
+		shaders_params = 
+		{ 
+			{ param_name = "lights_enabled_v", shader_index = 0, register = 24 },
+			{ param_name = "light0_dir_v", shader_index = 0, register = 25 },
+			{ param_name = "flags_v", shader_index = 0, register = 26 },
+			{ param_name = "reflectorPos", shader_index = 0, register = 27 },
+			{ param_name = "reflectorNormale", shader_index = 0, register = 28 },
+			{ param_name = "ambient_color", shader_index = 1, register = 0 },
+			{ param_name = "lights_enabled", shader_index = 1, register = 1 },
+			{ param_name = "light0_color", shader_index = 1, register = 2 },
+			{ param_name = "light0_dir", shader_index = 1, register = 3 },
+			{ param_name = "flags", shader_index = 1, register = 7 },
+			{ param_name = "self_emissive", shader_index = 1, register = 8 },
+			{ param_name = "absorption", shader_index = 1, register = 9 },
+			{ param_name = "color", shader_index = 1, register = 10 },
+			{ param_name = "color_source", shader_index = 1, register = 11 },
+			{ param_name = "fog_color", shader_index = 1, register = 12 }
+		}
 	},
 
 	meshes_loader_params =
@@ -71,6 +88,26 @@ landscape.dump.show = function()
    model.dump.show(landscape.dump.entity)
 end
 
+landscape.update_from_scene_env = function( p_pass_id, p_environment_table )
+
+	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'ambient_color', p_environment_table.ambient_light.r, p_environment_table.ambient_light.g, p_environment_table.ambient_light.b, p_environment_table.ambient_light.a )
+	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'lights_enabled', p_environment_table.lights_enabled.x, p_environment_table.lights_enabled.y, p_environment_table.lights_enabled.z, p_environment_table.lights_enabled.w )
+	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'light0_color', p_environment_table.light0.color.r, p_environment_table.light0.color.g, p_environment_table.light0.color.b, p_environment_table.light0.color.a )
+	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'light0_dir', p_environment_table.light0.direction.x, p_environment_table.light0.direction.y, p_environment_table.light0.direction.z, p_environment_table.light0.direction.w )
+
+	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'light0_dir_v', p_environment_table.light0.direction.x, p_environment_table.light0.direction.y, p_environment_table.light0.direction.z, p_environment_table.light0.direction.w )
+	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'lights_enabled_v', p_environment_table.lights_enabled.x, p_environment_table.lights_enabled.y, p_environment_table.lights_enabled.z, p_environment_table.lights_enabled.w )
+
+	
+	landscape.view.renderer:set_shaderrealinvector( p_pass_id, 'flags_v', 0, p_environment_table.mirror)
+	landscape.view.renderer:set_shaderrealinvector( p_pass_id, 'flags_v', 1, p_environment_table.fog_intensity)
+	
+	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'fog_color', p_environment_table.fog_color.r, p_environment_table.fog_color.g, p_environment_table.fog_color.b, 1.0 )
+		
+	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'reflectorPos', p_environment_table.reflector_pos.x, p_environment_table.reflector_pos.y, p_environment_table.reflector_pos.z, 1.0 )
+	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'reflectorNormale', p_environment_table.reflector_normale.x, p_environment_table.reflector_normale.y, p_environment_table.reflector_normale.z, 1.0 )
+end
+
 
 landscape.createmodelview = function(p_rendergraph, p_entitygraph, p_pass_id)
 
@@ -95,5 +132,5 @@ landscape.view.unload = function()
 end
 
 landscape.view.load = function()
-  model.view.load(landscape.createmodelview)
+  model.view.load(landscape.createmodelview, landscape.update_from_scene_env)
 end

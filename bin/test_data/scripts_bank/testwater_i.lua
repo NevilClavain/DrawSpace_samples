@@ -536,18 +536,12 @@ nb_renderers = nb_renderers + 1
 
 
 
-
-
-
-
 commons.update_lights( 'texture_pass', lights, renderers )
 commons.update_lights( 'texturemirror_pass', lights, renderers )
 
 
 commons.setup_lit_flags( 'texture_pass', renderers, REFLECTIONS_OFF, reflectorPos, reflectorNormale, fog_intensity, fog_color)
 commons.setup_lit_flags( 'texturemirror_pass', renderers, REFLECTIONS_ON, reflectorPos, reflectorNormale, fog_intensity, fog_color)
-
-
 
 
 
