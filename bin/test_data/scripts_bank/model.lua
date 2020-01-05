@@ -1,4 +1,19 @@
 
+MODEL_TRANSFORMATION_INPUTMODE_NONE = -1
+
+MODEL_TRANSFORMATION_INPUTMODE_POSX = 0
+MODEL_TRANSFORMATION_INPUTMODE_POSY = 1
+MODEL_TRANSFORMATION_INPUTMODE_POSZ = 2
+
+MODEL_TRANSFORMATION_INPUTMODE_ROTX = 3
+MODEL_TRANSFORMATION_INPUTMODE_ROTY = 4
+MODEL_TRANSFORMATION_INPUTMODE_ROTZ = 5
+
+MODEL_TRANSFORMATION_INPUTMODE_SCALEX = 6
+MODEL_TRANSFORMATION_INPUTMODE_SCALEY = 7
+MODEL_TRANSFORMATION_INPUTMODE_SCALEZ = 8
+
+MODEL_TRANSFORMATION_INPUTMODE_SCALEXYZ = 9
 
 
 environment = 
@@ -28,6 +43,7 @@ ctrl_key = FALSE
 last_key = 0
 
 mouse_right = FALSE
+mouse_left = FALSE
 
 
 current_animation_loop = -1
@@ -47,6 +63,9 @@ rg:set_pass_targetclearcolor('texture_pass', 80, 80, 80)
 text_renderer=TextRendering()
 text_renderer:configure(root_entity, "fps", 10, 40, 255, 0, 255, "??? fps")
 
+move_renderer=TextRendering()
+move_renderer:configure(root_entity, "move", 10, 60, 255, 0, 255, "...")
+
 root_entity:add_aspect(PHYSICS_ASPECT)
 root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
 
@@ -64,15 +83,117 @@ eg:set_camera(camera_entity)
 rg:update_renderingqueues()
 
 
-g:add_mousemovecb( "onmousemove",
-function( xm, ym, dx, dy )  
+g:add_mousemovecb( "onmousemove",function( xm, ym, dx, dy )  
 
   local mvt_info = { camera_mvt:read() }
 
-  if mouse_right == FALSE then
-	camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],-dy / 4.0,-dx / 4.0, 0)
+
+  if mouse_left == TRUE then
+
+    if model.transformation_input_mode == MODEL_TRANSFORMATION_INPUTMODE_POSX then
+
+	  local pos_x = model.pos_mat:get_value(3,0)
+      pos_x = pos_x + dx
+      model.pos_mat:set_value(3,0,pos_x)
+	end
+
+    if model.transformation_input_mode == MODEL_TRANSFORMATION_INPUTMODE_POSY then
+
+	  local pos_y = model.pos_mat:get_value(3,1)
+      pos_y = pos_y + dx
+      model.pos_mat:set_value(3,1,pos_y)
+	end
+
+    if model.transformation_input_mode == MODEL_TRANSFORMATION_INPUTMODE_POSZ then
+
+	  local pos_z = model.pos_mat:get_value(3,2)
+      pos_z = pos_z + dx
+      model.pos_mat:set_value(3,2,pos_z)      
+	end
+
+    if model.transformation_input_mode == MODEL_TRANSFORMATION_INPUTMODE_ROTX then
+
+	end
+
+    if model.transformation_input_mode == MODEL_TRANSFORMATION_INPUTMODE_ROTY then
+
+	end
+
+    if model.transformation_input_mode == MODEL_TRANSFORMATION_INPUTMODE_ROTZ then
+
+	end
+
+    if model.transformation_input_mode == MODEL_TRANSFORMATION_INPUTMODE_SCALEX then
+
+	  local scale_x = model.scale_mat:get_value(0,0)
+      scale_x = scale_x + 0.01 * dx
+	  if scale_x < 0.001 then
+	     scale_x = 0.001
+	  end
+
+      model.scale_mat:set_value(0,0,scale_x)
+	end
+
+    if model.transformation_input_mode == MODEL_TRANSFORMATION_INPUTMODE_SCALEY then
+
+	  local scale_y = model.scale_mat:get_value(1,1)
+      scale_y = scale_y + 0.01 * dx
+	  if scale_y < 0.001 then
+	     scale_y = 0.001
+	  end
+
+      model.scale_mat:set_value(1,1,scale_y)
+	end
+
+    if model.transformation_input_mode == MODEL_TRANSFORMATION_INPUTMODE_SCALEZ then
+
+	  local scale_z = model.scale_mat:get_value(2,2)
+      scale_z = scale_z + 0.01 * dx
+	  if scale_z < 0.001 then
+	     scale_z = 0.001
+	  end
+
+      model.scale_mat:set_value(2,2,scale_z)
+	end
+
+    if model.transformation_input_mode == MODEL_TRANSFORMATION_INPUTMODE_SCALEXYZ then
+
+	  local scale_x = model.scale_mat:get_value(0,0)
+	  local scale_y = model.scale_mat:get_value(1,1)
+	  local scale_z = model.scale_mat:get_value(2,2)
+      scale_x = scale_x + 0.01 * dx
+	  scale_y = scale_y + 0.01 * dx
+	  scale_z = scale_z + 0.01 * dx
+
+	  if scale_x < 0.001 then
+	     scale_x = 0.001
+	  end
+
+	  if scale_y < 0.001 then
+	     scale_y = 0.001
+	  end
+
+	  if scale_z < 0.001 then
+	     scale_z = 0.001
+	  end
+
+      model.scale_mat:set_value(0,0,scale_x)
+	  model.scale_mat:set_value(1,1,scale_y)
+	  model.scale_mat:set_value(2,2,scale_z)
+	end
+
+	model.transform:update_matrix("pos",model.pos_mat)
+	model.transform:update_matrix("scale",model.scale_mat)
+
   else
-	camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,-dx)
+
+    if mouse_right == FALSE then
+	  camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],-dy / 4.0,-dx / 4.0, 0)
+
+    else
+	  camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,-dx)
+
+    end
   end
 
 end)
@@ -83,10 +204,19 @@ function( xm, ym )
   mouse_right = TRUE
 end)
 
-
 g:add_mouserightbuttonupcb( "onmouserightbuttonup", 
 function( xm, ym )
   mouse_right = FALSE
+end)
+
+g:add_mouseleftbuttondowncb( "onmouseleftbuttondown", 
+function( xm, ym )
+  mouse_left = TRUE
+end)
+
+g:add_mouseleftbuttonupcb( "onmouseleftbuttonup", 
+function( xm, ym )
+  mouse_left = FALSE
 end)
 
 g:add_keydowncb( "keydown",
@@ -155,12 +285,22 @@ function()
   local timescale = commons.print_timescale(time_infos[1])
 
   local output_infos = "[MODEL VIEWER]    " ..renderer:descr() .." "..time_infos[3].. " fps "..time_infos[2].." timescale = "..timescale
-
   text_renderer:update(10, 30, 255, 0, 0, output_infos)
+
+  
+  local pos_x = model.pos_mat:get_value(3,0)
+  local pos_y = model.pos_mat:get_value(3,1)
+  local pos_z = model.pos_mat:get_value(3,2)
+  local scale_x = model.scale_mat:get_value(0,0)
+  local scale_y = model.scale_mat:get_value(1,1)
+  local scale_z = model.scale_mat:get_value(2,2)
+
+  local move_infos = "pos = "..pos_x.." "..pos_y.." "..pos_z.." scale = "..scale_x.." "..scale_y.." "..scale_z
+  move_renderer:update(10, 70, 255, 0, 0, move_infos)
+  
 
   local mvt_info = { camera_mvt:read() }
   camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
-
 
 end)
 
@@ -174,6 +314,11 @@ model.dump.anims = {}
 model.dump.meshes = {}
 
 model.view = {}
+
+model.move = {}
+
+ model.pos_mat = Matrix()
+ model.scale_mat = Matrix()
 
 model.dump.load = function(entity_name, model_file_path)
 
@@ -230,16 +375,76 @@ end
 
 model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function)
 
-  p_modelviewload_function(rg, eg, 'texture_pass')
-  p_update_from_scene_env_function( 'texture_pass', environment)  
+  model.entity = p_modelviewload_function(rg, eg, 'texture_pass')
+  p_update_from_scene_env_function( 'texture_pass', environment)
+
+  model.pos_mat:translation( 0.0, 0.0, 0.0 )  
+  model.scale_mat:scale( 1.0, 1.0, 1.0 )
+
+  model.transform = RawTransform()
+
+  model.transformation_input_mode = MODEL_TRANSFORMATION_INPUTMODE_NONE
+
+
+  model.transform:configure(model.entity)
+  model.transform:add_matrix( "scale", model.scale_mat )
+  model.transform:add_matrix( "pos", model.pos_mat )
+  
+
+    
   rg:update_renderingqueues()
 end
 
 model.view.unload = function(p_modelunload_function)
 
+  model.transform:release()
+
   p_modelunload_function(rg, eg)
   rg:update_renderingqueues()
 
+  model.entity = nil
+  model.transform = nil
+end
+
+
+model.move.posx = function()
+  model.transformation_input_mode = MODEL_TRANSFORMATION_INPUTMODE_POSX
+end
+
+model.move.posy = function()
+  model.transformation_input_mode = MODEL_TRANSFORMATION_INPUTMODE_POSY
+end
+
+model.move.posz = function()
+  model.transformation_input_mode = MODEL_TRANSFORMATION_INPUTMODE_POSZ
+end
+
+model.move.rotx = function()
+  model.transformation_input_mode = MODEL_TRANSFORMATION_INPUTMODE_ROTX
+end
+
+model.move.roty = function()
+  model.transformation_input_mode = MODEL_TRANSFORMATION_INPUTMODE_ROTY
+end
+
+model.move.rotz = function()
+  model.transformation_input_mode = MODEL_TRANSFORMATION_INPUTMODE_ROTZ
+end
+
+model.move.scalex = function()
+  model.transformation_input_mode = MODEL_TRANSFORMATION_INPUTMODE_SCALEX
+end
+
+model.move.scaley = function()
+  model.transformation_input_mode = MODEL_TRANSFORMATION_INPUTMODE_SCALEY
+end
+
+model.move.scalez = function()
+  model.transformation_input_mode = MODEL_TRANSFORMATION_INPUTMODE_SCALEZ
+end
+
+model.move.scalexyz = function()
+  model.transformation_input_mode = MODEL_TRANSFORMATION_INPUTMODE_SCALEXYZ
 end
 
 g:show_mousecursor(FALSE)

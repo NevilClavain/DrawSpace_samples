@@ -118,7 +118,7 @@ landscape.createmodelview = function(p_rendergraph, p_entitygraph, p_pass_id)
 
   commons.apply_material( landscape.material, landscape.view.renderer, p_pass_id)
 
-  return landscape.view.renderer  
+  return landscape.view.entity
 end
 
 landscape.trashmodelview = function(p_rendergraph, p_entitygraph)
