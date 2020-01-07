@@ -15,6 +15,24 @@ MODEL_TRANSFORMATION_INPUTMODE_SCALEZ = 8
 
 MODEL_TRANSFORMATION_INPUTMODE_SCALEXYZ = 9
 
+model = {}
+
+model.dump = {}
+model.dump.anims = {}
+model.dump.meshes = {}
+
+model.view = {}
+
+model.move = {}
+
+model.pos_mat = Matrix()
+model.scale_mat = Matrix()
+model.rotx_mat = Matrix()
+model.roty_mat = Matrix()
+model.rotz_mat = Matrix()
+model.rotx_deg_angle = 0.0
+model.roty_deg_angle = 0.0
+model.rotz_deg_angle = 0.0
 
 environment = 
 {
@@ -112,15 +130,15 @@ g:add_mousemovecb( "onmousemove",function( xm, ym, dx, dy )
 	end
 
     if model.transformation_input_mode == MODEL_TRANSFORMATION_INPUTMODE_ROTX then
-
+	  model.rotx_deg_angle = model.rotx_deg_angle + dx
 	end
 
     if model.transformation_input_mode == MODEL_TRANSFORMATION_INPUTMODE_ROTY then
-
+	  model.roty_deg_angle = model.roty_deg_angle + dx
 	end
 
     if model.transformation_input_mode == MODEL_TRANSFORMATION_INPUTMODE_ROTZ then
-
+	  model.rotz_deg_angle = model.rotz_deg_angle + dx
 	end
 
     if model.transformation_input_mode == MODEL_TRANSFORMATION_INPUTMODE_SCALEX then
@@ -182,7 +200,14 @@ g:add_mousemovecb( "onmousemove",function( xm, ym, dx, dy )
 	  model.scale_mat:set_value(2,2,scale_z)
 	end
 
+    model.rotx_mat:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(model.rotx_deg_angle))
+    model.roty_mat:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(model.roty_deg_angle))
+    model.rotz_mat:rotation(0.0, 0.0, 1.0, commons.utils.deg_to_rad(model.rotz_deg_angle))
+
 	model.transform:update_matrix("pos",model.pos_mat)
+	model.transform:update_matrix("rotx",model.rotx_mat)
+	model.transform:update_matrix("roty",model.roty_mat)
+	model.transform:update_matrix("rotz",model.rotz_mat)
 	model.transform:update_matrix("scale",model.scale_mat)
 
   else
@@ -295,7 +320,7 @@ function()
   local scale_y = model.scale_mat:get_value(1,1)
   local scale_z = model.scale_mat:get_value(2,2)
 
-  local move_infos = "pos = "..pos_x.." "..pos_y.." "..pos_z.." scale = "..scale_x.." "..scale_y.." "..scale_z
+  local move_infos = "pos = "..pos_x.." "..pos_y.." "..pos_z.." scale = "..scale_x.." "..scale_y.." "..scale_z.." rot = "..model.rotx_deg_angle.." "..model.roty_deg_angle.." "..model.rotz_deg_angle
   move_renderer:update(10, 70, 255, 0, 0, move_infos)
   
 
@@ -307,18 +332,8 @@ end)
 
 g:signal_renderscenebegin("eg")
 
-model = {}
 
-model.dump = {}
-model.dump.anims = {}
-model.dump.meshes = {}
 
-model.view = {}
-
-model.move = {}
-
- model.pos_mat = Matrix()
- model.scale_mat = Matrix()
 
 model.dump.load = function(entity_name, model_file_path)
 
@@ -380,18 +395,21 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
 
   model.pos_mat:translation( 0.0, 0.0, 0.0 )  
   model.scale_mat:scale( 1.0, 1.0, 1.0 )
+  model.rotx_mat:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(model.rotx_deg_angle))
+  model.roty_mat:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(model.roty_deg_angle))
+  model.rotz_mat:rotation(0.0, 0.0, 1.0, commons.utils.deg_to_rad(model.rotz_deg_angle))
 
   model.transform = RawTransform()
 
   model.transformation_input_mode = MODEL_TRANSFORMATION_INPUTMODE_NONE
 
-
   model.transform:configure(model.entity)
   model.transform:add_matrix( "scale", model.scale_mat )
+  model.transform:add_matrix( "roty", model.roty_mat )
+  model.transform:add_matrix( "rotx", model.rotx_mat )
+  model.transform:add_matrix( "rotz", model.rotz_mat )
   model.transform:add_matrix( "pos", model.pos_mat )
   
-
-    
   rg:update_renderingqueues()
 end
 
