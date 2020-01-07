@@ -465,6 +465,58 @@ model.move.scalexyz = function()
   model.transformation_input_mode = MODEL_TRANSFORMATION_INPUTMODE_SCALEXYZ
 end
 
+model.move.resetpos = function()
+
+  local pos_x = model.pos_mat:get_value(3,0)
+  local pos_y = model.pos_mat:get_value(3,1)
+  local pos_z = model.pos_mat:get_value(3,2)
+
+  pos_x = 0
+  pos_y = 0
+  pos_z = 0
+
+  model.pos_mat:set_value(3,0,pos_x)
+  model.pos_mat:set_value(3,1,pos_y)
+  model.pos_mat:set_value(3,2,pos_z)
+
+  model.transform:update_matrix("pos",model.pos_mat)
+end
+
+model.move.resetrot = function()
+
+  model.rotx_deg_angle = 0
+  model.roty_deg_angle = 0
+  model.rotz_deg_angle = 0
+
+  model.rotx_mat:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(model.rotx_deg_angle))
+  model.roty_mat:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(model.roty_deg_angle))
+  model.rotz_mat:rotation(0.0, 0.0, 1.0, commons.utils.deg_to_rad(model.rotz_deg_angle))
+
+  model.transform:update_matrix("rotx",model.rotx_mat)
+  model.transform:update_matrix("roty",model.roty_mat)
+  model.transform:update_matrix("rotz",model.rotz_mat)
+end
+
+model.move.resetscale = function()
+
+  local scale_x = model.scale_mat:get_value(0,0)
+  local scale_y = model.scale_mat:get_value(1,1)
+  local scale_z = model.scale_mat:get_value(2,2)
+
+  scale_x = 1
+  scale_y = 1
+  scale_z = 1
+
+  model.scale_mat:set_value(0,0,scale_x)
+  model.scale_mat:set_value(1,1,scale_y)
+  model.scale_mat:set_value(2,2,scale_z)
+
+  model.transform:update_matrix("scale",model.scale_mat)
+
+end
+
+
+
 g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
 
