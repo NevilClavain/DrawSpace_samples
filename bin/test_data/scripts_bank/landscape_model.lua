@@ -5,10 +5,13 @@ landscape = {}
 landscape.dump = {}
 landscape.view = {}
 
+landscape.view.lit = {}
+landscape.view.wireframe = {}
+
 
 landscape.rendering_config = 
 { 
-    landscape_rendering = 
+    lit_rendering = 
 	{
 		fx = 
 		{
@@ -19,7 +22,7 @@ landscape.rendering_config =
 			},
 			rs_in = 
 			{
-				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" }		
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" }
 			},
 			rs_out =
 			{
@@ -57,7 +60,38 @@ landscape.rendering_config =
 			{ param_name = "fog_color", shader_index = 1, register = 12 }
 		}
 	},
-
+	wireframe_rendering =
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='color.vso',mode=SHADER_COMPILED },
+				{ path='color.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" },
+				{ ope=RENDERSTATE_OPE_SETFILLMODE, value="line" }
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+				{ ope=RENDERSTATE_OPE_SETFILLMODE, value="solid" }
+			}
+		},
+		textures =
+		{
+		},
+		vertex_textures =
+		{
+		},
+		rendering_order = 10000,
+		shaders_params = 
+		{ 
+		    { param_name = "color", shader_index = 1, register = 0 },
+		}	
+	},	
 	meshes_loader_params =
 	{
 		normale_generation_mode = NORMALES_AUTO_SMOOTH,
@@ -65,7 +99,7 @@ landscape.rendering_config =
 	},
 }
 
-landscape.material =
+landscape.lit_material =
 {
 	--specular_power = 429.0,
 	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
@@ -88,7 +122,7 @@ landscape.dump.show = function()
    model.dump.show(landscape.dump.entity)
 end
 
-landscape.update_from_scene_env = function( p_pass_id, p_environment_table )
+landscape.update_lit_from_scene_env = function( p_pass_id, p_environment_table )
 
 	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'ambient_color', p_environment_table.ambient_light.r, p_environment_table.ambient_light.g, p_environment_table.ambient_light.b, p_environment_table.ambient_light.a )
 	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'lights_enabled', p_environment_table.lights_enabled.x, p_environment_table.lights_enabled.y, p_environment_table.lights_enabled.z, p_environment_table.lights_enabled.w )
@@ -108,15 +142,29 @@ landscape.update_from_scene_env = function( p_pass_id, p_environment_table )
 	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'reflectorNormale', p_environment_table.reflector_normale.x, p_environment_table.reflector_normale.y, p_environment_table.reflector_normale.z, 1.0 )
 end
 
+landscape.update_wireframe_from_scene_env = function( p_pass_id, p_environment_table )
 
-landscape.createmodelview = function(p_rendergraph, p_entitygraph, p_pass_id)
+	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'color', 1.0, 1.0, 1.0, 1.0 )
+end
 
-  landscape.view.entity, landscape.view.renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {landscape_rendering=p_pass_id})
+landscape.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id)
+
+  landscape.view.entity, landscape.view.renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {lit_rendering=p_pass_id})
   landscape.view.renderer:register_to_rendering(p_rendergraph)
 
   p_entitygraph:add_child('root','landscape.view.entity',landscape.view.entity)
 
-  commons.apply_material( landscape.material, landscape.view.renderer, p_pass_id)
+  commons.apply_material( landscape.lit_material, landscape.view.renderer, p_pass_id)
+
+  return landscape.view.entity
+end
+
+landscape.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pass_id)
+
+  landscape.view.entity, landscape.view.renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {wireframe_rendering=p_pass_id})
+  landscape.view.renderer:register_to_rendering(p_rendergraph)
+
+  p_entitygraph:add_child('root','landscape.view.entity',landscape.view.entity)
 
   return landscape.view.entity
 end
@@ -132,5 +180,14 @@ landscape.view.unload = function()
 end
 
 landscape.view.load = function()
-  model.view.load(landscape.createmodelview, landscape.update_from_scene_env)
+  landscape.view.lit.load()
+end
+
+
+landscape.view.lit.load = function()
+  model.view.load(landscape.createlitmodelview, landscape.update_lit_from_scene_env)
+end
+
+landscape.view.wireframe.load = function()
+  model.view.load(landscape.createwireframemodelview, landscape.update_wireframe_from_scene_env)
 end

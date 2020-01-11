@@ -265,9 +265,9 @@ model.dump.show = function(entity)
 end
 
 
-model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function)
+model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function, p_render_context, p_material)
 
-  model.entity = p_modelviewload_function(rg, eg, 'texture_pass')
+  model.entity = p_modelviewload_function(rg, eg, 'texture_pass', p_render_context, p_material)
   p_update_from_scene_env_function( 'texture_pass', environment)
 
   model.pos_mat:translation( 0.0, 0.0, 0.0 )  
