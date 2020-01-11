@@ -147,8 +147,9 @@ landscape.update_wireframe_from_scene_env = function( p_pass_id, p_environment_t
 	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'color', 1.0, 1.0, 1.0, 1.0 )
 end
 
-landscape.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id)
+landscape.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id)
 
+  g:print('adding entity : '..p_entity_id)
   landscape.view.entity, landscape.view.renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {lit_rendering=p_pass_id})
   landscape.view.renderer:register_to_rendering(p_rendergraph)
 
@@ -159,8 +160,9 @@ landscape.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id)
   return landscape.view.entity
 end
 
-landscape.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pass_id)
+landscape.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id)
 
+  g:print('adding entity : '..p_entity_id)
   landscape.view.entity, landscape.view.renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {wireframe_rendering=p_pass_id})
   landscape.view.renderer:register_to_rendering(p_rendergraph)
 
@@ -169,25 +171,27 @@ landscape.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pa
   return landscape.view.entity
 end
 
-landscape.trashmodelview = function(p_rendergraph, p_entitygraph)
+landscape.trashmodelview = function(p_rendergraph, p_entitygraph, p_entity_id)
+
+  g:print('trashing entity : '..p_entity_id)
   commons.trash.meshe(p_rendergraph, landscape.view.entity, landscape.view.renderer)
   p_entitygraph:remove('landscape.view.entity')
 end
 
 
-landscape.view.unload = function()
-  model.view.unload(landscape.trashmodelview)
+landscape.view.unload = function(p_entity_id)
+  model.view.unload(landscape.trashmodelview,p_entity_id)
 end
 
-landscape.view.load = function()
-  landscape.view.lit.load()
+landscape.view.load = function(p_entity_id)
+  landscape.view.lit.load(p_entity_id)
 end
 
 
-landscape.view.lit.load = function()
-  model.view.load(landscape.createlitmodelview, landscape.update_lit_from_scene_env)
+landscape.view.lit.load = function(p_entity_id)
+  model.view.load(landscape.createlitmodelview, landscape.update_lit_from_scene_env, p_entity_id)
 end
 
-landscape.view.wireframe.load = function()
-  model.view.load(landscape.createwireframemodelview, landscape.update_wireframe_from_scene_env)
+landscape.view.wireframe.load = function(p_entity_id)
+  model.view.load(landscape.createwireframemodelview, landscape.update_wireframe_from_scene_env, p_entity_id)
 end

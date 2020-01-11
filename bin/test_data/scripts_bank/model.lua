@@ -265,9 +265,9 @@ model.dump.show = function(entity)
 end
 
 
-model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function, p_render_context, p_material)
+model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function, p_entity_id)
 
-  model.entity = p_modelviewload_function(rg, eg, 'texture_pass', p_render_context, p_material)
+  model.entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id)
   p_update_from_scene_env_function( 'texture_pass', environment)
 
   model.pos_mat:translation( 0.0, 0.0, 0.0 )  
@@ -290,11 +290,11 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
   rg:update_renderingqueues()
 end
 
-model.view.unload = function(p_modelunload_function)
+model.view.unload = function(p_modelunload_function,p_entity_id)
 
   model.transform:release()
 
-  p_modelunload_function(rg, eg)
+  p_modelunload_function(rg, eg, p_entity_id)
   rg:update_renderingqueues()
 
   model.entity = nil
