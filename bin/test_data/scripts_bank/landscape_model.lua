@@ -8,6 +8,9 @@ landscape.view = {}
 landscape.view.lit = {}
 landscape.view.wireframe = {}
 
+-- stockage des instances modeles : paire {entity, renderer}
+landscape.models = {}
+
 
 landscape.rendering_config = 
 { 
@@ -150,12 +153,20 @@ end
 landscape.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id)
 
   g:print('adding entity : '..p_entity_id)
+  
+
   landscape.view.entity, landscape.view.renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {lit_rendering=p_pass_id})
   landscape.view.renderer:register_to_rendering(p_rendergraph)
 
-  p_entitygraph:add_child('root','landscape.view.entity',landscape.view.entity)
+  p_entitygraph:add_child('root',p_entity_id,landscape.view.entity)
 
   commons.apply_material( landscape.lit_material, landscape.view.renderer, p_pass_id)
+
+  local pair = {}
+  pair['entity'] = landscape.view.entity
+  pair['renderer'] = landscape.view.renderer
+
+  landscape.models[p_entity_id] = pair
 
   return landscape.view.entity
 end
@@ -166,7 +177,13 @@ landscape.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pa
   landscape.view.entity, landscape.view.renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {wireframe_rendering=p_pass_id})
   landscape.view.renderer:register_to_rendering(p_rendergraph)
 
-  p_entitygraph:add_child('root','landscape.view.entity',landscape.view.entity)
+  p_entitygraph:add_child('root',p_entity_id,landscape.view.entity)
+
+  local pair = {}
+  pair['entity'] = landscape.view.entity
+  pair['renderer'] = landscape.view.renderer
+  
+  landscape.models[p_entity_id] = pair
 
   return landscape.view.entity
 end
@@ -175,12 +192,37 @@ landscape.trashmodelview = function(p_rendergraph, p_entitygraph, p_entity_id)
 
   g:print('trashing entity : '..p_entity_id)
   commons.trash.meshe(p_rendergraph, landscape.view.entity, landscape.view.renderer)
-  p_entitygraph:remove('landscape.view.entity')
+  p_entitygraph:remove(p_entity_id)
+
+  landscape.models[p_entity_id] = nil
+end
+
+landscape.dump.models = function()
+  g:print('landscape.dump.models BEGIN')
+
+  for k, v in pairs(landscape.models) do
+    g:print("landscape entity instance : "..k)
+  end
+
+  g:print('landscape.dump.models END')
 end
 
 
 landscape.view.unload = function(p_entity_id)
-  model.view.unload(landscape.trashmodelview,p_entity_id)
+ 
+  found_id = FALSE
+  for k, v in pairs(landscape.models) do
+
+    if k == p_entity_id then
+	  found_id = TRUE
+	end
+  end
+
+  if found_id == TRUE then
+     model.view.unload(landscape.trashmodelview,p_entity_id)
+  else
+    g:print('Unknown entity '..p_entity_id)
+  end
 end
 
 landscape.view.load = function(p_entity_id)
