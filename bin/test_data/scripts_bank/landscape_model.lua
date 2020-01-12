@@ -125,88 +125,90 @@ landscape.dump.show = function()
    model.dump.show(landscape.dump.entity)
 end
 
-landscape.update_lit_from_scene_env = function( p_pass_id, p_environment_table )
+landscape.update_lit_from_scene_env = function( p_pass_id, p_environment_table, p_entity_id )
 
-	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'ambient_color', p_environment_table.ambient_light.r, p_environment_table.ambient_light.g, p_environment_table.ambient_light.b, p_environment_table.ambient_light.a )
-	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'lights_enabled', p_environment_table.lights_enabled.x, p_environment_table.lights_enabled.y, p_environment_table.lights_enabled.z, p_environment_table.lights_enabled.w )
-	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'light0_color', p_environment_table.light0.color.r, p_environment_table.light0.color.g, p_environment_table.light0.color.b, p_environment_table.light0.color.a )
-	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'light0_dir', p_environment_table.light0.direction.x, p_environment_table.light0.direction.y, p_environment_table.light0.direction.z, p_environment_table.light0.direction.w )
+    local renderer = landscape.models[p_entity_id]['renderer']
 
-	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'light0_dir_v', p_environment_table.light0.direction.x, p_environment_table.light0.direction.y, p_environment_table.light0.direction.z, p_environment_table.light0.direction.w )
-	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'lights_enabled_v', p_environment_table.lights_enabled.x, p_environment_table.lights_enabled.y, p_environment_table.lights_enabled.z, p_environment_table.lights_enabled.w )
+	renderer:set_shaderrealvector( p_pass_id, 'ambient_color', p_environment_table.ambient_light.r, p_environment_table.ambient_light.g, p_environment_table.ambient_light.b, p_environment_table.ambient_light.a )
+	renderer:set_shaderrealvector( p_pass_id, 'lights_enabled', p_environment_table.lights_enabled.x, p_environment_table.lights_enabled.y, p_environment_table.lights_enabled.z, p_environment_table.lights_enabled.w )
+	renderer:set_shaderrealvector( p_pass_id, 'light0_color', p_environment_table.light0.color.r, p_environment_table.light0.color.g, p_environment_table.light0.color.b, p_environment_table.light0.color.a )
+	renderer:set_shaderrealvector( p_pass_id, 'light0_dir', p_environment_table.light0.direction.x, p_environment_table.light0.direction.y, p_environment_table.light0.direction.z, p_environment_table.light0.direction.w )
 
+	renderer:set_shaderrealvector( p_pass_id, 'light0_dir_v', p_environment_table.light0.direction.x, p_environment_table.light0.direction.y, p_environment_table.light0.direction.z, p_environment_table.light0.direction.w )
+	renderer:set_shaderrealvector( p_pass_id, 'lights_enabled_v', p_environment_table.lights_enabled.x, p_environment_table.lights_enabled.y, p_environment_table.lights_enabled.z, p_environment_table.lights_enabled.w )
 	
-	landscape.view.renderer:set_shaderrealinvector( p_pass_id, 'flags_v', 0, p_environment_table.mirror)
-	landscape.view.renderer:set_shaderrealinvector( p_pass_id, 'flags_v', 1, p_environment_table.fog_intensity)
+	renderer:set_shaderrealinvector( p_pass_id, 'flags_v', 0, p_environment_table.mirror)
+	renderer:set_shaderrealinvector( p_pass_id, 'flags_v', 1, p_environment_table.fog_intensity)
 	
-	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'fog_color', p_environment_table.fog_color.r, p_environment_table.fog_color.g, p_environment_table.fog_color.b, 1.0 )
+	renderer:set_shaderrealvector( p_pass_id, 'fog_color', p_environment_table.fog_color.r, p_environment_table.fog_color.g, p_environment_table.fog_color.b, 1.0 )
 		
-	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'reflectorPos', p_environment_table.reflector_pos.x, p_environment_table.reflector_pos.y, p_environment_table.reflector_pos.z, 1.0 )
-	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'reflectorNormale', p_environment_table.reflector_normale.x, p_environment_table.reflector_normale.y, p_environment_table.reflector_normale.z, 1.0 )
+	renderer:set_shaderrealvector( p_pass_id, 'reflectorPos', p_environment_table.reflector_pos.x, p_environment_table.reflector_pos.y, p_environment_table.reflector_pos.z, 1.0 )
+	renderer:set_shaderrealvector( p_pass_id, 'reflectorNormale', p_environment_table.reflector_normale.x, p_environment_table.reflector_normale.y, p_environment_table.reflector_normale.z, 1.0 )
 end
 
-landscape.update_wireframe_from_scene_env = function( p_pass_id, p_environment_table )
+landscape.update_wireframe_from_scene_env = function( p_pass_id, p_environment_table, p_entity_id )
 
-	landscape.view.renderer:set_shaderrealvector( p_pass_id, 'color', 1.0, 1.0, 1.0, 1.0 )
+    local renderer = landscape.models[p_entity_id]['renderer']
+
+	renderer:set_shaderrealvector( p_pass_id, 'color', 1.0, 1.0, 1.0, 1.0 )
 end
 
 landscape.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id)
-
-  g:print('adding entity : '..p_entity_id)
   
+  local entity
+  local renderer
 
-  landscape.view.entity, landscape.view.renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {lit_rendering=p_pass_id})
-  landscape.view.renderer:register_to_rendering(p_rendergraph)
+  entity, renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {lit_rendering=p_pass_id})
+  renderer:register_to_rendering(p_rendergraph)
 
-  p_entitygraph:add_child('root',p_entity_id,landscape.view.entity)
+  p_entitygraph:add_child('root',p_entity_id,entity)
 
-  commons.apply_material( landscape.lit_material, landscape.view.renderer, p_pass_id)
+  commons.apply_material( landscape.lit_material, renderer, p_pass_id)
 
   local pair = {}
-  pair['entity'] = landscape.view.entity
-  pair['renderer'] = landscape.view.renderer
+  pair['entity'] = entity
+  pair['renderer'] = renderer
 
   landscape.models[p_entity_id] = pair
 
-  return landscape.view.entity
+  return entity
 end
 
 landscape.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id)
 
-  g:print('adding entity : '..p_entity_id)
-  landscape.view.entity, landscape.view.renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {wireframe_rendering=p_pass_id})
-  landscape.view.renderer:register_to_rendering(p_rendergraph)
+  local entity
+  local renderer
 
-  p_entitygraph:add_child('root',p_entity_id,landscape.view.entity)
+ entity, renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {wireframe_rendering=p_pass_id})
+  renderer:register_to_rendering(p_rendergraph)
+
+  p_entitygraph:add_child('root',p_entity_id,entity)
 
   local pair = {}
-  pair['entity'] = landscape.view.entity
-  pair['renderer'] = landscape.view.renderer
+  pair['entity'] = entity
+  pair['renderer'] = renderer
   
   landscape.models[p_entity_id] = pair
 
-  return landscape.view.entity
+  return entity
 end
 
 landscape.trashmodelview = function(p_rendergraph, p_entitygraph, p_entity_id)
 
-  g:print('trashing entity : '..p_entity_id)
-  commons.trash.meshe(p_rendergraph, landscape.view.entity, landscape.view.renderer)
+  local entity = landscape.models[p_entity_id]['entity']
+  local renderer = landscape.models[p_entity_id]['renderer']
+
+  commons.trash.meshe(p_rendergraph, entity, renderer)
   p_entitygraph:remove(p_entity_id)
 
   landscape.models[p_entity_id] = nil
 end
 
-landscape.dump.models = function()
-  g:print('landscape.dump.models BEGIN')
-
+landscape.models.dump = function()
   for k, v in pairs(landscape.models) do
-    g:print("landscape entity instance : "..k)
-  end
-
-  g:print('landscape.dump.models END')
+    g:print("landscape entity instance -> "..k)
+  end  
 end
-
 
 landscape.view.unload = function(p_entity_id)
  

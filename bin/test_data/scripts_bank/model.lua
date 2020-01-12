@@ -267,8 +267,8 @@ end
 
 model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function, p_entity_id)
 
-  model.entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id)
-  p_update_from_scene_env_function( 'texture_pass', environment)
+  local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id)
+  p_update_from_scene_env_function( 'texture_pass', environment, p_entity_id)
 
   model.pos_mat:translation( 0.0, 0.0, 0.0 )  
   model.scale_mat:scale( 1.0, 1.0, 1.0 )
@@ -280,7 +280,7 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
 
   model.transformation_input_mode = MODEL_TRANSFORMATION_INPUTMODE_NONE
 
-  model.transform:configure(model.entity)
+  model.transform:configure(entity)
   model.transform:add_matrix( "scale", model.scale_mat )
   model.transform:add_matrix( "roty", model.roty_mat )
   model.transform:add_matrix( "rotx", model.rotx_mat )
@@ -297,12 +297,8 @@ model.view.unload = function(p_modelunload_function,p_entity_id)
   p_modelunload_function(rg, eg, p_entity_id)
   rg:update_renderingqueues()
 
-  model.entity = nil
   model.transform = nil
 end
-
-
-
 
 
 g:show_mousecursor(FALSE)
