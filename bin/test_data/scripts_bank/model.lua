@@ -189,18 +189,6 @@ function()
   local output_infos = "[MODEL VIEWER]    " ..renderer:descr() .." "..time_infos[3].. " fps "..time_infos[2].." timescale = "..timescale
   text_renderer:update(10, 30, 255, 0, 0, output_infos)
 
-  
-  local pos_x = model.pos_mat:get_value(3,0)
-  local pos_y = model.pos_mat:get_value(3,1)
-  local pos_z = model.pos_mat:get_value(3,2)
-  local scale_x = model.scale_mat:get_value(0,0)
-  local scale_y = model.scale_mat:get_value(1,1)
-  local scale_z = model.scale_mat:get_value(2,2)
-
-  local move_infos = "pos = "..pos_x.." "..pos_y.." "..pos_z.." scale = "..scale_x.." "..scale_y.." "..scale_z.." rot = "..model.rotx_deg_angle.." "..model.roty_deg_angle.." "..model.rotz_deg_angle
-  move_renderer:update(10, 70, 255, 0, 0, move_infos)
-  
-
   local mvt_info = { camera_mvt:read() }
   camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
@@ -270,34 +258,78 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
   local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id)
   p_update_from_scene_env_function( 'texture_pass', environment, p_entity_id)
 
-  model.pos_mat:translation( 0.0, 0.0, 0.0 )  
-  model.scale_mat:scale( 1.0, 1.0, 1.0 )
-  model.rotx_mat:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(model.rotx_deg_angle))
-  model.roty_mat:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(model.roty_deg_angle))
-  model.rotz_mat:rotation(0.0, 0.0, 1.0, commons.utils.deg_to_rad(model.rotz_deg_angle))
 
-  model.transform = RawTransform()
+  local rotx_deg_angle = 0.0
+  local roty_deg_angle = 0.0
+  local rotz_deg_angle = 0.0
 
-  model.transformation_input_mode = MODEL_TRANSFORMATION_INPUTMODE_NONE
 
-  model.transform:configure(entity)
-  model.transform:add_matrix( "scale", model.scale_mat )
-  model.transform:add_matrix( "roty", model.roty_mat )
-  model.transform:add_matrix( "rotx", model.rotx_mat )
-  model.transform:add_matrix( "rotz", model.rotz_mat )
-  model.transform:add_matrix( "pos", model.pos_mat )
+  local pos_mat = Matrix()
+  pos_mat:translation( 0.0, 0.0, 0.0 )
+
+  local scale_mat = Matrix()
+  scale_mat:scale( 1.0, 1.0, 1.0 )
+
+  local rotx_mat = Matrix()
+  rotx_mat:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(rotx_deg_angle))
+
+  local roty_mat = Matrix()
+  roty_mat:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(roty_deg_angle))
+
+  local rotz_mat = Matrix()
+  rotz_mat:rotation(0.0, 0.0, 1.0, commons.utils.deg_to_rad(rotz_deg_angle))
+
+
+  local transform = RawTransform()
+
+  transform:configure(entity)
   
+  transform:add_matrix( "scale", scale_mat )
+  transform:add_matrix( "roty", roty_mat )
+  transform:add_matrix( "rotx", rotx_mat )
+  transform:add_matrix( "rotz", rotz_mat )
+  transform:add_matrix( "pos", pos_mat )
+  
+  local transform_entry = 
+  { 
+    ['pos_mat'] = pos_mat,
+	['scale_mat'] = scale_mat,
+	['rotx_mat'] = rotx_mat,
+	['roty_mat'] = roty_mat,
+	['rotz_mat'] = rotz_mat,
+	['rotx_deg_angle'] = rotx_deg_angle,
+	['roty_deg_angle'] = roty_deg_angle,
+	['rotz_deg_angle'] = rotz_deg_angle,
+	['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_NONE,
+    ['transform'] = transform 	
+  }
+  
+  model.transformations[p_entity_id] = transform_entry
+
   rg:update_renderingqueues()
 end
 
 model.view.unload = function(p_modelunload_function,p_entity_id)
 
-  model.transform:release()
+  local transform_entry = model.transformations[p_entity_id]
+
+  local transform = transform_entry['transform']
+  transform:release()
+
+  transform_entry['pos_mat'] = nil
+  transform_entry['scale_mat'] = nil
+  transform_entry['rotx_mat'] = nil
+  transform_entry['roty_mat'] = nil
+  transform_entry['rotz_mat'] = nil
+
 
   p_modelunload_function(rg, eg, p_entity_id)
   rg:update_renderingqueues()
 
-  model.transform = nil
+  transform_entry['transform'] = nil
+
+  model.transformations[p_entity_id] = nil
+
 end
 
 

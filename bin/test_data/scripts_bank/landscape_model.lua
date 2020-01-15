@@ -184,9 +184,7 @@ landscape.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pa
 
   p_entitygraph:add_child('root',p_entity_id,entity)
 
-  local pair = {}
-  pair['entity'] = entity
-  pair['renderer'] = renderer
+  local pair = { ['entity'] = entity, ['renderer'] = renderer }
   
   landscape.models[p_entity_id] = pair
 
@@ -200,6 +198,10 @@ landscape.trashmodelview = function(p_rendergraph, p_entitygraph, p_entity_id)
 
   commons.trash.meshe(p_rendergraph, entity, renderer)
   p_entitygraph:remove(p_entity_id)
+
+  local pair = landscape.models[p_entity_id]
+  pair['entity'] = nil
+  pair['renderer'] = nil
 
   landscape.models[p_entity_id] = nil
 end
@@ -228,7 +230,20 @@ landscape.view.unload = function(p_entity_id)
 end
 
 landscape.view.load = function(p_entity_id)
-  landscape.view.lit.load(p_entity_id)
+
+  found_id = FALSE
+  for k, v in pairs(landscape.models) do
+
+    if k == p_entity_id then
+	  found_id = TRUE
+	end
+  end
+
+  if found_id == TRUE then
+    g:print('Entity '..p_entity_id..' already exists')
+  else
+    landscape.view.lit.load(p_entity_id)
+  end  
 end
 
 
