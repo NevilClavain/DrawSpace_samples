@@ -189,6 +189,30 @@ function()
   local output_infos = "[MODEL VIEWER]    " ..renderer:descr() .." "..time_infos[3].. " fps "..time_infos[2].." timescale = "..timescale
   text_renderer:update(10, 30, 255, 0, 0, output_infos)
 
+  local move_infos = ""
+
+  if model.transformation_target_entity_id ~= "" then
+
+     local transform_entry = model.transformations[model.transformation_target_entity_id]
+
+     local pos_x = transform_entry['pos_mat']:get_value(3,0)
+	 local pos_y = transform_entry['pos_mat']:get_value(3,1)
+	 local pos_z = transform_entry['pos_mat']:get_value(3,2)
+
+	 local scale_x = transform_entry['scale_mat']:get_value(0,0)
+	 local scale_y = transform_entry['scale_mat']:get_value(1,1)
+	 local scale_z = transform_entry['scale_mat']:get_value(2,2)
+
+	 local rot_x = transform_entry['rotx_deg_angle']
+	 local rot_y = transform_entry['roty_deg_angle']
+	 local rot_z = transform_entry['rotz_deg_angle']
+
+	 move_infos = model.transformation_target_entity_id.. " rot = "..rot_x.. " "..rot_y.." "..rot_z.." pos = "..pos_x.." "..pos_y.." "..pos_z.." scale = "..scale_x.. " "..scale_y.." "..scale_z
+
+  end
+
+  move_renderer:update(15, 70, 255, 255, 255, move_infos)
+
   local mvt_info = { camera_mvt:read() }
   camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 

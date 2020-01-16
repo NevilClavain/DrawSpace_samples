@@ -1,12 +1,9 @@
 
 
-
-
 model.move = {}
 model.transformations = {}
 
 model.transformation_target_entity_id = ""
-
 
 --[[
 une entree :
@@ -110,6 +107,7 @@ transformations_update = function(p_delta)
   end
 
   if transform_entry['transformation_input_mode'] == MODEL_TRANSFORMATION_INPUTMODE_SCALEXYZ then
+
     local scale_x = transform_entry['scale_mat']:get_value(0,0)
 	local scale_y = transform_entry['scale_mat']:get_value(1,1)
 	local scale_z = transform_entry['scale_mat']:get_value(2,2)
@@ -212,61 +210,66 @@ end
 
 
 
-model.move.resetpos = function()
+model.move.resetpos = function(p_entity_id)
 
---[[
-  local pos_x = model.pos_mat:get_value(3,0)
-  local pos_y = model.pos_mat:get_value(3,1)
-  local pos_z = model.pos_mat:get_value(3,2)
+  local transform_entry = model.transformations[p_entity_id]
+
+  local pos_x = transform_entry['pos_mat']:get_value(3,0)
+  local pos_y = transform_entry['pos_mat']:get_value(3,1)
+  local pos_z = transform_entry['pos_mat']:get_value(3,2)
 
   pos_x = 0
   pos_y = 0
   pos_z = 0
 
-  model.pos_mat:set_value(3,0,pos_x)
-  model.pos_mat:set_value(3,1,pos_y)
-  model.pos_mat:set_value(3,2,pos_z)
+  transform_entry['pos_mat']:set_value(3,0,pos_x) 
+  transform_entry['pos_mat']:set_value(3,1,pos_y) 
+  transform_entry['pos_mat']:set_value(3,2,pos_z) 
 
-  model.transform:update_matrix("pos",model.pos_mat)
-  ]]
+  local transform = transform_entry['transform']
+
+  transform:update_matrix("pos",transform_entry['pos_mat'])
+end
+
+model.move.resetrot = function(p_entity_id)
+
+  local transform_entry = model.transformations[p_entity_id]
+
+  transform_entry['rotx_deg_angle'] = 0
+  transform_entry['roty_deg_angle'] = 0
+  transform_entry['rotz_deg_angle'] = 0
+
+  transform_entry['rotx_mat']:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(transform_entry['rotx_deg_angle']))
+  transform_entry['roty_mat']:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(transform_entry['roty_deg_angle']))
+  transform_entry['rotz_mat']:rotation(0.0, 0.0, 1.0, commons.utils.deg_to_rad(transform_entry['rotz_deg_angle']))
+
+  local transform = transform_entry['transform']
+
+  transform:update_matrix("rotx",transform_entry['rotx_mat'])
+  transform:update_matrix("roty",transform_entry['roty_mat'])
+  transform:update_matrix("rotz",transform_entry['rotz_mat'])
 
 end
 
-model.move.resetrot = function()
+model.move.resetscale = function(p_entity_id)
 
---[[
-  model.rotx_deg_angle = 0
-  model.roty_deg_angle = 0
-  model.rotz_deg_angle = 0
+  local transform_entry = model.transformations[p_entity_id]
 
-  model.rotx_mat:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(model.rotx_deg_angle))
-  model.roty_mat:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(model.roty_deg_angle))
-  model.rotz_mat:rotation(0.0, 0.0, 1.0, commons.utils.deg_to_rad(model.rotz_deg_angle))
-
-  model.transform:update_matrix("rotx",model.rotx_mat)
-  model.transform:update_matrix("roty",model.roty_mat)
-  model.transform:update_matrix("rotz",model.rotz_mat)
-  ]]
-
-end
-
-model.move.resetscale = function()
-
---[[
-  local scale_x = model.scale_mat:get_value(0,0)
-  local scale_y = model.scale_mat:get_value(1,1)
-  local scale_z = model.scale_mat:get_value(2,2)
+  local scale_x = transform_entry['scale_mat']:get_value(0,0)
+  local scale_y = transform_entry['scale_mat']:get_value(1,1)
+  local scale_z = transform_entry['scale_mat']:get_value(2,2)
 
   scale_x = 1
   scale_y = 1
   scale_z = 1
 
-  model.scale_mat:set_value(0,0,scale_x)
-  model.scale_mat:set_value(1,1,scale_y)
-  model.scale_mat:set_value(2,2,scale_z)
+  transform_entry['scale_mat']:set_value(0,0,scale_x) 
+  transform_entry['scale_mat']:set_value(1,1,scale_y) 
+  transform_entry['scale_mat']:set_value(2,2,scale_z)
 
-  model.transform:update_matrix("scale",model.scale_mat)
-  ]]
+  local transform = transform_entry['transform']
+
+  transform:update_matrix("scale",transform_entry['scale_mat'])
 
 end
 
