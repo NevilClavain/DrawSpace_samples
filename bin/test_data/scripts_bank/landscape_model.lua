@@ -179,7 +179,7 @@ landscape.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pa
   local entity
   local renderer
 
- entity, renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {wireframe_rendering=p_pass_id})
+  entity, renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {wireframe_rendering=p_pass_id})
   renderer:register_to_rendering(p_rendergraph)
 
   p_entitygraph:add_child('root',p_entity_id,entity)
