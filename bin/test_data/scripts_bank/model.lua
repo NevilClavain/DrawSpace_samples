@@ -266,11 +266,9 @@ model.dump.show = function(entity)
 
 	g:print('Animations : ')
     local anims_id_list = { entity:read_meshesfiledescription(i, 'anims_list') }
-	for k, v in pairs(anims_id_list) do
-	  g:print(k.. ' - ' ..v)
-
+	for k, v in pairs(anims_id_list) do	 
       local anim_infos = { entity:read_meshesfiledescription(i, 'anim', k) }
-      g:print('name = '..anim_infos[1]..' ticks/sec = '..anim_infos[2]..' duration = '..anim_infos[3]..'s number of channels = '..anim_infos[4])
+      g:print(k.. ' - ' ..v..' name = '..anim_infos[1]..' ticks/sec = '..anim_infos[2]..' duration = '..anim_infos[3]..'s number of channels = '..anim_infos[4])
 	end
   end
 
