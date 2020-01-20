@@ -275,11 +275,10 @@ model.dump.show = function(entity)
 end
 
 
-model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function, p_entity_id)
+model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function, p_initial_scale, p_entity_id)
 
   local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id)
   p_update_from_scene_env_function( 'texture_pass', environment, p_entity_id)
-
 
   local rotx_deg_angle = 0.0
   local roty_deg_angle = 0.0
@@ -290,7 +289,14 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
   pos_mat:translation( 0.0, 0.0, 0.0 )
 
   local scale_mat = Matrix()
-  scale_mat:scale( 1.0, 1.0, 1.0 )
+
+  if p_initial_scale ~= nil then
+    scale_mat:scale( p_initial_scale['x'], p_initial_scale['y'], p_initial_scale['z'] )
+  else
+    scale_mat:scale( 1.0, 1.0, 1.0 )
+  end
+
+  
 
   local rotx_mat = Matrix()
   rotx_mat:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(rotx_deg_angle))

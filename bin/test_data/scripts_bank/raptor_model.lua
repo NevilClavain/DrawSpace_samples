@@ -119,6 +119,12 @@ raptor.lit_material =
 	--bump_mapping = { texture_size = 1024, bias = 0.193 }
 }
 
+
+raptor.scale = 
+{
+	x = 0.12, y = 0.12, z = 0.12
+}
+
 raptor.dump.load = function()
    raptor.dump.entity = model.dump.load('raptor.dump.entity','raptor.fbx')
 end
@@ -254,9 +260,9 @@ raptor.view.load = function(p_entity_id)
 end
 
 raptor.view.lit.load = function(p_entity_id)
-  model.view.load(raptor.createlitmodelview, raptor.update_lit_from_scene_env, p_entity_id)
+  model.view.load(raptor.createlitmodelview, raptor.update_lit_from_scene_env, raptor.scale, p_entity_id)
 end
 
 raptor.view.wireframe.load = function(p_entity_id)
-  model.view.load(raptor.createwireframemodelview, raptor.update_wireframe_from_scene_env, p_entity_id)
+  model.view.load(raptor.createwireframemodelview, raptor.update_wireframe_from_scene_env, raptor.scale, p_entity_id)
 end
