@@ -15,7 +15,7 @@ lights =
 	light0 = 
 	{
 		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-		direction = { x = -1.0, y = -0.5, z = 0.0, w = 1.0 },
+		direction = { x = -1.0, y = 0.0, z = 0.0, w = 1.0 },
 	}
 }
 
@@ -197,7 +197,7 @@ dino_entity_config =
 	},
 }
 
---dino_entity, dino_renderer = commons.create_rendered_meshe(dino_entity_config, 'raptor.fbx', 'raptorMesh')
+--dino_entity, dino_renderer = commons.create_rendered_meshe(dino_entity_config, 'raptor.fbx', 'raptorMesh', {main_rendering='texture_pass'})
 dino_entity, dino_renderer = commons.create_rendered_meshe(dino_entity_config, 'Trex.fbx', 'trexMesh', {main_rendering='texture_pass'})
 
 dino_renderer:set_shaderrealinvector( 'texture_pass', 'flags_v', 2, 1.0)
@@ -387,10 +387,10 @@ rand_engine:set_seedfromtime()
 
 rand_anim_mode = FALSE;
 main_idle_anim = 9
-rand_anims = {8, 10, 11, 12, 13, 14 }
+rand_anims = { 1, 2, 3, 4, 5, 8, 10, 11, 12, 13, 14 }
 
 do_something=Distribution("uniform_int_distribution", 1, 2)
-dino_action=Distribution("uniform_int_distribution", 1, 6)
+dino_action=Distribution("uniform_int_distribution", 1, 11)
 
 
 
