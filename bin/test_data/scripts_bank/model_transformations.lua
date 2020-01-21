@@ -41,6 +41,10 @@ MODEL_TRANSFORMATION_INPUTMODE_SCALEXYZ = 9
 
 transformations_update = function(p_delta)
 
+  if model.transformation_target_entity_id == "" then
+    return
+  end
+
   local transform_entry = model.transformations[model.transformation_target_entity_id]
 
   if transform_entry['transformation_input_mode'] == MODEL_TRANSFORMATION_INPUTMODE_POSX then
