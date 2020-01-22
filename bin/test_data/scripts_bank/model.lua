@@ -9,6 +9,10 @@ model.dump.meshes = {}
 
 model.view = {}
 
+model.entities = {}
+
+model.anims = {}
+
 include("model_transformations.lua")
 
 environment = 
@@ -218,6 +222,13 @@ function()
 
 end)
 
+g:add_animationeventcb( "onanimationevent",
+function( event, animation_name )
+  if event == ANIMATION_END then
+     g:breakpoint(animation_name)
+  end
+end)
+
 
 g:signal_renderscenebegin("eg")
 
@@ -333,6 +344,7 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
   }
   
   model.transformations[p_entity_id] = transform_entry
+  model.entities[p_entity_id] = entity
 
   rg:update_renderingqueues()
 end
@@ -357,7 +369,26 @@ model.view.unload = function(p_modelunload_function,p_entity_id)
   transform_entry['transform'] = nil
 
   model.transformations[p_entity_id] = nil
+  model.entities[p_entity_id] = nil
 
+end
+
+model.anims.run = function(p_entity_id, p_index)
+ 
+  local entity = model.entities[p_entity_id]
+  local animations_names = {entity:read_animationsnames()}
+  entity:push_animation(animations_names[p_index])
+
+end
+
+model.anims.dump = function(p_entity_id)
+
+  local entity = model.entities[p_entity_id]
+  animations_names = {entity:read_animationsnames()}
+
+  for k, v in pairs(animations_names) do
+	g:print('animation '..k..' ->'..v)
+  end	
 end
 
 

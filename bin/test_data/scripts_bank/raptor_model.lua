@@ -299,11 +299,3 @@ end
 raptor.view.wireframe.load = function(p_entity_id)
   model.view.load(raptor.createwireframemodelview, raptor.update_from_scene_env, raptor.scale, p_entity_id)
 end
-
-raptor.run_anim = function(p_entity_id, p_index)
- 
-  local entity = raptor.models[p_entity_id]['entity']
-  local animations_names = {entity:read_animationsnames()}
-  entity:push_animation(animations_names[p_index])
-
-end
