@@ -417,7 +417,7 @@ end
 
 g:add_animationeventcb( "onanimationevent",
 function( event, animation_name )
-  if event == 1 then
+  if event == ANIMATION_END then
 
     if rand_anim_mode == TRUE then
 	  current_animation_loop = compute_random_anim_index(do_something, dino_action, rand_engine)
