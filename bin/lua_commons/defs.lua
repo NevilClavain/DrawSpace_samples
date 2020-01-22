@@ -119,6 +119,9 @@ TB_AUTO = 1
 TB_FROMLOADER = 2
 TB_COMPUTED = 3
 
+ANIMATION_BEGIN = 0
+ANIMATION_END = 1
+
 
 print_memsize=function() 
 	g:print('Total mem = '..g:total_mem()..' byte(s)') 
