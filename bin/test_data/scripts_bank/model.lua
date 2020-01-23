@@ -345,7 +345,14 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
   }
   
   model.transformations[p_entity_id] = transform_entry
-  model.entities[p_entity_id] = entity
+
+  local entity_properties_entry =
+  {
+    ['entity'] = entity,
+	['current_animation_loop'] = -1
+  }
+
+  model.entities[p_entity_id] = entity_properties_entry
 
   rg:update_renderingqueues()
 end
@@ -370,13 +377,18 @@ model.view.unload = function(p_modelunload_function,p_entity_id)
   transform_entry['transform'] = nil
 
   model.transformations[p_entity_id] = nil
+
+  local entity_properties_entry = model.entities[p_entity_id]
+  entity_properties_entry['entity'] = nil
+
   model.entities[p_entity_id] = nil
 
 end
 
 model.anims.run = function(p_entity_id, p_index)
  
-  local entity = model.entities[p_entity_id]
+  local entity_properties_entry = model.entities[p_entity_id]
+  local entity = entity_properties_entry['entity']
   local animations_names = {entity:read_animationsnames()}
   entity:push_animation(animations_names[p_index])
 
@@ -384,7 +396,8 @@ end
 
 model.anims.dump = function(p_entity_id)
 
-  local entity = model.entities[p_entity_id]
+  local entity_properties_entry = model.entities[p_entity_id]
+  local entity = entity_properties_entry['entity']
   animations_names = {entity:read_animationsnames()}
 
   for k, v in pairs(animations_names) do
