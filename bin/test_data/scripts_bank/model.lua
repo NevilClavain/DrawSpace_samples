@@ -15,6 +15,7 @@ model.anims = {}
 
 include("model_transformations.lua")
 
+
 environment = 
 {
 	ambient_light = {r = 0.15, g = 0.15, b = 0.15, a = 0.0 },
@@ -396,4 +397,13 @@ g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
 
 g:signal_renderscenebegin("eg")
+
+
+
+if modelscenefile ~= "" then
+    g:print('Loading scene file : '..modelscenefile)
+	g:do_file(modelscenefile)
+else
+    g:print('No scene file')
+end
 
