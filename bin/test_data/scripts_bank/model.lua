@@ -224,9 +224,11 @@ function()
 end)
 
 g:add_animationeventcb( "onanimationevent",
-function( event, animation_name )
+function( id, event, animation_name )
   if event == ANIMATION_END then
-     g:breakpoint(animation_name)
+	 if model.entities[id]['current_animation_loop'] ~= -1 then
+	    model.anims.run(id, model.entities[id]['current_animation_loop'])
+	 end
   end
 end)
 
@@ -391,7 +393,11 @@ model.anims.run = function(p_entity_id, p_index)
   local entity = entity_properties_entry['entity']
   local animations_names = {entity:read_animationsnames()}
   entity:push_animation(animations_names[p_index])
+end
 
+model.anims.runloop = function(p_entity_id, p_index)
+  model.entities[p_entity_id]['current_animation_loop'] = p_index
+  model.anims.run(p_entity_id, p_index)
 end
 
 model.anims.dump = function(p_entity_id)

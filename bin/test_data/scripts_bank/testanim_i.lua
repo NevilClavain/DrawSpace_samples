@@ -205,6 +205,7 @@ dino_entity:add_aspect(ANIMATION_ASPECT)
 
 
 dino_entity:configure_animationbones()
+dino_entity:update_animationeventsid('dino_entity')
 
 dino_renderer:register_to_rendering(rg)
 eg:add_child('root','dino_entity',dino_entity)
@@ -416,7 +417,7 @@ end
 )
 
 g:add_animationeventcb( "onanimationevent",
-function( event, animation_name )
+function( id, event, animation_name )
   if event == ANIMATION_END then
 
     if rand_anim_mode == TRUE then

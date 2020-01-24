@@ -198,6 +198,7 @@ raptor.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_
   
   entity:add_aspect(ANIMATION_ASPECT)
   entity:configure_animationbones()
+  entity:update_animationeventsid(p_entity_id)
 
   p_entitygraph:add_child('root',p_entity_id,entity)
 
@@ -222,6 +223,7 @@ raptor.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pass_
 
   entity:add_aspect(ANIMATION_ASPECT)
   entity:configure_animationbones()
+  entity:update_animationeventsid(p_entity_id)
 
   p_entitygraph:add_child('root',p_entity_id,entity)
 
