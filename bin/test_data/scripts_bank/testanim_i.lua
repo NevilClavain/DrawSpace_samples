@@ -489,7 +489,7 @@ end
 
 compute_random_anim_index = function(p_do_something_generator, p_action_generator, p_random_engine)
   
-   index = p_do_something_generator:generate(p_random_engine)
+   local index = p_do_something_generator:generate(p_random_engine)
 
    if index == 2 then      
 	  return rand_anims[p_action_generator:generate(p_random_engine)]
