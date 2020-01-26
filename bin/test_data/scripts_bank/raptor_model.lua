@@ -8,6 +8,8 @@ raptor.view = {}
 raptor.view.lit = {}
 raptor.view.wireframe = {}
 
+raptor.anims = {}
+
 -- stockage des instances modeles : paire {entity, renderer}
 raptor.models = {}
 
@@ -148,6 +150,7 @@ raptor.scale =
 {
 	x = 0.12, y = 0.12, z = 0.12
 }
+
 
 raptor.dump.load = function()
    raptor.dump.entity = model.dump.load('raptor.dump.entity','raptor.fbx')
@@ -300,4 +303,18 @@ end
 
 raptor.view.wireframe.load = function(p_entity_id)
   model.view.load(raptor.createwireframemodelview, raptor.update_from_scene_env, raptor.scale, p_entity_id)
+end
+
+
+raptor.anims.rand = function(p_entity_id)
+  local random_anims = 
+  {	
+	1,2,5,6,8
+  }
+  local idle_anim = 9
+
+  local do_something=Distribution("uniform_int_distribution", 1, 2)
+  local dino_action=Distribution("uniform_int_distribution", 1, 5)
+
+  model.anims.rand(p_entity_id, idle_anim, random_anims, do_something, dino_action)
 end
