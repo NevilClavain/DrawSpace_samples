@@ -19,7 +19,6 @@ local animations_rand_engine=RandomEngine()
 animations_rand_engine:set_seedfromtime()
 
 
-
 environment = 
 {
 	ambient_light = {r = 0.15, g = 0.15, b = 0.15, a = 0.0 },
@@ -69,6 +68,10 @@ text_renderer:configure(root_entity, "fps", 10, 40, 255, 0, 255, "??? fps")
 
 move_renderer=TextRendering()
 move_renderer:configure(root_entity, "move", 10, 60, 255, 0, 255, "...")
+
+dbg_renderer=TextRendering()
+dbg_renderer:configure(root_entity, "debug", 10, 100, 255, 0, 255, "...")
+dbg_string = "debugme"
 
 root_entity:add_aspect(PHYSICS_ASPECT)
 root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
@@ -222,6 +225,9 @@ function()
 
   move_renderer:update(15, 70, 255, 255, 255, move_infos)
 
+  dbg_renderer:update(15, 110, 0, 255, 0, dbg_string)
+
+
   local mvt_info = { camera_mvt:read() }
   camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
@@ -238,23 +244,31 @@ local compute_random_anim_index = function(p_do_something_generator, p_action_ge
 
       return p_main_idle_anim 
    end
+   
 end
 
 g:add_animationeventcb( "onanimationevent",
 function( id, event, animation_name )
   if event == ANIMATION_END then
   
+	 --dbg_string = animation_name..'-> '..id..' rand anim mode '..model.entities[id]['rand_anim_mode']..' current_animation_loop '..model.entities[id]['current_animation_loop'].. ' pool size = '.. model.entities[id]['entity']:read_animationpoolsize()
 
-     if model.entities[id]['rand_anim_mode'] == TRUE then
+	 if animation_name ~= "transition_animation" then
 
-	   local selected_index = compute_random_anim_index(model.entities[id]['do_something_distribution'], model.entities[id]['anim_action_distribution'], animations_rand_engine, model.entities[id]['rand_anims'], model.entities[id]['main_idle_anim'])
-       model.entities[id]['current_animation_loop'] = selected_index
-	 end
-	 
+       if model.entities[id]['rand_anim_mode'] == TRUE then
 
-	 if model.entities[id]['current_animation_loop'] ~= -1 then
-	    model.anims.run(id, model.entities[id]['current_animation_loop'])
-	 end
+	     local selected_index = compute_random_anim_index(model.entities[id]['do_something_distribution'], model.entities[id]['anim_action_distribution'], animations_rand_engine, model.entities[id]['rand_anims'], model.entities[id]['main_idle_anim'])
+         model.entities[id]['current_animation_loop'] = selected_index
+	     model.anims.run(id, model.entities[id]['current_animation_loop'])
+
+	   else
+
+	     if model.entities[id]['current_animation_loop'] ~= -1 then	   
+	       model.anims.run(id, model.entities[id]['current_animation_loop'])
+	     end
+
+	   end
+     end
   end
 end)
 
@@ -442,6 +456,11 @@ model.anims.rand = function(p_entity_id, p_main_idle_anim, p_rand_anims, p_dosom
 
 
   model.anims.run(p_entity_id, selected_index)
+end
+
+model.anims.stop = function(p_entity_id)
+    model.entities[p_entity_id]['rand_anim_mode'] = FALSE
+	model.entities[p_entity_id]['current_animation_loop'] = -1
 end
 
 model.anims.dump = function(p_entity_id)
