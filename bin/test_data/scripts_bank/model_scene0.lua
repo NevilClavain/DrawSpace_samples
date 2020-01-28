@@ -9,5 +9,6 @@
 	raptor.view.load('r')
 	trex.view.load('t')
 
-    model.move.setpos('r', -15, 0, 0)
+    model.move.setpos('r', -45, 0, 0)
+	model.move.setpos('landscape', 0, 4.0, 0)
 	

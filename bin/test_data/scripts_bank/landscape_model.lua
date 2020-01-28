@@ -248,9 +248,9 @@ end
 
 
 landscape.view.lit.load = function(p_entity_id)
-  model.view.load(landscape.createlitmodelview, landscape.update_lit_from_scene_env, nil, p_entity_id)
+  model.view.load(landscape.createlitmodelview, landscape.update_lit_from_scene_env, { x = 30.0, y = 30.0, z = 30.0 }, p_entity_id)
 end
 
 landscape.view.wireframe.load = function(p_entity_id)
-  model.view.load(landscape.createwireframemodelview, landscape.update_wireframe_from_scene_env, nil, p_entity_id)
+  model.view.load(landscape.createwireframemodelview, landscape.update_wireframe_from_scene_env, { x = 30.0, y = 30.0, z = 30.0 }, p_entity_id)
 end
