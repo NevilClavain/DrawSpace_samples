@@ -277,3 +277,9 @@ model.move.resetscale = function(p_entity_id)
 
 end
 
+model.move.setpos = function(p_entity_id, x, y, z)
+  model.transformations[p_entity_id]['pos_mat']:set_value(3,0,x) 
+  model.transformations[p_entity_id]['pos_mat']:set_value(3,1,y) 
+  model.transformations[p_entity_id]['pos_mat']:set_value(3,2,z) 
+  model.transformations[p_entity_id]['transform']:update_matrix("pos",model.transformations['r']['pos_mat'])
+end

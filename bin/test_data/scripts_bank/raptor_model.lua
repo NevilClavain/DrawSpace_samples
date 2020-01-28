@@ -307,6 +307,7 @@ end
 
 
 raptor.anims.rand = function(p_entity_id)
+
   local random_anims = 
   {	
 	1,2,5,6,8
