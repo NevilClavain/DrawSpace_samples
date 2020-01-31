@@ -203,22 +203,25 @@ function()
 
   if model.transformation_target_entity_id ~= "" then
 
-     local transform_entry = model.transformations[model.transformation_target_entity_id]
+    if model.transformations[model.transformation_target_entity_id] ~= nil then
 
-     local pos_x = transform_entry['pos_mat']:get_value(3,0)
-	 local pos_y = transform_entry['pos_mat']:get_value(3,1)
-	 local pos_z = transform_entry['pos_mat']:get_value(3,2)
+      local transform_entry = model.transformations[model.transformation_target_entity_id]
 
-	 local scale_x = transform_entry['scale_mat']:get_value(0,0)
-	 local scale_y = transform_entry['scale_mat']:get_value(1,1)
-	 local scale_z = transform_entry['scale_mat']:get_value(2,2)
+      local pos_x = transform_entry['pos_mat']:get_value(3,0)
+	  local pos_y = transform_entry['pos_mat']:get_value(3,1)
+	  local pos_z = transform_entry['pos_mat']:get_value(3,2)
 
-	 local rot_x = transform_entry['rotx_deg_angle']
-	 local rot_y = transform_entry['roty_deg_angle']
-	 local rot_z = transform_entry['rotz_deg_angle']
+	  local scale_x = transform_entry['scale_mat']:get_value(0,0)
+	  local scale_y = transform_entry['scale_mat']:get_value(1,1)
+	  local scale_z = transform_entry['scale_mat']:get_value(2,2)
 
-	 move_infos = model.transformation_target_entity_id.. " rot = "..rot_x.. " "..rot_y.." "..rot_z.." pos = "..pos_x.." "..pos_y.." "..pos_z.." scale = "..scale_x.. " "..scale_y.." "..scale_z
+	  local rot_x = transform_entry['rotx_deg_angle']
+	  local rot_y = transform_entry['roty_deg_angle']
+	  local rot_z = transform_entry['rotz_deg_angle']
 
+	  move_infos = model.transformation_target_entity_id.. " rot = "..rot_x.. " "..rot_y.." "..rot_z.." pos = "..pos_x.." "..pos_y.." "..pos_z.." scale = "..scale_x.. " "..scale_y.." "..scale_z
+
+	end
   end
 
   move_renderer:update(15, 70, 255, 255, 255, move_infos)
@@ -318,59 +321,64 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
   local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id)
   p_update_from_scene_env_function( 'texture_pass', environment, p_entity_id)
 
-  local rotx_deg_angle = 0.0
-  local roty_deg_angle = 0.0
-  local rotz_deg_angle = 0.0
+  --if p_isphysicbody_model == FALSE then
+
+    local rotx_deg_angle = 0.0
+    local roty_deg_angle = 0.0
+    local rotz_deg_angle = 0.0
 
 
-  local pos_mat = Matrix()
-  pos_mat:translation( 0.0, 0.0, 0.0 )
+    local pos_mat = Matrix()
+    pos_mat:translation( 0.0, 0.0, 0.0 )
 
-  local scale_mat = Matrix()
+    local scale_mat = Matrix()
 
-  if p_initial_scale ~= nil then
-    scale_mat:scale( p_initial_scale['x'], p_initial_scale['y'], p_initial_scale['z'] )
-  else
-    scale_mat:scale( 1.0, 1.0, 1.0 )
-  end
+    if p_initial_scale ~= nil then
+      scale_mat:scale( p_initial_scale['x'], p_initial_scale['y'], p_initial_scale['z'] )
+    else
+      scale_mat:scale( 1.0, 1.0, 1.0 )
+    end
 
+    local rotx_mat = Matrix()
+    rotx_mat:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(rotx_deg_angle))
+
+    local roty_mat = Matrix()
+    roty_mat:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(roty_deg_angle))
+
+    local rotz_mat = Matrix()
+    rotz_mat:rotation(0.0, 0.0, 1.0, commons.utils.deg_to_rad(rotz_deg_angle))
+
+    local transform = RawTransform()
+
+    transform:configure(entity)
   
-
-  local rotx_mat = Matrix()
-  rotx_mat:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(rotx_deg_angle))
-
-  local roty_mat = Matrix()
-  roty_mat:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(roty_deg_angle))
-
-  local rotz_mat = Matrix()
-  rotz_mat:rotation(0.0, 0.0, 1.0, commons.utils.deg_to_rad(rotz_deg_angle))
-
-
-  local transform = RawTransform()
-
-  transform:configure(entity)
+    transform:add_matrix( "scale", scale_mat )
+    transform:add_matrix( "roty", roty_mat )
+    transform:add_matrix( "rotx", rotx_mat )
+    transform:add_matrix( "rotz", rotz_mat )
+    transform:add_matrix( "pos", pos_mat )
   
-  transform:add_matrix( "scale", scale_mat )
-  transform:add_matrix( "roty", roty_mat )
-  transform:add_matrix( "rotx", rotx_mat )
-  transform:add_matrix( "rotz", rotz_mat )
-  transform:add_matrix( "pos", pos_mat )
+    local transform_entry = 
+    { 
+      ['pos_mat'] = pos_mat,
+  	  ['scale_mat'] = scale_mat,
+	  ['rotx_mat'] = rotx_mat,
+	  ['roty_mat'] = roty_mat,
+	  ['rotz_mat'] = rotz_mat,
+	  ['rotx_deg_angle'] = rotx_deg_angle,
+	  ['roty_deg_angle'] = roty_deg_angle,
+  	  ['rotz_deg_angle'] = rotz_deg_angle,
+	  ['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_NONE,
+      ['transform'] = transform 	
+    }
   
-  local transform_entry = 
-  { 
-    ['pos_mat'] = pos_mat,
-	['scale_mat'] = scale_mat,
-	['rotx_mat'] = rotx_mat,
-	['roty_mat'] = roty_mat,
-	['rotz_mat'] = rotz_mat,
-	['rotx_deg_angle'] = rotx_deg_angle,
-	['roty_deg_angle'] = roty_deg_angle,
-	['rotz_deg_angle'] = rotz_deg_angle,
-	['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_NONE,
-    ['transform'] = transform 	
-  }
-  
-  model.transformations[p_entity_id] = transform_entry
+    model.transformations[p_entity_id] = transform_entry
+
+  --else
+
+    --model.transformations[p_entity_id] = nil
+  --end
+
 
   local entity_properties_entry =
   {
@@ -388,29 +396,32 @@ end
 
 model.view.unload = function(p_modelunload_function,p_entity_id)
 
-  local transform_entry = model.transformations[p_entity_id]
+  if model.transformations[p_entity_id] ~= nil then
 
-  local transform = transform_entry['transform']
-  transform:release()
+    local transform_entry = model.transformations[p_entity_id]
 
-  transform_entry['pos_mat'] = nil
-  transform_entry['scale_mat'] = nil
-  transform_entry['rotx_mat'] = nil
-  transform_entry['roty_mat'] = nil
-  transform_entry['rotz_mat'] = nil
+    local transform = transform_entry['transform']
+    transform:release()
 
+    transform_entry['pos_mat'] = nil
+    transform_entry['scale_mat'] = nil
+    transform_entry['rotx_mat'] = nil
+    transform_entry['roty_mat'] = nil
+    transform_entry['rotz_mat'] = nil
 
-  p_modelunload_function(rg, eg, p_entity_id)
-  rg:update_renderingqueues()
+    p_modelunload_function(rg, eg, p_entity_id)
+    rg:update_renderingqueues()
 
-  transform_entry['transform'] = nil
+    transform_entry['transform'] = nil
 
-  model.transformations[p_entity_id] = nil
+    model.transformations[p_entity_id] = nil
 
-  local entity_properties_entry = model.entities[p_entity_id]
-  entity_properties_entry['entity'] = nil
+    local entity_properties_entry = model.entities[p_entity_id]
+    entity_properties_entry['entity'] = nil
 
-  model.entities[p_entity_id] = nil
+    model.entities[p_entity_id] = nil
+
+  end
 
 end
 
