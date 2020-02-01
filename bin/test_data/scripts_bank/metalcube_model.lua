@@ -205,6 +205,6 @@ metalcube.view.load = function(p_entity_id)
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.load(metalcube.createlitmodelview, metalcube.update_from_scene_env, nil, p_entity_id)
+    model.view.load(metalcube.createlitmodelview, metalcube.update_from_scene_env, nil, p_entity_id, TRUE)
   end  
 end

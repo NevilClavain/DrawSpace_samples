@@ -13,5 +13,4 @@
 
     model.move.setpos('r', -45, 0, 0)
 	model.move.setpos('landscape', 0, 4.0, 0)
-	model.move.setpos('c', 0, 20.0, -60.0)
 	

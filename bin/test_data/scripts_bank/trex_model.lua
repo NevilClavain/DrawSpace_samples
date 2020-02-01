@@ -291,11 +291,11 @@ trex.view.load = function(p_entity_id)
 end
 
 trex.view.lit.load = function(p_entity_id)
-  model.view.load(trex.createlitmodelview, trex.update_from_scene_env, trex.scale, p_entity_id)
+  model.view.load(trex.createlitmodelview, trex.update_from_scene_env, trex.scale, p_entity_id, FALSE)
 end
 
 trex.view.wireframe.load = function(p_entity_id)
-  model.view.load(trex.createwireframemodelview, trex.update_from_scene_env, trex.scale, p_entity_id)
+  model.view.load(trex.createwireframemodelview, trex.update_from_scene_env, trex.scale, p_entity_id, FALSE)
 end
 
 trex.anims.rand = function(p_entity_id)

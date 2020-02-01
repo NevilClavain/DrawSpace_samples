@@ -72,7 +72,7 @@ dbg_renderer:configure(root_entity, "debug", 10, 100, 255, 0, 255, "...")
 dbg_string = "debugme"
 
 root_entity:add_aspect(PHYSICS_ASPECT)
-root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
+--root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
 
 camera_entity, camera_mvt=commons.create_free_camera(0.0, 1.70, 6.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
 
@@ -316,17 +316,16 @@ model.dump.show = function(entity)
 end
 
 
-model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function, p_initial_scale, p_entity_id)
+model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function, p_initial_scale, p_entity_id, p_isbody)
 
   local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id)
   p_update_from_scene_env_function( 'texture_pass', environment, p_entity_id)
 
-  --if p_isphysicbody_model == FALSE then
+  if p_isbody == FALSE then
 
     local rotx_deg_angle = 0.0
     local roty_deg_angle = 0.0
     local rotz_deg_angle = 0.0
-
 
     local pos_mat = Matrix()
     pos_mat:translation( 0.0, 0.0, 0.0 )
@@ -334,9 +333,9 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
     local scale_mat = Matrix()
 
     if p_initial_scale ~= nil then
-      scale_mat:scale( p_initial_scale['x'], p_initial_scale['y'], p_initial_scale['z'] )
+	  scale_mat:scale( p_initial_scale['x'], p_initial_scale['y'], p_initial_scale['z'] )
     else
-      scale_mat:scale( 1.0, 1.0, 1.0 )
+  	  scale_mat:scale( 1.0, 1.0, 1.0 )
     end
 
     local rotx_mat = Matrix()
@@ -357,10 +356,10 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
     transform:add_matrix( "rotx", rotx_mat )
     transform:add_matrix( "rotz", rotz_mat )
     transform:add_matrix( "pos", pos_mat )
-  
+      
     local transform_entry = 
     { 
-      ['pos_mat'] = pos_mat,
+  	  ['pos_mat'] = pos_mat,
   	  ['scale_mat'] = scale_mat,
 	  ['rotx_mat'] = rotx_mat,
 	  ['roty_mat'] = roty_mat,
@@ -369,15 +368,15 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
 	  ['roty_deg_angle'] = roty_deg_angle,
   	  ['rotz_deg_angle'] = rotz_deg_angle,
 	  ['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_NONE,
-      ['transform'] = transform 	
+	  ['transform'] = transform 	
     }
   
     model.transformations[p_entity_id] = transform_entry
 
   --else
-
     --model.transformations[p_entity_id] = nil
-  --end
+  end
+
 
 
   local entity_properties_entry =
@@ -409,19 +408,18 @@ model.view.unload = function(p_modelunload_function,p_entity_id)
     transform_entry['roty_mat'] = nil
     transform_entry['rotz_mat'] = nil
 
-    p_modelunload_function(rg, eg, p_entity_id)
-    rg:update_renderingqueues()
-
     transform_entry['transform'] = nil
 
     model.transformations[p_entity_id] = nil
-
-    local entity_properties_entry = model.entities[p_entity_id]
-    entity_properties_entry['entity'] = nil
-
-    model.entities[p_entity_id] = nil
-
   end
+
+  p_modelunload_function(rg, eg, p_entity_id)
+  rg:update_renderingqueues()
+
+  local entity_properties_entry = model.entities[p_entity_id]
+  entity_properties_entry['entity'] = nil
+
+  model.entities[p_entity_id] = nil
 
 end
 
