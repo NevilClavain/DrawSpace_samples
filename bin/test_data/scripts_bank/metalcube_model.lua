@@ -112,7 +112,7 @@ metalcube.update_from_scene_env = function( p_pass_id, p_environment_table, p_en
 
 end
 
-metalcube.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id)
+metalcube.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id, p_initialpos)
   
   local entity
   local renderer
@@ -128,7 +128,7 @@ metalcube.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id,
   cube_body:configure_shape( SHAPE_BOX, 0.5, 0.5, 0.5)
 
   local cube_pos_mat = Matrix()
-  --cube_pos_mat:translation( 0.7, 9.0, -15.0 )
+  cube_pos_mat:translation( p_initialpos.x, p_initialpos.y, p_initialpos.z )
   cube_body:configure_attitude(cube_pos_mat)
   cube_body:configure_mass(7.0)
   cube_body:configure_mode(BODY_MODE)
@@ -192,7 +192,7 @@ metalcube.view.unload = function(p_entity_id)
   end
 end
 
-metalcube.view.load = function(p_entity_id)
+metalcube.view.load = function(p_entity_id, p_initialpos)
 
   found_id = FALSE
   for k, v in pairs(metalcube.models) do
@@ -205,6 +205,6 @@ metalcube.view.load = function(p_entity_id)
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.load(metalcube.createlitmodelview, metalcube.update_from_scene_env, nil, p_entity_id, TRUE)
+    model.view.loadbody(metalcube.createlitmodelview, metalcube.update_from_scene_env, nil, p_entity_id, p_initialpos)
   end  
 end

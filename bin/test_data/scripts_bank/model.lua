@@ -316,68 +316,62 @@ model.dump.show = function(entity)
 end
 
 
-model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function, p_initial_scale, p_entity_id, p_isbody)
+model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function, p_initial_scale, p_entity_id)
 
-  local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id)
+  local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id, p_bodyinitialpos)
+
   p_update_from_scene_env_function( 'texture_pass', environment, p_entity_id)
 
-  if p_isbody == FALSE then
 
-    local rotx_deg_angle = 0.0
-    local roty_deg_angle = 0.0
-    local rotz_deg_angle = 0.0
+  local rotx_deg_angle = 0.0
+  local roty_deg_angle = 0.0
+  local rotz_deg_angle = 0.0
 
-    local pos_mat = Matrix()
-    pos_mat:translation( 0.0, 0.0, 0.0 )
+  local pos_mat = Matrix()
+  pos_mat:translation( 0.0, 0.0, 0.0 )
 
-    local scale_mat = Matrix()
+  local scale_mat = Matrix()
 
-    if p_initial_scale ~= nil then
-	  scale_mat:scale( p_initial_scale['x'], p_initial_scale['y'], p_initial_scale['z'] )
-    else
-  	  scale_mat:scale( 1.0, 1.0, 1.0 )
-    end
-
-    local rotx_mat = Matrix()
-    rotx_mat:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(rotx_deg_angle))
-
-    local roty_mat = Matrix()
-    roty_mat:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(roty_deg_angle))
-
-    local rotz_mat = Matrix()
-    rotz_mat:rotation(0.0, 0.0, 1.0, commons.utils.deg_to_rad(rotz_deg_angle))
-
-    local transform = RawTransform()
-
-    transform:configure(entity)
-  
-    transform:add_matrix( "scale", scale_mat )
-    transform:add_matrix( "roty", roty_mat )
-    transform:add_matrix( "rotx", rotx_mat )
-    transform:add_matrix( "rotz", rotz_mat )
-    transform:add_matrix( "pos", pos_mat )
-      
-    local transform_entry = 
-    { 
-  	  ['pos_mat'] = pos_mat,
-  	  ['scale_mat'] = scale_mat,
-	  ['rotx_mat'] = rotx_mat,
-	  ['roty_mat'] = roty_mat,
-	  ['rotz_mat'] = rotz_mat,
-	  ['rotx_deg_angle'] = rotx_deg_angle,
-	  ['roty_deg_angle'] = roty_deg_angle,
-  	  ['rotz_deg_angle'] = rotz_deg_angle,
-	  ['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_NONE,
-	  ['transform'] = transform 	
-    }
-  
-    model.transformations[p_entity_id] = transform_entry
-
-  --else
-    --model.transformations[p_entity_id] = nil
+  if p_initial_scale ~= nil then
+	scale_mat:scale( p_initial_scale['x'], p_initial_scale['y'], p_initial_scale['z'] )
+  else
+  	scale_mat:scale( 1.0, 1.0, 1.0 )
   end
 
+  local rotx_mat = Matrix()
+  rotx_mat:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(rotx_deg_angle))
 
+  local roty_mat = Matrix()
+  roty_mat:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(roty_deg_angle))
+
+  local rotz_mat = Matrix()
+  rotz_mat:rotation(0.0, 0.0, 1.0, commons.utils.deg_to_rad(rotz_deg_angle))
+
+  local transform = RawTransform()
+
+  transform:configure(entity)
+  
+  transform:add_matrix( "scale", scale_mat )
+  transform:add_matrix( "roty", roty_mat )
+  transform:add_matrix( "rotx", rotx_mat )
+  transform:add_matrix( "rotz", rotz_mat )
+  transform:add_matrix( "pos", pos_mat )
+      
+  local transform_entry = 
+  { 
+  	['pos_mat'] = pos_mat,
+  	['scale_mat'] = scale_mat,
+	['rotx_mat'] = rotx_mat,
+	['roty_mat'] = roty_mat,
+	['rotz_mat'] = rotz_mat,
+	['rotx_deg_angle'] = rotx_deg_angle,
+	['roty_deg_angle'] = roty_deg_angle,
+  	['rotz_deg_angle'] = rotz_deg_angle,
+	['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_NONE,
+	['transform'] = transform 	
+  }
+  
+  model.transformations[p_entity_id] = transform_entry
 
   local entity_properties_entry =
   {
@@ -392,6 +386,27 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
 
   rg:update_renderingqueues()
 end
+
+model.view.loadbody = function(p_modelviewload_function, p_update_from_scene_env_function, p_initial_scale, p_entity_id, p_bodyinitialpos)
+
+  local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id, p_bodyinitialpos)
+
+  p_update_from_scene_env_function( 'texture_pass', environment, p_entity_id)
+
+  local entity_properties_entry =
+  {
+    ['entity'] = entity,
+	['current_animation_loop'] = -1,
+	['rand_anim_mode'] = FALSE,
+	['rand_anims'] = {},
+	['main_idle_anim'] = 0
+  }
+
+  model.entities[p_entity_id] = entity_properties_entry
+
+  rg:update_renderingqueues()
+end
+
 
 model.view.unload = function(p_modelunload_function,p_entity_id)
 

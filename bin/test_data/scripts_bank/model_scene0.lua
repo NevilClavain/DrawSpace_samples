@@ -9,7 +9,7 @@
 
 	raptor.view.load('r')
 	trex.view.load('t')
-	metalcube.view.load('c')
+	metalcube.view.load('c', {x = -60.0, y = 30.0, z = 0.0} )
 
     model.move.setpos('r', -45, 0, 0)
 	model.move.setpos('landscape', 0, 4.0, 0)
