@@ -11,6 +11,8 @@ model.view = {}
 
 model.entities = {}
 
+model.env = {}
+
 include("model_transformations.lua")
 include("model_anims.lua")
 
@@ -38,6 +40,8 @@ environment =
 	mirror = 0,
 	reflector_pos = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
 	reflector_normale = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
+
+	gravity = { x = 0.0, y = -9.81, z = 0.0}
 }
 
 ctrl_key = FALSE
@@ -72,7 +76,6 @@ dbg_renderer:configure(root_entity, "debug", 10, 100, 255, 0, 255, "...")
 dbg_string = "debugme"
 
 root_entity:add_aspect(PHYSICS_ASPECT)
---root_entity:configure_world(GRAVITY_ENABLED, 0.0, -9.81, 0.0)
 
 camera_entity, camera_mvt=commons.create_free_camera(0.0, 1.70, 6.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
 
@@ -447,9 +450,16 @@ g:signal_renderscenebegin("eg")
 
 
 if modelscenefile ~= "" then
-    g:print('Loading scene file : '..modelscenefile)
-	g:do_file(modelscenefile)
+  g:print('Loading scene file : '..modelscenefile)
+  g:do_file(modelscenefile)
 else
-    g:print('No scene file')
+  g:print('No scene file')
 end
 
+model.env.setgravity = function( p_state )
+  if p_state == TRUE then
+    root_entity:configure_world(GRAVITY_ENABLED, environment.gravity.x, environment.gravity.y, environment.gravity.z )
+  else
+    root_entity:configure_world(GRAVITY_DISABLED, environment.gravity.x, environment.gravity.y, environment.gravity.z )
+  end
+end
