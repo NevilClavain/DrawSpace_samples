@@ -113,7 +113,7 @@ landscape.lit_material =
 }
 
 landscape.dump.load = function()
-   landscape.dump.entity = model.dump.load('landscape.dump.entity','land2.ac')
+   landscape.dump.entity = model.dump.load('landscape.dump.entity','land2_large.ac')
 end
 
 landscape.dump.unload = function()
@@ -158,7 +158,7 @@ landscape.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id,
   local entity
   local renderer
 
-  entity, renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {lit_rendering=p_pass_id})
+  entity, renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2_large.ac', 'wavefront obj', {lit_rendering=p_pass_id})
   renderer:register_to_rendering(p_rendergraph)
 
   p_entitygraph:add_child('root',p_entity_id,entity)
@@ -179,7 +179,7 @@ landscape.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pa
   local entity
   local renderer
 
-  entity, renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2.ac', 'wavefront obj', {wireframe_rendering=p_pass_id})
+  entity, renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2_large.ac', 'wavefront obj', {wireframe_rendering=p_pass_id})
   renderer:register_to_rendering(p_rendergraph)
 
   p_entitygraph:add_child('root',p_entity_id,entity)
@@ -248,9 +248,9 @@ end
 
 
 landscape.view.lit.load = function(p_entity_id)
-  model.view.load(landscape.createlitmodelview, landscape.update_lit_from_scene_env, { x = 30.0, y = 30.0, z = 30.0 }, p_entity_id)
+  model.view.load(landscape.createlitmodelview, landscape.update_lit_from_scene_env, nil, p_entity_id)
 end
 
 landscape.view.wireframe.load = function(p_entity_id)
-  model.view.load(landscape.createwireframemodelview, landscape.update_wireframe_from_scene_env, { x = 30.0, y = 30.0, z = 30.0 }, p_entity_id)
+  model.view.load(landscape.createwireframemodelview, landscape.update_wireframe_from_scene_env, nil, p_entity_id)
 end
