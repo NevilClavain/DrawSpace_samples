@@ -144,7 +144,7 @@ trex.wireframe_material =
 
 trex.scale = 
 {
-	x = 0.12, y = 0.12, z = 0.12
+	x = 0.06, y = 0.06, z = 0.06
 }
 
 trex.dump.load = function()

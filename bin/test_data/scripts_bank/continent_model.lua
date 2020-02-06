@@ -1,18 +1,18 @@
 
 
-landscape = {}
+continent = {}
 
-landscape.dump = {}
-landscape.view = {}
+continent.dump = {}
+continent.view = {}
 
-landscape.view.lit = {}
-landscape.view.wireframe = {}
+continent.view.lit = {}
+continent.view.wireframe = {}
 
 -- stockage des instances modeles : paire {entity, renderer}
-landscape.models = {}
+continent.models = {}
 
 
-landscape.rendering_config = 
+continent.rendering_config = 
 { 
     lit_rendering = 
 	{
@@ -36,7 +36,7 @@ landscape.rendering_config =
 		{
 			[1] = 
 			{
-				{ path='012b2su2.jpg', stage=0 },
+				{ path='DefaultMaterial_albedo.jpg', stage=0 },
 				{ path='grass_bump.bmp', stage=1 }
 			}
 		},
@@ -102,32 +102,30 @@ landscape.rendering_config =
 	},
 }
 
-landscape.lit_material =
+continent.lit_material =
 {
-	--specular_power = 429.0,
 	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
 	simple_color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
 	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 	self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
-	--bump_mapping = { texture_size = 1024, bias = 0.193 }
 }
 
-landscape.dump.load = function()
-   landscape.dump.entity = model.dump.load('landscape.dump.entity','land2_large.ac')
+continent.dump.load = function()
+   continent.dump.entity = model.dump.load('continent.dump.entity','continent.ac')
 end
 
-landscape.dump.unload = function()
-   landscape.dump.entity = model.dump.unload(landscape.dump.entity)
-   landscape.dump.entity = nil;
+continent.dump.unload = function()
+   continent.dump.entity = model.dump.unload(continent.dump.entity)
+   continent.dump.entity = nil;
 end
 
-landscape.dump.show = function()
-   model.dump.show(landscape.dump.entity)
+continent.dump.show = function()
+   model.dump.show(continent.dump.entity)
 end
 
-landscape.update_lit_from_scene_env = function( p_pass_id, p_environment_table, p_entity_id )
+continent.update_lit_from_scene_env = function( p_pass_id, p_environment_table, p_entity_id )
 
-    local renderer = landscape.models[p_entity_id]['renderer']
+    local renderer = continent.models[p_entity_id]['renderer']
 
 	renderer:set_shaderrealvector( p_pass_id, 'ambient_color', p_environment_table.ambient_light.r, p_environment_table.ambient_light.g, p_environment_table.ambient_light.b, p_environment_table.ambient_light.a )
 	renderer:set_shaderrealvector( p_pass_id, 'lights_enabled', p_environment_table.lights_enabled.x, p_environment_table.lights_enabled.y, p_environment_table.lights_enabled.z, p_environment_table.lights_enabled.w )
@@ -146,76 +144,76 @@ landscape.update_lit_from_scene_env = function( p_pass_id, p_environment_table, 
 	renderer:set_shaderrealvector( p_pass_id, 'reflectorNormale', p_environment_table.reflector_normale.x, p_environment_table.reflector_normale.y, p_environment_table.reflector_normale.z, 1.0 )
 end
 
-landscape.update_wireframe_from_scene_env = function( p_pass_id, p_environment_table, p_entity_id )
+continent.update_wireframe_from_scene_env = function( p_pass_id, p_environment_table, p_entity_id )
 
-    local renderer = landscape.models[p_entity_id]['renderer']
+    local renderer = continent.models[p_entity_id]['renderer']
 
 	renderer:set_shaderrealvector( p_pass_id, 'color', 1.0, 1.0, 1.0, 1.0 )
 end
 
-landscape.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id)
+continent.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id)
   
   local entity
   local renderer
 
-  entity, renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2_large.ac', 'wavefront obj', {lit_rendering=p_pass_id})
+  entity, renderer = commons.create_rendered_meshe(continent.rendering_config, 'continent.ac', 'g TerrainMesh', {lit_rendering=p_pass_id})
   renderer:register_to_rendering(p_rendergraph)
 
   p_entitygraph:add_child('root',p_entity_id,entity)
 
-  commons.apply_material( landscape.lit_material, renderer, p_pass_id)
+  commons.apply_material( continent.lit_material, renderer, p_pass_id)
 
   local pair = {}
   pair['entity'] = entity
   pair['renderer'] = renderer
 
-  landscape.models[p_entity_id] = pair
+  continent.models[p_entity_id] = pair
 
   return entity
 end
 
-landscape.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id)
+continent.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id)
 
   local entity
   local renderer
 
-  entity, renderer = commons.create_rendered_meshe(landscape.rendering_config, 'land2_large.ac', 'wavefront obj', {wireframe_rendering=p_pass_id})
+  entity, renderer = commons.create_rendered_meshe(continent.rendering_config, 'continent.ac', 'g TerrainMesh', {wireframe_rendering=p_pass_id})
   renderer:register_to_rendering(p_rendergraph)
 
   p_entitygraph:add_child('root',p_entity_id,entity)
 
   local pair = { ['entity'] = entity, ['renderer'] = renderer }
   
-  landscape.models[p_entity_id] = pair
+  continent.models[p_entity_id] = pair
 
   return entity
 end
 
-landscape.trashmodelview = function(p_rendergraph, p_entitygraph, p_entity_id)
+continent.trashmodelview = function(p_rendergraph, p_entitygraph, p_entity_id)
 
-  local entity = landscape.models[p_entity_id]['entity']
-  local renderer = landscape.models[p_entity_id]['renderer']
+  local entity = continent.models[p_entity_id]['entity']
+  local renderer = continent.models[p_entity_id]['renderer']
 
   commons.trash.meshe(p_rendergraph, entity, renderer)
   p_entitygraph:remove(p_entity_id)
 
-  local pair = landscape.models[p_entity_id]
+  local pair = continent.models[p_entity_id]
   pair['entity'] = nil
   pair['renderer'] = nil
 
-  landscape.models[p_entity_id] = nil
+  continent.models[p_entity_id] = nil
 end
 
-landscape.models.dump = function()
-  for k, v in pairs(landscape.models) do
-    g:print("landscape entity instance -> "..k)
+continent.models.dump = function()
+  for k, v in pairs(continent.models) do
+    g:print("continent entity instance -> "..k)
   end  
 end
 
-landscape.view.unload = function(p_entity_id)
+continent.view.unload = function(p_entity_id)
  
   found_id = FALSE
-  for k, v in pairs(landscape.models) do
+  for k, v in pairs(continent.models) do
 
     if k == p_entity_id then
 	  found_id = TRUE
@@ -223,16 +221,16 @@ landscape.view.unload = function(p_entity_id)
   end
 
   if found_id == TRUE then
-     model.view.unload(landscape.trashmodelview,p_entity_id)
+     model.view.unload(continent.trashmodelview,p_entity_id)
   else
     g:print('Unknown entity '..p_entity_id)
   end
 end
 
-landscape.view.load = function(p_entity_id)
+continent.view.load = function(p_entity_id)
 
   found_id = FALSE
-  for k, v in pairs(landscape.models) do
+  for k, v in pairs(continent.models) do
 
     if k == p_entity_id then
 	  found_id = TRUE
@@ -242,15 +240,15 @@ landscape.view.load = function(p_entity_id)
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    landscape.view.lit.load(p_entity_id)
+    continent.view.lit.load(p_entity_id)
   end  
 end
 
 
-landscape.view.lit.load = function(p_entity_id)
-  model.view.load(landscape.createlitmodelview, landscape.update_lit_from_scene_env, nil, p_entity_id)
+continent.view.lit.load = function(p_entity_id)
+  model.view.load(continent.createlitmodelview, continent.update_lit_from_scene_env, nil, p_entity_id)
 end
 
-landscape.view.wireframe.load = function(p_entity_id)
-  model.view.load(landscape.createwireframemodelview, landscape.update_wireframe_from_scene_env, nil, p_entity_id)
+continent.view.wireframe.load = function(p_entity_id)
+  model.view.load(continent.createwireframemodelview, continent.update_wireframe_from_scene_env, nil, p_entity_id)
 end

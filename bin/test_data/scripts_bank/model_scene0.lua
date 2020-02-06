@@ -1,16 +1,18 @@
 
 
-	g:do_file('landscape_model.lua')
+	g:do_file('continent_model.lua')
+
+	
 	g:do_file('raptor_model.lua')
 	g:do_file('trex_model.lua')
 	g:do_file('metalcube_model.lua')
-
-	landscape.view.load('landscape')
-
+	
+	continent.view.load('continent')
+	
 	raptor.view.load('r')
 	trex.view.load('t')
-	metalcube.view.load('c', {x = -60.0, y = 30.0, z = 0.0} )
+	metalcube.view.load('c', {x = -4010.0, y = 5.0, z = -2740.0} )
 
-    model.move.setpos('r', -45, 0, 0)
-	model.move.setpos('landscape', 0, 4.0, 0)
-	
+    model.move.setpos('r', -4020.0, 0, -2740)
+	model.move.setpos('t', -4068.0, 0, -2740)
+	--model.move.setpos('landscape', 0, 0.0, 0)

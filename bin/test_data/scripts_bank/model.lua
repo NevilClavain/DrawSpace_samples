@@ -26,14 +26,14 @@ environment =
 	light0 = 
 	{
 		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-		direction = { x = -1.0, y = 0.0, z = 0.0, w = 1.0 },
+		direction = { x = -0.2, y = -1.0, z = 0.0, w = 1.0 },
 	},
 
-	fog_intensity = 0.0009,
+	fog_intensity = 0.00022,
 	fog_color = 
 	{
-		r = 0.75,
-		g = 0.75,
+		r = 0.55,
+		g = 0.55,
 		b = 0.99, 
 	},
 
@@ -77,7 +77,7 @@ dbg_string = "debugme"
 
 root_entity:add_aspect(PHYSICS_ASPECT)
 
-camera_entity, camera_mvt=commons.create_free_camera(0.0, 1.70, 6.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
+camera_entity, camera_mvt=commons.create_free_camera(-4000.0, 5.0, -2744.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
 
 eg:add_child('root','camera_entity',camera_entity)
 
