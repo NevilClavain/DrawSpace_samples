@@ -125,7 +125,7 @@ metalcube.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id,
   local cube_body=Body()
 
   cube_body:attach_toentity(entity)
-  cube_body:configure_shape( SHAPE_BOX, 0.5, 0.5, 0.5)
+  cube_body:configure_shape( SHAPE_BOX, 1.0, 1.0, 1.0)
 
   local cube_pos_mat = Matrix()
   cube_pos_mat:translation( p_initialpos.x, p_initialpos.y, p_initialpos.z )

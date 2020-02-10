@@ -77,7 +77,7 @@ dbg_string = "debugme"
 
 root_entity:add_aspect(PHYSICS_ASPECT)
 
-camera_entity, camera_mvt=commons.create_free_camera(-4000.0, 5.0, -2744.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
+camera_entity, camera_mvt=commons.create_free_camera(-4000.0, 5.0, -2684.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
 
 eg:add_child('root','camera_entity',camera_entity)
 
@@ -441,6 +441,14 @@ model.view.unload = function(p_modelunload_function,p_entity_id)
 
 end
 
+model.env.setgravity = function( p_state )
+  if p_state == TRUE then
+    root_entity:configure_world(GRAVITY_ENABLED, environment.gravity.x, environment.gravity.y, environment.gravity.z )
+  else
+    root_entity:configure_world(GRAVITY_DISABLED, environment.gravity.x, environment.gravity.y, environment.gravity.z )
+  end
+end
+
 
 g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
@@ -456,10 +464,4 @@ else
   g:print('No scene file')
 end
 
-model.env.setgravity = function( p_state )
-  if p_state == TRUE then
-    root_entity:configure_world(GRAVITY_ENABLED, environment.gravity.x, environment.gravity.y, environment.gravity.z )
-  else
-    root_entity:configure_world(GRAVITY_DISABLED, environment.gravity.x, environment.gravity.y, environment.gravity.z )
-  end
-end
+

@@ -159,13 +159,17 @@ continent.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id,
   entity, renderer = commons.create_rendered_meshe(continent.rendering_config, 'continent.ac', 'g TerrainMesh', {lit_rendering=p_pass_id})
   renderer:register_to_rendering(p_rendergraph)
 
+  entity:add_aspect(BODY_ASPECT)
+  local body=Body()
+  body:attach_toentity(entity)
+  body:configure_shape(SHAPE_MESHE, 'continent.ac', 'g TerrainMesh')
+  body:configure_mode(COLLIDER_MODE)
+
   p_entitygraph:add_child('root',p_entity_id,entity)
 
   commons.apply_material( continent.lit_material, renderer, p_pass_id)
 
-  local pair = {}
-  pair['entity'] = entity
-  pair['renderer'] = renderer
+  local pair = { ['entity'] = entity, ['renderer'] = renderer, ['body'] = body }
 
   continent.models[p_entity_id] = pair
 
@@ -180,9 +184,15 @@ continent.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pa
   entity, renderer = commons.create_rendered_meshe(continent.rendering_config, 'continent.ac', 'g TerrainMesh', {wireframe_rendering=p_pass_id})
   renderer:register_to_rendering(p_rendergraph)
 
+  entity:add_aspect(BODY_ASPECT)
+  local body=Body()
+  body:attach_toentity(entity)
+  body:configure_shape(SHAPE_MESHE, 'continent.ac', 'g TerrainMesh')
+  body:configure_mode(COLLIDER_MODE)
+
   p_entitygraph:add_child('root',p_entity_id,entity)
 
-  local pair = { ['entity'] = entity, ['renderer'] = renderer }
+  local pair = { ['entity'] = entity, ['renderer'] = renderer, ['body'] = body }
   
   continent.models[p_entity_id] = pair
 
@@ -194,12 +204,20 @@ continent.trashmodelview = function(p_rendergraph, p_entitygraph, p_entity_id)
   local entity = continent.models[p_entity_id]['entity']
   local renderer = continent.models[p_entity_id]['renderer']
 
+  local body = metalcube.models[p_entity_id]['body']
+
+  body:release()
+  body:detach_fromentity(entity)
+
+  entity:remove_aspect(BODY_ASPECT)
+
   commons.trash.meshe(p_rendergraph, entity, renderer)
   p_entitygraph:remove(p_entity_id)
 
   local pair = continent.models[p_entity_id]
   pair['entity'] = nil
   pair['renderer'] = nil
+  pair['body'] = nil
 
   continent.models[p_entity_id] = nil
 end
