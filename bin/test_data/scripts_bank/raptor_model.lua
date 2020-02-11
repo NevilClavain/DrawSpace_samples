@@ -306,7 +306,7 @@ raptor.view.wireframe.load = function(p_entity_id)
 end
 
 
-raptor.anims.rand = function(p_entity_id)
+raptor.anims.rand = function()
 
   local random_anims = 
   {	
@@ -317,5 +317,5 @@ raptor.anims.rand = function(p_entity_id)
   local do_something=Distribution("uniform_int_distribution", 1, 2)
   local dino_action=Distribution("uniform_int_distribution", 1, 5)
 
-  model.anims.rand(p_entity_id, idle_anim, random_anims, do_something, dino_action)
+  model.anims.rand(idle_anim, random_anims, do_something, dino_action)
 end

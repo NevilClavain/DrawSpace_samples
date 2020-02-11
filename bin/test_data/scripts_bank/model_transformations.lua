@@ -3,8 +3,6 @@
 model.move = {}
 model.transformations = {}
 
-model.transformation_target_entity_id = ""
-
 --[[
 une entree :
 	key : entity id
@@ -41,11 +39,11 @@ MODEL_TRANSFORMATION_INPUTMODE_SCALEXYZ = 9
 
 transformations_update = function(p_delta)
 
-  if model.transformation_target_entity_id == "" then
+  if model.target == "" then
     return
   end
 
-  local transform_entry = model.transformations[model.transformation_target_entity_id]
+  local transform_entry = model.transformations[model.target]
 
   if transform_entry['transformation_input_mode'] == MODEL_TRANSFORMATION_INPUTMODE_POSX then
 
@@ -152,71 +150,55 @@ transformations_update = function(p_delta)
 
 end
 
-model.move.posx = function(p_entity_id)
-
-  model.transformations[p_entity_id]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_POSX
-  model.transformation_target_entity_id = p_entity_id
+model.move.posx = function()
+  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_POSX
 end
 
-model.move.posy = function(p_entity_id)
-
-  model.transformations[p_entity_id]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_POSY
-  model.transformation_target_entity_id = p_entity_id
+model.move.posy = function()
+  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_POSY
 end
 
-model.move.posz = function(p_entity_id)
-
-  model.transformations[p_entity_id]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_POSZ
-  model.transformation_target_entity_id = p_entity_id
+model.move.posz = function()
+  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_POSZ
 end
 
-model.move.rotx = function(p_entity_id)
-
-  model.transformations[p_entity_id]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_ROTX
-  model.transformation_target_entity_id = p_entity_id
+model.move.rotx = function()
+  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_ROTX
 end
 
-model.move.roty = function(p_entity_id)
-
-  model.transformations[p_entity_id]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_ROTY
-  model.transformation_target_entity_id = p_entity_id
+model.move.roty = function()
+  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_ROTY
 end
 
-model.move.rotz = function(p_entity_id)
-
-  model.transformations[p_entity_id]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_ROTZ
-  model.transformation_target_entity_id = p_entity_id
+model.move.rotz = function()
+  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_ROTZ
 end
 
-model.move.scalex = function(p_entity_id)
+model.move.scalex = function()
 
-  model.transformations[p_entity_id]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEX
-  model.transformation_target_entity_id = p_entity_id
+  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEX
 end
 
-model.move.scaley = function(p_entity_id)
+model.move.scaley = function()
 
-  model.transformations[p_entity_id]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEY
-  model.transformation_target_entity_id = p_entity_id
+  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEY
 end
 
-model.move.scalez = function(p_entity_id)
+model.move.scalez = function()
 
-  model.transformations[p_entity_id]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEZ
-  model.transformation_target_entity_id = p_entity_id
+  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEZ
 end
 
-model.move.scalexyz = function(p_entity_id)
+model.move.scalexyz = function()
 
-  model.transformations[p_entity_id]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEXYZ
-  model.transformation_target_entity_id = p_entity_id
+  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEXYZ
 end
 
 
 
-model.move.resetpos = function(p_entity_id)
+model.move.resetpos = function()
 
-  local transform_entry = model.transformations[p_entity_id]
+  local transform_entry = model.transformations[model.target]
 
   local pos_x = transform_entry['pos_mat']:get_value(3,0)
   local pos_y = transform_entry['pos_mat']:get_value(3,1)
@@ -235,9 +217,9 @@ model.move.resetpos = function(p_entity_id)
   transform:update_matrix("pos",transform_entry['pos_mat'])
 end
 
-model.move.resetrot = function(p_entity_id)
+model.move.resetrot = function()
 
-  local transform_entry = model.transformations[p_entity_id]
+  local transform_entry = model.transformations[model.target]
 
   transform_entry['rotx_deg_angle'] = 0
   transform_entry['roty_deg_angle'] = 0
@@ -255,9 +237,9 @@ model.move.resetrot = function(p_entity_id)
 
 end
 
-model.move.resetscale = function(p_entity_id)
+model.move.resetscale = function()
 
-  local transform_entry = model.transformations[p_entity_id]
+  local transform_entry = model.transformations[model.target]
 
   local scale_x = transform_entry['scale_mat']:get_value(0,0)
   local scale_y = transform_entry['scale_mat']:get_value(1,1)

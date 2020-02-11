@@ -298,7 +298,7 @@ trex.view.wireframe.load = function(p_entity_id)
   model.view.load(trex.createwireframemodelview, trex.update_from_scene_env, trex.scale, p_entity_id)
 end
 
-trex.anims.rand = function(p_entity_id)
+trex.anims.rand = function()
 
   local random_anims = 
   {	
@@ -309,5 +309,5 @@ trex.anims.rand = function(p_entity_id)
   local do_something=Distribution("uniform_int_distribution", 1, 2)
   local dino_action=Distribution("uniform_int_distribution", 1, 11)
 
-  model.anims.rand(p_entity_id, idle_anim, random_anims, do_something, dino_action)
+  model.anims.rand(idle_anim, random_anims, do_something, dino_action)
 end

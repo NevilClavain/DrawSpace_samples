@@ -13,6 +13,8 @@ model.entities = {}
 
 model.env = {}
 
+model.target = ""
+
 include("model_transformations.lua")
 include("model_anims.lua")
 
@@ -70,6 +72,9 @@ text_renderer:configure(root_entity, "fps", 10, 40, 255, 0, 255, "??? fps")
 
 move_renderer=TextRendering()
 move_renderer:configure(root_entity, "move", 10, 60, 255, 0, 255, "...")
+
+animsinfos_renderer=TextRendering()
+animsinfos_renderer:configure(root_entity, "anims", 10, 80, 255, 0, 255, "...")
 
 dbg_renderer=TextRendering()
 dbg_renderer:configure(root_entity, "debug", 10, 100, 255, 0, 255, "...")
@@ -202,34 +207,57 @@ function()
   local output_infos = "[MODEL VIEWER]    " ..renderer:descr() .." "..time_infos[3].. " fps "..time_infos[2].." timescale = "..timescale
   text_renderer:update(10, 30, 255, 0, 0, output_infos)
 
-  local move_infos = ""
+  local target_infos = ""
+  local target_anims_infos = ""
 
-  if model.transformation_target_entity_id ~= "" then
+  if model.target ~= nil then
 
-    if model.transformations[model.transformation_target_entity_id] ~= nil then
+    if model.target ~= "" then
 
-      local transform_entry = model.transformations[model.transformation_target_entity_id]
+      target_infos = "selection = ["..model.target.."]"
 
-      local pos_x = transform_entry['pos_mat']:get_value(3,0)
-	  local pos_y = transform_entry['pos_mat']:get_value(3,1)
-	  local pos_z = transform_entry['pos_mat']:get_value(3,2)
+	  if model.entities[model.target] ~= nil then
 
-	  local scale_x = transform_entry['scale_mat']:get_value(0,0)
-	  local scale_y = transform_entry['scale_mat']:get_value(1,1)
-	  local scale_z = transform_entry['scale_mat']:get_value(2,2)
+        if model.entities[model.target].entity:has_aspect(BODY_ASPECT) == TRUE then
 
-	  local rot_x = transform_entry['rotx_deg_angle']
-	  local rot_y = transform_entry['roty_deg_angle']
-	  local rot_z = transform_entry['rotz_deg_angle']
+	      target_infos = target_infos.. " (is body)"
 
-	  move_infos = model.transformation_target_entity_id.. " rot = "..rot_x.. " "..rot_y.." "..rot_z.." pos = "..pos_x.." "..pos_y.." "..pos_z.." scale = "..scale_x.. " "..scale_y.." "..scale_z
+	    else
 
-	end
+          local transform_entry = model.transformations[model.target]
+
+          local pos_x = transform_entry['pos_mat']:get_value(3,0)
+	      local pos_y = transform_entry['pos_mat']:get_value(3,1)
+	      local pos_z = transform_entry['pos_mat']:get_value(3,2)
+
+	      local scale_x = transform_entry['scale_mat']:get_value(0,0)
+	      local scale_y = transform_entry['scale_mat']:get_value(1,1)
+	      local scale_z = transform_entry['scale_mat']:get_value(2,2)
+
+	      local rot_x = transform_entry['rotx_deg_angle']
+	      local rot_y = transform_entry['roty_deg_angle']
+	      local rot_z = transform_entry['rotz_deg_angle']
+
+	      target_infos = target_infos.. " rot = "..rot_x.. " "..rot_y.." "..rot_z.." pos = "..pos_x.." "..pos_y.." "..pos_z.." scale = "..scale_x.. " "..scale_y.." "..scale_z
+
+	    end
+		
+		if model.entities[model.target].entity:has_aspect(ANIMATION_ASPECT) == TRUE then
+		   target_anims_infos = "ANIMATED"
+		end
+		
+      else
+	    target_infos = target_infos.. " UNKNOWN"
+	  end
+    end
+  else
+    target_infos = target_infos.. " UNKNOWN"
   end
 
-  move_renderer:update(15, 70, 255, 255, 255, move_infos)
+  move_renderer:update(15, 70, 255, 255, 255, target_infos)
+  animsinfos_renderer:update(15, 90, 255, 255, 255, target_anims_infos)
 
-  dbg_renderer:update(15, 110, 0, 255, 0, dbg_string)
+  dbg_renderer:update(15, 120, 0, 255, 0, dbg_string)
 
 
   local mvt_info = { camera_mvt:read() }
@@ -251,12 +279,12 @@ function( id, event, animation_name )
 
 	     local selected_index = model.anims.compute_random_anim_index(model.entities[id]['do_something_distribution'], model.entities[id]['anim_action_distribution'], animations_rand_engine, model.entities[id]['rand_anims'], model.entities[id]['main_idle_anim'])
          model.entities[id]['current_animation_loop'] = selected_index
-	     model.anims.run(id, model.entities[id]['current_animation_loop'])
+	     model.anims.pushanim(id, model.entities[id]['current_animation_loop'])
 
 	   else
 
 	     if model.entities[id]['current_animation_loop'] ~= -1 then	   
-	       model.anims.run(id, model.entities[id]['current_animation_loop'])
+	       model.anims.pushanim(id, model.entities[id]['current_animation_loop'])
 	     end
 
 	   end
@@ -382,7 +410,8 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
 	['current_animation_loop'] = -1,
 	['rand_anim_mode'] = FALSE,
 	['rand_anims'] = {},
-	['main_idle_anim'] = 0
+	['main_idle_anim'] = 0,
+	['positioner'] = 'transform'
   }
 
   model.entities[p_entity_id] = entity_properties_entry
@@ -402,7 +431,8 @@ model.view.loadbody = function(p_modelviewload_function, p_update_from_scene_env
 	['current_animation_loop'] = -1,
 	['rand_anim_mode'] = FALSE,
 	['rand_anims'] = {},
-	['main_idle_anim'] = 0
+	['main_idle_anim'] = 0,
+	['positioner'] = 'body'
   }
 
   model.entities[p_entity_id] = entity_properties_entry
@@ -449,13 +479,10 @@ model.env.setgravity = function( p_state )
   end
 end
 
-
 g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
 
 g:signal_renderscenebegin("eg")
-
-
 
 if modelscenefile ~= "" then
   g:print('Loading scene file : '..modelscenefile)
