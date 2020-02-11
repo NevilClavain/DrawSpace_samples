@@ -23,12 +23,12 @@ include("model_anims.lua")
 
 environment = 
 {
-	ambient_light = {r = 0.15, g = 0.15, b = 0.15, a = 0.0 },
+	ambient_light = {r = 0.35, g = 0.35, b = 0.35, a = 0.0 },
 	lights_enabled = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
 	light0 = 
 	{
 		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-		direction = { x = -0.2, y = -1.0, z = 0.0, w = 1.0 },
+		direction = { x = -0.1, y = -1.0, z = 0.0, w = 1.0 },
 	},
 
 	fog_intensity = 0.00022,
@@ -243,7 +243,29 @@ function()
 	    end
 		
 		if model.entities[model.target].entity:has_aspect(ANIMATION_ASPECT) == TRUE then
-		   target_anims_infos = "ANIMATED"
+		   target_anims_infos = "ANIMATED : "
+
+           local current_animation_name
+           local current_animation_ticks_per_seconds
+		   local current_animation_ticks_duration
+           local current_animation_seconds_duration
+           local current_animation_ticks_progress 
+           local current_animation_seconds_progress 
+		   
+		   
+		   current_animation_name, 
+           current_animation_ticks_per_seconds, 
+           current_animation_ticks_duration,
+           current_animation_seconds_duration, 
+           current_animation_ticks_progress, 
+           current_animation_seconds_progress = model.entities[model.target].entity:read_currentanimationinfos()
+
+		   target_anims_infos = target_anims_infos.."anim="..current_animation_name
+												--[[
+													.." ticks/s = "..current_animation_ticks_per_seconds..
+													" "..current_animation_ticks_progress.."/"..current_animation_ticks_duration.." ticks "..
+													current_animation_seconds_progress.."/"..current_animation_seconds_duration.. " s"
+													]]
 		end
 		
       else
