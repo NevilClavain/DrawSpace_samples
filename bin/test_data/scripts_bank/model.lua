@@ -14,6 +14,8 @@ model.entities = {}
 model.env = {}
 model.camera = {}
 
+model.camera.speed = 50.0
+
 model.target = ""
 
 include("model_transformations.lua")
@@ -149,14 +151,14 @@ function( key )
   if key == 81 then 
     local mvt_info = { model.camera.mvt:read() }
 
-	model.camera.mvt:update(60.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	model.camera.mvt:update(model.camera.speed,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
       
   --W key
   elseif key == 87 then
 
     local mvt_info = { model.camera.mvt:read() }
 
-	model.camera.mvt:update(-60.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	model.camera.mvt:update(-model.camera.speed,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
   elseif key == 17 then
     ctrl_key = TRUE
