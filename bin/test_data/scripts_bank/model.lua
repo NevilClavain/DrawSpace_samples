@@ -12,6 +12,7 @@ model.view = {}
 model.entities = {}
 
 model.env = {}
+model.camera = {}
 
 model.target = ""
 
@@ -82,23 +83,23 @@ dbg_string = "debugme"
 
 root_entity:add_aspect(PHYSICS_ASPECT)
 
-camera_entity, camera_mvt=commons.create_free_camera(-4000.0, 5.0, -2684.0, renderer_infos[5],renderer_infos[6], mvt_mod, "camera")
+model.camera.entity, model.camera.mvt=commons.create_free_camera(0.0, 5.0, 0, renderer_infos[5],renderer_infos[6], mvt_mod, "model.camera")
 
-eg:add_child('root','camera_entity',camera_entity)
+eg:add_child('root','model.camera.entity',model.camera.entity)
 
 
 
 
 -- ///////////////////////////////
 
-eg:set_camera(camera_entity)
+eg:set_camera(model.camera.entity)
 
 rg:update_renderingqueues()
 
 
 g:add_mousemovecb( "onmousemove",function( xm, ym, dx, dy )  
 
-  local mvt_info = { camera_mvt:read() }
+  local mvt_info = { model.camera.mvt:read() }
 
 
   if mouse_left == TRUE then
@@ -108,10 +109,10 @@ g:add_mousemovecb( "onmousemove",function( xm, ym, dx, dy )
   else
 
     if mouse_right == FALSE then
-	  camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],-dy / 4.0,-dx / 4.0, 0)
+	  model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],-dy / 4.0,-dx / 4.0, 0)
 
     else
-	  camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,-dx)
+	  model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,-dx)
 
     end
   end
@@ -146,16 +147,16 @@ function( key )
 
   --Q key
   if key == 81 then 
-    local mvt_info = { camera_mvt:read() }
+    local mvt_info = { model.camera.mvt:read() }
 
-	camera_mvt:update(60.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	model.camera.mvt:update(60.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
       
   --W key
   elseif key == 87 then
 
-    local mvt_info = { camera_mvt:read() }
+    local mvt_info = { model.camera.mvt:read() }
 
-	camera_mvt:update(-60.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	model.camera.mvt:update(-60.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
   elseif key == 17 then
     ctrl_key = TRUE
@@ -172,16 +173,16 @@ function( key )
 
   --Q key
   if key == 81 then
-    local mvt_info = { camera_mvt:read() }
+    local mvt_info = { model.camera.mvt:read() }
 
-	camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	model.camera.mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
     
   --W key
   elseif key == 87 then
-    local mvt_info = { camera_mvt:read() }
+    local mvt_info = { model.camera.mvt:read() }
 
-	camera_mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	model.camera.mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
  
   elseif key == 17 then
     ctrl_key = FALSE
@@ -282,8 +283,8 @@ function()
   dbg_renderer:update(15, 120, 0, 255, 0, dbg_string)
 
 
-  local mvt_info = { camera_mvt:read() }
-  camera_mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+  local mvt_info = { model.camera.mvt:read() }
+  model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
 end)
 
@@ -500,6 +501,8 @@ model.env.setgravity = function( p_state )
     root_entity:configure_world(GRAVITY_DISABLED, environment.gravity.x, environment.gravity.y, environment.gravity.z )
   end
 end
+
+
 
 g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
