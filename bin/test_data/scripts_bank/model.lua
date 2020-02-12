@@ -504,7 +504,9 @@ model.env.setgravity = function( p_state )
   end
 end
 
-
+model.env.setbkcolor = function( p_r, p_g, p_b )
+   rg:set_pass_targetclearcolor('texture_pass', p_r * 255, p_g * 255, p_b * 255)
+end
 
 g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)

@@ -21,5 +21,6 @@
 	model.move.setpos('t', -4068.0, 0, -2740)
 
 	model.env.setgravity(1)
+	model.env.setbkcolor(0.55,0.55,0.99)
 
 	model.camera.mvt:set_pos(-4000.0, 15.0, -2684.0)
