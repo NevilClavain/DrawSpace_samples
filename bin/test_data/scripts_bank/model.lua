@@ -436,6 +436,7 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
 	['rand_anim_mode'] = FALSE,
 	['rand_anims'] = {},
 	['main_idle_anim'] = 0,
+	['update_from_scene_env_function'] = p_update_from_scene_env_function
   }
 
   model.entities[p_entity_id] = entity_properties_entry
@@ -456,6 +457,7 @@ model.view.loadbody = function(p_modelviewload_function, p_update_from_scene_env
 	['rand_anim_mode'] = FALSE,
 	['rand_anims'] = {},
 	['main_idle_anim'] = 0,
+	['update_from_scene_env_function'] = p_update_from_scene_env_function
   }
 
   model.entities[p_entity_id] = entity_properties_entry
@@ -505,6 +507,33 @@ end
 model.env.setbkcolor = function( p_r, p_g, p_b )
    rg:set_pass_targetclearcolor('texture_pass', p_r * 255, p_g * 255, p_b * 255)
 end
+
+local update_entities_shaders = function()
+
+  for k, v in pairs(model.entities) do
+     
+	-- extract shader update function provided by model
+    local update_entity_shaders_func = v.update_from_scene_env_function
+
+	-- and call it with updated environnment
+	update_entity_shaders_func( 'texture_pass', environment, k )
+  end
+end
+
+model.env.setfogdensity = function(p_density)
+  environment.fog_intensity = p_density
+  update_entities_shaders()
+end
+
+model.env.setfogcolor = function(p_r, p_g, p_b)
+  environment.fog_color.r = p_r
+  environment.fog_color.g = p_g
+  environment.fog_color.b = p_b
+  update_entities_shaders()
+end
+
+
+
 
 g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
