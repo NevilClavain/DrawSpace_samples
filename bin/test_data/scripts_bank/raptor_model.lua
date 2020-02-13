@@ -297,16 +297,7 @@ raptor.view.load = function(p_entity_id)
   end  
 end
 
-raptor.view.lit.load = function(p_entity_id)
-  model.view.load(raptor.createlitmodelview, raptor.update_from_scene_env, raptor.scale, p_entity_id)
-end
-
-raptor.view.wireframe.load = function(p_entity_id)
-  model.view.load(raptor.createwireframemodelview, raptor.update_from_scene_env, raptor.scale, p_entity_id)
-end
-
-
-raptor.anims.rand = function()
+raptor.anims.parameters = function()
 
   local random_anims = 
   {	
@@ -317,5 +308,15 @@ raptor.anims.rand = function()
   local do_something=Distribution("uniform_int_distribution", 1, 2)
   local dino_action=Distribution("uniform_int_distribution", 1, 5)
 
-  model.anims.rand(idle_anim, random_anims, do_something, dino_action)
+  return random_anims, idle_anim, do_something, dino_action
 end
+
+raptor.view.lit.load = function(p_entity_id)
+  model.view.load(raptor.createlitmodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id)
+end
+
+raptor.view.wireframe.load = function(p_entity_id)
+  model.view.load(raptor.createwireframemodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id)
+end
+
+

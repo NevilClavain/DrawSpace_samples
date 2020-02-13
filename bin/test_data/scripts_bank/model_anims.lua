@@ -34,19 +34,18 @@ model.anims.runloop = function( p_index)
   model.anims.pushanim(model.target, p_index)
 end
 
-model.anims.rand = function( p_main_idle_anim, p_rand_anims, p_dosomething_distrib, p_action_distrib)
+model.anims.rand = function()
 
   model.entities[model.target]['rand_anim_mode'] = TRUE
-  local selected_index = model.anims.compute_random_anim_index(p_dosomething_distrib, p_action_distrib, animations_rand_engine,p_rand_anims,p_main_idle_anim)
+
+  local random_anims = model.entities[model.target]['rand_anims']
+  local idle_anim = model.entities[model.target]['main_idle_anim']
+  local do_something_distribution = model.entities[model.target]['do_something_distribution']
+  local anim_action_distribution = model.entities[model.target]['anim_action_distribution']
+
+  local selected_index = model.anims.compute_random_anim_index(do_something_distribution, anim_action_distribution, animations_rand_engine,random_anims,idle_anim)
   
   model.entities[model.target]['current_animation_loop'] = selected_index
-
-  model.entities[model.target]['rand_anims'] = p_rand_anims
-  model.entities[model.target]['main_idle_anim'] = p_main_idle_anim
-
-  model.entities[model.target]['do_something_distribution'] = p_dosomething_distrib
-  model.entities[model.target]['anim_action_distribution'] = p_action_distrib
-
   model.anims.pushanim(model.target, selected_index)
 end
 

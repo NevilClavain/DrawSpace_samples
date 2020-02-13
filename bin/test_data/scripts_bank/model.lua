@@ -377,7 +377,7 @@ model.dump.show = function(entity)
 end
 
 
-model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function, p_initial_scale, p_entity_id)
+model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function, p_anims_parameters, p_initial_scale, p_entity_id)
 
   local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id, p_bodyinitialpos)
 
@@ -439,17 +439,33 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
     ['entity'] = entity,
 	['current_animation_loop'] = -1,
 	['rand_anim_mode'] = FALSE,
-	['rand_anims'] = {},
-	['main_idle_anim'] = 0,
+	--['rand_anims'] = {},
+	--['main_idle_anim'] = 0,
 	['update_from_scene_env_function'] = p_update_from_scene_env_function
   }
 
   model.entities[p_entity_id] = entity_properties_entry
 
+  if p_anims_parameters ~= nil then
+
+    local random_anims 
+    local idle_anim
+    local do_something_distribution
+    local anim_action_distribution
+
+	random_anims, idle_anim, do_something_distribution, anim_action_distribution = p_anims_parameters()
+
+	model.entities[p_entity_id]['rand_anims'] = random_anims
+	model.entities[p_entity_id]['main_idle_anim'] = idle_anim
+	model.entities[p_entity_id]['do_something_distribution'] = do_something_distribution
+	model.entities[p_entity_id]['anim_action_distribution'] = anim_action_distribution
+    
+  end
+
   rg:update_renderingqueues()
 end
 
-model.view.loadbody = function(p_modelviewload_function, p_update_from_scene_env_function, p_initial_scale, p_entity_id, p_bodyinitialpos)
+model.view.loadbody = function(p_modelviewload_function, p_update_from_scene_env_function, p_anims_parameters, p_entity_id, p_bodyinitialpos)
 
   local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id, p_bodyinitialpos)
 
@@ -460,12 +476,28 @@ model.view.loadbody = function(p_modelviewload_function, p_update_from_scene_env
     ['entity'] = entity,
 	['current_animation_loop'] = -1,
 	['rand_anim_mode'] = FALSE,
-	['rand_anims'] = {},
-	['main_idle_anim'] = 0,
+	--['rand_anims'] = {},
+	--['main_idle_anim'] = 0,
 	['update_from_scene_env_function'] = p_update_from_scene_env_function
   }
 
   model.entities[p_entity_id] = entity_properties_entry
+
+  if p_anims_parameters ~= nil then
+
+    local random_anims 
+    local idle_anim
+    local do_something_distribution
+    local anim_action_distribution
+
+	random_anims, idle_anim, do_something_distribution, anim_action_distribution = p_anims_parameters()
+
+	model.entities[p_entity_id]['rand_anims'] = random_anims
+	model.entities[p_entity_id]['main_idle_anim'] = idle_anim
+	model.entities[p_entity_id]['do_something_distribution'] = do_something_distribution
+	model.entities[p_entity_id]['anim_action_distribution'] = anim_action_distribution
+    
+  end
 
   rg:update_renderingqueues()
 end
