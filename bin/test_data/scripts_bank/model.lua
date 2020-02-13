@@ -50,7 +50,8 @@ environment =
 	reflector_pos = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
 	reflector_normale = {x = 1.0, y = 0.0, z = 0.0, w = 0.0 },
 
-	gravity = { x = 0.0, y = -9.81, z = 0.0}
+	gravity = { x = 0.0, y = -9.81, z = 0.0},
+	gravity_state = GRAVITY_DISABLED
 }
 
 ctrl_key = FALSE
@@ -501,11 +502,23 @@ model.view.unload = function(p_modelunload_function,p_entity_id)
 end
 
 model.env.setgravity = function( p_state )
+ 
   if p_state == TRUE then
-    root_entity:configure_world(GRAVITY_ENABLED, environment.gravity.x, environment.gravity.y, environment.gravity.z )
+    environment.gravity_state = GRAVITY_ENABLED
   else
-    root_entity:configure_world(GRAVITY_DISABLED, environment.gravity.x, environment.gravity.y, environment.gravity.z )
+    environment.gravity_state = GRAVITY_DISABLED
   end
+
+  root_entity:update_gravitystate(environment.gravity_state)
+end
+
+model.env.setgravitydir = function( p_x, p_y, p_z )
+
+  environment.gravity.x = p_x
+  environment.gravity.y = p_y
+  environment.gravity.z = p_z
+
+  root_entity:update_gravitydirection( environment.gravity.x, environment.gravity.y, environment.gravity.z )
 end
 
 model.env.setbkcolor = function( p_r, p_g, p_b )
@@ -568,6 +581,9 @@ model.env.ambientlight.setcolor = function( p_r, p_g, p_b )
 
   update_entities_shaders()
 end
+
+
+root_entity:configure_world(environment.gravity_state, environment.gravity.x, environment.gravity.y, environment.gravity.z )
 
 
 g:show_mousecursor(FALSE)
