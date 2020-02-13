@@ -12,6 +12,9 @@ model.view = {}
 model.entities = {}
 
 model.env = {}
+model.env.light = {}
+model.env.ambientlight = {}
+model.env.fog = {}
 model.camera = {}
 
 model.camera.speed = 50.0
@@ -33,6 +36,7 @@ environment =
 		color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
 		direction = { x = -0.1, y = -1.0, z = 0.0, w = 1.0 },
 	},
+
 
 	fog_intensity = 0.00022,
 	fog_color = 
@@ -520,19 +524,50 @@ local update_entities_shaders = function()
   end
 end
 
-model.env.setfogdensity = function(p_density)
+model.env.fog.setdensity = function(p_density)
   environment.fog_intensity = p_density
   update_entities_shaders()
 end
 
-model.env.setfogcolor = function(p_r, p_g, p_b)
+model.env.fog.setcolor = function(p_r, p_g, p_b)
   environment.fog_color.r = p_r
   environment.fog_color.g = p_g
   environment.fog_color.b = p_b
   update_entities_shaders()
 end
 
+model.env.light.setstate = function( p_state )
+  if p_state == TRUE then
+    environment.lights_enabled.x = 1.0
+  else
+    environment.lights_enabled.x = 0.0
+  end
+  update_entities_shaders()
+end
 
+model.env.light.setcolor = function( p_r, p_g, p_b )
+  environment.light0.color.r = p_r
+  environment.light0.color.g = p_g
+  environment.light0.color.b = p_b
+
+  update_entities_shaders()
+end
+
+model.env.light.setdir = function( p_x, p_y, p_z )
+  environment.light0.direction.x = p_x
+  environment.light0.direction.y = p_y
+  environment.light0.direction.z = p_z
+
+  update_entities_shaders()
+end
+
+model.env.ambientlight.setcolor = function( p_r, p_g, p_b )
+  environment.ambient_light.r = p_r
+  environment.ambient_light.g = p_g
+  environment.ambient_light.b = p_b
+
+  update_entities_shaders()
+end
 
 
 g:show_mousecursor(FALSE)
