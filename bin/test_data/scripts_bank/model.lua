@@ -439,8 +439,6 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
     ['entity'] = entity,
 	['current_animation_loop'] = -1,
 	['rand_anim_mode'] = FALSE,
-	--['rand_anims'] = {},
-	--['main_idle_anim'] = 0,
 	['update_from_scene_env_function'] = p_update_from_scene_env_function
   }
 
@@ -476,8 +474,6 @@ model.view.loadbody = function(p_modelviewload_function, p_update_from_scene_env
     ['entity'] = entity,
 	['current_animation_loop'] = -1,
 	['rand_anim_mode'] = FALSE,
-	--['rand_anims'] = {},
-	--['main_idle_anim'] = 0,
 	['update_from_scene_env_function'] = p_update_from_scene_env_function
   }
 
