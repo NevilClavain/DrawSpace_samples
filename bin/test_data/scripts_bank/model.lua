@@ -436,7 +436,6 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
 	['rand_anim_mode'] = FALSE,
 	['rand_anims'] = {},
 	['main_idle_anim'] = 0,
-	['positioner'] = 'transform'
   }
 
   model.entities[p_entity_id] = entity_properties_entry
@@ -457,7 +456,6 @@ model.view.loadbody = function(p_modelviewload_function, p_update_from_scene_env
 	['rand_anim_mode'] = FALSE,
 	['rand_anims'] = {},
 	['main_idle_anim'] = 0,
-	['positioner'] = 'body'
   }
 
   model.entities[p_entity_id] = entity_properties_entry
