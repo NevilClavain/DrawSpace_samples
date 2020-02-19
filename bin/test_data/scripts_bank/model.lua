@@ -4,24 +4,22 @@
 model = {}
 
 
-
-model.view = {}
-
 model.entities = {}
 
-model.env = {}
-model.env.light = {}
-model.env.ambientlight = {}
-model.env.fog = {}
+
 model.camera = {}
 
 model.camera.speed = 50.0
 
 model.target = ""
 
+
+include("model_dump.lua")
+include("model_view.lua")
 include("model_transformations.lua")
 include("model_anims.lua")
-include("model_dump.lua")
+include("model_env.lua")
+
 
 
 
@@ -324,241 +322,6 @@ end)
 g:signal_renderscenebegin("eg")
 
 
-
-
-
-model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function, p_anims_parameters, p_initial_scale, p_entity_id)
-
-  local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id, p_bodyinitialpos)
-
-  p_update_from_scene_env_function( 'texture_pass', environment, p_entity_id)
-
-
-  local rotx_deg_angle = 0.0
-  local roty_deg_angle = 0.0
-  local rotz_deg_angle = 0.0
-
-  local pos_mat = Matrix()
-  pos_mat:translation( 0.0, 0.0, 0.0 )
-
-  local scale_mat = Matrix()
-
-  if p_initial_scale ~= nil then
-	scale_mat:scale( p_initial_scale['x'], p_initial_scale['y'], p_initial_scale['z'] )
-  else
-  	scale_mat:scale( 1.0, 1.0, 1.0 )
-  end
-
-  local rotx_mat = Matrix()
-  rotx_mat:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(rotx_deg_angle))
-
-  local roty_mat = Matrix()
-  roty_mat:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(roty_deg_angle))
-
-  local rotz_mat = Matrix()
-  rotz_mat:rotation(0.0, 0.0, 1.0, commons.utils.deg_to_rad(rotz_deg_angle))
-
-  local transform = RawTransform()
-
-  transform:configure(entity)
-  
-  transform:add_matrix( "scale", scale_mat )
-  transform:add_matrix( "roty", roty_mat )
-  transform:add_matrix( "rotx", rotx_mat )
-  transform:add_matrix( "rotz", rotz_mat )
-  transform:add_matrix( "pos", pos_mat )
-      
-  local transform_entry = 
-  { 
-  	['pos_mat'] = pos_mat,
-  	['scale_mat'] = scale_mat,
-	['rotx_mat'] = rotx_mat,
-	['roty_mat'] = roty_mat,
-	['rotz_mat'] = rotz_mat,
-	['rotx_deg_angle'] = rotx_deg_angle,
-	['roty_deg_angle'] = roty_deg_angle,
-  	['rotz_deg_angle'] = rotz_deg_angle,
-	['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_NONE,
-	['transform'] = transform 	
-  }
-  
-  model.transformations[p_entity_id] = transform_entry
-
-  local entity_properties_entry =
-  {
-    ['entity'] = entity,
-	['current_animation_loop'] = -1,
-	['rand_anim_mode'] = FALSE,
-	['update_from_scene_env_function'] = p_update_from_scene_env_function
-  }
-
-  model.entities[p_entity_id] = entity_properties_entry
-
-  if p_anims_parameters ~= nil then
-
-    local random_anims 
-    local idle_anim
-    local do_something_distribution
-    local anim_action_distribution
-
-	random_anims, idle_anim, do_something_distribution, anim_action_distribution = p_anims_parameters()
-
-	model.entities[p_entity_id]['rand_anims'] = random_anims
-	model.entities[p_entity_id]['main_idle_anim'] = idle_anim
-	model.entities[p_entity_id]['do_something_distribution'] = do_something_distribution
-	model.entities[p_entity_id]['anim_action_distribution'] = anim_action_distribution
-    
-  end
-
-  rg:update_renderingqueues()
-end
-
-model.view.loadbody = function(p_modelviewload_function, p_update_from_scene_env_function, p_anims_parameters, p_entity_id, p_bodyinitialpos)
-
-  local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id, p_bodyinitialpos)
-
-  p_update_from_scene_env_function( 'texture_pass', environment, p_entity_id)
-
-  local entity_properties_entry =
-  {
-    ['entity'] = entity,
-	['current_animation_loop'] = -1,
-	['rand_anim_mode'] = FALSE,
-	['update_from_scene_env_function'] = p_update_from_scene_env_function
-  }
-
-  model.entities[p_entity_id] = entity_properties_entry
-
-  if p_anims_parameters ~= nil then
-
-    local random_anims 
-    local idle_anim
-    local do_something_distribution
-    local anim_action_distribution
-
-	random_anims, idle_anim, do_something_distribution, anim_action_distribution = p_anims_parameters()
-
-	model.entities[p_entity_id]['rand_anims'] = random_anims
-	model.entities[p_entity_id]['main_idle_anim'] = idle_anim
-	model.entities[p_entity_id]['do_something_distribution'] = do_something_distribution
-	model.entities[p_entity_id]['anim_action_distribution'] = anim_action_distribution
-    
-  end
-
-  rg:update_renderingqueues()
-end
-
-
-model.view.unload = function(p_modelunload_function,p_entity_id)
-
-  if model.transformations[p_entity_id] ~= nil then
-
-    local transform_entry = model.transformations[p_entity_id]
-
-    local transform = transform_entry['transform']
-    transform:release()
-
-    transform_entry['pos_mat'] = nil
-    transform_entry['scale_mat'] = nil
-    transform_entry['rotx_mat'] = nil
-    transform_entry['roty_mat'] = nil
-    transform_entry['rotz_mat'] = nil
-
-    transform_entry['transform'] = nil
-
-    model.transformations[p_entity_id] = nil
-  end
-
-  p_modelunload_function(rg, eg, p_entity_id)
-  rg:update_renderingqueues()
-
-  local entity_properties_entry = model.entities[p_entity_id]
-  entity_properties_entry['entity'] = nil
-
-  model.entities[p_entity_id] = nil
-
-end
-
-model.env.setgravity = function( p_state )
- 
-  if p_state == TRUE then
-    environment.gravity_state = GRAVITY_ENABLED
-  else
-    environment.gravity_state = GRAVITY_DISABLED
-  end
-
-  root_entity:update_gravitystate(environment.gravity_state)
-end
-
-model.env.setgravitydir = function( p_x, p_y, p_z )
-
-  environment.gravity.x = p_x
-  environment.gravity.y = p_y
-  environment.gravity.z = p_z
-
-  root_entity:update_gravitydirection( environment.gravity.x, environment.gravity.y, environment.gravity.z )
-end
-
-model.env.setbkcolor = function( p_r, p_g, p_b )
-   rg:set_pass_targetclearcolor('texture_pass', p_r * 255, p_g * 255, p_b * 255)
-end
-
-local update_entities_shaders = function()
-
-  for k, v in pairs(model.entities) do
-     
-	-- extract shader update function provided by model
-    local update_entity_shaders_func = v.update_from_scene_env_function
-
-	-- and call it with updated environnment
-	update_entity_shaders_func( 'texture_pass', environment, k )
-  end
-end
-
-model.env.fog.setdensity = function(p_density)
-  environment.fog_intensity = p_density
-  update_entities_shaders()
-end
-
-model.env.fog.setcolor = function(p_r, p_g, p_b)
-  environment.fog_color.r = p_r
-  environment.fog_color.g = p_g
-  environment.fog_color.b = p_b
-  update_entities_shaders()
-end
-
-model.env.light.setstate = function( p_state )
-  if p_state == TRUE then
-    environment.lights_enabled.x = 1.0
-  else
-    environment.lights_enabled.x = 0.0
-  end
-  update_entities_shaders()
-end
-
-model.env.light.setcolor = function( p_r, p_g, p_b )
-  environment.light0.color.r = p_r
-  environment.light0.color.g = p_g
-  environment.light0.color.b = p_b
-
-  update_entities_shaders()
-end
-
-model.env.light.setdir = function( p_x, p_y, p_z )
-  environment.light0.direction.x = p_x
-  environment.light0.direction.y = p_y
-  environment.light0.direction.z = p_z
-
-  update_entities_shaders()
-end
-
-model.env.ambientlight.setcolor = function( p_r, p_g, p_b )
-  environment.ambient_light.r = p_r
-  environment.ambient_light.g = p_g
-  environment.ambient_light.b = p_b
-
-  update_entities_shaders()
-end
 
 
 root_entity:configure_world(environment.gravity_state, environment.gravity.x, environment.gravity.y, environment.gravity.z )
