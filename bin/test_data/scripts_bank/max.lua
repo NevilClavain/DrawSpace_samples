@@ -1,5 +1,5 @@
 
-
+text_x_position = 110
 
 include("model_main.lua")
 
@@ -25,16 +25,16 @@ rg:create_child('final_pass', 'texture_pass', 0)
 rg:set_pass_targetclearcolor('texture_pass', 80, 80, 80)
 
 text_renderer=TextRendering()
-text_renderer:configure(root_entity, "fps", 10, 40, 255, 0, 255, "??? fps")
+text_renderer:configure(root_entity, "fps", 80, 40, 255, 0, 255, "??? fps")
 
 move_renderer=TextRendering()
-move_renderer:configure(root_entity, "move", 10, 60, 255, 0, 255, "...")
+move_renderer:configure(root_entity, "move", 80, 60, 255, 0, 255, "...")
 
 animsinfos_renderer=TextRendering()
-animsinfos_renderer:configure(root_entity, "anims", 10, 80, 255, 0, 255, "...")
+animsinfos_renderer:configure(root_entity, "anims", 80, 80, 255, 0, 255, "...")
 
 dbg_renderer=TextRendering()
-dbg_renderer:configure(root_entity, "debug", 10, 100, 255, 0, 255, "...")
+dbg_renderer:configure(root_entity, "debug", 80, 100, 255, 0, 255, "...")
 dbg_string = "debugme"
 
 root_entity:add_aspect(PHYSICS_ASPECT)
@@ -162,7 +162,7 @@ function()
   local timescale = commons.print_timescale(time_infos[1])
 
   local output_infos = "[MODEL VIEWER]    " ..renderer:descr() .." "..time_infos[3].. " fps "..time_infos[2].." timescale = "..timescale
-  text_renderer:update(10, 30, 255, 0, 0, output_infos)
+  text_renderer:update(text_x_position, 30, 255, 0, 0, output_infos)
 
   local target_infos = ""
   local target_anims_infos = ""
@@ -233,10 +233,10 @@ function()
     target_infos = target_infos.. " UNKNOWN"
   end
 
-  move_renderer:update(15, 70, 255, 255, 255, target_infos)
-  animsinfos_renderer:update(15, 90, 255, 255, 255, target_anims_infos)
+  move_renderer:update(text_x_position, 70, 255, 255, 255, target_infos)
+  animsinfos_renderer:update(text_x_position, 90, 255, 255, 255, target_anims_infos)
 
-  dbg_renderer:update(15, 120, 0, 255, 0, dbg_string)
+  dbg_renderer:update(text_x_position, 120, 0, 255, 0, dbg_string)
 
 
   local mvt_info = { model.camera.mvt:read() }
@@ -272,6 +272,14 @@ end)
 g:signal_renderscenebegin("eg")
 
 root_entity:configure_world(environment.gravity_state, environment.gravity.x, environment.gravity.y, environment.gravity.z )
+
+gui=Gui()
+gui:init()
+gui:set_resourcespath("./maxskin")
+gui:load_scheme("AlfiskoSkin.scheme")
+gui:load_layout("max.layout","maxskin/layouts/max_widgets.conf")
+gui:set_layout("max.layout")
+gui:show_gui(TRUE)
 
 g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
