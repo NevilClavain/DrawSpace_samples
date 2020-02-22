@@ -1,7 +1,8 @@
 
-text_x_position = 110
-
 include("model_main.lua")
+
+text_x_position = 110
+hmi_mode=FALSE
 
 ctrl_key = FALSE
 last_key = 0
@@ -55,21 +56,19 @@ rg:update_renderingqueues()
 
 g:add_mousemovecb( "onmousemove",function( xm, ym, dx, dy )  
 
-  local mvt_info = { model.camera.mvt:read() }
-
-
-  if mouse_left == TRUE then
-
-    transformations_update( dx )
-
+  if hmi_mode == TRUE then
+    gui:on_mousemove( xm, ym, dx, dy )
   else
 
-    if mouse_right == FALSE then
-	  model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],-dy / 4.0,-dx / 4.0, 0)
-
+    local mvt_info = { model.camera.mvt:read() }
+    if mouse_left == TRUE then
+      transformations_update( dx )
     else
-	  model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,-dx)
-
+      if mouse_right == FALSE then
+	    model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],-dy / 4.0,-dx / 4.0, 0)
+      else
+	    model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,-dx)
+      end
     end
   end
 
@@ -78,22 +77,43 @@ end)
 
 g:add_mouserightbuttondowncb( "onmouserightbuttondown", 
 function( xm, ym )
-  mouse_right = TRUE
+
+  if hmi_mode == TRUE then
+    gui:on_mouserightbuttondown()
+  else
+    mouse_right = TRUE
+  end
+
 end)
 
 g:add_mouserightbuttonupcb( "onmouserightbuttonup", 
 function( xm, ym )
-  mouse_right = FALSE
+
+  if hmi_mode == TRUE then
+    gui:on_mouserightbuttonup()
+  else
+    mouse_right = FALSE
+  end
 end)
 
 g:add_mouseleftbuttondowncb( "onmouseleftbuttondown", 
 function( xm, ym )
-  mouse_left = TRUE
+
+  if hmi_mode == TRUE then
+    gui:on_mouseleftbuttondown()
+  else
+    mouse_left = TRUE
+  end
 end)
 
 g:add_mouseleftbuttonupcb( "onmouseleftbuttonup", 
 function( xm, ym )
-  mouse_left = FALSE
+
+  if hmi_mode == TRUE then
+    gui:on_mouseleftbuttonup()
+  else
+    mouse_left = FALSE
+  end
 end)
 
 g:add_keydowncb( "keydown",
@@ -103,20 +123,22 @@ function( key )
 
   --Q key
   if key == 81 then 
-    local mvt_info = { model.camera.mvt:read() }
 
-	model.camera.mvt:update(model.camera.speed,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+    if hmi_mode == FALSE then
+      local mvt_info = { model.camera.mvt:read() }
+	  model.camera.mvt:update(model.camera.speed,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	end
       
   --W key
   elseif key == 87 then
 
-    local mvt_info = { model.camera.mvt:read() }
-
-	model.camera.mvt:update(-model.camera.speed,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+    if hmi_mode == FALSE then
+      local mvt_info = { model.camera.mvt:read() }
+	  model.camera.mvt:update(-model.camera.speed,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	end
 
   elseif key == 17 then
     ctrl_key = TRUE
-
 
   end
 
@@ -129,30 +151,39 @@ function( key )
 
   --Q key
   if key == 81 then
-    local mvt_info = { model.camera.mvt:read() }
-
-	model.camera.mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
-
-    
+    if hmi_mode == FALSE then
+      local mvt_info = { model.camera.mvt:read() }
+	  model.camera.mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+    end
   --W key
   elseif key == 87 then
-    local mvt_info = { model.camera.mvt:read() }
-
-	model.camera.mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
- 
+    if hmi_mode == FALSE then
+      local mvt_info = { model.camera.mvt:read() }
+	  model.camera.mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+    end
   elseif key == 17 then
     ctrl_key = FALSE
 
     -- VK_F1
   elseif key == 112 then
 
+    if hmi_mode == FALSE then
+      hmi_mode = TRUE
+      g:show_mousecursor(TRUE)
+      g:set_mousecursorcircularmode(FALSE)
+
+
+    elseif hmi_mode==TRUE then
+      hmi_mode=FALSE
+      g:show_mousecursor(FALSE)
+      g:set_mousecursorcircularmode(TRUE)
+    end
+
     -- VK_F2
   elseif key == 113 then
     
   end
 end)
-
-
 
 g:add_appruncb( "run",
 function()  
