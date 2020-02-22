@@ -306,9 +306,9 @@ trex.anims.parameters = function()
 end
 
 trex.view.lit.load = function(p_entity_id)
-  model.view.load(trex.createlitmodelview, trex.update_from_scene_env, trex.anims.parameters, trex.scale, p_entity_id)
+  model.view.load('trex model', trex.createlitmodelview, trex.update_from_scene_env, trex.anims.parameters, trex.scale, p_entity_id)
 end
 
 trex.view.wireframe.load = function(p_entity_id)
-  model.view.load(trex.createwireframemodelview, trex.update_from_scene_env, trex.anims.parameters, trex.scale, p_entity_id)
+  model.view.load('trex model', trex.createwireframemodelview, trex.update_from_scene_env, trex.anims.parameters, trex.scale, p_entity_id)
 end

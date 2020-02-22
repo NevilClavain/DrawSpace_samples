@@ -264,9 +264,9 @@ end
 
 
 continent.view.lit.load = function(p_entity_id)
-  model.view.load(continent.createlitmodelview, continent.update_lit_from_scene_env, nil, nil, p_entity_id)
+  model.view.load('continent model', continent.createlitmodelview, continent.update_lit_from_scene_env, nil, nil, p_entity_id)
 end
 
 continent.view.wireframe.load = function(p_entity_id)
-  model.view.load(continent.createwireframemodelview, continent.update_wireframe_from_scene_env, nil, nil, p_entity_id)
+  model.view.load('continent model', continent.createwireframemodelview, continent.update_wireframe_from_scene_env, nil, nil, p_entity_id)
 end

@@ -1,7 +1,7 @@
 
 model.view = {}
 
-model.view.load = function(p_modelviewload_function, p_update_from_scene_env_function, p_anims_parameters, p_initial_scale, p_entity_id)
+model.view.load = function(p_modelname, p_modelviewload_function, p_update_from_scene_env_function, p_anims_parameters, p_initial_scale, p_entity_id)
 
   local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id, p_bodyinitialpos)
 
@@ -63,7 +63,8 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
     ['entity'] = entity,
 	['current_animation_loop'] = -1,
 	['rand_anim_mode'] = FALSE,
-	['update_from_scene_env_function'] = p_update_from_scene_env_function
+	['update_from_scene_env_function'] = p_update_from_scene_env_function,
+	['model_classname'] = p_modelname
   }
 
   model.entities[p_entity_id] = entity_properties_entry
@@ -87,7 +88,7 @@ model.view.load = function(p_modelviewload_function, p_update_from_scene_env_fun
   rg:update_renderingqueues()
 end
 
-model.view.loadbody = function(p_modelviewload_function, p_update_from_scene_env_function, p_anims_parameters, p_entity_id, p_bodyinitialpos)
+model.view.loadbody = function(p_modelname, p_modelviewload_function, p_update_from_scene_env_function, p_anims_parameters, p_entity_id, p_bodyinitialpos)
 
   local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id, p_bodyinitialpos)
 
@@ -98,7 +99,8 @@ model.view.loadbody = function(p_modelviewload_function, p_update_from_scene_env
     ['entity'] = entity,
 	['current_animation_loop'] = -1,
 	['rand_anim_mode'] = FALSE,
-	['update_from_scene_env_function'] = p_update_from_scene_env_function
+	['update_from_scene_env_function'] = p_update_from_scene_env_function,
+	['model_classname'] = p_modelname
   }
 
   model.entities[p_entity_id] = entity_properties_entry

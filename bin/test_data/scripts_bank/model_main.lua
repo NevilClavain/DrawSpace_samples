@@ -42,3 +42,10 @@ include("model_view.lua")
 include("model_transformations.lua")
 include("model_anims.lua")
 include("model_env.lua")
+
+model.printscenelist = function()
+
+  for k, v in pairs(model.entities) do
+    g:print(k..' ['..v.model_classname..']')
+  end
+end

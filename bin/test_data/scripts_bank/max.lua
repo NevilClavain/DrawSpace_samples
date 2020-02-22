@@ -11,8 +11,6 @@ mouse_right = FALSE
 mouse_left = FALSE
 
 
-current_animation_loop = -1
-
 renderer_infos = {renderer:descr()}
 g:print('Current renderer is '..renderer_infos[1]..', '..renderer_infos[2]..'x'..renderer_infos[3])
 
@@ -201,10 +199,9 @@ function()
   if model.target ~= nil then
 
     if model.target ~= "" then
-
-      target_infos = "selection = ["..model.target.."]"
-
 	  if model.entities[model.target] ~= nil then
+
+	    target_infos = "selection = ["..model.target.."] ("..model.entities[model.target].model_classname..")"
 
         if model.entities[model.target].entity:has_aspect(BODY_ASPECT) == TRUE then
 

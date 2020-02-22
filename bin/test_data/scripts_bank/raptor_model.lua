@@ -312,11 +312,11 @@ raptor.anims.parameters = function()
 end
 
 raptor.view.lit.load = function(p_entity_id)
-  model.view.load(raptor.createlitmodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id)
+  model.view.load('raptor model', raptor.createlitmodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id)
 end
 
 raptor.view.wireframe.load = function(p_entity_id)
-  model.view.load(raptor.createwireframemodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id)
+  model.view.load('raptor model', raptor.createwireframemodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id)
 end
 
 
