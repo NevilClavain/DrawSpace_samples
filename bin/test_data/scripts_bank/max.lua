@@ -32,9 +32,12 @@ move_renderer:configure(root_entity, "move", 80, 60, 255, 0, 255, "...")
 animsinfos_renderer=TextRendering()
 animsinfos_renderer:configure(root_entity, "anims", 80, 80, 255, 0, 255, "...")
 
+operation_renderer=TextRendering()
+operation_renderer:configure(root_entity, "current_operation", 80, 100, 255, 0, 255, "")
+
 dbg_renderer=TextRendering()
 dbg_renderer:configure(root_entity, "debug", 80, 100, 255, 0, 255, "...")
-dbg_string = "debugme"
+dbg_string = ""
 
 root_entity:add_aspect(PHYSICS_ASPECT)
 
@@ -264,7 +267,9 @@ function()
   move_renderer:update(text_x_position, 70, 255, 255, 255, target_infos)
   animsinfos_renderer:update(text_x_position, 90, 255, 255, 255, target_anims_infos)
 
-  dbg_renderer:update(text_x_position, 120, 0, 255, 0, dbg_string)
+  operation_renderer:update(text_x_position, 120, 255, 255, 255, model.current_operation)
+
+  dbg_renderer:update(text_x_position, 150, 0, 255, 0, dbg_string)
 
 
   local mvt_info = { model.camera.mvt:read() }

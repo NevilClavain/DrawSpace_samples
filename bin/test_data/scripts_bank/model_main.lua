@@ -9,6 +9,7 @@ model.camera = {}
 model.camera.speed = 50.0
 
 model.target = ""
+model.current_operation = ""
 
 environment = 
 {

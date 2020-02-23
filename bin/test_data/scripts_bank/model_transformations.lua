@@ -152,46 +152,52 @@ end
 
 model.move.posx = function()
   model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_POSX
+  model.current_operation = "Positionning model along X axis"
 end
 
 model.move.posy = function()
   model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_POSY
+  model.current_operation = "Positionning model along Y axis"
 end
 
 model.move.posz = function()
   model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_POSZ
+  model.current_operation = "Positionning model along Z axis"
 end
 
 model.move.rotx = function()
   model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_ROTX
+  model.current_operation = "Rotating model along X axis"
 end
 
 model.move.roty = function()
   model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_ROTY
+  model.current_operation = "Rotating model along Y axis"
 end
 
 model.move.rotz = function()
   model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_ROTZ
+  model.current_operation = "Rotating model along Z axis"
 end
 
 model.move.scalex = function()
-
   model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEX
+  model.current_operation = "Scaling model along X axis"
 end
 
 model.move.scaley = function()
-
   model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEY
+  model.current_operation = "Scaling model along Y axis"
 end
 
 model.move.scalez = function()
-
   model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEZ
+  model.current_operation = "Scaling model along Z axis"
 end
 
 model.move.scalexyz = function()
-
   model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEXYZ
+  model.current_operation = "Scaling model on X-Y-Z axis"
 end
 
 
@@ -215,6 +221,7 @@ model.move.resetpos = function()
   local transform = transform_entry['transform']
 
   transform:update_matrix("pos",transform_entry['pos_mat'])
+
 end
 
 model.move.resetrot = function()
