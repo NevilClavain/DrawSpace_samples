@@ -6,6 +6,7 @@
 	include('metalcube_model.lua')
     include('spherebump_model.lua')
 	
+	
 	continent.view.load('continent')
 	
 	
@@ -18,6 +19,7 @@
 
     model.move.setpos('r', -4020.0, 0, -2740)
 	model.move.setpos('t', -4068.0, 0, -2740)
+	
 
 	model.env.setgravity(1)
 	

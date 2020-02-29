@@ -1,7 +1,7 @@
 
 include("model_main.lua")
 
-text_x_position = 110
+text_x_position = 140
 hmi_mode=FALSE
 
 ctrl_key = FALSE
@@ -120,27 +120,24 @@ end)
 g:add_keydowncb( "keydown",
 function( key )
 
+  if hmi_mode == TRUE then
+    gui:on_keydown( key )
+  else
 
+    --Q key
+    if key == 81 then 
 
-  --Q key
-  if key == 81 then 
-
-    if hmi_mode == FALSE then
       local mvt_info = { model.camera.mvt:read() }
 	  model.camera.mvt:update(model.camera.speed,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
-	end
       
-  --W key
-  elseif key == 87 then
+    --W key
+    elseif key == 87 then
 
-    if hmi_mode == FALSE then
       local mvt_info = { model.camera.mvt:read() }
 	  model.camera.mvt:update(-model.camera.speed,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
-	end
-
-  elseif key == 17 then
-    ctrl_key = TRUE
-
+    elseif key == 17 then
+      ctrl_key = TRUE
+    end
   end
 
 end)
@@ -148,42 +145,48 @@ end)
 g:add_keyupcb( "keyup",
 function( key )  
 
-  last_key = key
+  if hmi_mode == TRUE then
+    if key == 112 then -- VK_F1
+      if hmi_mode==TRUE then
+        hmi_mode=FALSE
+        g:show_mousecursor(FALSE)
+        g:set_mousecursorcircularmode(TRUE)
+      end 
+	else
+	  gui:on_keyup( key )
+	end    
+  else
 
-  --Q key
-  if key == 81 then
-    if hmi_mode == FALSE then
-      local mvt_info = { model.camera.mvt:read() }
-	  model.camera.mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
-    end
-  --W key
-  elseif key == 87 then
-    if hmi_mode == FALSE then
-      local mvt_info = { model.camera.mvt:read() }
-	  model.camera.mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
-    end
-  elseif key == 17 then
-    ctrl_key = FALSE
+    last_key = key
 
-    -- VK_F1
-  elseif key == 112 then
-
-    if hmi_mode == FALSE then
-      hmi_mode = TRUE
-      g:show_mousecursor(TRUE)
-      g:set_mousecursorcircularmode(FALSE)
-
-
-    elseif hmi_mode==TRUE then
-      hmi_mode=FALSE
-      g:show_mousecursor(FALSE)
-      g:set_mousecursorcircularmode(TRUE)
-    end
-
-    -- VK_F2
-  elseif key == 113 then
+    --Q key
+    if key == 81 then
     
+      local mvt_info = { model.camera.mvt:read() }
+	  model.camera.mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+
+    --W key
+    elseif key == 87 then
+      local mvt_info = { model.camera.mvt:read() }
+	  model.camera.mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+    elseif key == 17 then
+      ctrl_key = FALSE
+    -- VK_F1
+    elseif key == 112 then
+
+      if hmi_mode == FALSE then
+        hmi_mode = TRUE
+        g:show_mousecursor(TRUE)
+        g:set_mousecursorcircularmode(FALSE)
+	  end   
+    end
+
   end
+end)
+
+g:add_oncharcb( "onchar",
+function( char, scan )  
+  gui:on_char( char )
 end)
 
 g:add_appruncb( "run",
@@ -313,6 +316,25 @@ gui:load_scheme("AlfiskoSkin.scheme")
 gui:load_layout("max.layout","maxskin/layouts/max_widgets.conf")
 gui:set_layout("max.layout")
 gui:show_gui(TRUE)
+
+gui:add_pushbuttonclickedcb( "onpushbutton",
+function( layout, widget )
+  
+  -- dbg_renderer:update(350, 20, 255, 0, 255, layout.. " "..widget)
+
+  if widget == "Button_Quit" then
+    g:quit()
+  end
+
+  if widget == "Button_AnimsDump" then
+    model.anims.dump()
+  end
+
+  if widget == "Button_AnimsRun" then
+    
+  end
+
+end)
 
 g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
