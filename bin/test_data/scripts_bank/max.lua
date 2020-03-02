@@ -331,11 +331,11 @@ function( layout, widget )
     gui:set_widgettext("max.layout", "Label_Text", model.text)
   end
 
-  if widget == "Button_AnimsDump" then
+  if widget == "Button_AnimsDump" and model.target ~= "" then
     model.anims.dump()
   end
 
-  if widget == "Button_AnimsRun" then
+  if widget == "Button_AnimsRun" and model.target ~= "" then
 	local index, error = g:stoi(gui:get_widgettext("max.layout", "Editbox_AnimIndex"))
 	if error == 1 then
 	  --g:print('CONV ERROR')
@@ -343,6 +343,24 @@ function( layout, widget )
 	  model.anims.run(index)
 	end	
   end
+
+  if widget == "Button_AnimsRunLoop" and model.target ~= "" then
+	local index, error = g:stoi(gui:get_widgettext("max.layout", "Editbox_AnimIndex"))
+	if error == 1 then
+	  --g:print('CONV ERROR')
+	else
+	  model.anims.runloop(index)
+	end	
+  end
+
+  if widget == "Button_AnimsRand" and model.target ~= "" then
+    model.anims.rand()
+  end
+
+  if widget == "Button_AnimsStop" and model.target ~= "" then
+    model.anims.stop()
+  end
+
 end)
 
 g:show_mousecursor(FALSE)
