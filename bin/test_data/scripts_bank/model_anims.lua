@@ -56,12 +56,18 @@ end
 
 model.anims.dump = function()
 
+  model.text = ""
   local entity_properties_entry = model.entities[model.target]
   local entity = entity_properties_entry['entity']
   animations_names = {entity:read_animationsnames()}
 
   for k, v in pairs(animations_names) do
-	g:print('animation '..k..' ->'..v)
-  end	
+	--g:print('animation '..k..' ->'..v)
+    model.text = model.text..'animation '..k..' ->'..v.."\n"
+  end
+
+  if model.dump.showcontentfunc ~= nil then
+    model.dump.showcontentfunc()
+  end
 end
 

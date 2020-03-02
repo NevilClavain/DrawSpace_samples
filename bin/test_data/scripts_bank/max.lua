@@ -326,14 +326,23 @@ function( layout, widget )
     g:quit()
   end
 
+  if widget == "Button_ClearInfos" then
+    model.text = ""
+    gui:set_widgettext("max.layout", "Label_Text", model.text)
+  end
+
   if widget == "Button_AnimsDump" then
     model.anims.dump()
   end
 
   if widget == "Button_AnimsRun" then
-    
+	local index, error = g:stoi(gui:get_widgettext("max.layout", "Editbox_AnimIndex"))
+	if error == 1 then
+	  --g:print('CONV ERROR')
+	else
+	  model.anims.run(index)
+	end	
   end
-
 end)
 
 g:show_mousecursor(FALSE)
@@ -349,3 +358,9 @@ else
 end
 
 
+--define how to show dump infos
+
+model.dump.showcontentfunc = function()
+  g:breakpoint(model.text)
+  gui:set_widgettext("max.layout", "Label_Text", model.text)
+end
