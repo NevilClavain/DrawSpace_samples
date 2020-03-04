@@ -377,7 +377,6 @@ end
 
 
 --define how to show dump infos
-
 model.dump.showcontentfunc = function()
   g:breakpoint(model.text)
   gui:set_widgettext("max.layout", "Label_Text", model.text)
