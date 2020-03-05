@@ -47,8 +47,11 @@ include("model_anims.lua")
 include("model_env.lua")
 
 model.printscenelist = function()
-
+  model.text = ""
   for k, v in pairs(model.entities) do
-    g:print(k..' ['..v.model_classname..']')
+	model.text=model.text..'{'..k..'}'..v.model_classname.."\n"
+  end
+  if model.dump.showcontentfunc ~= nil then
+    model.dump.showcontentfunc()
   end
 end
