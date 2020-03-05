@@ -361,6 +361,10 @@ function( layout, widget )
     model.anims.stop()
   end
 
+  if widget == "Button_SceneContent" then
+    model.printscenelist()
+  end
+
 end)
 
 g:show_mousecursor(FALSE)

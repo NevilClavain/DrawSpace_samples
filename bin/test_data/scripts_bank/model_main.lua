@@ -48,8 +48,10 @@ include("model_env.lua")
 
 model.printscenelist = function()
   model.text = ""
+  local i = 1
   for k, v in pairs(model.entities) do
-	model.text=model.text..'{'..k..'}'..v.model_classname.."\n"
+	model.text=model.text..i..' - {'..k..'}'..v.model_classname.."\n"
+	i = i + 1
   end
   if model.dump.showcontentfunc ~= nil then
     model.dump.showcontentfunc()
