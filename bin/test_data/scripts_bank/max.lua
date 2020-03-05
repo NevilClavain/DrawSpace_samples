@@ -331,11 +331,11 @@ function( layout, widget )
     gui:set_widgettext("max.layout", "Label_Text", model.text)
   end
 
-  if widget == "Button_AnimsDump" and model.target ~= "" then
+  if widget == "Button_AnimsDump" and model.target ~= "" and model.entities[model.target].entity:has_aspect(ANIMATION_ASPECT) == TRUE then
     model.anims.dump()
   end
 
-  if widget == "Button_AnimsRun" and model.target ~= "" then
+  if widget == "Button_AnimsRun" and model.target ~= "" and model.entities[model.target].entity:has_aspect(ANIMATION_ASPECT) == TRUE then
 	local index, error = g:stoi(gui:get_widgettext("max.layout", "Editbox_AnimIndex"))
 	if error == 1 then
 	  --g:print('CONV ERROR')
@@ -344,7 +344,7 @@ function( layout, widget )
 	end	
   end
 
-  if widget == "Button_AnimsRunLoop" and model.target ~= "" then
+  if widget == "Button_AnimsRunLoop" and model.target ~= "" and model.entities[model.target].entity:has_aspect(ANIMATION_ASPECT) == TRUE then
 	local index, error = g:stoi(gui:get_widgettext("max.layout", "Editbox_AnimIndex"))
 	if error == 1 then
 	  --g:print('CONV ERROR')
@@ -353,11 +353,11 @@ function( layout, widget )
 	end	
   end
 
-  if widget == "Button_AnimsRand" and model.target ~= "" then
+  if widget == "Button_AnimsRand" and model.target ~= "" and model.entities[model.target].entity:has_aspect(ANIMATION_ASPECT) == TRUE then
     model.anims.rand()
   end
 
-  if widget == "Button_AnimsStop" and model.target ~= "" then
+  if widget == "Button_AnimsStop" and model.target ~= "" and model.entities[model.target].entity:has_aspect(ANIMATION_ASPECT) == TRUE then
     model.anims.stop()
   end
 
