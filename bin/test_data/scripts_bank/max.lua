@@ -415,6 +415,93 @@ function( layout, widget )
     model.move.scalez()
   end
 
+  if widget == "Button_MesheFileInfos" then
+
+    model.text = ""
+	model.text = model.text..'<modelname>.dump.load()\n'
+	model.text = model.text..'<modelname>.dump.show()\n'
+	model.text = model.text..'<modelname>.dump.unload()\n'
+
+    if model.dump.showcontentfunc ~= nil then
+      model.dump.showcontentfunc()
+    end
+  end
+
+  if widget == "Button_ModelView" then
+
+    model.text = ""
+	model.text = model.text..'<modelname>.view.load(<entity_id>)\n'
+	model.text = model.text..'<modelname>.view.load(<entity_id>, {x = <value>, y = <value>, z = <value>})\n'
+	model.text = model.text..'<modelname>.view.unload(<entity_id>)\n'
+
+    if model.dump.showcontentfunc ~= nil then
+      model.dump.showcontentfunc()
+    end
+  end
+
+  if widget == "Button_TargetSel" then
+    model.text = ""
+	model.text = model.text..'model.target = <entity_id>\n'
+	model.text = model.text..'model.printscenelist()\n'
+
+    if model.dump.showcontentfunc ~= nil then
+      model.dump.showcontentfunc()
+    end
+  end
+
+  if widget == "Button_ModelMove" then
+    model.text = ""
+	model.text = model.text..'model.move.posx()\n'
+	model.text = model.text..'model.move.posy()\n'
+	model.text = model.text..'model.move.posz()\n'
+	model.text = model.text..'model.move.rotx()\n'
+	model.text = model.text..'model.move.roty()\n'
+	model.text = model.text..'model.move.rotz()\n'
+	model.text = model.text..'model.move.scalex()\n'
+	model.text = model.text..'model.move.scaley()\n'
+	model.text = model.text..'model.move.scalez()\n'
+	model.text = model.text..'model.move.scalexyz()\n'
+	model.text = model.text..'model.move.resetpos()\n'
+	model.text = model.text..'model.move.resetrot()\n'
+	model.text = model.text..'model.move.resetscale()\n'
+	model.text = model.text..'model.move.setpos(<entity_id>, <x>, <y>, <z>)\n'
+
+    if model.dump.showcontentfunc ~= nil then
+      model.dump.showcontentfunc()
+    end
+  end
+
+  if widget == "Button_ModelAnims" then
+    model.text = ""
+	model.text = model.text..'model.anims.dump()\n'
+	model.text = model.text..'model.anims.run(<anim_index>)\n'
+	model.text = model.text..'model.anims.runloop(<anim_index>)\n'
+	model.text = model.text..'model.anims.rand()\n'
+	model.text = model.text..'model.anims.stop()\n'
+
+    if model.dump.showcontentfunc ~= nil then
+      model.dump.showcontentfunc()
+    end
+  end
+
+  if widget == "Button_Env" then
+    model.text = ""
+	model.text = model.text..'model.camera.speed = <speed>\n'
+	model.text = model.text..'model.env.setgravity(<bool>)\n'
+	model.text = model.text..'model.env.setgravitydir(<x>, <y>, <z>)\n'
+	model.text = model.text..'model.env.setbkcolor(<r>, <g>, <b>)\n'
+	model.text = model.text..'model.env.fog.setdensity(<density>)\n'
+	model.text = model.text..'model.env.fog.setcolor(<r>, <g>, <b>)\n'
+	model.text = model.text..'model.env.light.setdir(<x>, <y>, <z>)\n'
+	model.text = model.text..'model.env.ambientlight.setcolor(<r>, <g>, <b>)\n'
+	model.text = model.text..'model.env.light.setstate(<bool>)\n'
+	model.text = model.text..'model.env.light.setcolor(<r>, <g>, <b>)\n'
+
+    if model.dump.showcontentfunc ~= nil then
+      model.dump.showcontentfunc()
+    end
+  end
+
 end)
 
 g:show_mousecursor(FALSE)
