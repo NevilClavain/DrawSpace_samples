@@ -58,7 +58,11 @@ rg:update_renderingqueues()
 g:add_mousemovecb( "onmousemove",function( xm, ym, dx, dy )  
 
   if hmi_mode == TRUE then
-    gui:on_mousemove( xm, ym, dx, dy )
+    if mouse_left == TRUE then
+      transformations_update( dx )
+    else
+      gui:on_mousemove( xm, ym, dx, dy )
+	end
   else
 
     local mvt_info = { model.camera.mvt:read() }
@@ -100,20 +104,18 @@ end)
 g:add_mouseleftbuttondowncb( "onmouseleftbuttondown", 
 function( xm, ym )
 
+  mouse_left = TRUE
   if hmi_mode == TRUE then
-    gui:on_mouseleftbuttondown()
-  else
-    mouse_left = TRUE
+    gui:on_mouseleftbuttondown()  
   end
 end)
 
 g:add_mouseleftbuttonupcb( "onmouseleftbuttonup", 
 function( xm, ym )
 
+  mouse_left = FALSE
   if hmi_mode == TRUE then
     gui:on_mouseleftbuttonup()
-  else
-    mouse_left = FALSE
   end
 end)
 
@@ -363,6 +365,54 @@ function( layout, widget )
 
   if widget == "Button_SceneContent" then
     model.printscenelist()
+  end
+
+  if widget == "Button_ResestPos" then
+    model.move.resetpos()
+  end
+
+  if widget == "Button_ResetRot" then
+    model.move.resetrot()
+  end
+
+  if widget == "Button_ResetScale" then
+    model.move.resetscale()
+  end
+
+  if widget == "Button_PosX" then
+    model.move.posx()
+  end
+
+  if widget == "Button_PosY" then
+    model.move.posy()
+  end
+
+  if widget == "Button_PosZ" then
+    model.move.posz()
+  end
+
+  if widget == "Button_RotX" then
+    model.move.rotx()
+  end
+
+  if widget == "Button_RotY" then
+    model.move.roty()
+  end
+
+  if widget == "Button_RotZ" then
+    model.move.rotz()
+  end
+
+  if widget == "Button_ScaleX" then
+    model.move.scalex()
+  end
+
+  if widget == "Button_ScaleY" then
+    model.move.scaley()
+  end
+
+  if widget == "Button_ScaleZ" then
+    model.move.scalez()
   end
 
 end)
