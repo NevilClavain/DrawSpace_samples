@@ -151,124 +151,152 @@ transformations_update = function(p_delta)
 end
 
 model.move.posx = function()
-  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_POSX
-  model.current_operation = "Positionning model along X axis"
+
+  if model.transformations[model.target] ~= nil then
+    model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_POSX
+    model.current_operation = "Positionning model along X axis"
+  end
 end
 
 model.move.posy = function()
-  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_POSY
-  model.current_operation = "Positionning model along Y axis"
+
+  if model.transformations[model.target] ~= nil then
+    model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_POSY
+    model.current_operation = "Positionning model along Y axis"
+  end
 end
 
 model.move.posz = function()
-  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_POSZ
-  model.current_operation = "Positionning model along Z axis"
+
+  if model.transformations[model.target] ~= nil then
+    model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_POSZ
+    model.current_operation = "Positionning model along Z axis"
+  end
 end
 
 model.move.rotx = function()
-  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_ROTX
-  model.current_operation = "Rotating model along X axis"
+
+  if model.transformations[model.target] ~= nil then
+    model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_ROTX
+    model.current_operation = "Rotating model along X axis"
+  end
 end
 
 model.move.roty = function()
-  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_ROTY
-  model.current_operation = "Rotating model along Y axis"
+  if model.transformations[model.target] ~= nil then
+    model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_ROTY
+    model.current_operation = "Rotating model along Y axis"
+  end
 end
 
 model.move.rotz = function()
-  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_ROTZ
-  model.current_operation = "Rotating model along Z axis"
+  if model.transformations[model.target] ~= nil then
+    model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_ROTZ
+    model.current_operation = "Rotating model along Z axis"
+  end
 end
 
 model.move.scalex = function()
-  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEX
-  model.current_operation = "Scaling model along X axis"
+  if model.transformations[model.target] ~= nil then
+    model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEX
+    model.current_operation = "Scaling model along X axis"
+  end
 end
 
 model.move.scaley = function()
-  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEY
-  model.current_operation = "Scaling model along Y axis"
+  if model.transformations[model.target] ~= nil then
+    model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEY
+    model.current_operation = "Scaling model along Y axis"
+  end
 end
 
 model.move.scalez = function()
-  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEZ
-  model.current_operation = "Scaling model along Z axis"
+  if model.transformations[model.target] ~= nil then
+    model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEZ
+    model.current_operation = "Scaling model along Z axis"
+  end
 end
 
 model.move.scalexyz = function()
-  model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEXYZ
-  model.current_operation = "Scaling model on X-Y-Z axis"
+  if model.transformations[model.target] ~= nil then
+    model.transformations[model.target]['transformation_input_mode'] = MODEL_TRANSFORMATION_INPUTMODE_SCALEXYZ
+    model.current_operation = "Scaling model on X-Y-Z axis"
+  end
 end
-
-
 
 model.move.resetpos = function()
 
-  local transform_entry = model.transformations[model.target]
+  if model.transformations[model.target] ~= nil then
+    local transform_entry = model.transformations[model.target]
 
-  local pos_x = transform_entry['pos_mat']:get_value(3,0)
-  local pos_y = transform_entry['pos_mat']:get_value(3,1)
-  local pos_z = transform_entry['pos_mat']:get_value(3,2)
+    local pos_x = transform_entry['pos_mat']:get_value(3,0)
+    local pos_y = transform_entry['pos_mat']:get_value(3,1)
+    local pos_z = transform_entry['pos_mat']:get_value(3,2)
 
-  pos_x = 0
-  pos_y = 0
-  pos_z = 0
+    pos_x = 0
+    pos_y = 0
+    pos_z = 0
 
-  transform_entry['pos_mat']:set_value(3,0,pos_x) 
-  transform_entry['pos_mat']:set_value(3,1,pos_y) 
-  transform_entry['pos_mat']:set_value(3,2,pos_z) 
+    transform_entry['pos_mat']:set_value(3,0,pos_x) 
+    transform_entry['pos_mat']:set_value(3,1,pos_y) 
+    transform_entry['pos_mat']:set_value(3,2,pos_z) 
 
-  local transform = transform_entry['transform']
+    local transform = transform_entry['transform']
 
-  transform:update_matrix("pos",transform_entry['pos_mat'])
-
+    transform:update_matrix("pos",transform_entry['pos_mat'])
+  end
 end
 
 model.move.resetrot = function()
 
-  local transform_entry = model.transformations[model.target]
+  if model.transformations[model.target] ~= nil then
+    local transform_entry = model.transformations[model.target]
 
-  transform_entry['rotx_deg_angle'] = 0
-  transform_entry['roty_deg_angle'] = 0
-  transform_entry['rotz_deg_angle'] = 0
+    transform_entry['rotx_deg_angle'] = 0
+    transform_entry['roty_deg_angle'] = 0
+    transform_entry['rotz_deg_angle'] = 0
 
-  transform_entry['rotx_mat']:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(transform_entry['rotx_deg_angle']))
-  transform_entry['roty_mat']:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(transform_entry['roty_deg_angle']))
-  transform_entry['rotz_mat']:rotation(0.0, 0.0, 1.0, commons.utils.deg_to_rad(transform_entry['rotz_deg_angle']))
+    transform_entry['rotx_mat']:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(transform_entry['rotx_deg_angle']))
+    transform_entry['roty_mat']:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(transform_entry['roty_deg_angle']))
+    transform_entry['rotz_mat']:rotation(0.0, 0.0, 1.0, commons.utils.deg_to_rad(transform_entry['rotz_deg_angle']))
 
-  local transform = transform_entry['transform']
+    local transform = transform_entry['transform']
 
-  transform:update_matrix("rotx",transform_entry['rotx_mat'])
-  transform:update_matrix("roty",transform_entry['roty_mat'])
-  transform:update_matrix("rotz",transform_entry['rotz_mat'])
-
+    transform:update_matrix("rotx",transform_entry['rotx_mat'])
+    transform:update_matrix("roty",transform_entry['roty_mat'])
+    transform:update_matrix("rotz",transform_entry['rotz_mat'])
+  end
 end
 
 model.move.resetscale = function()
 
-  local transform_entry = model.transformations[model.target]
+  if model.transformations[model.target] ~= nil then
+    local transform_entry = model.transformations[model.target]
 
-  local scale_x = transform_entry['scale_mat']:get_value(0,0)
-  local scale_y = transform_entry['scale_mat']:get_value(1,1)
-  local scale_z = transform_entry['scale_mat']:get_value(2,2)
+    local scale_x = transform_entry['scale_mat']:get_value(0,0)
+    local scale_y = transform_entry['scale_mat']:get_value(1,1)
+    local scale_z = transform_entry['scale_mat']:get_value(2,2)
 
-  scale_x = 1
-  scale_y = 1
-  scale_z = 1
+    scale_x = 1
+    scale_y = 1
+    scale_z = 1
 
-  transform_entry['scale_mat']:set_value(0,0,scale_x) 
-  transform_entry['scale_mat']:set_value(1,1,scale_y) 
-  transform_entry['scale_mat']:set_value(2,2,scale_z)
+    transform_entry['scale_mat']:set_value(0,0,scale_x) 
+    transform_entry['scale_mat']:set_value(1,1,scale_y) 
+    transform_entry['scale_mat']:set_value(2,2,scale_z)
 
-  local transform = transform_entry['transform']
+    local transform = transform_entry['transform']
 
-  transform:update_matrix("scale",transform_entry['scale_mat'])
-
+    transform:update_matrix("scale",transform_entry['scale_mat'])
+  end
 end
 
 model.move.setpos = function(p_entity_id, x, y, z)
-  model.transformations[p_entity_id]['pos_mat']:set_value(3,0,x) 
-  model.transformations[p_entity_id]['pos_mat']:set_value(3,1,y) 
-  model.transformations[p_entity_id]['pos_mat']:set_value(3,2,z) 
-  model.transformations[p_entity_id]['transform']:update_matrix("pos",model.transformations[p_entity_id]['pos_mat'])
+
+  if model.transformations[p_entity_id] ~= nil then
+    model.transformations[p_entity_id]['pos_mat']:set_value(3,0,x) 
+    model.transformations[p_entity_id]['pos_mat']:set_value(3,1,y) 
+    model.transformations[p_entity_id]['pos_mat']:set_value(3,2,z) 
+    model.transformations[p_entity_id]['transform']:update_matrix("pos",model.transformations[p_entity_id]['pos_mat'])
+  end
 end

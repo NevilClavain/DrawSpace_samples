@@ -415,6 +415,11 @@ function( layout, widget )
     model.move.scalez()
   end
 
+  if widget == "Button_ScaleXYZ" then
+    model.move.scalexyz()
+  end
+
+
   if widget == "Button_MesheFileInfos" then
 
     model.text = ""
