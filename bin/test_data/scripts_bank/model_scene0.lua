@@ -5,11 +5,12 @@
 	include('trex_model.lua')
 	include('metalcube_model.lua')
     include('spherebump_model.lua')
+	include('skyboxmod_model.lua')
 	
 	
 	continent.view.load('continent')
 	
-	
+	--[[
 	raptor.view.load('r')
 	trex.view.load('t')
 	metalcube.view.load('c', {x = -4010.0, y = 15.0, z = -2740.0} )
@@ -19,7 +20,9 @@
 
     model.move.setpos('r', -4020.0, 0, -2740)
 	model.move.setpos('t', -4068.0, 0, -2740)
-	
+	]]
+
+	skyboxmod.view.load('skybox0')
 
 	model.env.setgravity(1)
 	
