@@ -258,7 +258,7 @@ end
 
 trex.view.unload = function(p_entity_id)
  
-  found_id = FALSE
+  local found_id = FALSE
   for k, v in pairs(trex.models) do
 
     if k == p_entity_id then
@@ -274,20 +274,7 @@ trex.view.unload = function(p_entity_id)
 end
 
 trex.view.load = function(p_entity_id)
-
-  found_id = FALSE
-  for k, v in pairs(trex.models) do
-
-    if k == p_entity_id then
-	  found_id = TRUE
-	end
-  end
-
-  if found_id == TRUE then
-    g:print('Entity '..p_entity_id..' already exists')
-  else
-    trex.view.lit.load(p_entity_id)
-  end  
+    trex.view.lit.load(p_entity_id)  
 end
 
 trex.anims.parameters = function()
@@ -306,9 +293,35 @@ trex.anims.parameters = function()
 end
 
 trex.view.lit.load = function(p_entity_id)
-  model.view.load('trex model', trex.createlitmodelview, trex.update_from_scene_env, trex.anims.parameters, trex.scale, p_entity_id)
+
+  local found_id = FALSE
+  for k, v in pairs(trex.models) do
+
+    if k == p_entity_id then
+	  found_id = TRUE
+	end
+  end
+
+  if found_id == TRUE then
+    g:print('Entity '..p_entity_id..' already exists')
+  else
+    model.view.load('trex model', trex.createlitmodelview, trex.update_from_scene_env, trex.anims.parameters, trex.scale, p_entity_id)
+  end  
 end
 
 trex.view.wireframe.load = function(p_entity_id)
-  model.view.load('trex model', trex.createwireframemodelview, trex.update_from_scene_env, trex.anims.parameters, trex.scale, p_entity_id)
+  
+  local found_id = FALSE
+  for k, v in pairs(trex.models) do
+
+    if k == p_entity_id then
+	  found_id = TRUE
+	end
+  end
+
+  if found_id == TRUE then
+    g:print('Entity '..p_entity_id..' already exists')
+  else
+    model.view.load('trex model', trex.createwireframemodelview, trex.update_from_scene_env, trex.anims.parameters, trex.scale, p_entity_id)
+  end   
 end

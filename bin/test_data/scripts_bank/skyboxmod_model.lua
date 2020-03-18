@@ -171,7 +171,7 @@ end
 
 skyboxmod.view.unload = function(p_entity_id)
  
-  found_id = FALSE
+  local found_id = FALSE
   for k, v in pairs(skyboxmod.models) do
 
     if k == p_entity_id then
@@ -188,7 +188,7 @@ end
 
 skyboxmod.view.load = function(p_entity_id)
 
-  found_id = FALSE
+  local found_id = FALSE
   for k, v in pairs(skyboxmod.models) do
 
     if k == p_entity_id then

@@ -3,7 +3,7 @@ model.view = {}
 
 model.view.load = function(p_modelname, p_modelviewload_function, p_update_from_scene_env_function, p_anims_parameters, p_initial_scale, p_entity_id)
 
-  local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id, p_bodyinitialpos)
+  local entity = p_modelviewload_function(rg, eg, 'texture_pass', p_entity_id)
 
   p_update_from_scene_env_function( 'texture_pass', environment, p_entity_id)
 

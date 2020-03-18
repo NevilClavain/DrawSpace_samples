@@ -175,7 +175,7 @@ end
 
 spherebump.view.unload = function(p_entity_id)
  
-  found_id = FALSE
+  local found_id = FALSE
   for k, v in pairs(spherebump.models) do
 
     if k == p_entity_id then
@@ -192,7 +192,7 @@ end
 
 spherebump.view.load = function(p_entity_id, p_initialpos)
 
-  found_id = FALSE
+  local found_id = FALSE
   for k, v in pairs(spherebump.models) do
 
     if k == p_entity_id then

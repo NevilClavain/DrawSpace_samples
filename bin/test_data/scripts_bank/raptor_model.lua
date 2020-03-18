@@ -265,7 +265,7 @@ end
 
 raptor.view.unload = function(p_entity_id)
  
-  found_id = FALSE
+  local found_id = FALSE
   for k, v in pairs(raptor.models) do
 
     if k == p_entity_id then
@@ -282,19 +282,7 @@ end
 
 raptor.view.load = function(p_entity_id)
 
-  found_id = FALSE
-  for k, v in pairs(raptor.models) do
-
-    if k == p_entity_id then
-	  found_id = TRUE
-	end
-  end
-
-  if found_id == TRUE then
-    g:print('Entity '..p_entity_id..' already exists')
-  else
-    raptor.view.lit.load(p_entity_id)
-  end  
+  raptor.view.lit.load(p_entity_id)
 end
 
 raptor.anims.parameters = function()
@@ -312,11 +300,38 @@ raptor.anims.parameters = function()
 end
 
 raptor.view.lit.load = function(p_entity_id)
-  model.view.load('raptor model', raptor.createlitmodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id)
+
+  local found_id = FALSE
+  for k, v in pairs(raptor.models) do
+
+    if k == p_entity_id then
+	  found_id = TRUE
+	end
+  end
+
+  if found_id == TRUE then
+    g:print('Entity '..p_entity_id..' already exists')
+  else
+    model.view.load('raptor model', raptor.createlitmodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id)
+  end
+
 end
 
 raptor.view.wireframe.load = function(p_entity_id)
-  model.view.load('raptor model', raptor.createwireframemodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id)
+
+  local found_id = FALSE
+  for k, v in pairs(raptor.models) do
+
+    if k == p_entity_id then
+	  found_id = TRUE
+	end
+  end
+
+  if found_id == TRUE then
+    g:print('Entity '..p_entity_id..' already exists')
+  else
+    model.view.load('raptor model', raptor.createwireframemodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id)
+  end
 end
 
 
