@@ -183,12 +183,12 @@ trex.update_from_scene_env = function( p_pass_id, p_environment_table, p_entity_
 	renderer:set_shaderrealinvector( p_pass_id, 'flags_v', 2, 1.0) --enable skinning animations
 end
 
-trex.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id)
+trex.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings)
   
   local entity
   local renderer
 
-  entity, renderer = commons.create_rendered_meshe(trex.rendering_config, 'Trex.fbx', 'trexMesh', {lit_rendering=p_pass_id})
+  entity, renderer = commons.create_rendered_meshe(trex.rendering_config, 'Trex.fbx', 'trexMesh', p_passes_bindings)
   renderer:register_to_rendering(p_rendergraph)
 
   
@@ -198,7 +198,10 @@ trex.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_en
 
   p_entitygraph:add_child('root',p_entity_id,entity)
 
-  commons.apply_material( trex.lit_material, renderer, p_pass_id)
+  --commons.apply_material( trex.lit_material, renderer, p_pass_id)
+  for k, v in pairs(p_passes_bindings) do
+    commons.apply_material( trex.lit_material, renderer, v)
+  end
 
   local pair = {}
   pair['entity'] = entity
@@ -209,12 +212,12 @@ trex.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_en
   return entity
 end
 
-trex.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id)
+trex.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings)
 
   local entity
   local renderer
 
-  entity, renderer = commons.create_rendered_meshe(trex.rendering_config, 'Trex.fbx', 'trexMesh', {wireframe_rendering=p_pass_id})
+  entity, renderer = commons.create_rendered_meshe(trex.rendering_config, 'Trex.fbx', 'trexMesh', p_passes_bindings)
   renderer:register_to_rendering(p_rendergraph)
 
   entity:add_aspect(ANIMATION_ASPECT)
@@ -223,7 +226,10 @@ trex.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pass_id
 
   p_entitygraph:add_child('root',p_entity_id,entity)
 
-  commons.apply_material( trex.wireframe_material, renderer, p_pass_id)
+  --commons.apply_material( trex.wireframe_material, renderer, p_pass_id)
+  for k, v in pairs(p_passes_bindings) do
+    commons.apply_material( trex.wireframe_material, renderer, v)
+  end
 
   local pair = { ['entity'] = entity, ['renderer'] = renderer }
   
@@ -273,8 +279,8 @@ trex.view.unload = function(p_entity_id)
   end
 end
 
-trex.view.load = function(p_entity_id)
-    trex.view.lit.load(p_entity_id)  
+trex.view.load = function(p_entity_id, p_passes_bindings)
+    trex.view.lit.load(p_entity_id, p_passes_bindings)  
 end
 
 trex.anims.parameters = function()
@@ -292,7 +298,7 @@ trex.anims.parameters = function()
 
 end
 
-trex.view.lit.load = function(p_entity_id)
+trex.view.lit.load = function(p_entity_id, p_passes_bindings)
 
   local found_id = FALSE
   for k, v in pairs(trex.models) do
@@ -305,11 +311,11 @@ trex.view.lit.load = function(p_entity_id)
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.load('trex model', trex.createlitmodelview, trex.update_from_scene_env, trex.anims.parameters, trex.scale, p_entity_id)
+    model.view.load('trex model', trex.createlitmodelview, trex.update_from_scene_env, trex.anims.parameters, trex.scale, p_entity_id, p_passes_bindings)
   end  
 end
 
-trex.view.wireframe.load = function(p_entity_id)
+trex.view.wireframe.load = function(p_entity_id, p_passes_bindings)
   
   local found_id = FALSE
   for k, v in pairs(trex.models) do
@@ -322,6 +328,6 @@ trex.view.wireframe.load = function(p_entity_id)
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.load('trex model', trex.createwireframemodelview, trex.update_from_scene_env, trex.anims.parameters, trex.scale, p_entity_id)
+    model.view.load('trex model', trex.createwireframemodelview, trex.update_from_scene_env, trex.anims.parameters, trex.scale, p_entity_id, p_passes_bindings)
   end   
 end

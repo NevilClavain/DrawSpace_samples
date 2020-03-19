@@ -190,12 +190,12 @@ end
 
 
 
-raptor.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id)
+raptor.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings)
   
   local entity
   local renderer
 
-  entity, renderer = commons.create_rendered_meshe(raptor.rendering_config, 'raptor.fbx', 'raptorMesh', {lit_rendering=p_pass_id})
+  entity, renderer = commons.create_rendered_meshe(raptor.rendering_config, 'raptor.fbx', 'raptorMesh', p_passes_bindings)
   renderer:register_to_rendering(p_rendergraph)
 
   
@@ -205,7 +205,12 @@ raptor.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_
 
   p_entitygraph:add_child('root',p_entity_id,entity)
 
-  commons.apply_material( raptor.lit_material, renderer, p_pass_id)
+  --commons.apply_material( raptor.lit_material, renderer, p_pass_id)
+
+  for k, v in pairs(p_passes_bindings) do
+    commons.apply_material( raptor.lit_material, renderer, v)
+  end
+
 
   local pair = {}
   pair['entity'] = entity
@@ -216,12 +221,12 @@ raptor.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_
   return entity
 end
 
-raptor.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id)
+raptor.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings)
 
   local entity
   local renderer
 
-  entity, renderer = commons.create_rendered_meshe(raptor.rendering_config, 'raptor.fbx', 'raptorMesh', {wireframe_rendering=p_pass_id})
+  entity, renderer = commons.create_rendered_meshe(raptor.rendering_config, 'raptor.fbx', 'raptorMesh', p_passes_bindings)
   renderer:register_to_rendering(p_rendergraph)
 
   entity:add_aspect(ANIMATION_ASPECT)
@@ -230,7 +235,11 @@ raptor.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_pass_
 
   p_entitygraph:add_child('root',p_entity_id,entity)
 
-  commons.apply_material( raptor.wireframe_material, renderer, p_pass_id)
+  --commons.apply_material( raptor.wireframe_material, renderer, p_pass_id)
+
+  for k, v in pairs(p_passes_bindings) do
+    commons.apply_material( raptor.wireframe_material, renderer, v)
+  end
 
   local pair = { ['entity'] = entity, ['renderer'] = renderer }
   
@@ -280,9 +289,9 @@ raptor.view.unload = function(p_entity_id)
   end
 end
 
-raptor.view.load = function(p_entity_id)
+raptor.view.load = function(p_entity_id, p_passes_bindings)
 
-  raptor.view.lit.load(p_entity_id)
+  raptor.view.lit.load(p_entity_id, p_passes_bindings)
 end
 
 raptor.anims.parameters = function()
@@ -299,7 +308,7 @@ raptor.anims.parameters = function()
   return random_anims, idle_anim, do_something, dino_action
 end
 
-raptor.view.lit.load = function(p_entity_id)
+raptor.view.lit.load = function(p_entity_id, p_passes_bindings)
 
   local found_id = FALSE
   for k, v in pairs(raptor.models) do
@@ -312,12 +321,12 @@ raptor.view.lit.load = function(p_entity_id)
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.load('raptor model', raptor.createlitmodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id)
+    model.view.load('raptor model', raptor.createlitmodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id, p_passes_bindings)
   end
 
 end
 
-raptor.view.wireframe.load = function(p_entity_id)
+raptor.view.wireframe.load = function(p_entity_id, p_passes_bindings)
 
   local found_id = FALSE
   for k, v in pairs(raptor.models) do
@@ -330,7 +339,7 @@ raptor.view.wireframe.load = function(p_entity_id)
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.load('raptor model', raptor.createwireframemodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id)
+    model.view.load('raptor model', raptor.createwireframemodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id, p_passes_bindings)
   end
 end
 

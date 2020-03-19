@@ -110,12 +110,12 @@ spherebump.update_from_scene_env = function( p_pass_id, p_environment_table, p_e
 
 end
 
-spherebump.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id, p_entity_id, p_initialpos)
+spherebump.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_initialpos, p_passes_bindings)
   
   local entity
   local renderer
 
-  entity, renderer = commons.create_rendered_meshe(spherebump.rendering_config, 'sphere.ac', 'sphere', {lit_rendering=p_pass_id})
+  entity, renderer = commons.create_rendered_meshe(spherebump.rendering_config, 'sphere.ac', 'sphere', p_passes_bindings)
   renderer:register_to_rendering(p_rendergraph)
 
   entity:add_aspect(BODY_ASPECT)
@@ -133,7 +133,9 @@ spherebump.createlitmodelview = function(p_rendergraph, p_entitygraph, p_pass_id
 
   p_entitygraph:add_child('root',p_entity_id,entity)
 
-  commons.apply_material( spherebump.lit_material, renderer, p_pass_id)
+  for k, v in pairs(p_passes_bindings) do
+    commons.apply_material( spherebump.lit_material, renderer, v)
+  end
 
   local pair = {}
   pair['entity'] = entity
@@ -190,7 +192,7 @@ spherebump.view.unload = function(p_entity_id)
   end
 end
 
-spherebump.view.load = function(p_entity_id, p_initialpos)
+spherebump.view.load = function(p_entity_id, p_initialpos, p_passes_bindings)
 
   local found_id = FALSE
   for k, v in pairs(spherebump.models) do
@@ -203,6 +205,6 @@ spherebump.view.load = function(p_entity_id, p_initialpos)
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.loadbody('spherebump model', spherebump.createlitmodelview, spherebump.update_from_scene_env, nil, p_entity_id, p_initialpos)
+    model.view.loadbody('spherebump model', spherebump.createlitmodelview, spherebump.update_from_scene_env, nil, p_entity_id, p_initialpos, p_passes_bindings)
   end  
 end

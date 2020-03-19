@@ -8,21 +8,21 @@
 	include('skyboxmod_model.lua')
 	
 	
-	continent.view.load('continent')
+	continent.view.load('continent', {lit_rendering='texture_pass'})
 	
-	
-	raptor.view.load('r')
-	trex.view.load('t')
-	metalcube.view.load('c', {x = -4010.0, y = 15.0, z = -2740.0} )
-	spherebump.view.load('s', {x = -4010.0, y = 135.0, z = -2740.0} )
+	raptor.view.load('r', {lit_rendering='texture_pass'})
+	--trex.view.load('t', {lit_rendering='texture_pass'})
+	trex.view.wireframe.load('t', {wireframe_rendering='texture_pass'})
+	metalcube.view.load('c', {x = -4010.0, y = 15.0, z = -2740.0}, {lit_rendering='texture_pass'} )
+	spherebump.view.load('s', {x = -4010.0, y = 135.0, z = -2740.0}, {lit_rendering='texture_pass'} )
 
-	spherebump.view.load('s2', {x = -4010.0, y = 0, z = -2740.0} )
+	spherebump.view.load('s2', {x = -4010.0, y = 0, z = -2740.0}, {lit_rendering='texture_pass'} )
 
     model.move.setpos('r', -4020.0, 0, -2740)
 	model.move.setpos('t', -4068.0, 0, -2740)
 	
-
-	skyboxmod.view.load('skybox0')
+	skyboxmod.view.load('skybox0', {layer0_rendering='texture_pass'})
+	
 
 	model.env.setgravity(1)
 	
