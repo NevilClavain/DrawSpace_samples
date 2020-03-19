@@ -151,7 +151,7 @@ continent.update_wireframe_from_scene_env = function( p_pass_id, p_environment_t
 	renderer:set_shaderrealvector( p_pass_id, 'color', 1.0, 1.0, 1.0, 1.0 )
 end
 
-continent.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings)
+continent.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings, p_parent_entity_id)
   
   local entity
   local renderer
@@ -165,7 +165,7 @@ continent.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_i
   body:configure_shape(SHAPE_MESHE, 'continent.ac', 'g TerrainMesh')
   body:configure_mode(COLLIDER_MODE)
 
-  p_entitygraph:add_child('root',p_entity_id,entity)
+  p_entitygraph:add_child(p_parent_entity_id,p_entity_id,entity)
 
   --commons.apply_material( continent.lit_material, renderer, p_pass_id)
   for k, v in pairs(p_passes_bindings) do
@@ -179,7 +179,7 @@ continent.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_i
   return entity
 end
 
-continent.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings)
+continent.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings, p_parent_entity_id)
 
   local entity
   local renderer
@@ -193,7 +193,7 @@ continent.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_en
   body:configure_shape(SHAPE_MESHE, 'continent.ac', 'g TerrainMesh')
   body:configure_mode(COLLIDER_MODE)
 
-  p_entitygraph:add_child('root',p_entity_id,entity)
+  p_entitygraph:add_child(p_parent_entity_id,p_entity_id,entity)
 
   local pair = { ['entity'] = entity, ['renderer'] = renderer, ['body'] = body }
   
@@ -248,13 +248,13 @@ continent.view.unload = function(p_entity_id)
   end
 end
 
-continent.view.load = function(p_entity_id, p_passes_bindings)
+continent.view.load = function(p_entity_id, p_passes_bindings, p_parent_entity_id)
 
-  continent.view.lit.load(p_entity_id, p_passes_bindings)
+  continent.view.lit.load(p_entity_id, p_passes_bindings, p_parent_entity_id)
 end
 
 
-continent.view.lit.load = function(p_entity_id, p_passes_bindings)
+continent.view.lit.load = function(p_entity_id, p_passes_bindings, p_parent_entity_id)
 
   local found_id = FALSE
   for k, v in pairs(continent.models) do
@@ -267,11 +267,11 @@ continent.view.lit.load = function(p_entity_id, p_passes_bindings)
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.load('continent model', continent.createlitmodelview, continent.update_lit_from_scene_env, nil, nil, p_entity_id, p_passes_bindings)
+    model.view.load('continent model', continent.createlitmodelview, continent.update_lit_from_scene_env, nil, nil, p_entity_id, p_passes_bindings, p_parent_entity_id)
   end
 end
 
-continent.view.wireframe.load = function(p_entity_id, p_passes_bindings)
+continent.view.wireframe.load = function(p_entity_id, p_passes_bindings, p_parent_entity_id)
 
   local found_id = FALSE
   for k, v in pairs(continent.models) do
@@ -284,6 +284,6 @@ continent.view.wireframe.load = function(p_entity_id, p_passes_bindings)
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.load('continent model', continent.createwireframemodelview, continent.update_wireframe_from_scene_env, nil, nil, p_entity_id, p_passes_bindings)
+    model.view.load('continent model', continent.createwireframemodelview, continent.update_wireframe_from_scene_env, nil, nil, p_entity_id, p_passes_bindings, p_parent_entity_id)
   end
 end

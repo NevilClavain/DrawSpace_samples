@@ -130,7 +130,7 @@ skyboxmod.update_from_scene_env = function( p_pass_id, p_environment_table, p_en
 
 end
                                                                       -- VV ici on voudrait la liste de tout les passes dispos
-skyboxmod.createmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings)
+skyboxmod.createmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings, p_parent_entity_id)
 
   local entity
   local renderer
@@ -139,7 +139,7 @@ skyboxmod.createmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, 
   renderer:register_to_rendering(p_rendergraph)
 
                            -- VV ca ne va pas !!! nom du pere en dur ! -> passer en arg !!!
-  p_entitygraph:add_child('root',p_entity_id,entity)
+  p_entitygraph:add_child(p_parent_entity_id,p_entity_id,entity)
 
   entity:add_aspect(TRANSFORM_ASPECT)
 
@@ -186,7 +186,7 @@ skyboxmod.view.unload = function(p_entity_id)
   end
 end
 
-skyboxmod.view.load = function(p_entity_id, p_passes_bindings)
+skyboxmod.view.load = function(p_entity_id, p_passes_bindings, p_parent_entity_id)
 
   local found_id = FALSE
   for k, v in pairs(skyboxmod.models) do
@@ -199,6 +199,6 @@ skyboxmod.view.load = function(p_entity_id, p_passes_bindings)
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.load('continent model', skyboxmod.createmodelview, skyboxmod.update_from_scene_env, nil, {x = 1000.0, y = 1000.0, z = 1000.0}, p_entity_id, p_passes_bindings)
+    model.view.load('continent model', skyboxmod.createmodelview, skyboxmod.update_from_scene_env, nil, {x = 1000.0, y = 1000.0, z = 1000.0}, p_entity_id, p_passes_bindings, p_parent_entity_id)
   end  
 end

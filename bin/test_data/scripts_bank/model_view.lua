@@ -1,9 +1,9 @@
 
 model.view = {}
 
-model.view.load = function(p_modelname, p_modelviewload_function, p_update_from_scene_env_function, p_anims_parameters, p_initial_scale, p_entity_id, p_passes_bindings)
+model.view.load = function(p_modelname, p_modelviewload_function, p_update_from_scene_env_function, p_anims_parameters, p_initial_scale, p_entity_id, p_passes_bindings, p_parent_entity_id)
 
-  local entity = p_modelviewload_function(rg, eg, p_entity_id, p_passes_bindings)
+  local entity = p_modelviewload_function(rg, eg, p_entity_id, p_passes_bindings, p_parent_entity_id)
 
   for k, v in pairs(p_passes_bindings) do
     p_update_from_scene_env_function( v, environment, p_entity_id)
@@ -89,9 +89,9 @@ model.view.load = function(p_modelname, p_modelviewload_function, p_update_from_
   rg:update_renderingqueues()
 end
 
-model.view.loadbody = function(p_modelname, p_modelviewload_function, p_update_from_scene_env_function, p_anims_parameters, p_entity_id, p_bodyinitialpos, p_passes_bindings)
+model.view.loadbody = function(p_modelname, p_modelviewload_function, p_update_from_scene_env_function, p_anims_parameters, p_entity_id, p_bodyinitialpos, p_passes_bindings, p_parent_entity_id)
 
-  local entity = p_modelviewload_function(rg, eg, p_entity_id, p_bodyinitialpos, p_passes_bindings)
+  local entity = p_modelviewload_function(rg, eg, p_entity_id, p_bodyinitialpos, p_passes_bindings, p_parent_entity_id)
 
   for k, v in pairs(p_passes_bindings) do
     p_update_from_scene_env_function( v, environment, p_entity_id)

@@ -112,7 +112,7 @@ metalcube.update_from_scene_env = function( p_pass_id, p_environment_table, p_en
 
 end
 
-metalcube.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_initialpos, p_passes_bindings)
+metalcube.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_initialpos, p_passes_bindings, p_parent_entity_id)
   
   local entity
   local renderer
@@ -133,7 +133,7 @@ metalcube.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_i
   cube_body:configure_mass(7.0)
   cube_body:configure_mode(BODY_MODE)
 
-  p_entitygraph:add_child('root',p_entity_id,entity)
+  p_entitygraph:add_child(p_parent_entity_id,p_entity_id,entity)
 
   --commons.apply_material( metalcube.lit_material, renderer, p_pass_id)
   for k, v in pairs(p_passes_bindings) do
@@ -195,7 +195,7 @@ metalcube.view.unload = function(p_entity_id)
   end
 end
 
-metalcube.view.load = function(p_entity_id, p_initialpos, p_passes_bindings)
+metalcube.view.load = function(p_entity_id, p_initialpos, p_passes_bindings, p_parent_entity_id)
 
   found_id = FALSE
   for k, v in pairs(metalcube.models) do
@@ -208,6 +208,6 @@ metalcube.view.load = function(p_entity_id, p_initialpos, p_passes_bindings)
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.loadbody('metalcube model', metalcube.createlitmodelview, metalcube.update_from_scene_env, nil, p_entity_id, p_initialpos, p_passes_bindings)
+    model.view.loadbody('metalcube model', metalcube.createlitmodelview, metalcube.update_from_scene_env, nil, p_entity_id, p_initialpos, p_passes_bindings, p_parent_entity_id)
   end  
 end
