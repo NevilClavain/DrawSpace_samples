@@ -51,7 +51,7 @@ raymarching.rendering_config =
 
 raymarching.scale = 
 {
-	x = 1.0, y = 1.0, z = 1.0
+	x = 8.0, y = 8.0, z = 8.0
 }
 
 raymarching.update_from_scene_env = function( p_pass_id, p_environment_table, p_entity_id )
