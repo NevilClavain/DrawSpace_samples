@@ -11,10 +11,10 @@
 	
 	continent.view.load('continent', {lit_rendering='texture_pass'}, 'root')
 	
-	--[[
+	
 	raptor.view.load('r', {lit_rendering='texture_pass'}, 'root')
-	--trex.view.load('t', {lit_rendering='texture_pass'}, 'root')
-	trex.view.wireframe.load('t', {wireframe_rendering='texture_pass'}, 'root')
+	trex.view.load('t', {lit_rendering='texture_pass'}, 'root')
+	--trex.view.wireframe.load('t', {wireframe_rendering='texture_pass'}, 'root')
 	metalcube.view.load('c', {x = -4010.0, y = 15.0, z = -2740.0}, {lit_rendering='texture_pass'}, 'root' )
 	spherebump.view.load('s', {x = -4010.0, y = 135.0, z = -2740.0}, {lit_rendering='texture_pass'}, 'root' )
 
@@ -24,11 +24,7 @@
 	model.move.setpos('t', -4068.0, 0, -2740)
 	
 	skyboxmod.view.load('skybox0', {layer0_rendering='texture_pass'}, 'root')
-	]]
-
-	raymarching.view.load('raymarch', {main_rendering='texture_pass'}, 'root')
-	model.move.setpos('raymarch', -4020.0, 12.0, -2735)
-
+	
 	model.env.setgravity(1)
 	
 	model.env.setbkcolor(0.55,0.55,0.99)
