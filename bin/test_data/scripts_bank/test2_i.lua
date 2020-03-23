@@ -1,5 +1,5 @@
 
-fog_intensity = 0.10
+fog_intensity = 0.010
 
 fog_color = 
 {
