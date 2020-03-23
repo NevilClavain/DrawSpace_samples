@@ -207,7 +207,7 @@ continent.trashmodelview = function(p_rendergraph, p_entitygraph, p_entity_id)
   local entity = continent.models[p_entity_id]['entity']
   local renderer = continent.models[p_entity_id]['renderer']
 
-  local body = metalcube.models[p_entity_id]['body']
+  local body = continent.models[p_entity_id]['body']
 
   body:release()
   body:detach_fromentity(entity)
