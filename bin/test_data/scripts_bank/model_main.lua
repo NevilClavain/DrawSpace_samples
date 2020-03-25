@@ -13,6 +13,8 @@ model.text = ""
 model.target = ""
 model.current_operation = ""
 
+model.renderer_infos = {renderer:descr()}
+
 environment = 
 {
 	ambient_light = {r = 0.35, g = 0.35, b = 0.35, a = 0.0 },
@@ -56,4 +58,16 @@ model.printscenelist = function()
   if model.dump.showcontentfunc ~= nil then
     model.dump.showcontentfunc()
   end
+end
+
+model.createmaincamera = function(p_x, p_y, p_z, p_mvt_mod)
+
+  model.camera.entity, model.camera.mvt=commons.create_free_camera(p_x, p_y, p_z, model.renderer_infos[5],model.renderer_infos[6], p_mvt_mod, "model.camera")
+  eg:add_child('root','model.camera.entity',model.camera.entity)
+
+end
+
+model.releasemaincamera = function()
+  commons.trash.camera(model.camera.entity, model.camera.mvt)
+  eg:remove('model.camera.entity')
 end

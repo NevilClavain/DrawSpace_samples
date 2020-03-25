@@ -5,10 +5,7 @@ g:signal_rendersceneend("eg")
 
 terrain.view.unload('terrain')
 
-
-commons.trash.camera(model.camera.entity, model.camera.mvt)
-eg:remove('model.camera.entity')
-
+model.releasemaincamera()
 
 g:remove_appruncb('run')
 

@@ -41,11 +41,8 @@ dbg_string = ""
 
 root_entity:add_aspect(PHYSICS_ASPECT)
 
-model.camera.entity, model.camera.mvt=commons.create_free_camera(0.0, 5.0, 0, renderer_infos[5],renderer_infos[6], mvt_mod, "model.camera")
 
-eg:add_child('root','model.camera.entity',model.camera.entity)
-
-
+model.createmaincamera(0.0, 0.0, 0.0, mvt_mod)
 
 
 -- ///////////////////////////////

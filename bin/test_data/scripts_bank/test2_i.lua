@@ -3,8 +3,7 @@ include("model_main.lua")
 include('terrain_model.lua')
 
 
-renderer_infos = {renderer:descr()}
-g:print('Current renderer is '..renderer_infos[1]..', '..renderer_infos[2]..'x'..renderer_infos[3])
+g:print('Current renderer is '..model.renderer_infos[1]..', '..model.renderer_infos[2]..'x'..model.renderer_infos[3])
 
 
 mvt_mod = Module("mvtmod", "mvts")
@@ -16,9 +15,7 @@ rg:create_child('final_pass', 'texture_pass', 0)
 
 root_entity:add_aspect(PHYSICS_ASPECT)
 
-model.camera.entity, model.camera.mvt=commons.create_free_camera(0.0, 5.0, 0, renderer_infos[5],renderer_infos[6], mvt_mod, "model.camera")
-
-eg:add_child('root','model.camera.entity',model.camera.entity)
+model.createmaincamera(0.0, 0.5, 0.0, mvt_mod)
 
 eg:set_camera(model.camera.entity)
 
