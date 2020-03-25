@@ -15,3 +15,7 @@
 
 	model.camera.mvt:set_pos(0.0, 0.0, 8.0)
 	model.camera.speed = 3.0
+
+	model.env.light.setstate( TRUE )
+	model.env.light.setdir(1.0, -0.2, 0.0)
+	model.env.ambientlight.setcolor(0.1, 0.1, 0.1)
