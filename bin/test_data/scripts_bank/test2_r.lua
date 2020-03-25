@@ -4,6 +4,9 @@ g:signal_rendersceneend("eg")
 
 
 terrain.view.unload('terrain')
+boulder.view.unload('rock')
+spherebump.view.unload('s')
+metalcube.view.unload('c')
 
 model.releasemaincamera()
 

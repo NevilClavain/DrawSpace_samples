@@ -1,6 +1,9 @@
 
 include("model_main.lua")
 include('terrain_model.lua')
+include('boulder_model.lua')
+include('metalcube_model.lua')
+include('spherebump_model.lua')
 
 
 g:print('Current renderer is '..model.renderer_infos[1]..', '..model.renderer_infos[2]..'x'..model.renderer_infos[3])
@@ -101,7 +104,9 @@ root_entity:configure_world(environment.gravity_state, environment.gravity.x, en
 
 
 terrain.view.load('terrain', {lit_rendering='texture_pass'}, 'root')
-
+boulder.view.load('rock', {x = 20.0, y = -3.0, z = 0.0}, {lit_rendering='texture_pass'}, 'root' )
+metalcube.view.load('c', {x = 0.0, y = 2.0, z = -15.0}, {lit_rendering='texture_pass'}, 'root' )
+spherebump.view.load('s', {x = 10.0, y = 17.0, z = 5.8}, {lit_rendering='texture_pass'}, 'root' )
 
 model.env.setgravity(1)	
 model.env.setbkcolor(0.55,0.55,0.99)
