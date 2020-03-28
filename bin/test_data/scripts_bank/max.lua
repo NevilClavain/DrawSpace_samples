@@ -11,9 +11,6 @@ mouse_right = FALSE
 mouse_left = FALSE
 
 
-renderer_infos = {renderer:descr()}
-g:print('Current renderer is '..renderer_infos[1]..', '..renderer_infos[2]..'x'..renderer_infos[3])
-
 mvt_mod = Module("mvtmod", "mvts")
 mvt_mod:load()
 g:print(mvt_mod:get_descr().. ' loaded')
