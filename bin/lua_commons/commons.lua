@@ -183,13 +183,13 @@ commons.create_rendering_from_module = function(p_layers, p_module, p_rendering_
 	
 	for k0, v0 in pairs(p_layers) do
 
-		g:print(k0)
+		--g:print(k0)
 
 		local renderconfig=RenderConfig()
 
 		for k, v in pairs(v0) do
 
-			g:print(k)
+			--g:print(k)
 			local rendercontext = RenderContext(k)
 
 			local fxparams = FxParams()
@@ -293,7 +293,7 @@ commons.create_rendered_meshe = function(p_config, p_meshefile, p_meshe_name, re
 	end
 
 	for k, v in pairs(p_config) do
-		g:print(k)
+		--g:print(k)
 
 		if k == 'meshes_loader_params' then
 		  for k2, v2 in pairs(v) do
@@ -509,10 +509,10 @@ commons.apply_material = function(p_material, p_renderer, p_pass_id)
 		mask_mode = p_material['mask_mode']
 	end
 
-	g:print( 'specular_power ='..specular_power )
-	g:print( 'bump_bias ='..bump_bias )
-	g:print( 'texture_size ='..texture_size )
-	g:print( 'mask_mode ='..mask_mode )
+	--g:print( 'specular_power ='..specular_power )
+	--g:print( 'bump_bias ='..bump_bias )
+	--g:print( 'texture_size ='..texture_size )
+	--g:print( 'mask_mode ='..mask_mode )
 
 	p_renderer:set_shaderrealvector( p_pass_id, 'flags', specular_power, bump_bias, texture_size, mask_mode )
 
