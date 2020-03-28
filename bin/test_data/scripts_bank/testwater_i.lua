@@ -849,7 +849,7 @@ function()
 		end
 	end
 
-	rg:set_viewportquadshaderrealvector('wave_pass', 'waves', waves:get_value(), 0.0, 0.0, 0.0, 0.0)
+	rg:set_viewportquadshaderrealvector('wave_pass', 'waves', waves:get_value(), 0.0, 0.0, 0.0)
 
 
 end)
