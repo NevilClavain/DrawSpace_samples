@@ -77,12 +77,11 @@ commons.init_final_pass = function(p_rendergraph, p_passid)
 	fxparams:add_shaderfile('texture.pso',SHADER_COMPILED)
 	fxparams:set_renderstatesset(finalpass_rss)
 
-
-	rendercontext = RenderContext(p_passid)
+	local rendercontext = RenderContext(p_passid)
 	rendercontext:add_fxparams(fxparams)
 	rendercontext:add_texturesset(textures)
 
-	renderconfig=RenderConfig()
+	local renderconfig=RenderConfig()
 	renderconfig:add_rendercontext(rendercontext)
 	p_rendergraph:configure_pass_viewportquad_resources(p_passid,renderconfig)
 
