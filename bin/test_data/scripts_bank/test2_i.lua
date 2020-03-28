@@ -14,7 +14,31 @@ mvt_mod:load()
 g:print(mvt_mod:get_descr().. ' loaded')
 
 commons.init_final_pass(rg, 'final_pass')
-rg:create_child('final_pass', 'texture_pass', 0)
+
+rg:create_child('final_pass', 'transfer_pass', 0)
+
+rg:create_pass_viewportquad('transfer_pass')
+transferpass_rss=RenderStatesSet()
+transferpass_rss:add_renderstate_in(RENDERSTATE_OPE_SETTEXTUREFILTERTYPE, "point")
+transferpass_rss:add_renderstate_out(RENDERSTATE_OPE_SETTEXTUREFILTERTYPE, "linear")
+transfer_textures = TexturesSet()
+transfer_fxparams = FxParams()
+transfer_fxparams:add_shaderfile('transfer.vso',SHADER_COMPILED)
+transfer_fxparams:add_shaderfile('transfer.pso',SHADER_COMPILED)
+transfer_fxparams:set_renderstatesset(transferpass_rss)
+
+transfer_rendercontext = RenderContext('transfer_pass')
+transfer_rendercontext:add_fxparams(transfer_fxparams)
+transfer_rendercontext:add_texturesset(transfer_textures)
+
+transfer_renderconfig=RenderConfig()
+transfer_renderconfig:add_rendercontext(transfer_rendercontext)
+rg:configure_pass_viewportquad_resources('transfer_pass',transfer_renderconfig)
+
+
+rg:create_child('transfer_pass', 'texture_pass', 0)
+
+--rg:create_child('final_pass', 'texture_pass', 0)
 
 root_entity:add_aspect(PHYSICS_ASPECT)
 
