@@ -184,3 +184,4 @@ bin/lua_commons/user.lua
 *.db
 *.iobj
 *.ipdb
+bin/appgraphics.conf
