@@ -47,6 +47,8 @@ bin/test_data/meshes_bank
 bin/test_data/textures_bank
 bin/test_data/shaders_bank
 
+bin/appgraphics.conf
+
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
 
@@ -184,4 +186,3 @@ bin/lua_commons/user.lua
 *.db
 *.iobj
 *.ipdb
-bin/appgraphics.conf
