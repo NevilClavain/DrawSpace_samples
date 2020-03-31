@@ -122,6 +122,10 @@ TB_COMPUTED = 3
 ANIMATION_BEGIN = 0
 ANIMATION_END = 1
 
+TRANSFORMATION_WORLD_MATRIX = 0
+TRANSFORMATION_VIEW_MATRIX = 1
+TRANSFORMATION_PROJ_MATRIX = 2
+
 
 print_memsize=function() 
 	g:print('Total mem = '..g:total_mem()..' byte(s)') 
