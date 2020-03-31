@@ -6,7 +6,7 @@ g:signal_rendersceneend("eg")
 terrain.view.unload('terrain')
 boulder.view.unload('rock')
 spherebump.view.unload('s')
-metalcube.view.unload('c')
+--metalcube.view.unload('c')
 
 model.releasemaincamera()
 
@@ -14,6 +14,12 @@ g:remove_appruncb('run')
 
 
 rg:remove_pass('texture_pass')
+
+
+rg:release_pass_viewportquad_resources('transfer_pass')
+rg:remove_pass_viewportquad('transfer_pass')
+rg:remove_pass('transfer_pass')
+
 commons.trash.final_pass(rg, 'final_pass')
 
 rg:update_renderingqueues()
