@@ -29,7 +29,7 @@ transfer_fxparams:set_renderstatesset(transferpass_rss)
 
 transfer_rendercontext = RenderContext('transfer_pass')
 transfer_rendercontext:add_fxparams(transfer_fxparams)
-transfer_rendercontext:add_shaderparam("camera_position", 1, 0)
+transfer_rendercontext:add_shaderparam("camera_params", 1, 0)
 transfer_rendercontext:add_shaderparam("view_matrix", 1, 1)
 
 transfer_rendercontext:add_texturesset(transfer_textures)
@@ -37,30 +37,6 @@ transfer_rendercontext:add_texturesset(transfer_textures)
 transfer_renderconfig=RenderConfig()
 transfer_renderconfig:add_rendercontext(transfer_rendercontext)
 rg:configure_pass_viewportquad_resources('transfer_pass',transfer_renderconfig)
-
-
-
-rg:create_child('transfer_pass', 'viewdirection_pass', 1)
-rg:create_pass_viewportquad('viewdirection_pass')
-viewdirectionpass_rss=RenderStatesSet()
-viewdirectionpass_rss:add_renderstate_in(RENDERSTATE_OPE_SETTEXTUREFILTERTYPE, "point")
-viewdirectionpass_rss:add_renderstate_out(RENDERSTATE_OPE_SETTEXTUREFILTERTYPE, "linear")
-viewdirectionpass_textures = TexturesSet()
-viewdirectionpass_fxparams = FxParams()
-viewdirectionpass_fxparams:add_shaderfile('viewdirection.vso',SHADER_COMPILED)
-viewdirectionpass_fxparams:add_shaderfile('viewdirection.pso',SHADER_COMPILED)
-viewdirectionpass_fxparams:set_renderstatesset(viewdirectionpass_rss)
-
-viewdirectionpass_rendercontext = RenderContext('viewdirection_pass')
-viewdirectionpass_rendercontext:add_fxparams(viewdirectionpass_fxparams)
-viewdirectionpass_rendercontext:add_shaderparam("camera_params_v", 0, 24)
-viewdirectionpass_rendercontext:add_shaderparam("camera_params_p", 1, 0)
-viewdirectionpass_rendercontext:add_texturesset(viewdirectionpass_textures)
-
-viewdirectionpass_renderconfig=RenderConfig()
-viewdirectionpass_renderconfig:add_rendercontext(viewdirectionpass_rendercontext)
-rg:configure_pass_viewportquad_resources('viewdirection_pass',viewdirectionpass_renderconfig)
-
 
 
 rg:create_child('transfer_pass', 'texture_pass', 0)
@@ -76,8 +52,8 @@ eg:set_camera(model.camera.entity)
 camera_width, camera_height, zn, zf = model.camera.entity:read_cameraparams()
 
 g:print('camera params = '..camera_width..' '..camera_height..' '..zn..' '..zf )
-rg:set_viewportquadshaderrealvector('viewdirection_pass', 'camera_params_p', camera_width, camera_height, zn, zf)
-rg:set_viewportquadshaderrealvector('viewdirection_pass', 'camera_params_v', camera_width, camera_height, zn, zf)
+rg:set_viewportquadshaderrealvector('transfer_pass', 'camera_params', camera_width, camera_height, zn, zf)
+
 
 rg:update_renderingqueues()
 
@@ -110,8 +86,6 @@ function()
 
   local mvt_info = { model.camera.mvt:read() }
   model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
-
-  rg:set_viewportquadshaderrealvector('transfer_pass', 'camera_position', mvt_info[1], mvt_info[2], mvt_info[3], 1.0)
 
   -- inject camera view matrix into 
   local view_mat = Matrix()
