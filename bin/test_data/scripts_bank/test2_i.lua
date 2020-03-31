@@ -29,6 +29,9 @@ transfer_fxparams:set_renderstatesset(transferpass_rss)
 
 transfer_rendercontext = RenderContext('transfer_pass')
 transfer_rendercontext:add_fxparams(transfer_fxparams)
+transfer_rendercontext:add_shaderparam("camera_position", 1, 0)
+transfer_rendercontext:add_shaderparam("view_matrix", 1, 1)
+
 transfer_rendercontext:add_texturesset(transfer_textures)
 
 transfer_renderconfig=RenderConfig()
@@ -66,7 +69,7 @@ rg:create_child('transfer_pass', 'texture_pass', 0)
 
 root_entity:add_aspect(PHYSICS_ASPECT)
 
-model.createmaincamera(0.0, 5.5, 0.0, mvt_mod)
+model.createmaincamera(0.0, 0.0, 0.0, mvt_mod)
 eg:set_camera(model.camera.entity)
 
 
@@ -107,6 +110,14 @@ function()
 
   local mvt_info = { model.camera.mvt:read() }
   model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+
+  rg:set_viewportquadshaderrealvector('transfer_pass', 'camera_position', mvt_info[1], mvt_info[2], mvt_info[3], 1.0)
+
+  -- inject camera view matrix into 
+  local view_mat = Matrix()
+  view_mat:store_entitytransformation(model.camera.entity, TRANSFORMATION_VIEW_MATRIX)
+  view_mat:inverse()
+  rg:set_viewportquadshaderrealmatrix('transfer_pass', 'view_matrix', view_mat)
 
 end)
 
@@ -159,13 +170,13 @@ root_entity:configure_world(environment.gravity_state, environment.gravity.x, en
 
 terrain.view.load('terrain', {lit_rendering='texture_pass'}, 'root')
 boulder.view.load('rock', {x = 20.0, y = -3.0, z = 0.0}, {lit_rendering='texture_pass'}, 'root' )
-metalcube.view.load('c', {x = 0.0, y = 2.0, z = -15.0}, {lit_rendering='texture_pass'}, 'root' )
+--metalcube.view.load('c', {x = 0.0, y = 2.0, z = -15.0}, {lit_rendering='texture_pass'}, 'root' )
 spherebump.view.load('s', {x = 10.0, y = 17.0, z = 5.8}, {lit_rendering='texture_pass'}, 'root' )
 
 model.env.setgravity(1)	
 model.env.setbkcolor(0.55,0.55,0.99)
 
-model.camera.mvt:set_pos(0.0, 1.4, 5.0)
+model.camera.mvt:set_pos(0.0, 0.0, 15.0)
 
 model.env.fog.setdensity(0.03)
 model.env.fog.setcolor(0.55,0.55,0.99)
