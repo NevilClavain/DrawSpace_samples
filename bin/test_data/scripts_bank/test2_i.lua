@@ -31,6 +31,7 @@ transfer_rendercontext = RenderContext('transfer_pass')
 transfer_rendercontext:add_fxparams(transfer_fxparams)
 transfer_rendercontext:add_shaderparam("camera_params", 1, 0)
 transfer_rendercontext:add_shaderparam("view_matrix", 1, 1)
+transfer_rendercontext:add_shaderparam("pos_matrix", 1, 5)
 
 transfer_rendercontext:add_texturesset(transfer_textures)
 
@@ -87,11 +88,28 @@ function()
   local mvt_info = { model.camera.mvt:read() }
   model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
-  -- inject camera view matrix into 
+  -- inject camera matrix into 
   local view_mat = Matrix()
   view_mat:store_entitytransformation(model.camera.entity, TRANSFORMATION_VIEW_MATRIX)
+
+  -- inverse view to get camera matrix
   view_mat:inverse()
+
+
+  -- box positionning in world
+  local box_pos = Matrix()
+  box_pos:translation( 0.0, 20.0, 0.0 )
+
+  local box_rot = Matrix()
+  box_rot:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(30))
+
+  local box_mat = Matrix()
+  box_mat:set_product(box_rot, box_pos)
+
   rg:set_viewportquadshaderrealmatrix('transfer_pass', 'view_matrix', view_mat)
+  rg:set_viewportquadshaderrealmatrix('transfer_pass', 'pos_matrix', box_mat)
+
+
 
 end)
 
