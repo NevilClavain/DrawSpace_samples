@@ -32,6 +32,7 @@ transfer_rendercontext:add_fxparams(transfer_fxparams)
 transfer_rendercontext:add_shaderparam("camera_params", 1, 0)
 transfer_rendercontext:add_shaderparam("view_matrix", 1, 1)
 transfer_rendercontext:add_shaderparam("pos_matrix", 1, 5)
+transfer_rendercontext:add_shaderparam("container_half_dims", 1, 9)
 
 transfer_rendercontext:add_texturesset(transfer_textures)
 
@@ -54,6 +55,7 @@ camera_width, camera_height, zn, zf = model.camera.entity:read_cameraparams()
 
 g:print('camera params = '..camera_width..' '..camera_height..' '..zn..' '..zf )
 rg:set_viewportquadshaderrealvector('transfer_pass', 'camera_params', camera_width, camera_height, zn, zf)
+rg:set_viewportquadshaderrealvector('transfer_pass', 'container_half_dims', 15.0, 2.0, 15.0, 0.0)
 
 
 rg:update_renderingqueues()
@@ -98,10 +100,10 @@ function()
 
   -- box positionning in world
   local box_pos = Matrix()
-  box_pos:translation( 0.0, 20.0, 0.0 )
+  box_pos:translation( 0.0, 8.0, 0.0 )
 
   local box_rot = Matrix()
-  box_rot:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(30))
+  box_rot:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(0))
 
   local box_mat = Matrix()
   box_mat:set_product(box_rot, box_pos)
