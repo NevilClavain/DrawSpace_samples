@@ -162,8 +162,9 @@ g:signal_renderscenebegin("eg")
 
 root_entity:configure_world(environment.gravity_state, environment.gravity.x, environment.gravity.y, environment.gravity.z )
 
-
+--terrain.view.flatcolor.load('terrain', {flatcolor_rendering='texture_pass'}, 'root')
 terrain.view.load('terrain', {lit_rendering='texture_pass'}, 'root')
+
 boulder.view.load('rock', {x = 20.0, y = -3.0, z = 0.0}, {lit_rendering='texture_pass'}, 'root' )
 --metalcube.view.load('c', {x = 0.0, y = 2.0, z = -15.0}, {lit_rendering='texture_pass'}, 'root' )
 spherebump.view.load('s', {x = 10.0, y = 17.0, z = 5.8}, {lit_rendering='texture_pass'}, 'root' )
@@ -182,3 +183,4 @@ model.env.fog.setcolor(0.55,0.55,0.99)
 model.env.light.setstate( TRUE )
 model.env.light.setdir(1.0, -0.2, 0.0)
 model.env.ambientlight.setcolor(0.1, 0.1, 0.1)
+
