@@ -1,14 +1,17 @@
 
 
 	include('skyboxmod_model.lua')
-	include('raymarching_model.lua')
+	--include('raymarching_model.lua')
+	include('container_model.lua')
 	
 	
 	skyboxmod.view.load('skybox0', {layer0_rendering='texture_pass'}, 'root')
-	
 
-	raymarching.view.load('raymarch', {main_rendering='texture_pass'}, 'root')
-	model.move.setpos('raymarch', 0.0, 0.0, 0.0)
+	container.view.load('container', {main_rendering='texture_pass'}, 'root')
+	model.move.setpos('container', 0.0, 0.0, 0.0)
+
+	--raymarching.view.load('raymarch', {main_rendering='texture_pass'}, 'root')
+	--model.move.setpos('raymarch', 0.0, 0.0, 0.0)
 
 	
 	model.env.setbkcolor(0.55,0.55,0.99)

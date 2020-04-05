@@ -4,6 +4,7 @@ include('terrain_model.lua')
 include('boulder_model.lua')
 include('metalcube_model.lua')
 include('spherebump_model.lua')
+include('container_model.lua')
 
 
 g:print('Current renderer is '..model.renderer_infos[1]..', '..model.renderer_infos[2]..'x'..model.renderer_infos[3])
@@ -100,7 +101,7 @@ function()
 
   -- box positionning in world
   local box_pos = Matrix()
-  box_pos:translation( 0.0, 8.0, 0.0 )
+  box_pos:translation( 10.0, 6.0, 0.0 )
 
   local box_rot = Matrix()
   box_rot:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(0))
@@ -167,10 +168,13 @@ boulder.view.load('rock', {x = 20.0, y = -3.0, z = 0.0}, {lit_rendering='texture
 --metalcube.view.load('c', {x = 0.0, y = 2.0, z = -15.0}, {lit_rendering='texture_pass'}, 'root' )
 spherebump.view.load('s', {x = 10.0, y = 17.0, z = 5.8}, {lit_rendering='texture_pass'}, 'root' )
 
+container.view.load('container', {main_rendering='texture_pass'}, 'root')
+model.move.setpos('container', 10.0, 6.0, 0.0)
+
 model.env.setgravity(1)	
 model.env.setbkcolor(0.55,0.55,0.99)
 
-model.camera.mvt:set_pos(0.0, 0.0, 15.0)
+model.camera.mvt:set_pos(0.0, 18.0, 25.0)
 
 model.env.fog.setdensity(0.03)
 model.env.fog.setcolor(0.55,0.55,0.99)
