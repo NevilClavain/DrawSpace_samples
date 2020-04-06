@@ -198,7 +198,6 @@ trex.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_
 
   p_entitygraph:add_child(p_parent_entity_id,p_entity_id,entity)
 
-  --commons.apply_material( trex.lit_material, renderer, p_pass_id)
   for k, v in pairs(p_passes_bindings) do
     commons.apply_material( trex.lit_material, renderer, v)
   end
@@ -226,7 +225,6 @@ trex.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_entity_
 
   p_entitygraph:add_child(p_parent_entity_id,p_entity_id,entity)
 
-  --commons.apply_material( trex.wireframe_material, renderer, p_pass_id)
   for k, v in pairs(p_passes_bindings) do
     commons.apply_material( trex.wireframe_material, renderer, v)
   end
