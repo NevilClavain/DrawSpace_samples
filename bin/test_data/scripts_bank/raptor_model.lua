@@ -198,19 +198,15 @@ raptor.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, 
   entity, renderer = commons.create_rendered_meshe(raptor.rendering_config, 'raptor.fbx', 'raptorMesh', p_passes_bindings)
   renderer:register_to_rendering(p_rendergraph)
 
-  
   entity:add_aspect(ANIMATION_ASPECT)
   entity:configure_animationbones()
   entity:update_animationeventsid(p_entity_id)
 
   p_entitygraph:add_child(p_parent_entity_id,p_entity_id,entity)
 
-  --commons.apply_material( raptor.lit_material, renderer, p_pass_id)
-
   for k, v in pairs(p_passes_bindings) do
     commons.apply_material( raptor.lit_material, renderer, v)
   end
-
 
   local pair = {}
   pair['entity'] = entity
@@ -234,8 +230,6 @@ raptor.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_entit
   entity:update_animationeventsid(p_entity_id)
 
   p_entitygraph:add_child(p_parent_entity_id,p_entity_id,entity)
-
-  --commons.apply_material( raptor.wireframe_material, renderer, p_pass_id)
 
   for k, v in pairs(p_passes_bindings) do
     commons.apply_material( raptor.wireframe_material, renderer, v)
