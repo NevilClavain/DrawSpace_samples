@@ -137,15 +137,6 @@ raptor.lit_material =
 	--bump_mapping = { texture_size = 1024, bias = 0.193 }
 }
 
-raptor.wireframe_material =
-{
-	color_source = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
-	simple_color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
-	self_emissive = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-}
-
-
 raptor.scale = 
 {
 	x = 0.06, y = 0.06, z = 0.06
@@ -186,6 +177,8 @@ raptor.update_from_scene_env = function( p_pass_id, p_environment_table, p_entit
 	renderer:set_shaderrealvector( p_pass_id, 'reflectorNormale', p_environment_table.reflector_normale.x, p_environment_table.reflector_normale.y, p_environment_table.reflector_normale.z, 1.0 )
 
 	renderer:set_shaderrealinvector( p_pass_id, 'flags_v', 2, 1.0) --enable skinning animations
+
+	commons.apply_material( raptor.lit_material, renderer, p_pass_id)
 end
 
 
@@ -204,10 +197,6 @@ raptor.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, 
 
   p_entitygraph:add_child(p_parent_entity_id,p_entity_id,entity)
 
-  for k, v in pairs(p_passes_bindings) do
-    commons.apply_material( raptor.lit_material, renderer, v)
-  end
-
   local pair = {}
   pair['entity'] = entity
   pair['renderer'] = renderer
@@ -217,30 +206,7 @@ raptor.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, 
   return entity
 end
 
-raptor.createwireframemodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings, p_parent_entity_id)
 
-  local entity
-  local renderer
-
-  entity, renderer = commons.create_rendered_meshe(raptor.rendering_config, 'raptor.fbx', 'raptorMesh', p_passes_bindings)
-  renderer:register_to_rendering(p_rendergraph)
-
-  entity:add_aspect(ANIMATION_ASPECT)
-  entity:configure_animationbones()
-  entity:update_animationeventsid(p_entity_id)
-
-  p_entitygraph:add_child(p_parent_entity_id,p_entity_id,entity)
-
-  for k, v in pairs(p_passes_bindings) do
-    commons.apply_material( raptor.wireframe_material, renderer, v)
-  end
-
-  local pair = { ['entity'] = entity, ['renderer'] = renderer }
-  
-  raptor.models[p_entity_id] = pair
-
-  return entity
-end
 
 raptor.trashmodelview = function(p_rendergraph, p_entitygraph, p_entity_id)
 
@@ -283,10 +249,7 @@ raptor.view.unload = function(p_entity_id)
   end
 end
 
-raptor.view.load = function(p_entity_id, p_passes_bindings, p_parent_entity_id)
 
-  raptor.view.lit.load(p_entity_id, p_passes_bindings, p_parent_entity_id)
-end
 
 raptor.anims.parameters = function()
 
@@ -302,7 +265,7 @@ raptor.anims.parameters = function()
   return random_anims, idle_anim, do_something, dino_action
 end
 
-raptor.view.lit.load = function(p_entity_id, p_passes_bindings, p_parent_entity_id)
+raptor.view.load = function(p_entity_id, p_passes_config, p_parent_entity_id)
 
   local found_id = FALSE
   for k, v in pairs(raptor.models) do
@@ -315,26 +278,9 @@ raptor.view.lit.load = function(p_entity_id, p_passes_bindings, p_parent_entity_
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.load('raptor model', raptor.createlitmodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id, p_passes_bindings, p_parent_entity_id)
-  end
-
-end
-
-raptor.view.wireframe.load = function(p_entity_id, p_passes_bindings, p_parent_entity_id)
-
-  local found_id = FALSE
-  for k, v in pairs(raptor.models) do
-
-    if k == p_entity_id then
-	  found_id = TRUE
-	end
-  end
-
-  if found_id == TRUE then
-    g:print('Entity '..p_entity_id..' already exists')
-  else
-    model.view.load('raptor model', raptor.createwireframemodelview, raptor.update_from_scene_env, raptor.anims.parameters, raptor.scale, p_entity_id, p_passes_bindings, p_parent_entity_id)
+    model.view.load('raptor model', raptor.createlitmodelview, p_passes_config, raptor.anims.parameters, raptor.scale, p_entity_id, p_parent_entity_id)
   end
 end
+
 
 

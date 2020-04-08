@@ -110,6 +110,7 @@ metalcube.update_from_scene_env = function( p_pass_id, p_environment_table, p_en
 	renderer:set_shaderrealvector( p_pass_id, 'reflectorPos', p_environment_table.reflector_pos.x, p_environment_table.reflector_pos.y, p_environment_table.reflector_pos.z, 1.0 )
 	renderer:set_shaderrealvector( p_pass_id, 'reflectorNormale', p_environment_table.reflector_normale.x, p_environment_table.reflector_normale.y, p_environment_table.reflector_normale.z, 1.0 )
 
+	commons.apply_material( metalcube.lit_material, renderer, p_pass_id)
 end
 
 metalcube.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_initialpos, p_passes_bindings, p_parent_entity_id)
@@ -134,11 +135,6 @@ metalcube.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_i
   cube_body:configure_mode(BODY_MODE)
 
   p_entitygraph:add_child(p_parent_entity_id,p_entity_id,entity)
-
-  --commons.apply_material( metalcube.lit_material, renderer, p_pass_id)
-  for k, v in pairs(p_passes_bindings) do
-    commons.apply_material( metalcube.lit_material, renderer, v)
-  end
 
   local pair = {}
   pair['entity'] = entity
@@ -195,7 +191,7 @@ metalcube.view.unload = function(p_entity_id)
   end
 end
 
-metalcube.view.load = function(p_entity_id, p_initialpos, p_passes_bindings, p_parent_entity_id)
+metalcube.view.load = function(p_entity_id, p_initialpos, p_passes_config, p_parent_entity_id)
 
   found_id = FALSE
   for k, v in pairs(metalcube.models) do
@@ -208,6 +204,6 @@ metalcube.view.load = function(p_entity_id, p_initialpos, p_passes_bindings, p_p
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.loadbody('metalcube model', metalcube.createlitmodelview, metalcube.update_from_scene_env, nil, p_entity_id, p_initialpos, p_passes_bindings, p_parent_entity_id)
+    model.view.loadbody('metalcube model', metalcube.createlitmodelview, p_passes_config, nil, p_entity_id, p_initialpos, p_parent_entity_id)
   end  
 end

@@ -162,14 +162,56 @@ g:signal_renderscenebegin("eg")
 
 root_entity:configure_world(environment.gravity_state, environment.gravity.x, environment.gravity.y, environment.gravity.z )
 
---terrain.view.flatcolor.load('terrain', {flatcolor_rendering='texture_pass'}, 'root')
-terrain.view.load('terrain', {lit_rendering='texture_pass'}, 'root')
 
-boulder.view.load('rock', {x = 20.0, y = -3.0, z = 0.0}, {lit_rendering='texture_pass'}, 'root' )
---metalcube.view.load('c', {x = 0.0, y = 2.0, z = -15.0}, {lit_rendering='texture_pass'}, 'root' )
-spherebump.view.load('s', {x = 10.0, y = 17.0, z = 5.8}, {lit_rendering='texture_pass'}, 'root' )
+terrain_passes_config = 
+{
+    texture_pass = 
+    {
+        rendering_id = 'lit_rendering',
+        lit_shader_update_func = terrain.update_lit_from_scene_env
+	}
+}
+terrain.view.load('terrain', terrain_passes_config, 'root')
 
-container.view.load('container', {main_rendering='texture_pass'}, 'root')
+boulder_passes_config = 
+{
+    texture_pass = 
+    {
+        rendering_id = 'lit_rendering',
+        lit_shader_update_func = boulder.update_lit_from_scene_env
+	}
+}
+boulder.view.load('rock', {x = 20.0, y = -3.0, z = 0.0}, boulder_passes_config, 'root' )
+
+spherebump_passes_config = 
+{
+    texture_pass = 
+    {
+        rendering_id = 'lit_rendering',
+        lit_shader_update_func = spherebump.update_from_scene_env
+	}
+}
+spherebump.view.load('s', {x = 10.0, y = 17.0, z = 5.8}, spherebump_passes_config, 'root' )
+
+metalcube_passes_config = 
+{
+    texture_pass = 
+    {
+        rendering_id = 'lit_rendering',
+        lit_shader_update_func = metalcube.update_from_scene_env
+	}
+}
+metalcube.view.load('mc', {x = -18.0, y = 5.9, z = -18.8}, metalcube_passes_config, 'root' )
+
+container_passes_config = 
+{
+    texture_pass = 
+    {
+        rendering_id = 'main_rendering',
+        lit_shader_update_func = container.update_from_scene_env
+	}
+}
+container.view.load('container', container_passes_config, 'root')
 model.move.setpos('container', 10.0, 6.0, 0.0)
 
 model.env.setgravity(1)	

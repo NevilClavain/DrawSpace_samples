@@ -106,6 +106,8 @@ boulder.update_lit_from_scene_env = function( p_pass_id, p_environment_table, p_
 		
 	renderer:set_shaderrealvector( p_pass_id, 'reflectorPos', p_environment_table.reflector_pos.x, p_environment_table.reflector_pos.y, p_environment_table.reflector_pos.z, 1.0 )
 	renderer:set_shaderrealvector( p_pass_id, 'reflectorNormale', p_environment_table.reflector_normale.x, p_environment_table.reflector_normale.y, p_environment_table.reflector_normale.z, 1.0 )
+
+	commons.apply_material( boulder.lit_material, renderer, p_pass_id)
 end
 
 boulder.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_initialpos, p_passes_bindings, p_parent_entity_id)
@@ -127,10 +129,6 @@ boulder.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id,
   body:configure_mode(COLLIDER_MODE)
  
   p_entitygraph:add_child(p_parent_entity_id,p_entity_id,entity)
-
-  for k, v in pairs(p_passes_bindings) do
-    commons.apply_material( boulder.lit_material, renderer, v)
-  end
 
   local pair = { ['entity'] = entity, ['renderer'] = renderer, ['body'] = body }
 
@@ -179,7 +177,7 @@ boulder.view.unload = function(p_entity_id)
   end
 end
 
-boulder.view.load = function(p_entity_id, p_initialpos, p_passes_bindings, p_parent_entity_id)
+boulder.view.load = function(p_entity_id, p_initialpos, p_passes_config, p_parent_entity_id)
 
   local found_id = FALSE
   for k, v in pairs(boulder.models) do
@@ -192,6 +190,6 @@ boulder.view.load = function(p_entity_id, p_initialpos, p_passes_bindings, p_par
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.loadbody('boulder model', boulder.createlitmodelview, boulder.update_lit_from_scene_env, nil, p_entity_id, p_initialpos, p_passes_bindings, p_parent_entity_id)
+    model.view.loadbody('boulder model', boulder.createlitmodelview, p_passes_config, nil, p_entity_id, p_initialpos, p_parent_entity_id)
   end  
 end

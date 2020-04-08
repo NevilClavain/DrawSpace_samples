@@ -120,7 +120,7 @@ container.view.unload = function(p_entity_id)
   end
 end
 
-container.view.load = function(p_entity_id, p_passes_bindings, p_parent_entity_id)
+container.view.load = function(p_entity_id, p_passes_config, p_parent_entity_id)
 
   local found_id = FALSE
   for k, v in pairs(container.models) do
@@ -133,6 +133,6 @@ container.view.load = function(p_entity_id, p_passes_bindings, p_parent_entity_i
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.load('container model', container.createmodelview, container.update_from_scene_env, nil, container.scale, p_entity_id, p_passes_bindings, p_parent_entity_id)
+    model.view.load('container model', container.createmodelview, p_passes_config, nil, container.scale, p_entity_id, p_parent_entity_id)
   end
 end

@@ -3,7 +3,6 @@ terrain = {}
 
 terrain.dump = {}
 terrain.view = {}
-terrain.view.flatcolor = {}
 
 terrain.view.lit = {}
 
@@ -121,7 +120,6 @@ terrain.dump.show = function()
 end
 
 terrain.update_lit_from_scene_env = function( p_pass_id, p_environment_table, p_entity_id )
-
     local renderer = terrain.models[p_entity_id]['renderer']
 
 	renderer:set_shaderrealvector( p_pass_id, 'ambient_color', p_environment_table.ambient_light.r, p_environment_table.ambient_light.g, p_environment_table.ambient_light.b, p_environment_table.ambient_light.a )
@@ -139,15 +137,12 @@ terrain.update_lit_from_scene_env = function( p_pass_id, p_environment_table, p_
 		
 	renderer:set_shaderrealvector( p_pass_id, 'reflectorPos', p_environment_table.reflector_pos.x, p_environment_table.reflector_pos.y, p_environment_table.reflector_pos.z, 1.0 )
 	renderer:set_shaderrealvector( p_pass_id, 'reflectorNormale', p_environment_table.reflector_normale.x, p_environment_table.reflector_normale.y, p_environment_table.reflector_normale.z, 1.0 )
+
+	commons.apply_material( terrain.lit_material, renderer, p_pass_id)
 end
 
-terrain.update_flatcolor_from_scene_env = function( p_pass_id, p_environment_table, p_entity_id )
 
-    local renderer = terrain.models[p_entity_id]['renderer']
-	renderer:set_shaderrealvector( p_pass_id, 'color', 1.0, 1.0, 1.0, 1.0 )
-end
-
-terrain.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings, p_parent_entity_id)
+terrain.createmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings, p_parent_entity_id)
   
   local entity
   local renderer
@@ -162,33 +157,6 @@ terrain.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id,
   body:configure_mode(COLLIDER_MODE)
 
   p_entitygraph:add_child(p_parent_entity_id,p_entity_id,entity)
-
-  for k, v in pairs(p_passes_bindings) do
-    commons.apply_material( terrain.lit_material, renderer, v)
-  end
-
-  local pair = { ['entity'] = entity, ['renderer'] = renderer, ['body'] = body }
-
-  terrain.models[p_entity_id] = pair
-  return entity
-end
-
-terrain.createflatcolormodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings, p_parent_entity_id)
-  
-  local entity
-  local renderer
-
-  entity, renderer = commons.create_rendered_meshe(terrain.rendering_config, 'land2.ac', 'wavefront obj', p_passes_bindings)
-  renderer:register_to_rendering(p_rendergraph)
-
-  entity:add_aspect(BODY_ASPECT)
-  local body=Body()
-  body:attach_toentity(entity)
-  body:configure_shape(SHAPE_MESHE, 'land2.ac', 'wavefront obj')
-  body:configure_mode(COLLIDER_MODE)
-
-  p_entitygraph:add_child(p_parent_entity_id,p_entity_id,entity)
-
 
   local pair = { ['entity'] = entity, ['renderer'] = renderer, ['body'] = body }
 
@@ -243,7 +211,7 @@ terrain.view.unload = function(p_entity_id)
   end
 end
 
-terrain.view.load = function(p_entity_id, p_passes_bindings, p_parent_entity_id)
+terrain.view.load = function(p_entity_id, p_passes_config, p_parent_entity_id)
 
   local found_id = FALSE
   for k, v in pairs(terrain.models) do
@@ -256,25 +224,8 @@ terrain.view.load = function(p_entity_id, p_passes_bindings, p_parent_entity_id)
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.load('terrain model', terrain.createlitmodelview, terrain.update_lit_from_scene_env, nil, nil, p_entity_id, p_passes_bindings, p_parent_entity_id)
+    model.view.load('terrain model', terrain.createmodelview, p_passes_config, nil, nil, p_entity_id, p_parent_entity_id)
   end
   
 end
 
-terrain.view.flatcolor.load = function(p_entity_id, p_passes_bindings, p_parent_entity_id)
-
-  local found_id = FALSE
-  for k, v in pairs(terrain.models) do
-
-    if k == p_entity_id then
-	  found_id = TRUE
-	end
-  end
-
-  if found_id == TRUE then
-    g:print('Entity '..p_entity_id..' already exists')
-  else    
-    model.view.load('terrain model', terrain.createflatcolormodelview, terrain.update_flatcolor_from_scene_env, nil, nil, p_entity_id, p_passes_bindings, p_parent_entity_id)
-  end
-
-end

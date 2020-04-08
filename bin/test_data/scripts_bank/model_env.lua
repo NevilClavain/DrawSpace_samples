@@ -9,11 +9,16 @@ model.env.update_entities_shaders = function()
 
   for k, v in pairs(model.entities) do
      
-	-- extract shader update function provided by model
-    local update_entity_shaders_func = v.update_from_scene_env_function
+    local update_entity_shaders_func = v.passes_shaders_update_func
+    for k2, v2 in pairs(update_entity_shaders_func) do
 
-	-- and call it with updated environnment
-	update_entity_shaders_func( 'texture_pass', environment, k )
+      local pass_id = k2
+      local lit_shader_update_func = v2
+      if lit_shader_update_func ~= nil then
+        lit_shader_update_func( pass_id, environment, k)
+      end
+
+    end
   end
 end
 

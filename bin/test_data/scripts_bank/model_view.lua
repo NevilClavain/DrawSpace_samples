@@ -1,12 +1,25 @@
 
 model.view = {}
 
-model.view.load = function(p_modelname, p_modelviewload_function, p_update_from_scene_env_function, p_anims_parameters, p_initial_scale, p_entity_id, p_passes_bindings, p_parent_entity_id)
+model.view.load = function(p_modelname, p_modelviewload_function, p_passes_config, p_anims_parameters, p_initial_scale, p_entity_id, p_parent_entity_id)
 
-  local entity = p_modelviewload_function(rg, eg, p_entity_id, p_passes_bindings, p_parent_entity_id)
+  -- ici on reconstitue le tableau de paires 'rendering_id' -> 'pass_id'
+  local passes_bindings = {}
+  for k, v in pairs(p_passes_config) do
+    local pass_id = k
+    local pass_entry = v
+    passes_bindings[pass_entry.rendering_id] = pass_id
+  end
 
-  for k, v in pairs(p_passes_bindings) do
-    p_update_from_scene_env_function( v, environment, p_entity_id)
+  local entity = p_modelviewload_function(rg, eg, p_entity_id, passes_bindings, p_parent_entity_id)
+
+  -- loop pour execution lit_shader_update_func de chaque entree de p_passes_config
+  for k, v in pairs(p_passes_config) do
+    pass_entry = v
+    pass_id = k
+    if pass_entry.lit_shader_update_func ~= nil then
+      pass_entry.lit_shader_update_func( pass_id, environment, p_entity_id)
+    end
   end
 
   local rotx_deg_angle = 0.0
@@ -59,12 +72,19 @@ model.view.load = function(p_modelname, p_modelviewload_function, p_update_from_
   
   model.transformations[p_entity_id] = transform_entry
 
+  local passes_shaders_update_func = {}
+  for k, v in pairs(p_passes_config) do
+    local pass_id = k
+    local pass_entry = v
+    passes_shaders_update_func[pass_id] = pass_entry.lit_shader_update_func
+  end
+
   local entity_properties_entry =
   {
     ['entity'] = entity,
 	['current_animation_loop'] = -1,
 	['rand_anim_mode'] = FALSE,
-	['update_from_scene_env_function'] = p_update_from_scene_env_function,
+	['passes_shaders_update_func'] = passes_shaders_update_func,
 	['model_classname'] = p_modelname
   }
 
@@ -89,12 +109,32 @@ model.view.load = function(p_modelname, p_modelviewload_function, p_update_from_
   rg:update_renderingqueues()
 end
 
-model.view.loadbody = function(p_modelname, p_modelviewload_function, p_update_from_scene_env_function, p_anims_parameters, p_entity_id, p_bodyinitialpos, p_passes_bindings, p_parent_entity_id)
+model.view.loadbody = function(p_modelname, p_modelviewload_function, p_passes_config, p_anims_parameters, p_entity_id, p_bodyinitialpos, p_parent_entity_id)
 
-  local entity = p_modelviewload_function(rg, eg, p_entity_id, p_bodyinitialpos, p_passes_bindings, p_parent_entity_id)
+  -- ici on reconstitue le tableau de paires 'rendering_id' -> 'pass_id'
+  local passes_bindings = {}
+  for k, v in pairs(p_passes_config) do
+    local pass_id = k
+    local pass_entry = v
+    passes_bindings[pass_entry.rendering_id] = pass_id
+  end
 
-  for k, v in pairs(p_passes_bindings) do
-    p_update_from_scene_env_function( v, environment, p_entity_id)
+  local entity = p_modelviewload_function(rg, eg, p_entity_id, p_bodyinitialpos, passes_bindings, p_parent_entity_id)
+
+  -- loop pour execution lit_shader_update_func de chaque entree de p_passes_config
+  for k, v in pairs(p_passes_config) do
+    pass_entry = v
+    pass_id = k
+    if pass_entry.lit_shader_update_func ~= nil then
+      pass_entry.lit_shader_update_func( pass_id, environment, p_entity_id)
+    end
+  end
+
+  local passes_shaders_update_func = {}
+  for k, v in pairs(p_passes_config) do
+    local pass_id = k
+    local pass_entry = v
+    passes_shaders_update_func[pass_id] = pass_entry.lit_shader_update_func
   end
 
   local entity_properties_entry =
@@ -102,7 +142,7 @@ model.view.loadbody = function(p_modelname, p_modelviewload_function, p_update_f
     ['entity'] = entity,
 	['current_animation_loop'] = -1,
 	['rand_anim_mode'] = FALSE,
-	['update_from_scene_env_function'] = p_update_from_scene_env_function,
+	['passes_shaders_update_func'] = passes_shaders_update_func,
 	['model_classname'] = p_modelname
   }
 
