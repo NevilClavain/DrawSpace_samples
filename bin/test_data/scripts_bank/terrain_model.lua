@@ -141,6 +141,12 @@ terrain.update_lit_from_scene_env = function( p_pass_id, p_environment_table, p_
 	commons.apply_material( terrain.lit_material, renderer, p_pass_id)
 end
 
+terrain.update_flatcolor = function( p_pass_id, p_r, p_g, p_b, p_a, p_entity_id )
+
+    local renderer = terrain.models[p_entity_id]['renderer']
+    renderer:set_shaderrealvector( p_pass_id, 'color', p_r, p_g, p_b, p_a )
+end
+
 
 terrain.createmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings, p_parent_entity_id)
   

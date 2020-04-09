@@ -112,8 +112,6 @@ function()
   rg:set_viewportquadshaderrealmatrix('transfer_pass', 'view_matrix', view_mat)
   rg:set_viewportquadshaderrealmatrix('transfer_pass', 'pos_matrix', box_mat)
 
-
-
 end)
 
 g:add_keydowncb( "keydown",
@@ -167,11 +165,12 @@ terrain_passes_config =
 {
     texture_pass = 
     {
-        rendering_id = 'lit_rendering',
-        lit_shader_update_func = terrain.update_lit_from_scene_env
+        rendering_id = 'flatcolor_rendering', --'lit_rendering',
+        lit_shader_update_func = nil -- terrain.update_lit_from_scene_env
 	}
 }
 terrain.view.load('terrain', terrain_passes_config, 'root')
+terrain.update_flatcolor( 'texture_pass', 1.0, 0.0, 1.0, 1.0, 'terrain')
 
 boulder_passes_config = 
 {
