@@ -14,7 +14,7 @@
 	--model.move.setpos('raymarch', 0.0, 0.0, 0.0)
 
 	
-	model.env.setbkcolor(0.55,0.55,0.99)
+	model.env.setbkcolor('texture_pass', 0.55,0.55,0.99)
 
 	model.camera.mvt:set_pos(0.0, 0.0, 8.0)
 	model.camera.speed = 3.0

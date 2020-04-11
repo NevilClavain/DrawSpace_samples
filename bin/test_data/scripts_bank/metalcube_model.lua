@@ -59,6 +59,36 @@ metalcube.rendering_config =
 			{ param_name = "fog_color", shader_index = 1, register = 12 }
 		}
 	},
+	flatcolor_rendering =
+	{
+		fx = 
+		{
+			shaders = 
+			{
+				{ path='color.vso',mode=SHADER_COMPILED },
+				{ path='color.pso',mode=SHADER_COMPILED }
+			},
+			rs_in = 
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" }
+			},
+			rs_out =
+			{
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+			}
+		},
+		textures =
+		{
+		},
+		vertex_textures =
+		{
+		},
+		rendering_order = 10000,
+		shaders_params = 
+		{ 
+			{ param_name = "color", shader_index = 1, register = 0 },
+		}	
+	},
 	meshes_loader_params =
 	{
 		normale_generation_mode = NORMALES_AUTO,
@@ -111,6 +141,12 @@ metalcube.update_from_scene_env = function( p_pass_id, p_environment_table, p_en
 	renderer:set_shaderrealvector( p_pass_id, 'reflectorNormale', p_environment_table.reflector_normale.x, p_environment_table.reflector_normale.y, p_environment_table.reflector_normale.z, 1.0 )
 
 	commons.apply_material( metalcube.lit_material, renderer, p_pass_id)
+end
+
+metalcube.update_flatcolor = function( p_pass_id, p_r, p_g, p_b, p_a, p_entity_id )
+
+    local renderer = metalcube.models[p_entity_id]['renderer']
+    renderer:set_shaderrealvector( p_pass_id, 'color', p_r, p_g, p_b, p_a )
 end
 
 metalcube.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_initialpos, p_passes_bindings, p_parent_entity_id)

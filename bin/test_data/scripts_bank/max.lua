@@ -488,7 +488,7 @@ function( layout, widget )
 	model.text = model.text..'model.camera.speed = <speed>\n'
 	model.text = model.text..'model.env.setgravity(<bool>)\n'
 	model.text = model.text..'model.env.setgravitydir(<x>, <y>, <z>)\n'
-	model.text = model.text..'model.env.setbkcolor(<r>, <g>, <b>)\n'
+	model.text = model.text..'model.env.setbkcolor(<pass_id>, <r>, <g>, <b>)\n'
 	model.text = model.text..'model.env.fog.setdensity(<density>)\n'
 	model.text = model.text..'model.env.fog.setcolor(<r>, <g>, <b>)\n'
 	model.text = model.text..'model.env.light.setdir(<x>, <y>, <z>)\n'

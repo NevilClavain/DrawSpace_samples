@@ -11,7 +11,7 @@ container.models = {}
 
 container.rendering_config = 
 { 
-	main_rendering = 
+	flatcolor_rendering = 
 	{
 		fx = 
 		{
@@ -45,7 +45,6 @@ container.rendering_config =
 	{
 		normale_generation_mode = NORMALES_AUTO,
 		tb_generation_mode = TB_AUTO,
-
 															
 		normales_transform = commons.utils.init_matrix( { 
 		                        1, 0,-1, 0,
@@ -61,11 +60,10 @@ container.scale =
 	x = 30.0, y = 4.0, z = 30.0
 }
 
-container.update_from_scene_env = function( p_pass_id, p_environment_table, p_entity_id )
+container.update_flatcolor = function( p_pass_id, p_r, p_g, p_b, p_a, p_entity_id )
 
     local renderer = container.models[p_entity_id]['renderer']
-	renderer:set_shaderrealvector( p_pass_id, 'color', 1.0, 0.0, 0.0, 1.0 )
-
+    renderer:set_shaderrealvector( p_pass_id, 'color', p_r, p_g, p_b, p_a )
 end
 
 container.createmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings, p_parent_entity_id)
@@ -106,7 +104,7 @@ end
 container.view.unload = function(p_entity_id)
  
   local found_id = FALSE
-  for k, v in pairs(trex.models) do
+  for k, v in pairs(container.models) do
 
     if k == p_entity_id then
 	  found_id = TRUE

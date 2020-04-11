@@ -16,6 +16,7 @@ g:print(mvt_mod:get_descr().. ' loaded')
 
 commons.init_final_pass(rg, 'final_pass')
 
+
 rg:create_child('final_pass', 'transfer_pass', 0)
 
 rg:create_pass_viewportquad('transfer_pass')
@@ -41,10 +42,11 @@ transfer_renderconfig=RenderConfig()
 transfer_renderconfig:add_rendercontext(transfer_rendercontext)
 rg:configure_pass_viewportquad_resources('transfer_pass',transfer_renderconfig)
 
-
 rg:create_child('transfer_pass', 'texture_pass', 0)
+rg:create_child('transfer_pass', 'zmask_pass', 1)
 
---rg:create_child('final_pass', 'texture_pass', 0)
+
+
 
 root_entity:add_aspect(PHYSICS_ASPECT)
 
@@ -165,12 +167,17 @@ terrain_passes_config =
 {
     texture_pass = 
     {
-        rendering_id = 'flatcolor_rendering', --'lit_rendering',
-        lit_shader_update_func = nil -- terrain.update_lit_from_scene_env
+        rendering_id = 'lit_rendering',
+        lit_shader_update_func = terrain.update_lit_from_scene_env
+	},
+    zmask_pass = 
+    {
+        rendering_id = 'flatcolor_rendering',
+        lit_shader_update_func = nil
 	}
 }
 terrain.view.load('terrain', terrain_passes_config, 'root')
-terrain.update_flatcolor( 'texture_pass', 1.0, 0.0, 1.0, 1.0, 'terrain')
+terrain.update_flatcolor( 'zmask_pass', 0.0, 0.0, 0.0, 1.0, 'terrain')
 
 boulder_passes_config = 
 {
@@ -178,9 +185,15 @@ boulder_passes_config =
     {
         rendering_id = 'lit_rendering',
         lit_shader_update_func = boulder.update_lit_from_scene_env
+	},
+    zmask_pass = 
+    {
+        rendering_id = 'flatcolor_rendering',
+        lit_shader_update_func = nil
 	}
 }
 boulder.view.load('rock', {x = 20.0, y = -3.0, z = 0.0}, boulder_passes_config, 'root' )
+boulder.update_flatcolor( 'zmask_pass', 0.0, 0.0, 0.0, 1.0, 'rock')
 
 spherebump_passes_config = 
 {
@@ -188,9 +201,15 @@ spherebump_passes_config =
     {
         rendering_id = 'lit_rendering',
         lit_shader_update_func = spherebump.update_from_scene_env
+	},
+    zmask_pass = 
+    {
+        rendering_id = 'flatcolor_rendering',
+        lit_shader_update_func = nil
 	}
 }
 spherebump.view.load('s', {x = 10.0, y = 17.0, z = 5.8}, spherebump_passes_config, 'root' )
+spherebump.update_flatcolor( 'zmask_pass', 0.0, 0.0, 0.0, 1.0, 's')
 
 metalcube_passes_config = 
 {
@@ -198,23 +217,32 @@ metalcube_passes_config =
     {
         rendering_id = 'lit_rendering',
         lit_shader_update_func = metalcube.update_from_scene_env
+	},
+    zmask_pass = 
+    {
+        rendering_id = 'flatcolor_rendering',
+        lit_shader_update_func = nil
 	}
 }
 metalcube.view.load('mc', {x = -18.0, y = 5.9, z = -18.8}, metalcube_passes_config, 'root' )
+metalcube.update_flatcolor( 'zmask_pass', 0.0, 0.0, 0.0, 1.0, 'mc')
 
 container_passes_config = 
 {
-    texture_pass = 
+    zmask_pass = 
     {
-        rendering_id = 'main_rendering',
-        lit_shader_update_func = container.update_from_scene_env
+        rendering_id = 'flatcolor_rendering',
+        lit_shader_update_func = nil
 	}
 }
-container.view.load('container', container_passes_config, 'root')
-model.move.setpos('container', 10.0, 6.0, 0.0)
+container.view.load('cont', container_passes_config, 'root')
+container.update_flatcolor( 'zmask_pass', 1.0, 1.0, 1.0, 1.0, 'cont')
+
+model.move.setpos('cont', 10.0, 6.0, 0.0)
 
 model.env.setgravity(1)	
-model.env.setbkcolor(0.55,0.55,0.99)
+model.env.setbkcolor('texture_pass', 0.55,0.55,0.99)
+model.env.setbkcolor('zmask_pass', 0.0, 0.0, 0.0)
 
 model.camera.mvt:set_pos(0.0, 18.0, 25.0)
 

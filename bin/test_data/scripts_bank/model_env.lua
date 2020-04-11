@@ -42,8 +42,8 @@ model.env.setgravitydir = function( p_x, p_y, p_z )
   root_entity:update_gravitydirection( environment.gravity.x, environment.gravity.y, environment.gravity.z )
 end
 
-model.env.setbkcolor = function( p_r, p_g, p_b )
-   rg:set_pass_targetclearcolor('texture_pass', p_r * 255, p_g * 255, p_b * 255)
+model.env.setbkcolor = function( p_pass_id, p_r, p_g, p_b )
+   rg:set_pass_targetclearcolor(p_pass_id, p_r * 255, p_g * 255, p_b * 255)
 end
 
 model.env.fog.setdensity = function(p_density)
