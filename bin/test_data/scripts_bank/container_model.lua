@@ -22,11 +22,13 @@ container.rendering_config =
 			},
 			rs_in = 
 			{
-				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" }		
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" },
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="none" }
 			},
 			rs_out =
 			{
-				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
+				{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" }
 			}
 		},
 		textures =
@@ -57,7 +59,7 @@ container.rendering_config =
 
 container.scale = 
 {
-	x = 30.0, y = 4.0, z = 30.0
+	x = 30.0, y = 6.0, z = 30.0
 }
 
 container.update_flatcolor = function( p_pass_id, p_r, p_g, p_b, p_a, p_entity_id )
