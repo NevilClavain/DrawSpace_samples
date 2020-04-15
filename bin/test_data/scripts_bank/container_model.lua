@@ -59,7 +59,7 @@ container.rendering_config =
 
 container.scale = 
 {
-	x = 30.0, y = 6.0, z = 30.0
+	x = 50.0, y = 18.0, z = 50.0
 }
 
 container.update_flatcolor = function( p_pass_id, p_r, p_g, p_b, p_a, p_entity_id )

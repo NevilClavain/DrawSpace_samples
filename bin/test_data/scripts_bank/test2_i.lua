@@ -6,6 +6,7 @@ include('metalcube_model.lua')
 include('spherebump_model.lua')
 include('container_model.lua')
 
+ctrl_key = FALSE
 
 g:print('Current renderer is '..model.renderer_infos[1]..', '..model.renderer_infos[2]..'x'..model.renderer_infos[3])
 
@@ -58,8 +59,9 @@ camera_width, camera_height, zn, zf = model.camera.entity:read_cameraparams()
 
 g:print('camera params = '..camera_width..' '..camera_height..' '..zn..' '..zf )
 rg:set_viewportquadshaderrealvector('transfer_pass', 'camera_params', camera_width, camera_height, zn, zf)
-rg:set_viewportquadshaderrealvector('transfer_pass', 'container_half_dims', 15.0, 3.0, 15.0, 0.0)
+rg:set_viewportquadshaderrealvector('transfer_pass', 'container_half_dims', 25.0, 9.0, 25.0, 0.0)
 
+container_angle_deg = 0.0
 
 rg:update_renderingqueues()
 
@@ -69,12 +71,20 @@ mouse_right = FALSE
 g:add_mousemovecb( "onmousemove",
 function( xm, ym, dx, dy )  
 
-  local mvt_info = { model.camera.mvt:read() }
-  if mouse_right == FALSE then
-	model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],-dy / 4.0,-dx / 4.0, 0)
+  if ctrl_key == TRUE then
+    container_angle_deg = container_angle_deg + dx
+    model.target = 'cont'
+    model.move.roty()
+    transformations_update(dx)
   else
-	model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,-dx)
+    local mvt_info = { model.camera.mvt:read() }
+    if mouse_right == FALSE then
+  	  model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],-dy / 4.0,-dx / 4.0, 0)
+    else
+	  model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,-dx)
+    end
   end
+
 end)
 
 g:add_mouserightbuttondowncb( "onmouserightbuttondown", 
@@ -103,10 +113,12 @@ function()
 
   -- box positionning in world
   local box_pos = Matrix()
-  box_pos:translation( 10.0, 6.0, 0.0 )
+  box_pos:translation( 0.0, 26.0, 0.0 )
 
   local box_rot = Matrix()
-  box_rot:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(0))
+  box_rot:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(container_angle_deg))
+
+
 
   local box_mat = Matrix()
   box_mat:set_product(box_rot, box_pos)
@@ -131,6 +143,10 @@ function( key )
     local mvt_info = { model.camera.mvt:read() }
 
 	model.camera.mvt:update(-12.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+
+  elseif key == 17 then
+    ctrl_key = TRUE
+
   end
 
 end)
@@ -151,6 +167,9 @@ function( key )
     local mvt_info = { model.camera.mvt:read() }
 
 	model.camera.mvt:update(0.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+
+  elseif key == 17 then
+    ctrl_key = FALSE
      
   end
 end)
@@ -238,18 +257,18 @@ container_passes_config =
 container.view.load('cont', container_passes_config, 'root')
 container.update_flatcolor( 'zmask_pass', 1.0, 1.0, 1.0, 1.0, 'cont')
 
-model.move.setpos('cont', 10.0, 6.0, 0.0)
+model.move.setpos('cont', 0.0, 26.0, 0.0)
 
 model.env.setgravity(1)	
 model.env.setbkcolor('texture_pass', 0.55,0.55,0.99)
 model.env.setbkcolor('zmask_pass', 0.0, 0.0, 0.0)
 
-model.camera.mvt:set_pos(0.0, 18.0, 25.0)
+model.camera.mvt:set_pos(0.0, 68.0, 65.0)
 
 model.env.fog.setdensity(0.03)
 model.env.fog.setcolor(0.55,0.55,0.99)
 
 model.env.light.setstate( TRUE )
-model.env.light.setdir(1.0, -0.2, 0.0)
+model.env.light.setdir(1.0, -0.4, 0.0)
 model.env.ambientlight.setcolor(0.1, 0.1, 0.1)
 
