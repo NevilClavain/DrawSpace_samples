@@ -59,7 +59,7 @@ camera_width, camera_height, zn, zf = model.camera.entity:read_cameraparams()
 
 g:print('camera params = '..camera_width..' '..camera_height..' '..zn..' '..zf )
 rg:set_viewportquadshaderrealvector('transfer_pass', 'camera_params', camera_width, camera_height, zn, zf)
-rg:set_viewportquadshaderrealvector('transfer_pass', 'container_half_dims', 25.0, 12.5, 25.0, 0.0)
+rg:set_viewportquadshaderrealvector('transfer_pass', 'container_half_dims', container.scale.x * 0.5, container.scale.y * 0.5, container.scale.z * 0.5, 0.0)
 
 container_angle_deg = 0.0
 
@@ -113,7 +113,7 @@ function()
 
   -- box positionning in world
   local box_pos = Matrix()
-  box_pos:translation( 0.0, 26.0, 0.0 )
+  box_pos:translation( 0.0, 56.0, 0.0 )
 
   local box_rot = Matrix()
   box_rot:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(container_angle_deg))
@@ -257,7 +257,7 @@ container_passes_config =
 container.view.load('cont', container_passes_config, 'root')
 container.update_flatcolor( 'zmask_pass', 1.0, 1.0, 1.0, 1.0, 'cont')
 
-model.move.setpos('cont', 0.0, 26.0, 0.0)
+model.move.setpos('cont', 0.0, 56.0, 0.0)
 
 model.env.setgravity(1)	
 model.env.setbkcolor('texture_pass', 0.55,0.55,0.99)
