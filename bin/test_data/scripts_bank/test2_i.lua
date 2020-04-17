@@ -59,7 +59,7 @@ camera_width, camera_height, zn, zf = model.camera.entity:read_cameraparams()
 
 g:print('camera params = '..camera_width..' '..camera_height..' '..zn..' '..zf )
 rg:set_viewportquadshaderrealvector('transfer_pass', 'camera_params', camera_width, camera_height, zn, zf)
-rg:set_viewportquadshaderrealvector('transfer_pass', 'container_half_dims', 25.0, 9.0, 25.0, 0.0)
+rg:set_viewportquadshaderrealvector('transfer_pass', 'container_half_dims', 25.0, 12.5, 25.0, 0.0)
 
 container_angle_deg = 0.0
 
