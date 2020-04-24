@@ -46,6 +46,27 @@ rg:configure_pass_viewportquad_resources('transfer_pass',transfer_renderconfig)
 rg:create_child('transfer_pass', 'texture_pass', 0)
 rg:create_child('transfer_pass', 'zmask_pass', 1)
 
+rg:create_child('transfer_pass', 'noise_pass', 2)
+
+rg:create_pass_viewportquad('noise_pass')
+noisepass_rss=RenderStatesSet()
+noisepass_rss:add_renderstate_in(RENDERSTATE_OPE_SETTEXTUREFILTERTYPE, "point")
+noisepass_rss:add_renderstate_out(RENDERSTATE_OPE_SETTEXTUREFILTERTYPE, "linear")
+noise_textures = TexturesSet()
+noise_fxparams = FxParams()
+noise_fxparams:add_shaderfile('noiser.vso',SHADER_COMPILED)
+noise_fxparams:add_shaderfile('noiser.pso',SHADER_COMPILED)
+noise_fxparams:set_renderstatesset(noisepass_rss)
+
+noise_rendercontext = RenderContext('noise_pass')
+noise_rendercontext:add_fxparams(noise_fxparams)
+noise_rendercontext:add_shaderparam("coords", 1, 1)
+
+noise_rendercontext:add_texturesset(noise_textures)
+
+noise_renderconfig=RenderConfig()
+noise_renderconfig:add_rendercontext(noise_rendercontext)
+rg:configure_pass_viewportquad_resources('noise_pass',noise_renderconfig)
 
 
 
@@ -60,6 +81,9 @@ camera_width, camera_height, zn, zf = model.camera.entity:read_cameraparams()
 g:print('camera params = '..camera_width..' '..camera_height..' '..zn..' '..zf )
 rg:set_viewportquadshaderrealvector('transfer_pass', 'camera_params', camera_width, camera_height, zn, zf)
 rg:set_viewportquadshaderrealvector('transfer_pass', 'container_half_dims', container.scale.x * 0.5, container.scale.y * 0.5, container.scale.z * 0.5, 0.0)
+
+
+rg:set_viewportquadshaderrealvector('noise_pass', 'coords', 0.25, 0.25, 0.75, 0.75)
 
 container_angle_deg = 0.0
 

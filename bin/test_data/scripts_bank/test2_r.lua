@@ -16,6 +16,7 @@ g:remove_appruncb('run')
 
 rg:remove_pass('texture_pass')
 rg:remove_pass('zmask_pass')
+rg:remove_pass('noise_pass')
 
 
 rg:release_pass_viewportquad_resources('transfer_pass')
