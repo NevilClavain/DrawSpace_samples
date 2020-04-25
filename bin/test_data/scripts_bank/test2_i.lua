@@ -68,7 +68,8 @@ noise_renderconfig=RenderConfig()
 noise_renderconfig:add_rendercontext(noise_rendercontext)
 rg:configure_pass_viewportquad_resources('noise_pass',noise_renderconfig)
 
-
+rg:set_targettexturedepth('noise_pass', 4)
+--rg:set_pass_targetslice('noise_pass', 4)
 
 root_entity:add_aspect(PHYSICS_ASPECT)
 
