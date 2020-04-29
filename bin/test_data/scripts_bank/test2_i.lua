@@ -46,7 +46,7 @@ rg:configure_pass_viewportquad_resources('transfer_pass',transfer_renderconfig)
 rg:create_child('transfer_pass', 'texture_pass', 0)
 rg:create_child('transfer_pass', 'zmask_pass', 1)
 
-rg:create_child('transfer_pass', 'noise_pass', 2)
+rg:create_child('transfer_pass', 'noise_pass', 2, RENDERPURPOSE_COLOR, RENDERTARGET_GPU, FALSE, 128, 128)
 
 rg:create_pass_viewportquad('noise_pass')
 noisepass_rss=RenderStatesSet()
@@ -68,8 +68,8 @@ noise_renderconfig=RenderConfig()
 noise_renderconfig:add_rendercontext(noise_rendercontext)
 rg:configure_pass_viewportquad_resources('noise_pass',noise_renderconfig)
 
-rg:set_targettexturedepth('noise_pass', 4)
---rg:set_pass_targetslice('noise_pass', 4)
+rg:set_targettexturedepth('noise_pass', 128)
+rg:set_pass_targetslice('noise_pass', 0)
 
 root_entity:add_aspect(PHYSICS_ASPECT)
 
@@ -84,7 +84,7 @@ rg:set_viewportquadshaderrealvector('transfer_pass', 'camera_params', camera_wid
 rg:set_viewportquadshaderrealvector('transfer_pass', 'container_half_dims', container.scale.x * 0.5, container.scale.y * 0.5, container.scale.z * 0.5, 0.0)
 
 
-rg:set_viewportquadshaderrealvector('noise_pass', 'coords', 0.25, 0.25, 0.75, 0.75)
+
 
 container_angle_deg = 0.0
 
@@ -199,10 +199,48 @@ function( key )
   end
 end)
 
+
 g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
 
 g:signal_renderscenebegin("eg")
+
+
+noise_slice = 0
+ready = FALSE
+rg:add_renderpasseventcb("render pass event", 
+function(evt, passid)
+
+   if evt==RENDERINGQUEUE_UPDATED then
+     ready = TRUE
+   end
+
+   if ready==TRUE and evt==RENDERINGQUEUE_PASS_END and passid == 'noise_pass' then
+       
+
+     noise_slice = noise_slice + 1
+
+     if noise_slice < 42 then
+       rg:set_viewportquadshaderrealvector('noise_pass', 'coords', 0.25, 0.25, 0.75, 0.75)
+
+     elseif noise_slice < 84 then
+       rg:set_viewportquadshaderrealvector('noise_pass', 'coords', 0.35, 0.35, 0.65, 0.65)
+
+     else
+       rg:set_viewportquadshaderrealvector('noise_pass', 'coords', 0.45, 0.45, 0.55, 0.55)
+
+     end
+
+     if noise_slice == 128 then
+       rg:disable_pass("noise_pass")
+     else
+       rg:set_pass_targetslice('noise_pass', noise_slice)
+     end
+
+   end   
+end
+)
+
 
 root_entity:configure_world(environment.gravity_state, environment.gravity.x, environment.gravity.y, environment.gravity.z )
 
@@ -287,6 +325,7 @@ model.move.setpos('cont', 0.0, 56.0, 0.0)
 model.env.setgravity(1)	
 model.env.setbkcolor('texture_pass', 0.55,0.55,0.99)
 model.env.setbkcolor('zmask_pass', 0.0, 0.0, 0.0)
+model.env.setbkcolor('noise_pass', 0.0, 0.0, 0.0)
 
 model.camera.mvt:set_pos(0.0, 68.0, 65.0)
 

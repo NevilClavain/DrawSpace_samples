@@ -2,6 +2,8 @@
 
 g:signal_rendersceneend("eg")
 
+rg:remove_renderpasseventcb("render pass event")
+
 
 terrain.view.unload('terrain')
 boulder.view.unload('rock')
@@ -16,7 +18,11 @@ g:remove_appruncb('run')
 
 rg:remove_pass('texture_pass')
 rg:remove_pass('zmask_pass')
+
+rg:release_pass_viewportquad_resources('noise_pass')
+rg:remove_pass_viewportquad('noise_pass')
 rg:remove_pass('noise_pass')
+
 
 
 rg:release_pass_viewportquad_resources('transfer_pass')
