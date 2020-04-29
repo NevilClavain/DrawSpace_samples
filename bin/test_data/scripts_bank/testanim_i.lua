@@ -407,8 +407,9 @@ g:signal_renderscenebegin("eg")
 
 
 rg:add_renderpasseventcb("render pass event", 
-function()
+function(evt, passid)
   --run_anim_loop(main_idle_anim)
+
   run_random_anim_loop()
 
   --dino_entity:set_animationlastkeypose("die long")
