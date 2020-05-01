@@ -195,6 +195,6 @@ skyboxmod.view.load = function(p_entity_id, p_passes_config, p_parent_entity_id)
   if found_id == TRUE then
     g:print('Entity '..p_entity_id..' already exists')
   else
-    model.view.load('continent model', skyboxmod.createmodelview, p_passes_config, nil, {x = 1000.0, y = 1000.0, z = 1000.0}, p_entity_id, p_parent_entity_id)
+    model.view.load('skybox model', skyboxmod.createmodelview, p_passes_config, nil, {x = 1000.0, y = 1000.0, z = 1000.0}, p_entity_id, p_parent_entity_id)
   end  
 end
