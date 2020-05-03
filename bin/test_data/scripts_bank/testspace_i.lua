@@ -14,7 +14,32 @@ g:print(mvt_mod:get_descr().. ' loaded')
 commons.init_final_pass(rg, 'final_pass')
 
 
-rg:create_child('final_pass', 'texture_pass', 0)
+rg:create_child('final_pass', 'transfer_pass', 0)
+
+rg:create_pass_viewportquad('transfer_pass')
+transferpass_rss=RenderStatesSet()
+transferpass_rss:add_renderstate_in(RENDERSTATE_OPE_SETTEXTUREFILTERTYPE, "point")
+transferpass_rss:add_renderstate_out(RENDERSTATE_OPE_SETTEXTUREFILTERTYPE, "linear")
+transfer_textures = TexturesSet()
+transfer_fxparams = FxParams()
+transfer_fxparams:add_shaderfile('transfer2.vso',SHADER_COMPILED)
+transfer_fxparams:add_shaderfile('transfer2.pso',SHADER_COMPILED)
+transfer_fxparams:set_renderstatesset(transferpass_rss)
+
+transfer_rendercontext = RenderContext('transfer_pass')
+transfer_rendercontext:add_fxparams(transfer_fxparams)
+transfer_rendercontext:add_shaderparam("camera_params", 1, 0)
+transfer_rendercontext:add_shaderparam("view_matrix", 1, 1)
+transfer_rendercontext:add_shaderparam("pos_matrix", 1, 5)
+transfer_rendercontext:add_shaderparam("container_ray", 1, 9)
+
+transfer_rendercontext:add_texturesset(transfer_textures)
+
+transfer_renderconfig=RenderConfig()
+transfer_renderconfig:add_rendercontext(transfer_rendercontext)
+rg:configure_pass_viewportquad_resources('transfer_pass',transfer_renderconfig)
+
+rg:create_child('transfer_pass', 'texture_pass', 0)
 
 
 model.createmaincamera(0.0, 0.0, 0.0, mvt_mod)
@@ -24,7 +49,11 @@ eg:set_camera(model.camera.entity)
 camera_width, camera_height, zn, zf = model.camera.entity:read_cameraparams()
 
 g:print('camera params = '..camera_width..' '..camera_height..' '..zn..' '..zf )
+rg:set_viewportquadshaderrealvector('transfer_pass', 'camera_params', camera_width, camera_height, zn, zf)
+rg:set_viewportquadshaderrealvector('transfer_pass', 'container_ray', 1.0, 0.0, 0.0, 0.0)
 
+
+container_angle_deg = 0.0
 
 rg:update_renderingqueues()
 
@@ -62,6 +91,29 @@ function()
 
   local mvt_info = { model.camera.mvt:read() }
   model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+
+  -- inject camera matrix into 
+  local view_mat = Matrix()
+  view_mat:store_entitytransformation(model.camera.entity, TRANSFORMATION_VIEW_MATRIX)
+
+  -- inverse view to get camera matrix
+  view_mat:inverse()
+
+
+  -- sphere positionning in world
+  local sphere_pos = Matrix()
+  sphere_pos:translation( 0.0, 0.0, 0.0 )
+
+  local sphere_rot = Matrix()
+  sphere_rot:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(container_angle_deg))
+
+
+
+  local sphere_mat = Matrix()
+  sphere_mat:set_product(sphere_rot, sphere_pos)
+
+  rg:set_viewportquadshaderrealmatrix('transfer_pass', 'view_matrix', view_mat)
+  rg:set_viewportquadshaderrealmatrix('transfer_pass', 'pos_matrix', sphere_mat)
 
 
 end)
