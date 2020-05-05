@@ -53,7 +53,8 @@ rg:set_viewportquadshaderrealvector('transfer_pass', 'camera_params', camera_wid
 rg:set_viewportquadshaderrealvector('transfer_pass', 'container_ray', 1.0, 0.0, 0.0, 0.0)
 
 
-container_angle_deg = 0.0
+container_angle_y_deg = 0.0
+container_angle_x_deg = 0.0
 
 rg:update_renderingqueues()
 
@@ -64,6 +65,9 @@ g:add_mousemovecb( "onmousemove",
 function( xm, ym, dx, dy )  
 
   if ctrl_key == TRUE then
+
+    container_angle_y_deg = container_angle_y_deg + dx
+    container_angle_x_deg = container_angle_x_deg + dy
 
   else
     local mvt_info = { model.camera.mvt:read() }
@@ -104,13 +108,17 @@ function()
   local sphere_pos = Matrix()
   sphere_pos:translation( 0.0, 0.0, 0.0 )
 
-  local sphere_rot = Matrix()
-  sphere_rot:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(container_angle_deg))
+  local sphere_roty = Matrix()
+  sphere_roty:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(container_angle_y_deg))
 
+  local sphere_rotx = Matrix()
+  sphere_rotx:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(container_angle_x_deg))
 
+  local sphere_mat_rots = Matrix()
+  sphere_mat_rots:set_product(sphere_rotx, sphere_roty)
 
   local sphere_mat = Matrix()
-  sphere_mat:set_product(sphere_rot, sphere_pos)
+  sphere_mat:set_product(sphere_mat_rots, sphere_pos)
 
   rg:set_viewportquadshaderrealmatrix('transfer_pass', 'view_matrix', view_mat)
   rg:set_viewportquadshaderrealmatrix('transfer_pass', 'pos_matrix', sphere_mat)
@@ -170,15 +178,15 @@ g:set_mousecursorcircularmode(TRUE)
 
 g:signal_renderscenebegin("eg")
 
-	spacebox_passes_config = 
+spacebox_passes_config = 
+{
+	texture_pass = 
 	{
-		texture_pass = 
-		{
-			rendering_id = 'layer0_rendering',
-			lit_shader_update_func = nil
-		}
+		rendering_id = 'layer0_rendering',
+		lit_shader_update_func = nil
 	}
-	spaceboxmod.view.load('spacebox0', spacebox_passes_config, 'root')
+}
+spaceboxmod.view.load('spacebox0', spacebox_passes_config, 'root')
 
 
 model.env.setbkcolor('texture_pass', 0.0,0.0,0.0)
