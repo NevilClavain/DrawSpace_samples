@@ -33,7 +33,6 @@ transfer_rendercontext:add_fxparams(transfer_fxparams)
 transfer_rendercontext:add_shaderparam("camera_params", 1, 0)
 transfer_rendercontext:add_shaderparam("view_matrix", 1, 1)
 transfer_rendercontext:add_shaderparam("pos_matrix", 1, 5)
-transfer_rendercontext:add_shaderparam("container_ray", 1, 9)
 transfer_rendercontext:add_shaderparam("resol", 1, 10)
 
 
@@ -54,7 +53,6 @@ camera_width, camera_height, zn, zf = model.camera.entity:read_cameraparams()
 
 g:print('camera params = '..camera_width..' '..camera_height..' '..zn..' '..zf )
 rg:set_viewportquadshaderrealvector('transfer_pass', 'camera_params', camera_width, camera_height, zn, zf)
-rg:set_viewportquadshaderrealvector('transfer_pass', 'container_ray', 1.25, 0.0, 0.0, 0.0)
 rg:set_viewportquadshaderrealvector('transfer_pass', 'resol', renderer_infos[2], renderer_infos[3], 0.0, 0.0)
 
 
