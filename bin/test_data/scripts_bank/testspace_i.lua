@@ -5,6 +5,8 @@ include('spacebox_model.lua')
 ctrl_key = FALSE
 
 g:print('Current renderer is '..model.renderer_infos[1]..', '..model.renderer_infos[2]..'x'..model.renderer_infos[3])
+renderer_infos = {renderer:descr()}
+g:print('Current resolution is '..renderer_infos[2].." "..renderer_infos[3])
 
 
 mvt_mod = Module("mvtmod", "mvts")
@@ -32,6 +34,8 @@ transfer_rendercontext:add_shaderparam("camera_params", 1, 0)
 transfer_rendercontext:add_shaderparam("view_matrix", 1, 1)
 transfer_rendercontext:add_shaderparam("pos_matrix", 1, 5)
 transfer_rendercontext:add_shaderparam("container_ray", 1, 9)
+transfer_rendercontext:add_shaderparam("resol", 1, 10)
+
 
 transfer_rendercontext:add_texturesset(transfer_textures)
 
@@ -51,6 +55,7 @@ camera_width, camera_height, zn, zf = model.camera.entity:read_cameraparams()
 g:print('camera params = '..camera_width..' '..camera_height..' '..zn..' '..zf )
 rg:set_viewportquadshaderrealvector('transfer_pass', 'camera_params', camera_width, camera_height, zn, zf)
 rg:set_viewportquadshaderrealvector('transfer_pass', 'container_ray', 1.0, 0.0, 0.0, 0.0)
+rg:set_viewportquadshaderrealvector('transfer_pass', 'resol', renderer_infos[2], renderer_infos[3], 0.0, 0.0)
 
 
 container_angle_y_deg = 0.0
