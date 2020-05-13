@@ -111,17 +111,24 @@ function()
   local sphere_pos = Matrix()
   sphere_pos:translation( 0.0, 0.0, 0.0 )
 
+  local sphere_scale = Matrix()
+  sphere_scale:scale(1.0, 1.0, 1.0)
+
   local sphere_roty = Matrix()
   sphere_roty:rotation(0.0, 1.0, 0.0, commons.utils.deg_to_rad(container_angle_y_deg))
 
   local sphere_rotx = Matrix()
   sphere_rotx:rotation(1.0, 0.0, 0.0, commons.utils.deg_to_rad(container_angle_x_deg))
 
-  local sphere_mat_rots = Matrix()
-  sphere_mat_rots:set_product(sphere_rotx, sphere_roty)
+  local sphere_mat_1 = Matrix()
+  sphere_mat_1:set_product(sphere_rotx, sphere_roty)
+
+  local sphere_mat_2 = Matrix()
+  sphere_mat_2:set_product(sphere_scale, sphere_mat_1)
+
 
   local sphere_mat = Matrix()
-  sphere_mat:set_product(sphere_mat_rots, sphere_pos)
+  sphere_mat:set_product(sphere_mat_2, sphere_pos)
 
   rg:set_viewportquadshaderrealmatrix('transfer_pass', 'view_matrix', view_mat)
   rg:set_viewportquadshaderrealmatrix('transfer_pass', 'pos_matrix', sphere_mat)
@@ -136,14 +143,14 @@ function( key )
   if key == 81 then 
     local mvt_info = { model.camera.mvt:read() }
 
-	model.camera.mvt:update(12.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	model.camera.mvt:update(5.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
       
   --W key
   elseif key == 87 then
 
     local mvt_info = { model.camera.mvt:read() }
 
-	model.camera.mvt:update(-12.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
+	model.camera.mvt:update(-5.0,mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
   elseif key == 17 then
     ctrl_key = TRUE
