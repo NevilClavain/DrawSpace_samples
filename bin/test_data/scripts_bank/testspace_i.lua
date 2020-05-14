@@ -35,6 +35,20 @@ transfer_rendercontext:add_shaderparam("view_matrix", 1, 1)
 transfer_rendercontext:add_shaderparam("pos_matrix", 1, 5)
 transfer_rendercontext:add_shaderparam("resol", 1, 10)
 
+-- nebulae params creation
+transfer_rendercontext:add_shaderparam("emissioncolor", 1, 11)
+transfer_rendercontext:add_shaderparam("absorptioncolor", 1, 12)
+transfer_rendercontext:add_shaderparam("flags", 1, 13)
+transfer_rendercontext:add_shaderparam("densities", 1, 14)
+transfer_rendercontext:add_shaderparam("rotatey", 1, 15)
+transfer_rendercontext:add_shaderparam("seeds1", 1, 16)
+transfer_rendercontext:add_shaderparam("seeds2", 1, 17)
+transfer_rendercontext:add_shaderparam("pos1", 1, 18)
+transfer_rendercontext:add_shaderparam("pos2", 1, 19)
+transfer_rendercontext:add_shaderparam("pos3", 1, 20)
+
+
+
 
 transfer_rendercontext:add_texturesset(transfer_textures)
 
@@ -54,6 +68,21 @@ camera_width, camera_height, zn, zf = model.camera.entity:read_cameraparams()
 g:print('camera params = '..camera_width..' '..camera_height..' '..zn..' '..zf )
 rg:set_viewportquadshaderrealvector('transfer_pass', 'camera_params', camera_width, camera_height, zn, zf)
 rg:set_viewportquadshaderrealvector('transfer_pass', 'resol', renderer_infos[2], renderer_infos[3], 0.0, 0.0)
+
+-- nebulae params set
+rg:set_viewportquadshaderrealvector('transfer_pass', 'emissioncolor', 0.3, 0.15, 0.0, 0.0)
+rg:set_viewportquadshaderrealvector('transfer_pass', 'absorptioncolor', 0.9, 0.7, 0.15, 0.0)
+rg:set_viewportquadshaderrealvector('transfer_pass', 'flags', 0.0, 0.23, 0.0, 0.0 )
+rg:set_viewportquadshaderrealvector('transfer_pass', 'densities', 9.5, 0.0, 0.0, 0.0 )
+rg:set_viewportquadshaderrealvector('transfer_pass', 'rotatey', 1.0, 0.0, 0.0, 0.0 )
+rg:set_viewportquadshaderrealvector('transfer_pass', 'seeds1', 1088.0, 0.0, 0.0, 0.0 )
+rg:set_viewportquadshaderrealvector('transfer_pass', 'seeds2', 2132.0, 0.0, 0.0, 0.0 )
+rg:set_viewportquadshaderrealvector('transfer_pass', 'pos1', 0.0, 0.0, 0.0, 0.0 )
+rg:set_viewportquadshaderrealvector('transfer_pass', 'pos2', 0.0, 0.0, 0.0, 0.0 )
+rg:set_viewportquadshaderrealvector('transfer_pass', 'pos3', 0.0, 0.0, 0.0, 0.0 )
+
+
+
 
 
 container_angle_y_deg = 0.0
