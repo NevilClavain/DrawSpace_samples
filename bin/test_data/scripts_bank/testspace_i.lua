@@ -81,6 +81,74 @@ rg:set_viewportquadshaderrealvector('transfer_pass', 'pos1', 0.0, 0.0, 0.0, 0.0 
 rg:set_viewportquadshaderrealvector('transfer_pass', 'pos2', 0.0, 0.0, 0.0, 0.0 )
 rg:set_viewportquadshaderrealvector('transfer_pass', 'pos3', 0.0, 0.0, 0.0, 0.0 )
 
+neb_params = 
+{
+    emission_color = 
+    {
+        r = 0.3,
+        g = 0.15,
+        b = 0.0
+	},
+    absorption_color = 
+    {
+        r = 0.9,
+        g = 0.7,
+        b = 0.15
+	},
+    nb_spheres = 0,
+    sphere0_light_intensity = 0.23,
+    densities = 
+    {
+        9.5,
+        0.0,
+        0.0,
+        0.0
+	},
+    seeds =
+    {
+        { 1088, 2132 },
+        { 0, 0 },
+        { 0, 0 },
+        { 0, 0 }
+    },
+
+    twisty = 
+    {
+        1.0,
+        1.0,
+        1.0,
+        1.0
+	},
+
+    positions =
+    {
+        { x = 0.0, y = 0.0, z = 0.0 },
+        { x = 0.0, y = 0.0, z = 0.0 },
+        { x = 0.0, y = 0.0, z = 0.0 }
+	}
+}
+
+neb_update = function()
+
+    rg:set_viewportquadshaderrealvector('transfer_pass', 'emissioncolor', 
+            neb_params.emission_color.r, neb_params.emission_color.g, neb_params.emission_color.b, 0.0)
+
+    rg:set_viewportquadshaderrealvector('transfer_pass', 'absorptioncolor', 
+            neb_params.absorption_color.r, neb_params.absorption_color.g, neb_params.absorption_color.b, 0.0)
+
+    rg:set_viewportquadshaderrealvector('transfer_pass', 'densities', 
+            neb_params.densities[1], neb_params.densities[2], neb_params.densities[3], neb_params.densities[4] )
+
+    rg:set_viewportquadshaderrealvector('transfer_pass', 'flags', neb_params.nb_spheres, neb_params.sphere0_light_intensity, 0.0, 0.0 )
+
+    rg:set_viewportquadshaderrealvector('transfer_pass', 'seeds1', neb_params.seeds[1][1], neb_params.seeds[2][1], neb_params.seeds[3][1], neb_params.seeds[4][1] )
+    rg:set_viewportquadshaderrealvector('transfer_pass', 'seeds2', neb_params.seeds[1][2], neb_params.seeds[2][2], neb_params.seeds[3][2], neb_params.seeds[4][2] )
+
+    rg:set_viewportquadshaderrealvector('transfer_pass', 'rotatey', neb_params.twisty[1], neb_params.twisty[2], neb_params.twisty[3], neb_params.twisty[4] )
+
+
+end
+
 
 
 
