@@ -70,17 +70,6 @@ rg:set_viewportquadshaderrealvector('transfer_pass', 'camera_params', camera_wid
 rg:set_viewportquadshaderrealvector('transfer_pass', 'resol', renderer_infos[2], renderer_infos[3], 0.0, 0.0)
 
 -- nebulae params set
-rg:set_viewportquadshaderrealvector('transfer_pass', 'emissioncolor', 0.3, 0.15, 0.0, 0.0)
-rg:set_viewportquadshaderrealvector('transfer_pass', 'absorptioncolor', 0.9, 0.7, 0.15, 0.0)
-rg:set_viewportquadshaderrealvector('transfer_pass', 'flags', 0.0, 0.23, 0.0, 0.0 )
-rg:set_viewportquadshaderrealvector('transfer_pass', 'densities', 9.5, 0.0, 0.0, 0.0 )
-rg:set_viewportquadshaderrealvector('transfer_pass', 'rotatey', 1.0, 0.0, 0.0, 0.0 )
-rg:set_viewportquadshaderrealvector('transfer_pass', 'seeds1', 1088.0, 0.0, 0.0, 0.0 )
-rg:set_viewportquadshaderrealvector('transfer_pass', 'seeds2', 2132.0, 0.0, 0.0, 0.0 )
-rg:set_viewportquadshaderrealvector('transfer_pass', 'pos1', 0.0, 0.0, 0.0, 0.0 )
-rg:set_viewportquadshaderrealvector('transfer_pass', 'pos2', 0.0, 0.0, 0.0, 0.0 )
-rg:set_viewportquadshaderrealvector('transfer_pass', 'pos3', 0.0, 0.0, 0.0, 0.0 )
-
 neb_params = 
 {
     emission_color = 
@@ -95,21 +84,21 @@ neb_params =
         g = 0.7,
         b = 0.15
 	},
-    nb_spheres = 0,
+    nb_spheres = 3,
     sphere0_light_intensity = 0.23,
     densities = 
     {
         9.5,
-        0.0,
-        0.0,
-        0.0
+        9.7,
+        8.6,
+        11.0
 	},
     seeds =
     {
         { 1088, 2132 },
-        { 0, 0 },
-        { 0, 0 },
-        { 0, 0 }
+        { 345, 54014 },
+        { 47, 12 },
+        { 100234, 899 }
     },
 
     twisty = 
@@ -122,9 +111,9 @@ neb_params =
 
     positions =
     {
-        { x = 0.0, y = 0.0, z = 0.0 },
-        { x = 0.0, y = 0.0, z = 0.0 },
-        { x = 0.0, y = 0.0, z = 0.0 }
+        { x = 0.0, y = 2.0, z = 0.0 },
+        { x = 0.0, y = -2.0, z = 0.0 },
+        { x = 1.4, y = -2.0, z = 0.0 }
 	}
 }
 
@@ -146,12 +135,15 @@ neb_update = function()
 
     rg:set_viewportquadshaderrealvector('transfer_pass', 'rotatey', neb_params.twisty[1], neb_params.twisty[2], neb_params.twisty[3], neb_params.twisty[4] )
 
+    rg:set_viewportquadshaderrealvector('transfer_pass', 'pos1', neb_params.positions[1].x, neb_params.positions[1].y, neb_params.positions[1].z, 0.0 )
+    rg:set_viewportquadshaderrealvector('transfer_pass', 'pos2', neb_params.positions[2].x, neb_params.positions[2].y, neb_params.positions[2].z, 0.0 )
+    rg:set_viewportquadshaderrealvector('transfer_pass', 'pos3', neb_params.positions[3].x, neb_params.positions[3].y, neb_params.positions[3].z, 0.0 )
 
 end
 
 
 
-
+neb_update()
 
 container_angle_y_deg = 0.0
 container_angle_x_deg = 0.0
