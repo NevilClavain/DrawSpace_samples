@@ -82,7 +82,7 @@ neb_params =
     {
         r = 0.9,
         g = 0.7,
-        b = 0.15
+        b = 0.915
 	},
     nb_spheres = 3,
     sphere0_light_intensity = 0.23,
@@ -111,9 +111,9 @@ neb_params =
 
     positions =
     {
-        { x = 0.0, y = 2.0, z = 0.0 },
-        { x = 0.0, y = -2.0, z = 0.0 },
-        { x = 1.4, y = -2.0, z = 0.0 }
+        { x = 0.0, y = 1.0, z = 0.0 },
+        { x = 0.0, y = -1.0, z = 0.0 },
+        { x = 0.7, y = -1.0, z = 0.0 }
 	}
 }
 
@@ -142,6 +142,68 @@ neb_update = function()
 end
 
 
+
+rand_engine=RandomEngine()
+rand_engine:set_seedfromtime()
+
+emission_color_distr=Distribution("uniform_real_distribution", 0.0, 0.3)
+absorption_color_distr=Distribution("uniform_real_distribution", 0.7, 1.0)
+light_intensity_distr=Distribution("uniform_real_distribution", 0.0, 1.0)
+densities_distr=Distribution("uniform_real_distribution", 7.0, 11.0)
+nb_spheres_distr=Distribution("uniform_int_distribution", 0, 3)
+twisty_distr=Distribution("uniform_int_distribution", 0, 1)
+seed_distr=Distribution("uniform_real_distribution", 0.0, 99000.0)
+pos_distr=Distribution("uniform_real_distribution", -10.0, 10.0)
+pos_scale_distr=Distribution("uniform_real_distribution", 1.0, 1.5)
+
+neb_params.emission_color.r = emission_color_distr:generate(rand_engine)
+neb_params.emission_color.g = emission_color_distr:generate(rand_engine)
+neb_params.emission_color.b = emission_color_distr:generate(rand_engine)
+
+neb_params.absorption_color.r = absorption_color_distr:generate(rand_engine)
+neb_params.absorption_color.g = absorption_color_distr:generate(rand_engine)
+neb_params.absorption_color.b = absorption_color_distr:generate(rand_engine)
+
+neb_params.sphere0_light_intensity = light_intensity_distr:generate(rand_engine)
+
+
+
+neb_params.nb_spheres = nb_spheres_distr:generate(rand_engine)
+
+for i = 1, neb_params.nb_spheres + 1, 1 do
+
+  neb_params.densities[i] = densities_distr:generate(rand_engine)
+  neb_params.twisty[i] = twisty_distr:generate(rand_engine)
+
+  neb_params.seeds[i][1] = seed_distr:generate(rand_engine)
+  neb_params.seeds[i][2] = seed_distr:generate(rand_engine)
+
+end
+
+for i = 1, neb_params.nb_spheres, 1 do
+
+  local vec_pos = Vector()
+
+  while vec_pos:get_x() == 0 do
+    vec_pos:set_x(pos_distr:generate(rand_engine))
+  end
+
+  while vec_pos:get_y() == 0 do
+    vec_pos:set_y(pos_distr:generate(rand_engine))
+  end
+
+  while vec_pos:get_z() == 0 do
+    vec_pos:set_z(pos_distr:generate(rand_engine))
+  end
+
+  vec_pos:normalize()
+  vec_pos:scale(pos_scale_distr:generate(rand_engine))
+
+  neb_params.positions[i].x = vec_pos:get_x()
+  neb_params.positions[i].y = vec_pos:get_y()
+  neb_params.positions[i].z = vec_pos:get_z()
+
+end
 
 neb_update()
 
