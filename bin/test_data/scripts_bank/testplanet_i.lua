@@ -536,7 +536,7 @@ text4_renderer=TextRendering()
 text4_renderer:configure(root_entity, "planets_infos", 450, 70, 255, 0, 255, "xxxxxxx")
 
 root_entity:add_aspect(PHYSICS_ASPECT)
-root_entity:configure_world(GRAVITY_DISABLED)
+root_entity:configure_world(GRAVITY_DISABLED, 1.0, 1.0, 1.0)
 
 
 camera_entity, camera_mvt=commons.create_free_camera(0.0, 0.0, 0.0, viewport_width,viewport_height, mvt_mod, "free_camera")
