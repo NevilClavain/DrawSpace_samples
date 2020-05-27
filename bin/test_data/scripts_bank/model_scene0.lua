@@ -5,7 +5,7 @@
 	include('trex_model.lua')
 	include('metalcube_model.lua')
     include('spherebump_model.lua')
-	include('skyboxmod_model.lua')
+	include('skydome_model.lua')
 	include('boulder_model.lua')
 	
 	
@@ -19,6 +19,7 @@
 	}	
 	continent.view.load('continent', continent_passes_config, 'root')
 	
+--[[
 	raptor_passes_config = 
 	{
 		texture_pass = 
@@ -73,23 +74,29 @@
 		}
 	}
 	boulder.view.load('rock', {x = -4010.0, y = 0.0, z = -2740.0}, boulder_passes_config, 'root' )
+	]]
 
-	skybox_passes_config = 
+
+	skydome_passes_config = 
 	{
 		texture_pass = 
 		{
-			rendering_id = 'layer0_rendering',
+			rendering_id = 'wireframe_rendering',
 			lit_shader_update_func = nil
 		}
 	}
-	skyboxmod.view.load('skybox0', skybox_passes_config, 'root')
-	
+	skydome.view.load('dome', skydome_passes_config, 'root')
+	model.move.setpos('dome', 0.0, 0.0, 0.0)
+	--model.move.setscalexyz('dome', 7000000.0)
+
 	model.env.setgravity(1)
 	
-	model.env.setbkcolor('texture_pass', 0.55,0.55,0.99)
+	model.env.setbkcolor('texture_pass', 0.05,0.05,0.09)
 
 	model.camera.mvt:set_pos(-4000.0, 15.0, -2684.0)
 
 	model.env.light.setstate( TRUE )
 	model.env.light.setdir(1.0, -0.2, 0.0)
 	model.env.ambientlight.setcolor(0.1, 0.1, 0.1)
+
+	skydome.update_flatcolor('texture_pass', 1.0, 0.0, 0.0, 1.0, 'dome' )
