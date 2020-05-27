@@ -25,9 +25,11 @@ skyboxmod.layers =
 				},
 				rs_in = 
 				{
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
 				},
 				rs_out =
 				{
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
 				}		
 			},
 			textures =
@@ -63,7 +65,7 @@ skyboxmod.layers =
 			shaders_params = 
 			{
 			},
-			rendering_order = 10000
+			rendering_order = 1
 		},
 
 		layer0_mirror_rendering =	
@@ -77,7 +79,7 @@ skyboxmod.layers =
 				},
 				rs_in = 
 				{
-					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="true" },
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
 					{ ope=RENDERSTATE_OPE_SETCULLING, value="ccw" },		
 				},
 				rs_out =
@@ -121,7 +123,7 @@ skyboxmod.layers =
 				{ param_name = "reflector_pos", shader_index = 0, register = 24 },
 				{ param_name = "reflector_normale", shader_index = 0, register = 25 },
 			},
-			rendering_order = 10000
+			rendering_order = 1
 		}
 	}
 }
