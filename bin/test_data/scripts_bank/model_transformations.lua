@@ -300,3 +300,13 @@ model.move.setpos = function(p_entity_id, x, y, z)
     model.transformations[p_entity_id]['transform']:update_matrix("pos",model.transformations[p_entity_id]['pos_mat'])
   end
 end
+
+model.move.setscalexyz = function(p_entity_id, s)
+
+  if model.transformations[p_entity_id] ~= nil then
+    model.transformations[p_entity_id]['scale_mat']:set_value(0,0,s) 
+    model.transformations[p_entity_id]['scale_mat']:set_value(1,1,s) 
+    model.transformations[p_entity_id]['scale_mat']:set_value(2,2,s) 
+    model.transformations[p_entity_id]['transform']:update_matrix("scale",model.transformations[p_entity_id]['scale_mat'])
+  end
+end
