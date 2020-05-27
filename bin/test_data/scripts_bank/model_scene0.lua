@@ -81,7 +81,7 @@
 	{
 		texture_pass = 
 		{
-			rendering_id = 'wireframe_rendering',
+			rendering_id = 'main_rendering',
 			lit_shader_update_func = nil
 		}
 	}

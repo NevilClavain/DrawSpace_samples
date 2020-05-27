@@ -8,25 +8,25 @@ skydome.models = {}
 
 skydome.rendering_config = 
 { 
-	wireframe_rendering =
+	main_rendering =
 	{
 		fx = 
 		{
 			shaders = 
 			{
-				{ path='color.vso',mode=SHADER_COMPILED },
-				{ path='color.pso',mode=SHADER_COMPILED }
+				{ path='skydome.vso',mode=SHADER_COMPILED },
+				{ path='skydome.pso',mode=SHADER_COMPILED }
 			},
 			rs_in = 
 			{
 				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
-				{ ope=RENDERSTATE_OPE_SETFILLMODE, value="line" },
+				--{ ope=RENDERSTATE_OPE_SETFILLMODE, value="line" },
 				{ ope=RENDERSTATE_OPE_SETCULLING, value="ccw" }
 			},
 			rs_out =
 			{
 				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
-				{ ope=RENDERSTATE_OPE_SETFILLMODE, value="solid" },
+				--{ ope=RENDERSTATE_OPE_SETFILLMODE, value="solid" },
 				{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" }
 			}
 		},
