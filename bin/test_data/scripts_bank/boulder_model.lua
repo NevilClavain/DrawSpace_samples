@@ -4,8 +4,6 @@ boulder = {}
 boulder.dump = {}
 boulder.view = {}
 
-boulder.view.lit = {}
-
 -- stockage des instances modeles : paire {entity, renderer}
 boulder.models = {}
 
