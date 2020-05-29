@@ -2,6 +2,8 @@
 FALSE=0
 TRUE=1
 
+PI=3.1415927
+
 -- physics
 
 GRAVITY_ENABLED=1
