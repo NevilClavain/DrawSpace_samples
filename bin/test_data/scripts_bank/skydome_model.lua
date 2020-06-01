@@ -39,7 +39,12 @@ skydome.rendering_config =
 		rendering_order = 22,
 		shaders_params = 
 		{ 
-			{ param_name = "color", shader_index = 1, register = 0 },
+			{ param_name = "v_light0_dir",             shader_index = 1, register = 10 },
+			{ param_name = "v_atmo_scattering_flag_0", shader_index = 1, register = 18 },
+			{ param_name = "v_atmo_scattering_flag_1", shader_index = 1, register = 19 },
+			{ param_name = "v_atmo_scattering_flag_2", shader_index = 1, register = 20 },
+			{ param_name = "v_atmo_scattering_flag_3", shader_index = 1, register = 21 },
+			{ param_name = "v_atmo_scattering_flag_4", shader_index = 1, register = 22 },
 		}	
 	},
 	meshes_loader_params =
@@ -67,10 +72,33 @@ skydome.dump.show = function()
    model.dump.show(skydome.dump.entity)
 end
 
-skydome.update_flatcolor = function( p_pass_id, p_r, p_g, p_b, p_a, p_entity_id )
+skydome.skyfromspace_ESun = 8.7
+skydome.skyfromatmo_ESun = 70.0
+skydome.groundfromspace_ESun = 24.0
+skydome.groundfromatmo_ESun = 12.0
+
+skydome.atmoThickness = 160000.0
+skydome.outerRadius = 7000000.0
+skydome.innerRadius = skydome.outerRadius - skydome.atmoThickness
+
+skydome.waveLength_x = 0.650;
+skydome.waveLength_y = 0.570;
+skydome.waveLength_z = 0.475;	
+skydome.km = 0.0010;
+skydome.kr = 0.0033;
+skydome.scaleDepth = 0.25;
+
+skydome.update_from_scene_env = function( p_pass_id, p_environment_table, p_entity_id )
 
     local renderer = skydome.models[p_entity_id]['renderer']
-    renderer:set_shaderrealvector( p_pass_id, 'color', p_r, p_g, p_b, p_a )
+
+	renderer:set_shaderrealvector( p_pass_id, 'v_light0_dir', p_environment_table.light0.direction.x, p_environment_table.light0.direction.y, p_environment_table.light0.direction.z, p_environment_table.light0.direction.w )
+
+    renderer:set_shaderrealvector( p_pass_id, 'v_atmo_scattering_flag_0', skydome.outerRadius, skydome.innerRadius, skydome.outerRadius*skydome.outerRadius, skydome.innerRadius*skydome.innerRadius )
+	renderer:set_shaderrealvector( p_pass_id, 'v_atmo_scattering_flag_1', skydome.scaleDepth, 1.0/skydome.scaleDepth, 1.0 / (skydome.outerRadius - skydome.innerRadius), (1.0 / (skydome.outerRadius - skydome.innerRadius) ) / skydome.scaleDepth  )
+	renderer:set_shaderrealvector( p_pass_id, 'v_atmo_scattering_flag_2', 1.0 / g:pow(skydome.waveLength_x, 4.0), 1.0 / g:pow(skydome.waveLength_y, 4.0), 1.0 / g:pow(skydome.waveLength_z, 4.0), 0 )
+	renderer:set_shaderrealvector( p_pass_id, 'v_atmo_scattering_flag_3', skydome.kr, skydome.km, 4.0 * skydome.kr * PI, 4.0 * skydome.km * PI )
+	renderer:set_shaderrealvector( p_pass_id, 'v_atmo_scattering_flag_4', skydome.skyfromspace_ESun, skydome.skyfromatmo_ESun, skydome.groundfromspace_ESun, skydome.groundfromatmo_ESun )
 end
 
 skydome.createmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings, p_parent_entity_id)
@@ -127,7 +155,7 @@ end
 
 skydome.scale = 
 {
-	x = 7000000.0, y = 7000000.0, z = 7000000.0
+	x = skydome.outerRadius, y = skydome.outerRadius, z = skydome.outerRadius
 }
 
 skydome.view.load = function(p_entity_id, p_passes_config, p_parent_entity_id)
