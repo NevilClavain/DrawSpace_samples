@@ -21,7 +21,7 @@
 
 	model.move.setpos('continent', 0.0, skydome.innerRadius, 0.0)
 	
---[[
+
 	raptor_passes_config = 
 	{
 		texture_pass = 
@@ -31,8 +31,8 @@
 		}
 	}
 	raptor.view.load('r', raptor_passes_config, 'root')
-	model.move.setpos('r', -4040.0, 0, -2740)
-
+	model.move.setpos('r', -4040.0, skydome.innerRadius, -2740)
+--[[
 
 	trex_passes_config = 
 	{
@@ -100,9 +100,9 @@
 	model.camera.mvt:set_pos(-4000.0, skydome.innerRadius + 15.0, -2684.0)
 
 	model.env.light.setstate( TRUE )
-	model.env.light.setdir(1.0, -0.25, 0.0)
+	model.env.light.setdir(1.0, -4.25, 0.0)
 	model.env.ambientlight.setcolor(0.0, 0.0, 0.0)
 
 	--skydome.update_atmoscattering_flags('texture_pass', 'dome' )
 
-	model.camera.speed = 5000.0
+	model.camera.speed = 50.0
