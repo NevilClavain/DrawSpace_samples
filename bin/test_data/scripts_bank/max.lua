@@ -1,6 +1,9 @@
 
 include("model_main.lua")
 
+max_init_cbfunc = nil
+max_apprun_cbfunc = nil
+
 text_x_position = 140
 hmi_mode=FALSE
 
@@ -45,6 +48,10 @@ model.createmaincamera(0.0, 0.0, 0.0, mvt_mod)
 -- ///////////////////////////////
 
 eg:set_camera(model.camera.entity)
+
+
+
+
 
 rg:update_renderingqueues()
 
@@ -274,6 +281,10 @@ function()
   local mvt_info = { model.camera.mvt:read() }
   model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],0,0,0)
 
+  if max_apprun_cbfunc ~= nil then
+    max_apprun_cbfunc()
+  end
+
 end)
 
 g:add_animationeventcb( "onanimationevent",
@@ -300,8 +311,6 @@ function( id, event, animation_name )
      end
   end
 end)
-
-g:signal_renderscenebegin("eg")
 
 root_entity:configure_world(environment.gravity_state, environment.gravity.x, environment.gravity.y, environment.gravity.z )
 
@@ -506,8 +515,6 @@ end)
 g:show_mousecursor(FALSE)
 g:set_mousecursorcircularmode(TRUE)
 
-g:signal_renderscenebegin("eg")
-
 if modelscenefile ~= "" then
   g:print('Loading scene file : '..modelscenefile)
   g:do_file(modelscenefile)
@@ -518,6 +525,12 @@ end
 
 --define how to show dump infos
 model.dump.showcontentfunc = function()
-  g:breakpoint(model.text)
+  
   gui:set_widgettext("max.layout", "Label_Text", model.text)
 end
+
+if max_init_cbfunc ~= nil then
+  max_init_cbfunc()
+end
+
+g:signal_renderscenebegin("eg")

@@ -7,6 +7,21 @@
     include('spherebump_model.lua')
 	include('skydome_model.lua')
 	include('boulder_model.lua')
+
+	nb_frames = 0
+
+	max_init_cbfunc = function()
+
+	  scene0_renderer=TextRendering()
+      scene0_renderer:configure(root_entity, "scene0_text", 280, 200, 255, 0, 255, ".**.")
+      
+    end
+
+	max_apprun_cbfunc = function()
+	  
+	  scene0_renderer:update(280, 200, 255, 0, 0, nb_frames)
+	  nb_frames = nb_frames + 1
+    end
 	
 	
 	continent_passes_config = 
