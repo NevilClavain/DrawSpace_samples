@@ -8,22 +8,26 @@
 	include('skydome_model.lua')
 	include('boulder_model.lua')
 
-	nb_frames = 0
-
-	max_init_cbfunc = function()
-
-	  scene0_renderer=TextRendering()
-      scene0_renderer:configure(root_entity, "scene0_text", 280, 200, 255, 0, 255, ".**.")
-      
-    end
+	
 
 	max_apprun_cbfunc = function()
-	  
-	  scene0_renderer:update(280, 200, 255, 0, 0, nb_frames)
-	  nb_frames = nb_frames + 1
+
+      local normalized_light_dir = Vector(environment.light0.direction.x, environment.light0.direction.y, environment.light0.direction.z, 0.0)
+	  normalized_light_dir:normalize()
+
+	  local y = g:clamp(0.0, 1.0, -normalized_light_dir:get_y())	 
+	  model.env.fog.setdensity(y * 0.0005)
+
+	  local y0 = g:clamp(0.0, 1.0, 2.0 * normalized_light_dir:get_y())
+
+	  raptor.lit_material.light_absorption.r = y0
+	  raptor.lit_material.light_absorption.g = y0
+	  raptor.lit_material.light_absorption.b = y0
+
+	  raptor.update_from_scene_env('texture_pass', environment, 'r')
+
     end
-	
-	
+
 	continent_passes_config = 
 	{
 		texture_pass = 
@@ -115,11 +119,11 @@
 	model.camera.mvt:set_pos(-4000.0, skydome.innerRadius + 15.0, -2684.0)
 
 	model.env.light.setstate( TRUE )
-	model.env.light.setdir(1.0, 0.25, 0.0)
-	model.env.ambientlight.setcolor(0.0, 0.0, 0.0)
+	model.env.light.setdir(1.0, -10.25, 0.0)
+	model.env.ambientlight.setcolor(0.1, 0.1, 0.1)
 
 	--skydome.update_atmoscattering_flags('texture_pass', 'dome' )
 
 	model.camera.speed = 50.0
 
-	model.env.fog.setdensity(0.001)
+	--model.env.fog.setdensity(0.001)
