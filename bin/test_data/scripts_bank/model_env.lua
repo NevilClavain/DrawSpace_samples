@@ -5,6 +5,8 @@ model.env.ambientlight = {}
 model.env.fog = {}
 
 
+model.env.update_entities_shaders_cb = nil
+
 model.env.update_entities_shaders = function()
 
   for k, v in pairs(model.entities) do
@@ -20,6 +22,12 @@ model.env.update_entities_shaders = function()
 
     end
   end
+
+  if model.env.update_entities_shaders_cb ~= nil then
+
+    model.env.update_entities_shaders_cb() -- update_entities_shader event callback
+  end
+
 end
 
 model.env.setgravity = function( p_state )
