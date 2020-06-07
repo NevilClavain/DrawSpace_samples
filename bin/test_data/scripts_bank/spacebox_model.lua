@@ -25,10 +25,12 @@ spaceboxmod.layers =
 				},
 				rs_in = 
 				{
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
 				},
 				rs_out =
 				{
-				}		
+					{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" }
+				}
 			},
 			textures =
 			{
@@ -63,7 +65,7 @@ spaceboxmod.layers =
 			shaders_params = 
 			{
 			},
-			rendering_order = 10000
+			rendering_order = 10
 		}
 	}
 }
