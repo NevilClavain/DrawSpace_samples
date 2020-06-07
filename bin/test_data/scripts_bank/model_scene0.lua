@@ -6,6 +6,7 @@
 	include('metalcube_model.lua')
     include('spherebump_model.lua')
 	include('skydome_model.lua')
+	include('spacebox_model.lua')
 	include('boulder_model.lua')
 
 	
@@ -98,6 +99,7 @@
 	]]
 
 
+	
 	skydome_passes_config = 
 	{
 		texture_pass = 
@@ -107,8 +109,18 @@
 		}
 	}
 	skydome.view.load('dome', skydome_passes_config, 'root')
-	--model.move.setpos('dome', 0.0, -skydome.innerRadius, 0.0)
 	model.move.setpos('dome', 0.0, 0.0, 0.0)
+	
+
+	spacebox_passes_config = 
+    {
+	   texture_pass = 
+	   {
+		   rendering_id = 'layer0_rendering',
+		   lit_shader_update_func = nil
+	   }
+    }
+    spaceboxmod.view.load('spacebox0', spacebox_passes_config, 'root')
 	
 
 	model.env.setgravity(1)
