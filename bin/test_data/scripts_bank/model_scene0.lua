@@ -131,7 +131,10 @@
 	model.camera.mvt:set_pos(-4000.0, skydome.innerRadius + 15.0, -2684.0)
 
 	model.env.light.setstate( TRUE )
-	model.env.light.setdir(1.0, -10.25, 0.0)
+	--model.env.light.setdir(1.0, -10.25, 0.0)
+
+	model.env.light.setsphericaldir(90.0,-60.0)
+
 	model.env.ambientlight.setcolor(0.1, 0.1, 0.1)
 
 	--skydome.update_atmoscattering_flags('texture_pass', 'dome' )

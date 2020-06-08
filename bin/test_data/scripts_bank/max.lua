@@ -501,6 +501,7 @@ function( layout, widget )
 	model.text = model.text..'model.env.fog.setdensity(<density>)\n'
 	model.text = model.text..'model.env.fog.setcolor(<r>, <g>, <b>)\n'
 	model.text = model.text..'model.env.light.setdir(<x>, <y>, <z>)\n'
+    model.text = model.text..'model.env.light.setsphericaldir(<theta>, <phi>)\n'
 	model.text = model.text..'model.env.ambientlight.setcolor(<r>, <g>, <b>)\n'
 	model.text = model.text..'model.env.light.setstate(<bool>)\n'
 	model.text = model.text..'model.env.light.setcolor(<r>, <g>, <b>)\n'
