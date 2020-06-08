@@ -101,9 +101,9 @@ model.env.light.setsphericaldir = function( p_thetadeg, p_phideg )
   local y = g:sin(phi)
   local z = g:cos(phi) * g:sin(theta)
   
-  environment.light0.direction.x = x
-  environment.light0.direction.y = y
-  environment.light0.direction.z = z
+  environment.light0.direction.x = -x
+  environment.light0.direction.y = -y
+  environment.light0.direction.z = -z
 
   model.env.update_entities_shaders()
 end

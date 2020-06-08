@@ -133,7 +133,7 @@
 	model.env.light.setstate( TRUE )
 	--model.env.light.setdir(1.0, -10.25, 0.0)
 
-	model.env.light.setsphericaldir(90.0,-60.0)
+	model.env.light.setsphericaldir(0.0,40.0)
 
 	model.env.ambientlight.setcolor(0.1, 0.1, 0.1)
 
