@@ -56,19 +56,43 @@ eg:set_camera(model.camera.entity)
 rg:update_renderingqueues()
 
 
+light_theta = SyncAngle()
+light_phi = SyncAngle()
+
+light_theta:init_fromtimeaspectof(root_entity, 0.0)
+light_phi:init_fromtimeaspectof(root_entity,0.0)
+
+
+move_light_vector = function(dx, dy)
+		
+  light_theta:inc(dx * 5)
+  light_phi:inc(-dy * 5)
+
+  model.env.light.setsphericaldir(light_theta:get_value(), light_phi:get_value())
+
+end
+
 g:add_mousemovecb( "onmousemove",function( xm, ym, dx, dy )  
 
   if hmi_mode == TRUE then
-    if mouse_left == TRUE then
+    if mouse_left == TRUE and mouse_right == FALSE then
       transformations_update( dx )
+
+    elseif mouse_left == TRUE and mouse_right == TRUE then      
+      move_light_vector(dx, dy)
+
     else
       gui:on_mousemove( xm, ym, dx, dy )
 	end
   else
 
     local mvt_info = { model.camera.mvt:read() }
-    if mouse_left == TRUE then
+    if mouse_left == TRUE and mouse_right == FALSE then
       transformations_update( dx )
+
+    elseif mouse_left == TRUE and mouse_right == TRUE then      
+      move_light_vector(dx, dy)
+
     else
       if mouse_right == FALSE then
 	    model.camera.mvt:update(mvt_info[4],mvt_info[1],mvt_info[2],mvt_info[3],-dy / 4.0,-dx / 4.0, 0)
@@ -84,10 +108,9 @@ end)
 g:add_mouserightbuttondowncb( "onmouserightbuttondown", 
 function( xm, ym )
 
+  mouse_right = TRUE
   if hmi_mode == TRUE then
-    gui:on_mouserightbuttondown()
-  else
-    mouse_right = TRUE
+    gui:on_mouserightbuttondown()    
   end
 
 end)
@@ -95,10 +118,9 @@ end)
 g:add_mouserightbuttonupcb( "onmouserightbuttonup", 
 function( xm, ym )
 
+  mouse_right = FALSE
   if hmi_mode == TRUE then
-    gui:on_mouserightbuttonup()
-  else
-    mouse_right = FALSE
+    gui:on_mouserightbuttonup()    
   end
 end)
 

@@ -94,8 +94,8 @@ end
 
 model.env.light.setsphericaldir = function( p_thetadeg, p_phideg )
 
-  local phi = PI * p_phideg / 180.0
-  local theta = PI * p_thetadeg / 180.0
+  local phi = commons.utils.deg_to_rad(p_phideg)
+  local theta = commons.utils.deg_to_rad(p_thetadeg)
 
   local x = g:cos(phi) * g:cos(theta)
   local y = g:sin(phi)
