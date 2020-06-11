@@ -21,12 +21,18 @@ skydome.rendering_config =
 			{
 				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
 				--{ ope=RENDERSTATE_OPE_SETFILLMODE, value="line" },
+				{ ope=RENDERSTATE_OPE_ALPHABLENDENABLE, value="true" },
+				{ ope=RENDERSTATE_OPE_ALPHABLENDOP, value="add" },
+				{ ope=RENDERSTATE_OPE_ALPHABLENDFUNC, value="always" },
+				{ ope=RENDERSTATE_OPE_ALPHABLENDDEST, value="invsrcalpha" },
+				{ ope=RENDERSTATE_OPE_ALPHABLENDSRC, value="srcalpha" },
 				{ ope=RENDERSTATE_OPE_SETCULLING, value="ccw" }
 			},
 			rs_out =
 			{
 				{ ope=RENDERSTATE_OPE_ENABLEZBUFFER, value="false" },
 				--{ ope=RENDERSTATE_OPE_SETFILLMODE, value="solid" },
+				{ ope=RENDERSTATE_OPE_ALPHABLENDENABLE, value="false" },
 				{ ope=RENDERSTATE_OPE_SETCULLING, value="cw" }
 			}
 		},
