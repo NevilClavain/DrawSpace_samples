@@ -419,6 +419,8 @@ sphere_material =
 
 commons.apply_material(sphere_material, sphere_renderer, 'texture_pass')
 commons.apply_material(sphere_material, sphere_renderer, 'texturemirror_pass')
+sphere_renderer:set_shaderrealvector( 'texture_pass', 'flags2', 0.0, 0.0, 0.0, 0.0 )
+sphere_renderer:set_shaderrealvector( 'texturemirror_pass', 'flags2', 0.0, 0.0, 0.0, 0.0 )
 
 renderers[nb_renderers] = sphere_renderer
 nb_renderers = nb_renderers + 1

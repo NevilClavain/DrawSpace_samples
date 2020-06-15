@@ -59,7 +59,8 @@ trex.rendering_config =
 			{ param_name = "absorption", shader_index = 1, register = 9 },
 			{ param_name = "color", shader_index = 1, register = 10 },
 			{ param_name = "color_source", shader_index = 1, register = 11 },
-			{ param_name = "fog_color", shader_index = 1, register = 12 }
+			{ param_name = "fog_color", shader_index = 1, register = 12 },
+			{ param_name = "flags2", shader_index = 1, register = 13 }
 		}
 	},
 	wireframe_rendering =
@@ -105,7 +106,8 @@ trex.rendering_config =
 			{ param_name = "absorption", shader_index = 1, register = 9 },
 			{ param_name = "color", shader_index = 1, register = 10 },
 			{ param_name = "color_source", shader_index = 1, register = 11 },
-			{ param_name = "fog_color", shader_index = 1, register = 12 }
+			{ param_name = "fog_color", shader_index = 1, register = 12 },
+			{ param_name = "flags2", shader_index = 1, register = 13 }
 		}	
 	},
 
@@ -183,6 +185,10 @@ trex.update_from_scene_env = function( p_pass_id, p_environment_table, p_entity_
 	renderer:set_shaderrealinvector( p_pass_id, 'flags_v', 2, 1.0) --enable skinning animations
 
 	commons.apply_material( trex.lit_material, renderer, p_pass_id)
+
+	-- flag for bump mapping normales inputs
+	renderer:set_shaderrealvector( p_pass_id, 'flags2', 0.0, 0.0, 0.0, 0.0 )
+
 end
 
 trex.createlitmodelview = function(p_rendergraph, p_entitygraph, p_entity_id, p_passes_bindings, p_parent_entity_id)

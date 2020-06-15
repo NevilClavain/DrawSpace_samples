@@ -55,7 +55,8 @@ spherebump.rendering_config =
 			{ param_name = "absorption", shader_index = 1, register = 9 },
 			{ param_name = "color", shader_index = 1, register = 10 },
 			{ param_name = "color_source", shader_index = 1, register = 11 },
-			{ param_name = "fog_color", shader_index = 1, register = 12 }
+			{ param_name = "fog_color", shader_index = 1, register = 12 },
+			{ param_name = "flags2", shader_index = 1, register = 13 }
 		}
 	},
 	flatcolor_rendering =
@@ -139,6 +140,9 @@ spherebump.update_from_scene_env = function( p_pass_id, p_environment_table, p_e
 	renderer:set_shaderrealvector( p_pass_id, 'reflectorNormale', p_environment_table.reflector_normale.x, p_environment_table.reflector_normale.y, p_environment_table.reflector_normale.z, 1.0 )
 
 	commons.apply_material( spherebump.lit_material, renderer, p_pass_id)
+
+	-- flag for bump mapping normales inputs
+	renderer:set_shaderrealvector( p_pass_id, 'flags2', 0.0, 0.0, 0.0, 0.0 )
 
 end
 

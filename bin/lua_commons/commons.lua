@@ -412,6 +412,7 @@ commons.setup_lit_shader_params = function()
 	shaders_params_table[12] = { param_name = "color", shader_index = 1, register = 10 }
 	shaders_params_table[13] = { param_name = "color_source", shader_index = 1, register = 11 }
 	shaders_params_table[14] = { param_name = "fog_color", shader_index = 1, register = 12 }
+	shaders_params_table[15] = { param_name = "flags2", shader_index = 1, register = 13 }
 
 	return shaders_params_table
 end

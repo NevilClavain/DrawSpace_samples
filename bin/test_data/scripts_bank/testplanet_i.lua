@@ -118,6 +118,7 @@ create_sphere = function()
 	}
 
 	commons.apply_material( sphere_material, renderer, 'texture_pass')
+	renderer:set_shaderrealvector( 'texture_pass', 'flags2', 0.0, 0.0, 0.0, 0.0 )
 
 	--return entity,renderer,body
 	return entity,renderer,transform
@@ -226,6 +227,7 @@ create_ship = function()
 	}
 
 	commons.apply_material( ship_material, renderer, 'texture_pass')
+	renderer:set_shaderrealvector( 'texture_pass', 'flags2', 0.0, 0.0, 0.0, 0.0 )
 
 	return entity,renderer,body
 end
