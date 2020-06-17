@@ -133,7 +133,7 @@ raptor.rendering_config =
 
 raptor.lit_material =
 {
-	mask_mode = 1,
+	spec_mask_mode = 1,
 	specular_power = 300.1,
 	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
 	simple_color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },

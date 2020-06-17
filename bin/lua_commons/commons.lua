@@ -494,7 +494,7 @@ commons.apply_material = function(p_material, p_renderer, p_pass_id)
 	local texture_size = 512.0
 	local bump_bias = 0.0
 	local specular_power = 0.0
-	local mask_mode = 0
+	local spec_mask_mode = 0
 
 
 	if p_material['bump_mapping'] ~= nil then
@@ -506,16 +506,16 @@ commons.apply_material = function(p_material, p_renderer, p_pass_id)
 		specular_power = p_material['specular_power']
 	end
 
-	if p_material['mask_mode'] ~= nil then
-		mask_mode = p_material['mask_mode']
+	if p_material['spec_mask_mode'] ~= nil then
+		spec_mask_mode = p_material['spec_mask_mode']
 	end
 
 	--g:print( 'specular_power ='..specular_power )
 	--g:print( 'bump_bias ='..bump_bias )
 	--g:print( 'texture_size ='..texture_size )
-	--g:print( 'mask_mode ='..mask_mode )
+	--g:print( 'spec_mask_mode ='..spec_mask_mode )
 
-	p_renderer:set_shaderrealvector( p_pass_id, 'flags', specular_power, bump_bias, texture_size, mask_mode )
+	p_renderer:set_shaderrealvector( p_pass_id, 'flags', specular_power, bump_bias, texture_size, spec_mask_mode )
 
 	if p_material['color_source'] ~= nil then
 		p_renderer:set_shaderrealvector( p_pass_id, 'color_source', p_material['color_source']['r'], p_material['color_source']['g'], p_material['color_source']['b'], p_material['color_source']['a'] )
