@@ -37,7 +37,9 @@ raptor.rendering_config =
 		{
 			[1] = 
 			{
-				{ path='raptorDif2.png', stage=0 },				
+				{ path='raptorDif2.png', stage=0 },
+				{ path='raptorBump.png', stage=1 },
+				{ path='raptorSpec.png', stage=2 },
 			}
 		},
 		vertex_textures =
@@ -131,12 +133,13 @@ raptor.rendering_config =
 
 raptor.lit_material =
 {
-	--specular_power = 429.0,
+	mask_mode = 1,
+	specular_power = 300.1,
 	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
 	simple_color = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
 	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 	self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
-	--bump_mapping = { texture_size = 1024, bias = 0.193 }
+	bump_mapping = { texture_size = 2048, bias = 0.1 }
 }
 
 raptor.scale = 
