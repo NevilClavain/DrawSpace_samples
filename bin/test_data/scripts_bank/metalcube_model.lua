@@ -33,7 +33,8 @@ metalcube.rendering_config =
 			{
 				{ path='tech_color.jpg', stage=0},
 				{ path='tech_bump.jpg', stage=1},
-				{ path='tech_mask.bmp', stage=2}
+				{ path='tech_spec_mask.bmp', stage=2},
+				{ path='tech_self_em_mask.jpg', stage=3}
 			}
 		},
 		vertex_textures =
@@ -104,7 +105,7 @@ metalcube.lit_material =
 	color_source = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
 	simple_color = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
 	light_absorption = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
-	self_emissive = { r = 0.0, g = 0.0, b = 0.0, a = 0.0 },
+	self_emissive = { r = 1.0, g = 0.0, b = 0.0, a = 0.0 },
 	bump_mapping = { texture_size = 2800, bias = 0.1 }
 }
 
