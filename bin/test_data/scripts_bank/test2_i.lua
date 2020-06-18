@@ -334,5 +334,5 @@ model.env.fog.setcolor(0.55,0.55,0.99)
 
 model.env.light.setstate( TRUE )
 model.env.light.setdir(1.0, -0.4, 0.0)
-model.env.ambientlight.setcolor(0.1, 0.1, 0.1)
+model.env.ambientlight.setcolor(0.0, 0.0, 0.0)
 
