@@ -1,6 +1,4 @@
 
-include("model_main.lua")
-
 max_init_cbfunc = nil
 max_apprun_cbfunc = nil
 

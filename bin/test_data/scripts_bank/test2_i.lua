@@ -1,5 +1,4 @@
 
-include("model_main.lua")
 include('terrain_model.lua')
 include('boulder_model.lua')
 include('metalcube_model.lua')

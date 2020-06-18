@@ -1,5 +1,4 @@
 
-include("model_main.lua")
 include('spacebox_model.lua')
 
 ctrl_key = FALSE
